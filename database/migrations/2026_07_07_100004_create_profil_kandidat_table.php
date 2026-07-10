@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->string('posisi_dilamar');
             $table->string('pendidikan_terakhir');
-            $table->string('no_ktp', 30)->nullable();
+            $table->string('nik_kandidat', 30)->nullable();
             $table->timestamps();
         });
     }

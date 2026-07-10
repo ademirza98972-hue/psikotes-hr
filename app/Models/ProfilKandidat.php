@@ -14,9 +14,10 @@ class ProfilKandidat extends Model
 
     protected $fillable = [
         'user_id',
+        'nama_kandidat',
         'posisi_dilamar',
         'pendidikan_terakhir',
-        'no_ktp',
+        'nik_kandidat',
     ];
 
     public function pengguna(): BelongsTo

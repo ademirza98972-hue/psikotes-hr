@@ -7,7 +7,7 @@
             Anda terdaftar sebagai
             <span class="font-medium text-[#2C5F6F]">{{ ucfirst($pengguna->tipe_akun ?? '') }}</span>.
             @if ($pengguna->status === 'menunggu_verifikasi')
-                <span class="mt-2 inline-block rounded-md bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">Akun menunggu verifikasi HR</span>
+                <span class="mt-2 inline-block rounded-md bg-amber-500 px-2 py-0.5 text-xs font-medium text-white">Akun menunggu verifikasi HR</span>
             @endif
         </p>
 

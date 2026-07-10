@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -45,6 +46,11 @@ class User extends Authenticatable
     public function profilKaryawan(): HasOne
     {
         return $this->hasOne(ProfilKaryawan::class, 'user_id', 'id');
+    }
+
+    public function dataKaryawan(): HasOneThrough
+    {
+        return $this->hasOneThrough(DataKaryawan::class, ProfilKaryawan::class, 'user_id', 'id', 'id', 'data_karyawan_id');
     }
 
     public function hasIzin(string $kodeIzin): bool

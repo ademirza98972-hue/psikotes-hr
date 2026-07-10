@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Models\DataKaryawan;
+use App\Models\Departemen;
 use App\Models\Peran;
 use App\Models\ProfilKandidat;
 use App\Models\ProfilKaryawan;
 use App\Models\User;
+use App\Models\Posisi;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +28,15 @@ class AutentikasiController extends Controller
     public function login(LoginRequest $request): RedirectResponse
     {
         $kredensial = $request->only('email', 'password');
+
+        $user = User::where('email', $kredensial['email'])->first();
+
+        if ($user && Hash::check($kredensial['password'], $user->password) && $user->status === 'nonaktif') {
+            return back()
+                ->withInput($request->only('email', 'ingat_saya'))
+                ->withErrors(['email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Admin/HR.']);
+        }
+
         $kredensial['status'] = 'aktif';
 
         if (! Auth::attempt($kredensial, $request->boolean('ingat_saya'))) {
@@ -40,13 +52,31 @@ class AutentikasiController extends Controller
 
     public function tampilkanRegister(): View
     {
-        return view('auth.register');
+        $departemen = Departemen::orderBy('nama_departemen')->get();
+        $posisi = Posisi::with('departemen')->orderBy('departemen_id')->orderBy('nama_posisi')->get();
+        return view('auth.register', compact('departemen', 'posisi'));
     }
 
     public function register(RegisterRequest $request): RedirectResponse
     {
         $data = $request->validated();
         $tipeAkun = $data['tipe_akun'];
+
+        if ($tipeAkun === 'karyawan') {
+            $dataMaster = DataKaryawan::where('nik_karyawan', $data['nik_karyawan'])->first();
+
+            if (! $dataMaster || strcasecmp($dataMaster->nama_karyawan, $data['name']) !== 0) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['nik_karyawan' => 'NIK dan nama tidak ditemukan pada data karyawan terdaftar. Silakan hubungi HR.']);
+            }
+
+            if ($dataMaster->status === 'sudah_terpakai') {
+                return back()
+                    ->withInput()
+                    ->withErrors(['nik_karyawan' => 'NIK ini sudah terdaftar sebelumnya.']);
+            }
+        }
 
         $peran = Peran::where('nama_peran', ucfirst($tipeAkun))->first();
 
@@ -57,6 +87,8 @@ class AutentikasiController extends Controller
         }
 
         DB::transaction(function () use ($data, $peran, $tipeAkun) {
+            $statusUser = $tipeAkun === 'karyawan' ? 'aktif' : 'menunggu_verifikasi';
+
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -64,23 +96,32 @@ class AutentikasiController extends Controller
                 'no_hp' => $data['no_hp'],
                 'tipe_akun' => $tipeAkun,
                 'peran_id' => $peran->id,
-                'status' => 'menunggu_verifikasi',
+                'status' => $statusUser,
             ]);
 
             if ($tipeAkun === 'kandidat') {
                 ProfilKandidat::create([
                     'user_id' => $user->id,
+                    'nama_kandidat' => $data['name'],
                     'posisi_dilamar' => $data['posisi_dilamar'],
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],
-                    'no_ktp' => $data['no_ktp'] ?? null,
+                    'nik_kandidat' => $data['nik_kandidat'] ?? null,
                 ]);
-            } else {
+            } elseif ($tipeAkun === 'karyawan') {
+                $dataMaster = DataKaryawan::where('nik_karyawan', $data['nik_karyawan'])
+                    ->lockForUpdate()
+                    ->first();
+
                 ProfilKaryawan::create([
                     'user_id' => $user->id,
-                    'nik' => $data['nik'],
-                    'departemen' => $data['departemen'],
-                    'jabatan' => $data['jabatan'] ?? null,
+                    'data_karyawan_id' => $dataMaster->id,
+                    'nama_karyawan' => $dataMaster->nama_karyawan,
+                    'nik_karyawan' => $dataMaster->nik_karyawan,
+                    'departemen' => $dataMaster->departemen,
+                    'jabatan' => $dataMaster->jabatan,
                 ]);
+
+                $dataMaster->update(['status' => 'sudah_terpakai']);
             }
         });
 

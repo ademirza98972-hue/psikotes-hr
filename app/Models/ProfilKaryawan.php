@@ -14,7 +14,9 @@ class ProfilKaryawan extends Model
 
     protected $fillable = [
         'user_id',
-        'nik',
+        'data_karyawan_id',
+        'nama_karyawan',
+        'nik_karyawan',
         'departemen',
         'jabatan',
     ];
@@ -22,5 +24,10 @@ class ProfilKaryawan extends Model
     public function pengguna(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function dataKaryawan(): BelongsTo
+    {
+        return $this->belongsTo(DataKaryawan::class, 'data_karyawan_id', 'id');
     }
 }

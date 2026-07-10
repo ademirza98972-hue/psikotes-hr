@@ -27,7 +27,7 @@ class SuperAdminSeeder extends Seeder
                 'name' => 'Super Admin',
                 'password' => Hash::make($password),
                 'no_hp' => null,
-                'tipe_akun' => null,
+                'tipe_akun' => 'custom',
                 'peran_id' => $peranSuperAdmin->id,
                 'status' => 'aktif',
             ]

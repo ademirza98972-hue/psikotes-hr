@@ -138,10 +138,10 @@ role_has_permissions
 - id, role_id, permission_id
 
 candidate_profiles
-- id, user_id, posisi_dilamar, pendidikan_terakhir, no_ktp
+- id, user_id, posisi_dilamar, pendidikan_terakhir, nik_kandidat
 
 employee_profiles
-- id, user_id, nik, departemen, jabatan
+- id, user_id, nik_karyawan, departemen, jabatan
 
 test_categories
 - id, nama_kategori, deskripsi, jenis (kepribadian/kognitif), durasi_menit, urutan

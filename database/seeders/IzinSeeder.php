@@ -10,20 +10,24 @@ class IzinSeeder extends Seeder
     public function run(): void
     {
         $daftarIzin = [
-            ['kode_izin' => 'pengguna.tambah', 'deskripsi' => 'Menambahkan pengguna baru'],
-            ['kode_izin' => 'pengguna.edit', 'deskripsi' => 'Mengubah data pengguna'],
-            ['kode_izin' => 'pengguna.hapus', 'deskripsi' => 'Menghapus pengguna'],
-            ['kode_izin' => 'pengguna.lihat', 'deskripsi' => 'Melihat daftar dan detail pengguna'],
-            ['kode_izin' => 'soal.tambah', 'deskripsi' => 'Menambahkan soal ke bank soal'],
-            ['kode_izin' => 'soal.edit', 'deskripsi' => 'Mengubah soal di bank soal'],
-            ['kode_izin' => 'soal.hapus', 'deskripsi' => 'Menghapus soal dari bank soal'],
-            ['kode_izin' => 'soal.lihat', 'deskripsi' => 'Melihat daftar soal'],
-            ['kode_izin' => 'kategori_tes.kelola', 'deskripsi' => 'Mengelola kategori tes (tambah, ubah, hapus)'],
-            ['kode_izin' => 'hasil_tes.lihat', 'deskripsi' => 'Melihat hasil tes peserta'],
-            ['kode_izin' => 'hasil_tes.review', 'deskripsi' => 'Mereview dan memberi catatan hasil tes'],
-            ['kode_izin' => 'dashboard.lihat', 'deskripsi' => 'Mengakses dashboard admin'],
-            ['kode_izin' => 'peran.kelola', 'deskripsi' => 'Mengelola peran (tambah, ubah, hapus, atur izin di dalamnya)'],
-            ['kode_izin' => 'izin.kelola', 'deskripsi' => 'Mengelola daftar izin sistem'],
+            ['kode_izin' => 'pengguna.tambah', 'deskripsi' => 'Tambah Pengguna'],
+            ['kode_izin' => 'pengguna.edit', 'deskripsi' => 'Edit Pengguna'],
+            ['kode_izin' => 'pengguna.hapus', 'deskripsi' => 'Hapus Pengguna'],
+            ['kode_izin' => 'pengguna.lihat', 'deskripsi' => 'Lihat Pengguna'],
+            ['kode_izin' => 'pengguna.verifikasi', 'deskripsi' => 'Verifikasi Kandidat'],
+            ['kode_izin' => 'soal.tambah', 'deskripsi' => 'Tambah Soal'],
+            ['kode_izin' => 'soal.edit', 'deskripsi' => 'Edit Soal'],
+            ['kode_izin' => 'soal.hapus', 'deskripsi' => 'Hapus Soal'],
+            ['kode_izin' => 'soal.lihat', 'deskripsi' => 'Lihat Soal'],
+            ['kode_izin' => 'kategori_tes.kelola', 'deskripsi' => 'Kelola Kategori Tes'],
+            ['kode_izin' => 'hasil_tes.lihat', 'deskripsi' => 'Lihat Hasil Tes'],
+            ['kode_izin' => 'hasil_tes.review', 'deskripsi' => 'Review Hasil Tes'],
+            ['kode_izin' => 'dashboard.lihat', 'deskripsi' => 'Akses Dashboard'],
+            ['kode_izin' => 'peran.kelola', 'deskripsi' => 'Kelola Peran'],
+            ['kode_izin' => 'izin.kelola', 'deskripsi' => 'Kelola Izin Sistem'],
+            ['kode_izin' => 'data_karyawan.kelola', 'deskripsi' => 'Kelola Data Karyawan'],
+            ['kode_izin' => 'pengguna_admin.kelola', 'deskripsi' => 'Kelola Admin & Staff'],
+            ['kode_izin' => 'master_data.kelola', 'deskripsi' => 'Kelola Master Data Departemen & Posisi'],
         ];
 
         foreach ($daftarIzin as $izin) {

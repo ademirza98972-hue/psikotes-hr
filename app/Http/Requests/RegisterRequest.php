@@ -18,17 +18,15 @@ class RegisterRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
-            'tipe_akun' => ['required', 'in:kandidat,karyawan'],
+            'tipe_akun' => ['required', 'in:kandidat,karyawan,custom'],
         ];
 
         if ($this->input('tipe_akun') === 'kandidat') {
             $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
             $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
-            $aturan['no_ktp'] = ['nullable', 'string', 'max:30'];
+            $aturan['nik_kandidat'] = ['nullable', 'string', 'max:30'];
         } elseif ($this->input('tipe_akun') === 'karyawan') {
-            $aturan['nik'] = ['required', 'string', 'max:30', 'unique:profil_karyawan,nik'];
-            $aturan['departemen'] = ['required', 'string', 'max:255'];
-            $aturan['jabatan'] = ['nullable', 'string', 'max:255'];
+            $aturan['nik_karyawan'] = ['required', 'string', 'max:30'];
         }
 
         return $aturan;
@@ -57,10 +55,8 @@ class RegisterRequest extends FormRequest
             'tipe_akun' => 'tipe akun',
             'posisi_dilamar' => 'posisi yang dilamar',
             'pendidikan_terakhir' => 'pendidikan terakhir',
-            'no_ktp' => 'no KTP',
-            'nik' => 'NIK',
-            'departemen' => 'departemen',
-            'jabatan' => 'jabatan',
+            'nik_kandidat' => 'nik KTP',
+            'nik_karyawan' => 'NIK',
         ];
     }
 }

@@ -8,32 +8,20 @@ class SimpanPenggunaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() && $this->user()->hasIzin('pengguna.tambah');
     }
 
     public function rules(): array
     {
-        $aturan = [
-            'name' => ['required', 'string', 'max:255'],
+        return [
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
-            'tipe_akun' => ['required', 'in:kandidat,karyawan'],
-            'peran_id' => ['required', 'integer', 'exists:peran,id'],
-            'status' => ['required', 'in:aktif,menunggu_verifikasi,nonaktif'],
+            'nik_karyawan' => ['required', 'string', 'max:30', 'unique:profil_karyawan,nik_karyawan'],
+            'nama_karyawan' => ['required', 'string', 'max:255'],
+            'departemen' => ['required', 'integer', 'exists:departemen,id'],
+            'jabatan' => ['nullable', 'integer', 'exists:posisi,id'],
         ];
-
-        if ($this->input('tipe_akun') === 'kandidat') {
-            $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
-            $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
-            $aturan['no_ktp'] = ['nullable', 'string', 'max:30'];
-        } elseif ($this->input('tipe_akun') === 'karyawan') {
-            $aturan['nik'] = ['required', 'string', 'max:30', 'unique:profil_karyawan,nik'];
-            $aturan['departemen'] = ['required', 'string', 'max:255'];
-            $aturan['jabatan'] = ['nullable', 'string', 'max:255'];
-        }
-
-        return $aturan;
     }
 
     public function messages(): array
@@ -53,17 +41,11 @@ class SimpanPenggunaRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama',
             'email' => 'email',
             'password' => 'password',
             'no_hp' => 'no HP',
-            'tipe_akun' => 'tipe akun',
-            'peran_id' => 'peran',
-            'status' => 'status',
-            'posisi_dilamar' => 'posisi yang dilamar',
-            'pendidikan_terakhir' => 'pendidikan terakhir',
-            'no_ktp' => 'no KTP',
-            'nik' => 'NIK',
+            'nik_karyawan' => 'NIK',
+            'nama_karyawan' => 'nama karyawan',
             'departemen' => 'departemen',
             'jabatan' => 'jabatan',
         ];

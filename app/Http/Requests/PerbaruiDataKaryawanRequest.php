@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class PerbaruiDataKaryawanRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $id = $this->route('data_karyawan');
+
+        return [
+            'nik_karyawan' => [
+                'required',
+                'string',
+                'max:30',
+                Rule::unique('data_karyawan', 'nik_karyawan')->ignore($id),
+            ],
+            'nama_karyawan' => ['required', 'string', 'max:255'],
+            'departemen_id' => ['required', 'integer', 'exists:departemen,id'],
+            'posisi_id' => ['nullable', 'integer', 'exists:posisi,id'],
+            'departemen' => ['required', 'string', 'max:255'],
+            'jabatan' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute wajib diisi.',
+            'unique' => ':attribute sudah terdaftar.',
+            'exists' => ':attribute tidak valid.',
+            'max' => ':attribute maksimal :max karakter.',
+            'integer' => ':attribute harus berupa angka.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'nik_karyawan' => 'NIK',
+            'nama_karyawan' => 'nama karyawan',
+            'departemen_id' => 'departemen',
+            'posisi_id' => 'jabatan',
+            'departemen' => 'departemen',
+            'jabatan' => 'jabatan',
+        ];
+    }
+}

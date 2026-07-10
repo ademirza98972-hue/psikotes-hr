@@ -9,7 +9,7 @@ class PerbaruiPenggunaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() && $this->user()->hasIzin('pengguna.edit');
     }
 
     public function rules(): array
@@ -17,28 +17,23 @@ class PerbaruiPenggunaRequest extends FormRequest
         $idPengguna = $this->route('pengguna');
 
         $aturan = [
-            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $idPengguna],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
-            'tipe_akun' => ['required', 'in:kandidat,karyawan'],
-            'peran_id' => ['required', 'integer', 'exists:peran,id'],
-            'status' => ['required', 'in:aktif,menunggu_verifikasi,nonaktif'],
+            'tipe_akun' => ['required', Rule::in(['kandidat', 'karyawan'])],
         ];
 
-        if ($this->input('tipe_akun') === 'kandidat') {
+        $tipe = $this->input('tipe_akun');
+
+        if ($tipe === 'kandidat') {
+            $aturan['nama_kandidat'] = ['required', 'string', 'max:255'];
             $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
             $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
-            $aturan['no_ktp'] = ['nullable', 'string', 'max:30'];
-        } elseif ($this->input('tipe_akun') === 'karyawan') {
-            $aturan['nik'] = [
-                'required',
-                'string',
-                'max:30',
-                Rule::unique('profil_karyawan', 'nik')->whereNot('user_id', $idPengguna),
-            ];
-            $aturan['departemen'] = ['required', 'string', 'max:255'];
-            $aturan['jabatan'] = ['nullable', 'string', 'max:255'];
+            $aturan['nik_kandidat'] = ['nullable', 'string', 'max:30'];
+        } elseif ($tipe === 'karyawan') {
+            $aturan['nama_karyawan'] = ['required', 'string', 'max:255'];
+            $aturan['departemen'] = ['required', 'integer', 'exists:departemen,id'];
+            $aturan['jabatan'] = ['nullable', 'integer', 'exists:posisi,id'];
         }
 
         return $aturan;
@@ -61,17 +56,15 @@ class PerbaruiPenggunaRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama',
             'email' => 'email',
             'password' => 'password',
             'no_hp' => 'no HP',
             'tipe_akun' => 'tipe akun',
-            'peran_id' => 'peran',
-            'status' => 'status',
+            'nama_kandidat' => 'nama kandidat',
             'posisi_dilamar' => 'posisi yang dilamar',
             'pendidikan_terakhir' => 'pendidikan terakhir',
-            'no_ktp' => 'no KTP',
-            'nik' => 'NIK',
+            'nik_kandidat' => 'no KTP',
+            'nama_karyawan' => 'nama karyawan',
             'departemen' => 'departemen',
             'jabatan' => 'jabatan',
         ];

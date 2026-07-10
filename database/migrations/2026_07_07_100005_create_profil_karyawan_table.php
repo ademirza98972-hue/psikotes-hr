@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('profil_karyawan', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
-            $table->string('nik', 30)->unique();
+            $table->string('nik_karyawan', 30)->unique();
             $table->string('departemen');
             $table->string('jabatan')->nullable();
             $table->timestamps();

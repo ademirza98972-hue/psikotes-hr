@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const hiddenDepartemen = document.getElementById('hidden_departemen');
     const hiddenJabatan = document.getElementById('hidden_jabatan');
 
-    const posisiUrl = '{{ route("admin.data-karyawan.posisi.api.daftar", ":deptId") }}'.replace(':deptId', '{departemenId}');
+    const posisiUrl = '{{ str_replace("__DEPT_ID__", "{departemenId}", route("api.posisi.daftar", ["departemen" => "__DEPT_ID__"])) }}';
 
     function syncHiddenFields() {
         const deptText = departemenSelect.options[departemenSelect.selectedIndex]?.text || '';

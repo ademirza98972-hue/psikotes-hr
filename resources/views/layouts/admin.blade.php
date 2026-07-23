@@ -22,6 +22,8 @@
         </div>
 
         <nav class="flex-1 space-y-1 px-3 py-4">
+
+            {{-- GROUP: standalone menu items --}}
             @auth
                 @if(auth()->user()->hasIzin('dashboard.lihat'))
                     <a href="{{ route('admin.dashboard') }}"
@@ -30,13 +32,22 @@
                            'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.dashboard'),
                            'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.dashboard'),
                        ])>
-                        <span class="flex w-5 h-5 items-center justify-center text-lg {{ request()->routeIs('admin.dashboard') ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-200' }}">▦</span> Dashboard
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor" stroke-width="2"
+                             @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.dashboard'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.dashboard')])>
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                        <span>Dashboard</span>
                     </a>
                 @endif
 
+                {{-- GROUP: Manajemen Karyawan --}}
                 @if(auth()->user()->hasIzin('pengguna.lihat') || auth()->user()->hasIzin('data_karyawan.kelola'))
-                    <div class="mt-6 border-t border-white/10 pt-4">
-                        <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Manajemen Karyawan</p>
+                    <div class="pt-4 mt-4 border-t border-white/10">
+                        <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Manajemen Karyawan</p>
 
                         @if(auth()->user()->hasIzin('data_karyawan.kelola'))
                             <a href="{{ route('admin.data-karyawan.index') }}"
@@ -45,7 +56,15 @@
                                    'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.data-karyawan.*'),
                                    'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.data-karyawan.*'),
                                ])>
-                                <span class="flex w-5 h-5 items-center justify-center text-lg {{ request()->routeIs('admin.data-karyawan.*') ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-200' }}">▤</span> Data Karyawan
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2"
+                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.data-karyawan.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.data-karyawan.*')])>
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                <span>Data Karyawan</span>
                             </a>
                         @endif
 
@@ -56,15 +75,23 @@
                                    'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.akun-karyawan.*'),
                                    'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.akun-karyawan.*'),
                                ])>
-                                <span class="flex w-5 h-5 items-center justify-center text-lg {{ request()->routeIs('admin.akun-karyawan.*') ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-200' }}">◉</span> Akun Karyawan
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2"
+                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.akun-karyawan.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.akun-karyawan.*')])>
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="8.5" cy="7" r="4"/>
+                                    <polyline points="17 11 19 13 23 9"/>
+                                </svg>
+                                <span>Akun Karyawan</span>
                             </a>
                         @endif
                     </div>
                 @endif
 
+                {{-- GROUP: Manajemen Kandidat --}}
                 @if(auth()->user()->hasIzin('pengguna.lihat'))
-                    <div class="mt-6 border-t border-white/10 pt-4">
-                        <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Manajemen Kandidat</p>
+                    <div class="pt-4 mt-4 border-t border-white/10">
+                        <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Manajemen Kandidat</p>
 
                         <a href="{{ route('admin.data-kandidat.index') }}"
                            @class([
@@ -72,41 +99,73 @@
                                'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.data-kandidat.*'),
                                'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.data-kandidat.*'),
                            ])>
-                            <span class="flex w-5 h-5 items-center justify-center text-lg {{ request()->routeIs('admin.data-kandidat.*') ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-200' }}">◐</span> Data Kandidat
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor" stroke-width="2"
+                                 @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.data-kandidat.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.data-kandidat.*')])>
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="8.5" cy="7" r="4"/>
+                                <line x1="20" y1="8" x2="20" y2="14"/>
+                                <line x1="23" y1="11" x2="17" y2="11"/>
+                            </svg>
+                            <span>Data Kandidat</span>
                         </a>
                     </div>
                 @endif
 
+                {{-- GROUP: Manajemen Tes --}}
                 @if(auth()->user()->hasIzin('soal.lihat') || auth()->user()->hasIzin('kategori_tes.kelola') || auth()->user()->hasIzin('hasil_tes.lihat'))
-                    <div class="mt-6 border-t border-white/10 pt-4">
-                        <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Manajemen Tes</p>
+                    <div class="pt-4 mt-4 border-t border-white/10">
+                        <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Manajemen Tes</p>
 
                         @if(auth()->user()->hasIzin('soal.lihat'))
                             <a href="#"
                                class="group flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors duration-150 hover:bg-white/5 hover:text-white">
-                                <span class="flex w-5 h-5 items-center justify-center text-lg text-slate-400 group-hover:text-slate-200">✎</span> Kelola Soal
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2"
+                                     class="w-5 h-5 shrink-0 text-slate-400 group-hover:text-slate-200">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <path d="M9 13l2 2 4-4"/>
+                                </svg>
+                                <span>Kelola Soal</span>
                             </a>
                         @endif
 
                         @if(auth()->user()->hasIzin('kategori_tes.kelola'))
                             <a href="#"
                                class="group flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors duration-150 hover:bg-white/5 hover:text-white">
-                                <span class="flex w-5 h-5 items-center justify-center text-lg text-slate-400 group-hover:text-slate-200">▤</span> Kategori Tes
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2"
+                                     class="w-5 h-5 shrink-0 text-slate-400 group-hover:text-slate-200">
+                                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                    <polyline points="2 17 12 22 22 17"/>
+                                    <polyline points="2 12 12 17 22 12"/>
+                                </svg>
+                                <span>Kategori Tes</span>
                             </a>
                         @endif
 
                         @if(auth()->user()->hasIzin('hasil_tes.lihat'))
                             <a href="#"
                                class="group flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors duration-150 hover:bg-white/5 hover:text-white">
-                                <span class="flex w-5 h-5 items-center justify-center text-lg text-slate-400 group-hover:text-slate-200">▣</span> Hasil Tes
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2"
+                                     class="w-5 h-5 shrink-0 text-slate-400 group-hover:text-slate-200">
+                                    <line x1="12" y1="20" x2="12" y2="10"/>
+                                    <line x1="18" y1="20" x2="18" y2="4"/>
+                                    <line x1="6" y1="20" x2="6" y2="16"/>
+                                    <line x1="3" y1="20" x2="21" y2="20"/>
+                                </svg>
+                                <span>Hasil Tes</span>
                             </a>
                         @endif
                     </div>
                 @endif
 
+                {{-- GROUP: Data Master --}}
                 @if(auth()->user()->hasIzin('master_data.kelola'))
-                    <div class="mt-6 border-t border-white/10 pt-4">
-                        <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Data Master</p>
+                    <div class="pt-4 mt-4 border-t border-white/10">
+                        <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Data Master</p>
 
                         <a href="{{ route('admin.departemen.index') }}"
                            @class([
@@ -114,7 +173,18 @@
                                'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.departemen.*'),
                                'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.departemen.*'),
                            ])>
-                            <span class="flex w-5 h-5 items-center justify-center text-lg {{ request()->routeIs('admin.departemen.*') ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-200' }}">▦</span> Departemen
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor" stroke-width="2"
+                                 @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.departemen.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.departemen.*')])>
+                                <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18z"/>
+                                <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>
+                                <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>
+                                <path d="M10 6h4"/>
+                                <path d="M10 10h4"/>
+                                <path d="M10 14h4"/>
+                                <path d="M10 18h4"/>
+                            </svg>
+                            <span>Departemen</span>
                         </a>
                         <a href="{{ route('admin.posisi.index') }}"
                            @class([
@@ -122,14 +192,24 @@
                                'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.posisi.*'),
                                'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.posisi.*'),
                            ])>
-                            <span class="flex w-5 h-5 items-center justify-center text-lg {{ request()->routeIs('admin.posisi.*') ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-200' }}">☷</span> Posisi
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor" stroke-width="2"
+                                 @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.posisi.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.posisi.*')])>
+                                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                                <circle cx="9" cy="10" r="2"/>
+                                <path d="M15 8h2"/>
+                                <path d="M15 12h2"/>
+                                <path d="M7 16h10"/>
+                            </svg>
+                            <span>Posisi</span>
                         </a>
                     </div>
                 @endif
 
+                {{-- GROUP: Pengaturan Sistem --}}
                 @if(auth()->user()->hasIzin('peran.kelola') || auth()->user()->hasIzin('pengguna_admin.kelola'))
-                    <div class="mt-6 border-t border-white/10 pt-4">
-                        <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Pengaturan Sistem</p>
+                    <div class="pt-4 mt-4 border-t border-white/10">
+                        <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Pengaturan Sistem</p>
 
                         @if(auth()->user()->hasIzin('peran.kelola'))
                             <a href="{{ route('admin.peran.index') }}"
@@ -138,7 +218,12 @@
                                    'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.peran.*'),
                                    'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.peran.*'),
                                ])>
-                                <span class="flex w-5 h-5 items-center justify-center text-lg {{ request()->routeIs('admin.peran.*') ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-200' }}">⚙</span> Kelola Peran
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2"
+                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.peran.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.peran.*')])>
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                                <span>Kelola Peran</span>
                             </a>
                         @endif
 
@@ -149,7 +234,15 @@
                                    'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.pengguna-admin.*'),
                                    'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.pengguna-admin.*'),
                                ])>
-                                <span class="flex w-5 h-5 items-center justify-center text-lg {{ request()->routeIs('admin.pengguna-admin.*') ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-200' }}">▣</span> Kelola Admin/Staff
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2"
+                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.pengguna-admin.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.pengguna-admin.*')])>
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                    <path d="M12 11v2"/>
+                                    <circle cx="12" cy="15" r="1"/>
+                                </svg>
+                                <span>Kelola Admin/Staff</span>
                             </a>
                         @endif
                     </div>

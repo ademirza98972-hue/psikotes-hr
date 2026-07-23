@@ -20,14 +20,6 @@
                 <p class="mt-1 text-sm text-slate-500">Kelola akun kandidat yang terdaftar di sistem.</p>
             </div>
             <div class="flex items-center gap-2">
-                <form method="GET" action="{{ route('admin.data-kandidat.index') }}" class="flex items-center gap-2">
-                    <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama / email..."
-                           class="block w-56 rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                    <button type="submit" class="rounded-md bg-slate-700 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">Cari</button>
-                    @if ($kataKunci)
-                        <a href="{{ route('admin.data-kandidat.index') }}" class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Reset</a>
-                    @endif
-                </form>
                 @if (auth()->user()->hasIzin('pengguna.tambah'))
                     <a href="{{ route('admin.data-kandidat.tambah') }}"
                        class="inline-flex items-center rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853]">
@@ -37,11 +29,55 @@
             </div>
         </div>
 
+        {{-- FILTER BAR --}}
+        <form method="GET" action="{{ route('admin.data-kandidat.index') }}" class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-1 flex-wrap items-end gap-2">
+                {{-- Search --}}
+                <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama, email, atau NIK KTP..."
+                    class="block w-56 rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+
+                {{-- Filter Status --}}
+                <select name="status"
+                    class="rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                    <option value="">Semua Status</option>
+                    <option value="menunggu_verifikasi" @if($filterStatus === 'menunggu_verifikasi') selected @endif>Menunggu Verifikasi</option>
+                    <option value="aktif" @if($filterStatus === 'aktif') selected @endif>Aktif</option>
+                    <option value="ditolak" @if($filterStatus === 'ditolak') selected @endif>Ditolak</option>
+                </select>
+
+                {{-- Filter Posisi --}}
+                <select name="posisi"
+                    class="rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                    <option value="">Semua Posisi</option>
+                    @foreach ($semuaPosisi as $p)
+                        <option value="{{ $p->id }}" @if($filterPosisi == $p->id) selected @endif>{{ $p->nama_posisi }}</option>
+                    @endforeach
+                </select>
+
+                <button type="submit" class="rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
+                    Terapkan Filter
+                </button>
+
+                @if ($kataKunci || $filterStatus || $filterPosisi)
+                    <a href="{{ route('admin.data-kandidat.index') }}"
+                        class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300 whitespace-nowrap">
+                        Reset Filter
+                    </a>
+                @endif
+            </div>
+        </form>
+
+        {{-- INDICATOR --}}
+        <div class="mb-2 text-xs text-slate-500">
+            Menampilkan <strong>{{ $kandidat->firstItem() ?? $kandidat->total() }}</strong> dari <strong>{{ $kandidat->total() }}</strong> kandidat
+        </div>
+
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
                 <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                         <th class="px-4 py-3">Nama Kandidat</th>
+                        <th class="px-4 py-3">NIK KTP</th>
                         <th class="px-4 py-3">Email</th>
                         <th class="px-4 py-3">Posisi yang Dilamar</th>
                         <th class="px-4 py-3">Status</th>
@@ -70,6 +106,7 @@
                         @endphp
                         <tr class="hover:bg-slate-50">
                             <td class="px-4 py-3 font-medium text-slate-900">{{ $namaTampil }}</td>
+                            <td class="px-4 py-3 font-mono text-xs text-slate-600">{{ $profil->nik_kandidat ?? '—' }}</td>
                             <td class="px-4 py-3 text-slate-600">{{ $item->email }}</td>
                             <td class="px-4 py-3 text-slate-600">{{ $profil->posisi_dilamar ?? '—' }}</td>
                             <td class="px-4 py-3">
@@ -126,11 +163,17 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-4 py-10 text-center text-sm text-slate-500">
-                                @if ($kataKunci)
-                                    Tidak ada data kandidat yang cocok dengan "<span class="font-medium">{{ $kataKunci }}</span>".
+                            <td colspan="6" class="px-4 py-10 text-center">
+                                @if ($kataKunci || $filterStatus || $filterPosisi)
+                                    <p class="text-sm text-slate-500">Tidak ada data kandidat yang cocok dengan filter aktif.</p>
+                                    <div class="mt-3">
+                                        <a href="{{ route('admin.data-kandidat.index') }}"
+                                            class="inline-block rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">
+                                            Reset Filter
+                                        </a>
+                                    </div>
                                 @else
-                                    Belum ada data kandidat. Klik <span class="font-medium">+ Tambah Kandidat</span> untuk menambahkan.
+                                    <p class="text-sm text-slate-500">Belum ada data kandidat. Klik <span class="font-medium">+ Tambah Kandidat</span> untuk menambahkan.</p>
                                 @endif
                             </td>
                         </tr>

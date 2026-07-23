@@ -23,22 +23,52 @@ class PenggunaController extends Controller
     public function index(Request $request): View
     {
         $kataKunci = $request->input('cari');
+        $filterDepartemenId = $request->input('departemen');
+        $filterPosisiId = $request->input('posisi');
 
-        $pengguna = User::with(['peran', 'profilKaryawan'])
-            ->where('tipe_akun', 'karyawan')
-            ->when($kataKunci, function ($query, $kataKunci) {
-                $query->where(function ($q) use ($kataKunci) {
-                    $q->where('name', 'like', '%' . $kataKunci . '%')
-                        ->orWhere('email', 'like', '%' . $kataKunci . '%');
-                });
-            })
-            ->orderBy('name')
-            ->paginate(15)
-            ->withQueryString();
+        $filterDepartemenNama = $filterDepartemenId
+            ? Departemen::whereKey($filterDepartemenId)->value('nama_departemen')
+            : null;
+        $filterPosisiNama = $filterPosisiId
+            ? Posisi::whereKey($filterPosisiId)->value('nama_posisi')
+            : null;
+
+        $query = User::with(['peran', 'profilKaryawan.dataKaryawan'])
+            ->where('tipe_akun', 'karyawan');
+
+        $query->when($kataKunci, function ($q) use ($kataKunci) {
+            $q->where(function ($inner) use ($kataKunci) {
+                $inner->where('name', 'like', '%' . $kataKunci . '%')
+                    ->orWhere('email', 'like', '%' . $kataKunci . '%')
+                    ->orWhereHas('profilKaryawan', fn ($pq) => $pq->where('nik_karyawan', 'like', '%' . $kataKunci . '%'))
+                    ->orWhereHas('profilKaryawan.dataKaryawan', fn ($dq) => $dq->where('nik_karyawan', 'like', '%' . $kataKunci . '%'));
+            });
+        });
+
+        $query->when($filterDepartemenNama, function ($q) use ($filterDepartemenNama) {
+            $q->whereHas('profilKaryawan', fn ($pq) => $pq->where('departemen', $filterDepartemenNama));
+        });
+
+        $query->when($filterPosisiNama, function ($q) use ($filterPosisiNama) {
+            $q->whereHas('profilKaryawan', fn ($pq) => $pq->where('jabatan', $filterPosisiNama));
+        });
+
+        $pengguna = $query->orderBy('name')->paginate(15)->withQueryString();
+
+        $semuaDepartemen = Departemen::orderBy('nama_departemen')->get();
+        $semuaPosisiQuery = Posisi::orderBy('nama_posisi');
+        if ($filterDepartemenId) {
+            $semuaPosisiQuery->where('departemen_id', $filterDepartemenId);
+        }
+        $semuaPosisi = $semuaPosisiQuery->get();
 
         return view('admin.akun-karyawan.index', [
             'pengguna' => $pengguna,
             'kataKunci' => $kataKunci,
+            'semuaDepartemen' => $semuaDepartemen,
+            'semuaPosisi' => $semuaPosisi,
+            'filterDepartemen' => $filterDepartemenId,
+            'filterPosisi' => $filterPosisiId,
         ]);
     }
 

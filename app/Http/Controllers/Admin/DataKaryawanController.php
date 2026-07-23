@@ -17,6 +17,13 @@ class DataKaryawanController extends Controller
     public function index(Request $request): View
     {
         $kataKunci = $request->input('cari');
+        $filterDepartemen = $request->input('departemen');
+        $filterStatus = $request->input('status');
+
+        $validStatus = ['belum_terpakai', 'sudah_terpakai'];
+        if ($filterStatus !== null && $filterStatus !== '' && ! in_array($filterStatus, $validStatus, true)) {
+            $filterStatus = null;
+        }
 
         $data = DataKaryawan::query()
             ->with(['departemen', 'posisi'])
@@ -26,13 +33,24 @@ class DataKaryawanController extends Controller
                         ->orWhere('nama_karyawan', 'like', '%' . $kataKunci . '%');
                 });
             })
+            ->when($filterDepartemen, function ($query, $filterDepartemen) {
+                $query->where('departemen_id', (int) $filterDepartemen);
+            })
+            ->when($filterStatus, function ($query, $filterStatus) {
+                $query->where('status', $filterStatus);
+            })
             ->orderBy('nama_karyawan')
             ->paginate(15)
             ->withQueryString();
 
+        $semuaDepartemen = Departemen::orderBy('nama_departemen')->get();
+
         return view('admin.data-karyawan.index', [
             'data' => $data,
             'kataKunci' => $kataKunci,
+            'filterDepartemen' => $filterDepartemen,
+            'filterStatus' => $filterStatus,
+            'semuaDepartemen' => $semuaDepartemen,
         ]);
     }
 

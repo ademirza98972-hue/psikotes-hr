@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const departemenSelect = document.getElementById('departemen');
     const posisiSelect = document.getElementById('posisi');
 
-    const posisiUrl = '{{ route("api.posisi.daftar", ":deptId") }}'.replace(':deptId', '{departemenId}');
+    const posisiUrl = '{{ str_replace("__DEPT_ID__", "{departemenId}", route("api.posisi.daftar", ["departemen" => "__DEPT_ID__"])) }}';
 
     departemenSelect.addEventListener('change', function () {
         const deptId = this.value;

@@ -175,13 +175,16 @@
             const ctx = document.getElementById('barPendaftaran');
             if (!ctx) return;
 
+            const chartLabels = @json($labelTanggal);
+            const chartData = @json($pendaftaran7Hari);
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: @json($labelTanggal),
+                    labels: chartLabels,
                     datasets: [{
                         label: 'Pendaftaran',
-                        data: @json($pendaftaran7Hari),
+                        data: chartData,
                         backgroundColor: 'rgba(44, 95, 111, 0.8)',
                         hoverBackgroundColor: 'rgba(44, 95, 111, 1)',
                         borderRadius: 6,

@@ -29,7 +29,11 @@ class PerbaruiPenggunaRequest extends FormRequest
             $aturan['nama_kandidat'] = ['required', 'string', 'max:255'];
             $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
             $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
-            $aturan['nik_kandidat'] = ['nullable', 'string', 'max:30'];
+            $nikKandidat = $this->input('nik_kandidat');
+            $aturan['nik_kandidat'] = [
+                'required', 'string', 'digits:16',
+                Rule::unique('profil_kandidat', 'nik_kandidat')->ignore($idPengguna, 'user_id'),
+            ];
         } elseif ($tipe === 'karyawan') {
             $aturan['nama_karyawan'] = ['required', 'string', 'max:255'];
             $aturan['departemen'] = ['required', 'integer', 'exists:departemen,id'];
@@ -63,7 +67,7 @@ class PerbaruiPenggunaRequest extends FormRequest
             'nama_kandidat' => 'nama kandidat',
             'posisi_dilamar' => 'posisi yang dilamar',
             'pendidikan_terakhir' => 'pendidikan terakhir',
-            'nik_kandidat' => 'no KTP',
+            'nik_kandidat' => 'NIK KTP',
             'nama_karyawan' => 'nama karyawan',
             'departemen' => 'departemen',
             'jabatan' => 'jabatan',

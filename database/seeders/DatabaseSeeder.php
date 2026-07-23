@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             IzinSeeder::class,
             PeranSeeder::class,
             SuperAdminSeeder::class,
+            DummyDataSeeder::class,
         ]);
     }
 }

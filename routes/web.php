@@ -106,8 +106,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('perbarui');
         Route::patch('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('perbarui');
         Route::delete('/{data_karyawan}', [DataKaryawanController::class, 'hapus'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('hapus');
-
-        Route::get('posisi/api/daftar/{departemen}', [\App\Http\Controllers\Admin\PosisiController::class, 'daftarByDepartemen'])->name('admin.data-karyawan.posisi.api.daftar');
     });
 
     Route::prefix('admin/peran')->name('admin.peran.')->group(function () {

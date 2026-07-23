@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PerbaruiKandidatRequest;
 use App\Http\Requests\SimpanKandidatRequest;
+use App\Models\Departemen;
 use App\Models\Peran;
 use App\Models\ProfilKandidat;
+use App\Models\Posisi;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,31 +22,60 @@ class DataKandidatController extends Controller
     public function index(Request $request): View
     {
         $kataKunci = $request->input('cari');
+        $filterStatus = $request->input('status');
+        $filterPosisiId = $request->input('posisi');
 
-        $kandidat = User::with(['profilKandidat'])
-            ->where('tipe_akun', 'kandidat')
-            ->when($kataKunci, function ($query, $kataKunci) {
-                $query->where(function ($q) use ($kataKunci) {
-                    $q->where('name', 'like', '%' . $kataKunci . '%')
-                        ->orWhere('email', 'like', '%' . $kataKunci . '%')
-                        ->orWhereHas('profilKandidat', function ($pk) use ($kataKunci) {
-                            $pk->where('nama_kandidat', 'like', '%' . $kataKunci . '%');
-                        });
-                });
-            })
-            ->orderBy('name')
+        $statusValid = ['menunggu_verifikasi', 'aktif', 'ditolak'];
+        if (! in_array($filterStatus, $statusValid, true)) {
+            $filterStatus = null;
+        }
+
+        $filterPosisiNama = $filterPosisiId
+            ? Posisi::whereKey($filterPosisiId)->value('nama_posisi')
+            : null;
+
+        $query = User::with(['profilKandidat'])
+            ->where('tipe_akun', 'kandidat');
+
+        $query->when($kataKunci, function ($q) use ($kataKunci) {
+            $q->where(function ($inner) use ($kataKunci) {
+                $inner->where('name', 'like', '%' . $kataKunci . '%')
+                    ->orWhere('email', 'like', '%' . $kataKunci . '%')
+                    ->orWhereHas('profilKandidat', function ($pk) use ($kataKunci) {
+                        $pk->where('nama_kandidat', 'like', '%' . $kataKunci . '%')
+                            ->orWhere('nik_kandidat', 'like', '%' . $kataKunci . '%');
+                    });
+            });
+        });
+
+        $query->when($filterStatus, function ($q) use ($filterStatus) {
+            $q->where('status', $filterStatus);
+        });
+
+        $query->when($filterPosisiNama, function ($q) use ($filterPosisiNama) {
+            $q->whereHas('profilKandidat', fn ($pk) => $pk->where('posisi_dilamar', $filterPosisiNama));
+        });
+
+        $kandidat = $query->orderBy('name')
             ->paginate(15)
             ->withQueryString();
+
+        $semuaPosisi = Posisi::orderBy('nama_posisi')->get();
 
         return view('admin.data-kandidat.index', [
             'kandidat' => $kandidat,
             'kataKunci' => $kataKunci,
+            'semuaPosisi' => $semuaPosisi,
+            'filterStatus' => $filterStatus,
+            'filterPosisi' => $filterPosisiId,
         ]);
     }
 
     public function tambah(): View
     {
-        return view('admin.data-kandidat.tambah');
+        $departemen = Departemen::orderBy('nama_departemen')->get();
+
+        return view('admin.data-kandidat.tambah', compact('departemen'));
     }
 
     public function simpan(SimpanKandidatRequest $request): RedirectResponse
@@ -59,7 +90,9 @@ class DataKandidatController extends Controller
                 ->withErrors(['tipe_akun' => 'Peran Kandidat belum tersedia di sistem. Jalankan seeder terlebih dahulu.']);
         }
 
-        DB::transaction(function () use ($data, $peran) {
+        $namaPosisi = Posisi::whereKey($data['posisi_dilamar'])->value('nama_posisi');
+
+        DB::transaction(function () use ($data, $peran, $namaPosisi) {
             $user = User::create([
                 'name' => $data['nama_kandidat'],
                 'email' => $data['email'],
@@ -73,7 +106,7 @@ class DataKandidatController extends Controller
             ProfilKandidat::create([
                 'user_id' => $user->id,
                 'nama_kandidat' => $data['nama_kandidat'],
-                'posisi_dilamar' => $data['posisi_dilamar'],
+                'posisi_dilamar' => $namaPosisi,
                 'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                 'nik_kandidat' => $data['nik_kandidat'] ?? null,
             ]);
@@ -90,9 +123,12 @@ class DataKandidatController extends Controller
 
         abort_unless($kandidat->tipe_akun === 'kandidat', 404);
 
+        $departemen = Departemen::orderBy('nama_departemen')->get();
+
         return view('admin.data-kandidat.ubah', [
             'kandidat' => $kandidat,
             'profilKandidat' => $kandidat->profilKandidat,
+            'departemen' => $departemen,
         ]);
     }
 
@@ -104,7 +140,9 @@ class DataKandidatController extends Controller
 
         $data = $request->validated();
 
-        DB::transaction(function () use ($kandidat, $data) {
+        $namaPosisi = Posisi::whereKey($data['posisi_dilamar'])->value('nama_posisi');
+
+        DB::transaction(function () use ($kandidat, $data, $namaPosisi) {
             $payload = [
                 'name' => $data['nama_kandidat'],
                 'email' => $data['email'],
@@ -121,7 +159,7 @@ class DataKandidatController extends Controller
             if ($profil) {
                 $profil->update([
                     'nama_kandidat' => $data['nama_kandidat'],
-                    'posisi_dilamar' => $data['posisi_dilamar'],
+                    'posisi_dilamar' => $namaPosisi,
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                     'nik_kandidat' => $data['nik_kandidat'] ?? null,
                 ]);

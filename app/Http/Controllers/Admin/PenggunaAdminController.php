@@ -21,6 +21,13 @@ class PenggunaAdminController extends Controller
     public function index(Request $request): View
     {
         $kataKunci = $request->input('cari');
+        $filterPeran = $request->input('peran');
+        $filterStatus = $request->input('status');
+
+        $validStatus = ['aktif', 'nonaktif'];
+        if ($filterStatus !== null && $filterStatus !== '' && ! in_array($filterStatus, $validStatus, true)) {
+            $filterStatus = null;
+        }
 
         $pengguna = User::with('peran')
             ->where('tipe_akun', 'custom')
@@ -33,13 +40,26 @@ class PenggunaAdminController extends Controller
                         ->orWhere('email', 'like', '%' . $kataKunci . '%');
                 });
             })
+            ->when($filterPeran, function ($query, $filterPeran) {
+                $query->where('peran_id', (int) $filterPeran);
+            })
+            ->when($filterStatus, function ($query, $filterStatus) {
+                $query->where('status', $filterStatus);
+            })
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 
+        $semuaPeran = Peran::whereNotIn('nama_peran', self::PERAN_DIKECUALIKAN)
+            ->orderBy('nama_peran')
+            ->get();
+
         return view('admin.pengguna-admin.index', [
             'pengguna' => $pengguna,
             'kataKunci' => $kataKunci,
+            'filterPeran' => $filterPeran,
+            'filterStatus' => $filterStatus,
+            'semuaPeran' => $semuaPeran,
         ]);
     }
 

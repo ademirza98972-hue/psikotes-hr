@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RegisterRequest extends FormRequest
 {
@@ -15,7 +16,13 @@ class RegisterRequest extends FormRequest
     {
         $aturan = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->whereNull('deleted_at'),
+            ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
             'tipe_akun' => ['required', 'in:kandidat,karyawan,custom'],
@@ -24,7 +31,7 @@ class RegisterRequest extends FormRequest
         if ($this->input('tipe_akun') === 'kandidat') {
             $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
             $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
-            $aturan['nik_kandidat'] = ['required', 'string', 'digits:16', 'unique:profil_kandidat,nik_kandidat'];
+            $aturan['nik_kandidat'] = ['required', 'string', 'digits:16'];
         } elseif ($this->input('tipe_akun') === 'karyawan') {
             $aturan['nik_karyawan'] = ['required', 'string', 'max:30'];
         }

@@ -14,10 +14,37 @@ class SimpanDataKaryawanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nik_karyawan' => ['required', 'string', 'max:30', 'unique:data_karyawan,nik_karyawan'],
+            'nik_karyawan' => [
+                'required',
+                'string',
+                'max:30',
+                \Illuminate\Validation\Rule::unique('data_karyawan', 'nik_karyawan')->whereNull('deleted_at'),
+            ],
             'nama_karyawan' => ['required', 'string', 'max:255'],
-            'departemen_id' => ['required', 'integer', 'exists:departemen,id'],
-            'posisi_id' => ['nullable', 'integer', 'exists:posisi,id'],
+            'departemen_id' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    if (!\Illuminate\Support\Facades\DB::table('departemen')
+                        ->whereNull('deleted_at')
+                        ->where('id', $value)
+                        ->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
+            'posisi_id' => [
+                'nullable',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    if (!\Illuminate\Support\Facades\DB::table('posisi')
+                        ->whereNull('deleted_at')
+                        ->where('id', $value)
+                        ->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
             'departemen' => ['required', 'string', 'max:255'],
             'jabatan' => ['nullable', 'string', 'max:255'],
         ];

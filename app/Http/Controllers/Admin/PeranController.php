@@ -16,12 +16,21 @@ class PeranController extends Controller
     protected const SUPER_ADMIN = 'Super Admin';
     protected const IZIN_WAJIB_SUPER_ADMIN = ['peran.kelola', 'izin.kelola'];
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $peran = Peran::withCount(['izin', 'pengguna'])->orderBy('nama_peran')->get();
+        $kataKunci = $request->input('cari');
+
+        $query = Peran::withCount(['izin', 'pengguna'])->orderBy('nama_peran');
+
+        $query->when($kataKunci, function ($q) use ($kataKunci) {
+            $q->where('nama_peran', 'like', '%' . $kataKunci . '%');
+        });
+
+        $peran = $query->paginate(15)->withQueryString();
 
         return view('admin.peran.index', [
             'peran' => $peran,
+            'kataKunci' => $kataKunci,
         ]);
     }
 

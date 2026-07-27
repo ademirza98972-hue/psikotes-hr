@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class PerbaruiKandidatRequest extends FormRequest
@@ -22,14 +23,36 @@ class PerbaruiKandidatRequest extends FormRequest
         }
 
         return [
-            'departemen' => ['required', 'int', 'exists:departemen,id'],
-            'posisi_dilamar' => ['required', 'int', 'exists:posisi,id'],
+            'departemen' => [
+                'required',
+                'int',
+                function ($attribute, $value, $fail) {
+                    if (! DB::table('departemen')->whereNull('deleted_at')->where('id', $value)->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
+            'posisi_dilamar' => [
+                'required',
+                'int',
+                function ($attribute, $value, $fail) {
+                    if (! DB::table('posisi')->whereNull('deleted_at')->where('id', $value)->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
             'nama_kandidat' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($userId)->whereNull('deleted_at'),
+            ],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
             'pendidikan_terakhir' => ['required', 'string', 'max:255'],
-            'nik_kandidat' => ['required', 'string', 'digits:16', Rule::unique('profil_kandidat', 'nik_kandidat')->ignore($profilId)],
+            'nik_kandidat' => ['required', 'string', 'digits:16'],
         ];
     }
 

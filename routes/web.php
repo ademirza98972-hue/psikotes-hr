@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DataKandidatController;
 use App\Http\Controllers\Admin\DataKaryawanController;
+use App\Http\Controllers\Admin\DataTerhapusController;
 use App\Http\Controllers\Admin\PeranController;
 use App\Http\Controllers\Admin\PenggunaAdminController;
 use App\Http\Controllers\Admin\PenggunaController;
@@ -116,5 +117,14 @@ Route::middleware('auth')->group(function () {
         Route::put('/{peran}', [PeranController::class, 'perbarui'])->middleware('izin:peran.kelola')->whereNumber('peran')->name('perbarui');
         Route::patch('/{peran}', [PeranController::class, 'perbarui'])->middleware('izin:peran.kelola')->whereNumber('peran')->name('perbarui');
         Route::delete('/{peran}', [PeranController::class, 'hapus'])->middleware('izin:peran.kelola')->whereNumber('peran')->name('hapus');
+    });
+
+    // =========================================
+    // DATA TERHAPUS (TRASH)
+    // =========================================
+    Route::prefix('admin/data-terhapus')->name('admin.data-terhapus.')->middleware('izin:data_terhapus.kelola')->group(function () {
+        Route::get('/', [DataTerhapusController::class, 'index'])->name('index');
+        Route::post('/pulihkan/{jenis}/{id}', [DataTerhapusController::class, 'pulihkan'])->whereNumber('id')->name('pulihkan');
+        Route::post('/hapus-permanen/{jenis}/{id}', [DataTerhapusController::class, 'hapusPermanen'])->whereNumber('id')->name('hapus-permanen');
     });
 });

@@ -11,11 +11,32 @@ use Illuminate\View\View;
 
 class PosisiController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $kataKunci = $request->input('cari');
+        $filterDepartemenId = $request->input('departemen');
+
+        $query = Posisi::with('departemen')
+            ->orderBy('departemen_id')
+            ->orderBy('nama_posisi');
+
+        $query->when($kataKunci, function ($q) use ($kataKunci) {
+            $q->where('nama_posisi', 'like', '%' . $kataKunci . '%');
+        });
+
+        $query->when($filterDepartemenId, function ($q) use ($filterDepartemenId) {
+            $q->where('departemen_id', $filterDepartemenId);
+        });
+
+        $posisi = $query->paginate(15)->withQueryString();
         $departemen = Departemen::orderBy('nama_departemen')->get();
-        $posisi = Posisi::with('departemen')->orderBy('departemen_id')->orderBy('nama_posisi')->paginate(15)->withQueryString();
-        return view('admin.posisi.index', compact('posisi', 'departemen'));
+
+        return view('admin.posisi.index', [
+            'posisi' => $posisi,
+            'departemen' => $departemen,
+            'kataKunci' => $kataKunci,
+            'filterDepartemen' => $filterDepartemenId,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -49,6 +70,10 @@ class PosisiController extends Controller
 
     public function destroy(Posisi $posisi): RedirectResponse
     {
+        if ($posisi->karyawan()->exists()) {
+            return redirect()->back()->with('error', 'Tidak dapat menghapus posisi yang masih memiliki karyawan terkait.');
+        }
+
         $posisi->delete();
 
         return redirect()->route('admin.posisi.index')

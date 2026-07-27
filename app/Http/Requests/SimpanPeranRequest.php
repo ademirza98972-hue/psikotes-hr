@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class SimpanPeranRequest extends FormRequest
 {
@@ -14,10 +16,24 @@ class SimpanPeranRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_peran' => ['required', 'string', 'max:255', 'unique:peran,nama_peran'],
+            'nama_peran' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('peran', 'nama_peran')->whereNull('deleted_at'),
+            ],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
             'izin' => ['required', 'array', 'min:1'],
-            'izin.*' => ['integer', 'exists:izin,id'],
+            'izin.*' => [
+                'integer',
+                function ($attribute, $value, $fail) {
+                    if (! DB::table('izin')
+                        ->where('id', $value)
+                        ->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
         ];
     }
 

@@ -4,22 +4,49 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Departemen;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DepartemenController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $departemen = Departemen::withCount('posisi')->orderBy('nama_departemen')->paginate(10);
-        return view('admin.departemen.index', compact('departemen'));
+        $kataKunci = $request->input('cari');
+
+        $query = Departemen::withCount('posisi')->orderBy('nama_departemen');
+
+        $query->when($kataKunci, function ($q) use ($kataKunci) {
+            $q->where('nama_departemen', 'like', '%' . $kataKunci . '%');
+        });
+
+        $departemen = $query->paginate(10)->withQueryString();
+
+        return view('admin.departemen.index', [
+            'departemen' => $departemen,
+            'kataKunci' => $kataKunci,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'nama_departemen' => 'required|string|max:100|unique:departemen,nama_departemen',
+            'nama_departemen' => [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $exists = DB::table('departemen')
+                        ->whereNull('deleted_at')
+                        ->where('nama_departemen', $value)
+                        ->exists();
+                    if ($exists) {
+                        $fail('Nama departemen sudah terdaftar.');
+                    }
+                },
+            ],
         ]);
 
         Departemen::create($request->only('nama_departemen'));
@@ -31,7 +58,21 @@ class DepartemenController extends Controller
     public function update(Request $request, Departemen $departemen): RedirectResponse
     {
         $request->validate([
-            'nama_departemen' => 'required|string|max:100|unique:departemen,nama_departemen,'.$departemen->id,
+            'nama_departemen' => [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) use ($departemen) {
+                    $exists = DB::table('departemen')
+                        ->whereNull('deleted_at')
+                        ->where('nama_departemen', $value)
+                        ->where('id', '!=', $departemen->id)
+                        ->exists();
+                    if ($exists) {
+                        $fail('Nama departemen sudah terdaftar.');
+                    }
+                },
+            ],
         ]);
 
         $departemen->update($request->only('nama_departemen'));

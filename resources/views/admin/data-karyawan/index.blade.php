@@ -4,25 +4,7 @@
 <div x-data="{ modalHapus: false, idHapus: null, namaHapus: '' }">
 
     {{-- OUTER WRAPPER FOR STYLING --}}
-    <div class="w-full rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-
-        {{-- HEADER --}}
-        <div class="mb-4 flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
-            <div>
-                <h2 class="text-lg font-semibold text-slate-900">Daftar Data Karyawan</h2>
-                <p class="mt-1 text-sm text-slate-500">Kelola data master karyawan yang tersedia di sistem.</p>
-            </div>
-            <div class="flex items-center gap-2">
-                @auth
-                    @if(auth()->user()->hasIzin('data_karyawan.kelola'))
-                        <a href="{{ route('admin.data-karyawan.tambah') }}"
-                           class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853]">
-                            + Tambah Data Karyawan
-                        </a>
-                    @endif
-                @endauth
-            </div>
-        </div>
+    <div class="w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
 
         {{-- FILTER BAR --}}
         <form method="GET" action="{{ route('admin.data-karyawan.index') }}" class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -59,6 +41,15 @@
                     </a>
                 @endif
             </div>
+
+            @auth
+                @if(auth()->user()->hasIzin('data_karyawan.kelola'))
+                    <a href="{{ route('admin.data-karyawan.tambah') }}"
+                       class="self-start rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] whitespace-nowrap">
+                        + Tambah Data Karyawan
+                    </a>
+                @endif
+            @endauth
         </form>
 
         {{-- INDICATOR --}}

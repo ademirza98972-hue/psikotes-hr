@@ -17,7 +17,15 @@ class PerbaruiPenggunaRequest extends FormRequest
         $idPengguna = $this->route('pengguna');
 
         $aturan = [
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $idPengguna],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')
+                    ->ignore($idPengguna)
+                    ->whereNull('deleted_at'),
+            ],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
             'tipe_akun' => ['required', Rule::in(['kandidat', 'karyawan'])],

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class PerbaruiDataKaryawanRequest extends FormRequest
@@ -21,11 +22,35 @@ class PerbaruiDataKaryawanRequest extends FormRequest
                 'required',
                 'string',
                 'max:30',
-                Rule::unique('data_karyawan', 'nik_karyawan')->ignore($id),
+                Rule::unique('data_karyawan', 'nik_karyawan')
+                    ->ignore($id)
+                    ->whereNull('deleted_at'),
             ],
             'nama_karyawan' => ['required', 'string', 'max:255'],
-            'departemen_id' => ['required', 'integer', 'exists:departemen,id'],
-            'posisi_id' => ['nullable', 'integer', 'exists:posisi,id'],
+            'departemen_id' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    if (! DB::table('departemen')
+                        ->whereNull('deleted_at')
+                        ->where('id', $value)
+                        ->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
+            'posisi_id' => [
+                'nullable',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    if (! DB::table('posisi')
+                        ->whereNull('deleted_at')
+                        ->where('id', $value)
+                        ->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
             'departemen' => ['required', 'string', 'max:255'],
             'jabatan' => ['nullable', 'string', 'max:255'],
         ];

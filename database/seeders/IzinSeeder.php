@@ -28,6 +28,7 @@ class IzinSeeder extends Seeder
             ['kode_izin' => 'data_karyawan.kelola', 'deskripsi' => 'Kelola Data Karyawan'],
             ['kode_izin' => 'pengguna_admin.kelola', 'deskripsi' => 'Kelola Admin & Staff'],
             ['kode_izin' => 'master_data.kelola', 'deskripsi' => 'Kelola Master Data Departemen & Posisi'],
+            ['kode_izin' => 'data_terhapus.kelola', 'deskripsi' => 'Kelola Data Terhapus'],
         ];
 
         foreach ($daftarIzin as $izin) {

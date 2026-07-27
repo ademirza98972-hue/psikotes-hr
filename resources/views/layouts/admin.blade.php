@@ -245,6 +245,34 @@
                                 <span>Kelola Admin/Staff</span>
                             </a>
                         @endif
+
+                        @if(auth()->user()->hasIzin('data_terhapus.kelola'))
+                            @php
+                                $jumlahTrash = (int) \App\Models\User::where('tipe_akun','karyawan')->onlyTrashed()->count()
+                                    + (int) \App\Models\User::where('tipe_akun','kandidat')->onlyTrashed()->count()
+                                    + (int) \App\Models\User::where('tipe_akun','custom')->onlyTrashed()->count()
+                                    + (int) \App\Models\DataKaryawan::onlyTrashed()->count()
+                                    + (int) \App\Models\Departemen::onlyTrashed()->count()
+                                    + (int) \App\Models\Posisi::onlyTrashed()->count()
+                                    + (int) \App\Models\Peran::onlyTrashed()->count();
+                            @endphp
+                            <a href="{{ route('admin.data-terhapus.index') }}"
+                               @class([
+                                   'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
+                                   'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.data-terhapus.*'),
+                                   'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.data-terhapus.*'),
+                               ])>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2"
+                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.data-terhapus.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.data-terhapus.*')])>
+                                    <path d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"/>
+                                </svg>
+                                <span>Data Terhapus</span>
+                                @if ($jumlahTrash > 0)
+                                    <span class="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">{{ $jumlahTrash }}</span>
+                                @endif
+                            </a>
+                        @endif
                     </div>
                 @endif
             @endauth

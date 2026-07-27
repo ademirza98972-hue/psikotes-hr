@@ -16,11 +16,31 @@ class SimpanPenggunaAdminRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')
+                    ->whereNull('deleted_at')
+                    ->where('tipe_akun', 'custom'),
+            ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
             'tipe_akun' => ['required', Rule::in(['custom'])],
-            'peran_id' => ['required', 'integer', 'exists:peran,id'],
+            'peran_id' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    if (! \Illuminate\Support\Facades\DB::table('peran')
+                        ->whereNull('deleted_at')
+                        ->whereNotIn('nama_peran', ['Kandidat', 'Karyawan'])
+                        ->where('id', $value)
+                        ->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
             'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
         ];
     }

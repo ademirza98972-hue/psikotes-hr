@@ -18,10 +18,31 @@ class PerbaruiPenggunaAdminRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $idPengguna],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')
+                    ->ignore($idPengguna)
+                    ->whereNull('deleted_at')
+                    ->where('tipe_akun', 'custom'),
+            ],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
-            'peran_id' => ['required', 'integer', 'exists:peran,id'],
+            'peran_id' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    if (! \Illuminate\Support\Facades\DB::table('peran')
+                        ->whereNull('deleted_at')
+                        ->whereNotIn('nama_peran', ['Kandidat', 'Karyawan'])
+                        ->where('id', $value)
+                        ->exists()) {
+                        $fail(':attribute tidak valid.');
+                    }
+                },
+            ],
             'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
         ];
     }

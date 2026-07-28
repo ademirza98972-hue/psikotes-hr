@@ -21,7 +21,10 @@ class PeranSeeder extends Seeder
             [
                 'nama_peran' => 'Admin HR',
                 'deskripsi' => 'Kelola pengguna, soal, kategori tes, review hasil tes, dan master data karyawan.',
-                'izin' => array_values(array_diff($semuaIzin, ['peran.kelola', 'izin.kelola', 'pengguna_admin.kelola'])),
+                'izin' => array_merge(
+                    array_values(array_diff($semuaIzin, ['peran.kelola', 'izin.kelola', 'pengguna_admin.kelola'])),
+                    ['hasil_tes.lihat_sensitif']
+                ),
             ],
             [
                 'nama_peran' => 'HR Viewer',

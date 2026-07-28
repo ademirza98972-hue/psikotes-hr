@@ -29,6 +29,7 @@ class IzinSeeder extends Seeder
             ['kode_izin' => 'pengguna_admin.kelola', 'deskripsi' => 'Kelola Admin & Staff'],
             ['kode_izin' => 'master_data.kelola', 'deskripsi' => 'Kelola Master Data Departemen & Posisi'],
             ['kode_izin' => 'data_terhapus.kelola', 'deskripsi' => 'Kelola Data Terhapus'],
+            ['kode_izin' => 'hasil_tes.lihat_sensitif', 'deskripsi' => 'Lihat Hasil Tes Sensitif (MMPI-2)'],
         ];
 
         foreach ($daftarIzin as $izin) {

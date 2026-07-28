@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AlatTesController;
+use App\Http\Controllers\Admin\BankSoalController;
 use App\Http\Controllers\Admin\DataKandidatController;
 use App\Http\Controllers\Admin\DataKaryawanController;
 use App\Http\Controllers\Admin\DataTerhapusController;
+use App\Http\Controllers\Admin\HasilTesController;
 use App\Http\Controllers\Admin\PeranController;
+use App\Http\Controllers\Admin\PenjadwalanTesController;
 use App\Http\Controllers\Admin\PenggunaAdminController;
 use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\AutentikasiController;
@@ -120,11 +124,45 @@ Route::middleware('auth')->group(function () {
     });
 
     // =========================================
+    // ALAT TES (placeholder, data dummy hardcode)
+    // =========================================
+    Route::prefix('admin/alat-tes')->name('admin.alat-tes.')->group(function () {
+        Route::get('/', [AlatTesController::class, 'index'])->name('index');
+        Route::get('/tambah', [AlatTesController::class, 'tambah'])->name('tambah');
+        Route::post('/', [AlatTesController::class, 'simpan'])->name('simpan');
+    });
+
+    // =========================================
+    // BANK SOAL (placeholder, data dummy hardcode)
+    // =========================================
+    Route::prefix('admin/bank-soal')->name('admin.bank-soal.')->group(function () {
+        Route::get('/', [BankSoalController::class, 'index'])->name('index');
+        Route::get('/tambah/{alatTesId}', [BankSoalController::class, 'tambah'])->whereNumber('alatTesId')->name('tambah');
+    });
+
+    // =========================================
+    // PENJADWALAN TES (placeholder, data dummy hardcode)
+    // =========================================
+    Route::prefix('admin/penjadwalan-tes')->name('admin.penjadwalan-tes.')->group(function () {
+        Route::get('/', [PenjadwalanTesController::class, 'index'])->name('index');
+        Route::get('/tambah', [PenjadwalanTesController::class, 'tambah'])->name('tambah');
+        Route::post('/', [PenjadwalanTesController::class, 'simpan'])->name('simpan');
+    });
+
+    // =========================================
     // DATA TERHAPUS (TRASH)
     // =========================================
     Route::prefix('admin/data-terhapus')->name('admin.data-terhapus.')->middleware('izin:data_terhapus.kelola')->group(function () {
         Route::get('/', [DataTerhapusController::class, 'index'])->name('index');
         Route::post('/pulihkan/{jenis}/{id}', [DataTerhapusController::class, 'pulihkan'])->whereNumber('id')->name('pulihkan');
         Route::post('/hapus-permanen/{jenis}/{id}', [DataTerhapusController::class, 'hapusPermanen'])->whereNumber('id')->name('hapus-permanen');
+    });
+
+    // =========================================
+    // HASIL TES (baru)
+    // =========================================
+    Route::prefix('admin/hasil-tes')->name('admin.hasil-tes.')->group(function () {
+        Route::get('/', [HasilTesController::class, 'index'])->name('index');
+        Route::get('/{sesiId}/{pesertaId}', [HasilTesController::class, 'detail'])->name('detail');
     });
 });

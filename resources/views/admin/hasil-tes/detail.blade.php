@@ -59,7 +59,7 @@
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
                 <thead class="bg-slate-50">
-                    <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                    <tr class="text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                         <th class="px-4 py-2">Alat Tes</th>
                         <th class="px-4 py-2">Format Dasar</th>
                         <th class="px-4 py-2">Durasi Aktual</th>
@@ -88,16 +88,44 @@
             <div class="rounded-lg border border-slate-200 p-6 bg-white shadow-sm">
                 <h3 class="text-lg font-semibold text-slate-900 mb-4">{{ $alatTes['nama_alat_tes'] }} - {{ $alatTes['format_dasar'] }}</h3>
 
-                {{-- IST: Skor Total + Kategori --}}
-                @if ($alatTes['nama_alat_tes'] === 'IST' && !empty($alatTes['skor_ringkas']['total_skor']))
-                    <div class="bg-slate-50 rounded-md p-4 mb-4">
-                        <p class="text-sm mb-2"><span class="text-slate-500">Skor Total:</span> <strong class="text-slate-900 text-2xl">{{ $alatTes['skor_ringkas']['total_skor'] }}</strong></p>
-                        <p class="text-sm mb-2"><span class="text-slate-500">Kategori:</span> <span class="inline-block rounded-md {{ $kategoriBadge[$alatTes['skor_ringkas']['kategori']] ?? 'bg-slate-600' }} px-2 py-1 text-sm font-semibold text-white">{{ $alatTes['skor_ringkas']['kategori'] }}</span></p>
-                        <p class="text-sm text-slate-700"><span class="text-slate-500">Deskripsi:</span> {{ $alatTes['skor_ringkas']['deskripsi_kategori'] }}</p>
+                {{-- IST: Skor per subtes dalam tabel formal --}}
+                @if ($alatTes['nama_alat_tes'] === 'IST' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['nama_subtes']))
+                    <p class="text-sm text-slate-600 mb-3">Format: Pilihan Ganda - Skor Mentah (RS) & Skor Skala (SS)</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 font-semibold border-b border-slate-200">
+                                    <th class="text-left px-4 py-2">Subtes</th>
+                                    <th class="text-left px-4 py-2">Skor Mentah (RS)</th>
+                                    <th class="text-left px-4 py-2">Skor Skala (SS)</th>
+                                    <th class="text-left px-4 py-2">Kategori</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($alatTes['skor_ringkas'] as $subtes)
+                                    <tr class="border-b border-slate-200">
+                                        <td class="px-4 py-2 text-sm">{{ $subtes['nama_subtes'] }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $subtes['skor_mentah'] }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $subtes['skor_skala'] }}</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            @php
+                                                $cat = $subtes['kategori'];
+                                                if ($cat === 'Kurang') $badgeClass = 'bg-red-100 text-red-800';
+                                                elseif ($cat === 'Cukup') $badgeClass = 'bg-blue-100 text-blue-800';
+                                                elseif ($cat === 'Baik') $badgeClass = 'bg-green-100 text-green-800';
+                                                elseif ($cat === 'Sangat Baik') $badgeClass = 'bg-emerald-100 text-emerald-800';
+                                                else $badgeClass = '';
+                                            @endphp
+                                            <span class="inline-block rounded px-2 py-0.5 text-xs font-semibold {{ $badgeClass }}">{{ $cat }}</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
 
                     {{-- Lampiran Detail Soal & Jawaban (hanya untuk contoh IST) --}}
-                    <div class="mt-4">
+                    <div class="mt-6">
                         <h4 class="text-sm font-semibold text-slate-900 mb-2">Contoh Soal & Jawaban Peserta</h4>
                         <div class="overflow-x-auto">
                             <table class="min-w-full text-sm">
@@ -147,46 +175,111 @@
                             </table>
                         </div>
                     </div>
-                {{-- DISC: 4 Skor D/I/S/C sebagai bar --}}
-                @elseif ($alatTes['nama_alat_tes'] === 'DISC' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas']['D']))
-                    <div class="space-y-3">
-                        @foreach (['D' => 'Dominance', 'I' => 'Influence', 'S' => 'Steadiness', 'C' => 'Compliance'] as $dimensi => $label)
-                            @if (isset($alatTes['skor_ringkas'][$dimensi]))
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="font-semibold text-slate-700">{{ $label }}</span>
-                                        <span class="text-slate-600">{{ $alatTes['skor_ringkas'][$dimensi] }}</span>
-                                    </div>
-                                    <div class="w-full h-2 bg-slate-200 rounded overflow-hidden">
-                                        <div class="h-full bg-[#2C5F6F] transition-all duration-500" style="width: {{ min($alatTes['skor_ringkas'][$dimensi], 100) }}%"></div>
-                                    </div>
-                                </div>
-                            @endif
-                        @endforeach
+
+                {{-- DISC: Skor per dimensi dalam tabel formal --}}
+                @elseif ($alatTes['nama_alat_tes'] === 'DISC' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['dimensi']))
+                    <p class="text-sm text-slate-600 mb-3">Format: Skala Likert - Skor Mentah (1-100), Skor Skala (1-10)</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 font-semibold border-b border-slate-200">
+                                    <th class="text-left px-4 py-2">Dimensi</th>
+                                    <th class="text-left px-4 py-2">Skor Mentah</th>
+                                    <th class="text-left px-4 py-2">Skor Skala</th>
+                                    <th class="text-left px-4 py-2">Kategori</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($alatTes['skor_ringkas'] as $dimensi)
+                                    <tr class="border-b border-slate-200">
+                                        <td class="px-4 py-2 text-sm">{{ $dimensi['dimensi'] }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $dimensi['skor_mentah'] }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $dimensi['skor_skala'] }}</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            @php
+                                                $cat = $dimensi['kategori'];
+                                                if ($cat === 'Rendah') $badgeClass = 'bg-amber-100 text-amber-800';
+                                                elseif ($cat === 'Sedang') $badgeClass = 'bg-blue-100 text-blue-800';
+                                                elseif ($cat === 'Tinggi') $badgeClass = 'bg-emerald-100 text-emerald-800';
+                                                else $badgeClass = '';
+                                            @endphp
+                                            <span class="inline-block rounded px-2 py-0.5 text-xs font-semibold {{ $badgeClass }}">{{ $cat }}</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                {{-- EPPS: Skor per dimensi sebagai list --}}
-                @elseif ($alatTes['nama_alat_tes'] === 'EPPS' && is_array($alatTes['skor_ringkas']))
-                    <div class="space-y-2">
-                        @foreach ($alatTes['skor_ringkas'] as $dimensi => $skor)
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-700">{{ $dimensi }}</span>
-                                <span class="inline-block rounded-md bg-[#2C5F6F] px-2 py-1 text-sm font-semibold text-white">{{ $skor }}</span>
-                            </div>
-                        @endforeach
+
+                {{-- EPPS: Skor per dimensi dalam tabel formal --}}
+                @elseif ($alatTes['nama_alat_tes'] === 'EPPS' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['dimensi']))
+                    <p class="text-sm text-slate-600 mb-3">Format: Forced Choice - Skor Mentah (1-100), Skor Skala (1-10)</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 font-semibold border-b border-slate-200">
+                                    <th class="text-left px-4 py-2">Dimensi</th>
+                                    <th class="text-left px-4 py-2">Skor Mentah</th>
+                                    <th class="text-left px-4 py-2">Skor Skala</th>
+                                    <th class="text-left px-4 py-2">Kategori</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($alatTes['skor_ringkas'] as $dimensi)
+                                    <tr class="border-b border-slate-200">
+                                        <td class="px-4 py-2 text-sm">{{ $dimensi['dimensi'] }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $dimensi['skor_mentah'] }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $dimensi['skor_skala'] }}</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            @php
+                                                $cat = $dimensi['kategori'];
+                                                if ($cat === 'Rendah') $badgeClass = 'bg-amber-100 text-amber-800';
+                                                elseif ($cat === 'Sedang') $badgeClass = 'bg-blue-100 text-blue-800';
+                                                elseif ($cat === 'Tinggi') $badgeClass = 'bg-emerald-100 text-emerald-800';
+                                                else $badgeClass = '';
+                                            @endphp
+                                            <span class="inline-block rounded px-2 py-0.5 text-xs font-semibold {{ $badgeClass }}">{{ $cat }}</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                {{-- MMPI-2 --}}
-                @elseif ($alatTes['nama_alat_tes'] === 'MMPI-2' && is_array($alatTes['skor_ringkas']))
+
+                {{-- MMPI-2: Skor skala klinis dalam tabel formal --}}
+                @elseif ($alatTes['nama_alat_tes'] === 'MMPI-2' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['skala_klinis']))
                     @if ($alatTes['is_sensitif'])
                         {{-- MMPI Sensitif --}}
                         @if ($bisaLihatSensitif)
-                            {{-- User punya izin — tunjukkan skor lengkap --}}
-                            <div class="space-y-2">
-                                @foreach ($alatTes['skor_ringkas'] as $skala => $skor)
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-slate-700">{{ $skala }}</span>
-                                        <span class="inline-block rounded-md bg-rose-100 text-rose-800 px-2 py-1 text-sm font-semibold">{{ $skor }}</span>
-                                    </div>
-                                @endforeach
+                            <p class="text-sm text-slate-600 mb-3">Format: Skala Likert - Skor T (40-90), Interpretasi</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 font-semibold border-b border-slate-200">
+                                            <th class="text-left px-4 py-2">Skala Klinis</th>
+                                            <th class="text-left px-4 py-2">Skor T</th>
+                                            <th class="text-left px-4 py-2">Interpretasi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($alatTes['skor_ringkas'] as $skala)
+                                            <tr class="border-b border-slate-200">
+                                                <td class="px-4 py-2 text-sm">{{ $skala['skala_klinis'] }}</td>
+                                                <td class="px-4 py-2 text-sm">{{ $skala['skor_t'] }}</td>
+                                                <td class="px-4 py-2 text-sm">
+                                                    @php
+                                                        $interp = $skala['interpretasi'];
+                                                        if ($interp === 'Signifikan') $colorClass = 'text-red-600 font-semibold';
+                                                        elseif ($interp === 'Perlu Perhatian') $colorClass = 'text-amber-600 font-semibold';
+                                                        elseif ($interp === 'Normal') $colorClass = 'text-emerald-600 font-semibold';
+                                                        else $colorClass = 'text-slate-600';
+                                                    @endphp
+                                                    <span class="{{ $colorClass }}">{{ $interp }}</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         @else
                             {{-- User tanpa izin — tunjukkan pesan akses --}}
@@ -196,14 +289,36 @@
                             </div>
                         @endif
                     @else
-                        {{-- MMPI biasa (non-sensitif) — tunjukkan skor biasa --}}
-                        <div class="space-y-2">
-                            @foreach ($alatTes['skor_ringkas'] as $skala => $skor)
-                                <div class="flex justify-between items-center">
-                                    <span class="text-slate-700">{{ $skala }}</span>
-                                    <span class="inline-block rounded-md bg-rose-100 text-rose-800 px-2 py-1 text-sm font-semibold">{{ $skor }}</span>
-                                </div>
-                            @endforeach
+                        {{-- MMPI biasa (non-sensitif) --}}
+                        <p class="text-sm text-slate-600 mb-3">Format: Skala Likert - Skor T (40-90), Interpretasi</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 font-semibold border-b border-slate-200">
+                                        <th class="text-left px-4 py-2">Skala Klinis</th>
+                                        <th class="text-left px-4 py-2">Skor T</th>
+                                        <th class="text-left px-4 py-2">Interpretasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($alatTes['skor_ringkas'] as $skala)
+                                        <tr class="border-b border-slate-200">
+                                            <td class="px-4 py-2 text-sm">{{ $skala['skala_klinis'] }}</td>
+                                            <td class="px-4 py-2 text-sm">{{ $skala['skor_t'] }}</td>
+                                            <td class="px-4 py-2 text-sm">
+                                                @php
+                                                    $interp = $skala['interpretasi'];
+                                                    if ($interp === 'Signifikan') $colorClass = 'text-red-600 font-semibold';
+                                                    elseif ($interp === 'Perlu Perhatian') $colorClass = 'text-amber-600 font-semibold';
+                                                    elseif ($interp === 'Normal') $colorClass = 'text-emerald-600 font-semibold';
+                                                    else $colorClass = 'text-slate-600';
+                                                @endphp
+                                                <span class="{{ $colorClass }}">{{ $interp }}</span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     @endif
                 @endif

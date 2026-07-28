@@ -4,7 +4,29 @@
 <div class="w-full rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
      x-data="{
          batasAktif: {{ old('batas_waktu_per_soal_aktif') ? 'true' : 'false' }},
-         formatDasar: '{{ old('format_dasar', 'Pilihan Ganda') }}'
+         formatDasar: '{{ old('format_dasar', 'Pilihan Ganda') }}',
+         tipe_kategori: '{{ old('tipe_kategori', '') }}',
+         dimensiArr: [],
+         addDimensi() {
+             this.dimensiArr.push({
+                 nama_dimensi: '',
+                 kode: '',
+                 bidang_psikogram: '',
+                 deskripsi_aspek: '',
+                 skor_min: 0,
+                 skor_max: 0,
+                 tipe_kategori: this.tipe_kategori,
+                 ambang_r: 0,
+                 ambang_k: 0,
+                 ambang_c: 0,
+                 ambang_b: 0,
+                 ambang_normal: 0,
+                 ambang_perlu_perhatian: 0
+             });
+         },
+         removeDimensi(index) {
+             this.dimensiArr.splice(index, 1);
+         }
      }">
 
     <div class="mb-4 flex items-center justify-between">
@@ -83,6 +105,147 @@
                 </div>
             </label>
         </div>
+
+        <section class="rounded-md border border-slate-200 bg-slate-50 p-4">
+            <h3 class="text-base font-semibold text-slate-900 mb-3">Konfigurasi Dimensi Penilaian</h3>
+
+            <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                    <label for="tipe_kategori_global" class="block text-sm font-medium text-slate-700">Tipe Kategori <span class="text-rose-500">*</span></label>
+                    <select id="tipe_kategori_global" name="tipe_kategori" x-model="tipe_kategori" required
+                            class="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        <option value="">-- Pilih Tipe --</option>
+                        <option value="psikogram" @selected(old('tipe_kategori') === 'psikogram')>Psikogram</option>
+                        <option value="klinis" @selected(old('tipe_kategori') === 'klinis')>Klinis</option>
+                    </select>
+                    <p class="mt-1 text-xs text-slate-500">Menentukan field ambang batas yang muncul per dimensi.</p>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between">
+                <p class="text-sm text-slate-600">Tambahkan setiap dimensi penilaian untuk alat tes ini.</p>
+                <button type="button" @click="addDimensi()" :disabled="!tipe_kategori"
+                        class="rounded-md border border-[#2C5F6F] bg-white px-4 py-2 text-sm font-medium text-[#2C5F6F] shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50">
+                    + Tambah Dimensi
+                </button>
+            </div>
+
+            <div class="mt-4 space-y-3" id="dimensi-container">
+                <template x-for="(dimensi, index) in dimensiArr" :key="index">
+                    <div class="rounded-lg border border-slate-200 bg-white p-4">
+                        <div class="mb-3 flex items-start justify-between">
+                            <h4 class="text-sm font-semibold text-slate-900">
+                                Dimensi #<span x-text="index + 1"></span>
+                            </h4>
+                            <button type="button" @click="removeDimensi(index)"
+                                    class="rounded-md p-1 text-slate-500 hover:bg-rose-50 hover:text-rose-600">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-slate-600">Nama Dimensi</label>
+                                <input type="text" x-model="dimensi.nama_dimensi"
+                                       class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                                       placeholder="Contoh: Dominance">
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-slate-600">Kode <span class="text-slate-400">(opsional)</span></label>
+                                <input type="text" x-model="dimensi.kode"
+                                       class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                                       placeholder="Contoh: D">
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-slate-600">Bidang Psikogram</label>
+                                <select x-model="dimensi.bidang_psikogram"
+                                        class="block w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                    <option value="">-- Pilih Bidang --</option>
+                                    <option value="Intelektual">Intelektual</option>
+                                    <option value="Sikap Kerja">Sikap Kerja</option>
+                                    <option value="Kepribadian">Kepribadian</option>
+                                    <option value="Potensi Kerja">Potensi Kerja</option>
+                                    <option value="Sensitif">Sensitif</option>
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2 lg:col-span-3">
+                                <label class="mb-1 block text-xs font-medium text-slate-600">Deskripsi Aspek <span class="text-slate-400">(1 kalimat)</span></label>
+                                <textarea x-model="dimensi.deskripsi_aspek" rows="2"
+                                          class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                                          placeholder="Contoh: Mengukur tingkat kepemimpinan dan kemauan mengontrol situasi."></textarea>
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-slate-600">Skor Min</label>
+                                <input type="number" min="0" x-model.number="dimensi.skor_min"
+                                       class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-slate-600">Skor Max</label>
+                                <input type="number" min="0" x-model.number="dimensi.skor_max"
+                                       class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                            </div>
+
+                            <template x-if="tipe_kategori === 'psikogram'">
+                                <div class="md:col-span-2 lg:col-span-3">
+                                    <label class="mb-2 block text-xs font-medium text-slate-600">Ambang Batas <span class="text-slate-400">(batas ATAS kategori; di atas ambang_b otomatis BS)</span></label>
+                                    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                                        <div>
+                                            <label class="block text-xs text-rose-600">R (Red)</label>
+                                            <input type="number" min="0" x-model.number="dimensi.ambang_r"
+                                                   class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-amber-600">K (Kuning)</label>
+                                            <input type="number" min="0" x-model.number="dimensi.ambang_k"
+                                                   class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-emerald-600">C (Hijau)</label>
+                                            <input type="number" min="0" x-model.number="dimensi.ambang_c"
+                                                   class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-sky-600">B (Biru)</label>
+                                            <input type="number" min="0" x-model.number="dimensi.ambang_b"
+                                                   class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template x-if="tipe_kategori === 'klinis'">
+                                <div class="md:col-span-2 lg:col-span-3">
+                                    <label class="mb-2 block text-xs font-medium text-slate-600">Ambang Batas <span class="text-slate-400">(batas ATAS; di atas ambang_perlu_perhatian otomatis Signifikan)</span></label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs text-emerald-600">Normal (ATAS)</label>
+                                            <input type="number" min="0" x-model.number="dimensi.ambang_normal"
+                                                   class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-amber-600">Perlu Perhatian (ATAS)</label>
+                                            <input type="number" min="0" x-model.number="dimensi.ambang_perlu_perhatian"
+                                                   class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="dimensiArr.length === 0" x-cloak class="rounded-md border border-dashed border-slate-300 bg-white p-6 text-center text-xs text-slate-500">
+                    Belum ada dimensi. Pilih tipe kategori lalu klik "+ Tambah Dimensi" untuk mulai menambahkan.
+                </div>
+            </div>
+        </section>
 
         <div class="sticky bottom-0 -mx-6 mt-4 flex justify-end gap-2 border-t border-slate-200 bg-white px-6 py-3 shadow-[0_-2px_4px_rgba(0,0,0,0.04)]">
             <a href="{{ route('admin.alat-tes.index') }}" class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</a>

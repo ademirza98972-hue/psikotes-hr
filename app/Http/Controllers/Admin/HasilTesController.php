@@ -89,9 +89,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '45 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'total_skor' => 78,
-                        'kategori' => 'Tinggi',
-                        'deskripsi_kategori' => 'Kesesuaian kerja sangat baik, potensi pengembangan tinggi'
+                        ['nama_subtes' => 'SE - Pengertian Umum', 'skor_mentah' => 15, 'skor_skala' => 118, 'kategori' => 'Baik'],
+                        ['nama_subtes' => 'WA - Kosakata',          'skor_mentah' => 17, 'skor_skala' => 124, 'kategori' => 'Sangat Baik'],
+                        ['nama_subtes' => 'AN - Aritmatika',        'skor_mentah' => 12, 'skor_skala' => 105, 'kategori' => 'Baik'],
+                        ['nama_subtes' => 'GE - Persamaan Kata',    'skor_mentah' => 14, 'skor_skala' => 112, 'kategori' => 'Baik'],
                     ]
                 ],
                 [
@@ -100,7 +101,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '32 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'D' => 65, 'I' => 42, 'S' => 78, 'C' => 55
+                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 65, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'I - Influence',   'skor_mentah' => 42, 'skor_skala' => 4, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 78, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 55, 'skor_skala' => 6, 'kategori' => 'Sedang'],
                     ]
                 ]
             ]
@@ -128,7 +132,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '25 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'D' => 52, 'I' => 68, 'S' => 45, 'C' => 61
+                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 52, 'skor_skala' => 5, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'I - Influence',   'skor_mentah' => 68, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 45, 'skor_skala' => 5, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 61, 'skor_skala' => 6, 'kategori' => 'Sedang'],
                     ]
                 ]
             ]
@@ -149,9 +156,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '52 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'total_skor' => 64,
-                        'kategori' => 'Sedang',
-                        'deskripsi_kategori' => 'Kesesuaian kerja sedang, memerlukan pelatihan lanjutan'
+                        ['nama_subtes' => 'SE - Pengertian Umum', 'skor_mentah' => 11, 'skor_skala' => 96,  'kategori' => 'Cukup'],
+                        ['nama_subtes' => 'WA - Kosakata',          'skor_mentah' => 13, 'skor_skala' => 102, 'kategori' => 'Baik'],
+                        ['nama_subtes' => 'AN - Aritmatika',        'skor_mentah' => 10, 'skor_skala' => 88,  'kategori' => 'Kurang'],
+                        ['nama_subtes' => 'GE - Persamaan Kata',    'skor_mentah' => 12, 'skor_skala' => 99,  'kategori' => 'Cukup'],
                     ]
                 ],
                 [
@@ -160,7 +168,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '35 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'D' => 58, 'I' => 38, 'S' => 72, 'C' => 49
+                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 58, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'I - Influence',   'skor_mentah' => 38, 'skor_skala' => 4, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 72, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 49, 'skor_skala' => 5, 'kategori' => 'Sedang'],
                     ]
                 ]
             ]
@@ -194,7 +205,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '40 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'D' => 85, 'I' => 55, 'S' => 38, 'C' => 62
+                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 85, 'skor_skala' => 9, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'I - Influence',   'skor_mentah' => 55, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 38, 'skor_skala' => 4, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 62, 'skor_skala' => 6, 'kategori' => 'Sedang'],
                     ]
                 ],
                 [
@@ -203,10 +217,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '65 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'Achievement' => 78,
-                        'Dominance' => 72,
-                        'Affiliation' => 45,
-                        'Exhibition' => 58
+                        ['dimensi' => 'Achievement',     'skor_mentah' => 78, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Dominance',       'skor_mentah' => 72, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Affiliation',     'skor_mentah' => 45, 'skor_skala' => 5, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'Exhibition',      'skor_mentah' => 58, 'skor_skala' => 6, 'kategori' => 'Sedang'],
                     ]
                 ],
                 [
@@ -215,9 +229,14 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '55 menit',
                     'is_sensitif' => true, // sensitif
                     'skor_ringkas' => [
-                        'Depresi' => 68,
-                        'Paranoia' => 52,
-                        'Psychasthenia' => 44
+                        ['skala_klinis' => 'Depresi',                 'skor_t' => 68, 'interpretasi' => 'Perlu Perhatian'],
+                        ['skala_klinis' => 'Paranoia',                'skor_t' => 52, 'interpretasi' => 'Normal'],
+                        ['skala_klinis' => 'Psychasthenia',           'skor_t' => 74, 'interpretasi' => 'Perlu Perhatian'],
+                        ['skala_klinis' => 'Hipocondriasis',          'skor_t' => 61, 'interpretasi' => 'Normal'],
+                        ['skala_klinis' => 'Histeria',               'skor_t' => 82, 'interpretasi' => 'Signifikan'],
+                        ['skala_klinis' => 'Hiperpatenia',           'skor_t' => 55, 'interpretasi' => 'Normal'],
+                        ['skala_klinis' => 'Schizophrenia',          'skor_t' => 69, 'interpretasi' => 'Perlu Perhatian'],
+                        ['skala_klinis' => 'Mania',                  'skor_t' => 48, 'interpretasi' => 'Normal'],
                     ]
                 ]
             ]
@@ -238,7 +257,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '38 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'D' => 71, 'I' => 48, 'S' => 61, 'C' => 53
+                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 71, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'I - Influence',   'skor_mentah' => 48, 'skor_skala' => 5, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 61, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 53, 'skor_skala' => 6, 'kategori' => 'Sedang'],
                     ]
                 ],
                 [
@@ -247,10 +269,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '60 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'Achievement' => 65,
-                        'Dominance' => 68,
-                        'Affiliation' => 52,
-                        'Exhibition' => 45
+                        ['dimensi' => 'Achievement',     'skor_mentah' => 65, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Dominance',       'skor_mentah' => 68, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Affiliation',     'skor_mentah' => 52, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'Exhibition',      'skor_mentah' => 45, 'skor_skala' => 5, 'kategori' => 'Sedang'],
                     ]
                 ]
             ]
@@ -271,7 +293,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '33 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'D' => 42, 'I' => 35, 'S' => 78, 'C' => 65
+                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 42, 'skor_skala' => 5, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'I - Influence',   'skor_mentah' => 35, 'skor_skala' => 4, 'kategori' => 'Rendah'],
+                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 78, 'skor_skala' => 9, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 65, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
                     ]
                 ],
                 [
@@ -280,10 +305,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '55 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'Achievement' => 54,
-                        'Dominance' => 38,
-                        'Affiliation' => 71,
-                        'Exhibition' => 39
+                        ['dimensi' => 'Achievement',     'skor_mentah' => 54, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'Dominance',       'skor_mentah' => 38, 'skor_skala' => 4, 'kategori' => 'Rendah'],
+                        ['dimensi' => 'Affiliation',     'skor_mentah' => 71, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Exhibition',      'skor_mentah' => 39, 'skor_skala' => 4, 'kategori' => 'Rendah'],
                     ]
                 ]
             ]
@@ -305,7 +330,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '36 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'D' => 72, 'I' => 45, 'S' => 68, 'C' => 59
+                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 72, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'I - Influence',   'skor_mentah' => 45, 'skor_skala' => 5, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 68, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 59, 'skor_skala' => 6, 'kategori' => 'Sedang'],
                     ]
                 ],
                 [
@@ -314,10 +342,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '52 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'Achievement' => 61,
-                        'Dominance' => 58,
-                        'Affiliation' => 65,
-                        'Exhibition' => 42
+                        ['dimensi' => 'Achievement',     'skor_mentah' => 61, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Dominance',       'skor_mentah' => 58, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'Affiliation',     'skor_mentah' => 65, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Exhibition',      'skor_mentah' => 42, 'skor_skala' => 5, 'kategori' => 'Sedang'],
                     ]
                 ]
             ]
@@ -338,7 +366,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '41 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'D' => 68, 'I' => 52, 'S' => 73, 'C' => 64
+                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 68, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'I - Influence',   'skor_mentah' => 52, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 73, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 64, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
                     ]
                 ],
                 [
@@ -347,10 +378,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '58 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'Achievement' => 69,
-                        'Dominance' => 51,
-                        'Affiliation' => 72,
-                        'Exhibition' => 48
+                        ['dimensi' => 'Achievement',     'skor_mentah' => 69, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Dominance',       'skor_mentah' => 51, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'Affiliation',     'skor_mentah' => 72, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Exhibition',      'skor_mentah' => 48, 'skor_skala' => 5, 'kategori' => 'Sedang'],
                     ]
                 ]
             ]
@@ -421,10 +452,10 @@ class HasilTesController extends Controller
                     'durasi_pengerjaan_aktual' => '58 menit',
                     'is_sensitif' => false,
                     'skor_ringkas' => [
-                        'Achievement' => 71,
-                        'Dominance' => 52,
-                        'Affiliation' => 88,
-                        'Exhibition' => 65
+                        ['dimensi' => 'Achievement',     'skor_mentah' => 71, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Dominance',       'skor_mentah' => 52, 'skor_skala' => 6, 'kategori' => 'Sedang'],
+                        ['dimensi' => 'Affiliation',     'skor_mentah' => 88, 'skor_skala' => 9, 'kategori' => 'Tinggi'],
+                        ['dimensi' => 'Exhibition',      'skor_mentah' => 65, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
                     ]
                 ]
             ]

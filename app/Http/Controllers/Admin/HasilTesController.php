@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class HasilTesController extends Controller
 {
+
     protected const ALAT_TES = [
         ['id' => 1, 'nama' => 'DISC', 'format_dasar' => 'Skala Likert'],
         ['id' => 2, 'nama' => 'IST',   'format_dasar' => 'Pilihan Ganda'],
@@ -509,10 +511,207 @@ class HasilTesController extends Controller
             }
         }
 
+        // Hit psikogram otomatis dari konfigurasi dimensi
+        $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
+
         return view('admin.hasil-tes.detail', [
             'sesi' => $sesi,
             'hasilTes' => $hasilTes,
             'bisaLihatSensitif' => $bisaLihatSensitif,
+            'psikogram' => $psikogram,
         ]);
+    }
+
+    /**
+     * Hit psikogram secara otomatis dari konfigurasi dimensi di AlatTesController
+     *
+     * @param array $hasilAlatPeserta Array hasil_alat_tes milik satu peserta
+     * @return array Array asosiatif dengan kunci bidang_psikogram (Intelektual, Sikap Kerja, Kepribadian, Potensi Kerja, Sensitif)
+     */
+    protected function hitungPsikogram(array $hasilAlatPeserta): array
+    {
+        // Muat konfigurasi alat tes dari AlatTesController
+        $allKonfigurasi = AlatTesController::DUMMY_ALAT_TES;
+
+        // Bangun peta konversi: nama alat tes => array ['nama' => ..., 'dimensi' => [...]]
+        $konfigByNama = [];
+        foreach ($allKonfigurasi as $alat) {
+            $konfigByNama[$alat['nama']] = [
+                'dimensi' => $alat['dimensi'] ?? [],
+            ];
+        }
+
+        // Hasil psikogram yang akan dikembalikan, urutan sesuai ketentuan
+        $psikogram = [
+            'Intelektual' => [],
+            'Sikap Kerja' => [],
+            'Kepribadian' => [],
+            'Potensi Kerja' => [],
+            'Sensitif' => [],
+        ];
+
+        foreach ($hasilAlatPeserta as $alat) {
+            $namaAlat = $alat['nama_alat_tes'] ?? '';
+            if (!isset($konfigByNama[$namaAlat])) {
+                continue; // alat tes tidak ditemukan konfigurasinya, skip
+            }
+
+            $dimensiKonfig = $konfigByNama[$namaAlat]['dimensi'];
+            $skorRingkas = $alat['skor_ringkas'] ?? [];
+
+            if (!is_array($skorRingkas) || empty($skorRingkas)) {
+                continue; // tidak ada skor, skip
+            }
+
+            foreach ($dimensiKonfig as $dim) {
+                $kodeDim = $dim['kode'] ?? '';
+                $namaDim = $dim['nama_dimensi'] ?? '';
+                $bidang = $dim['bidang_psikogram'] ?? '';
+                $deskripsi = $dim['deskripsi_aspek'] ?? '';
+                $tipeKategori = $dim['tipe_kategori'] ?? 'psikogram';
+
+                // Cari skor yang sesuai dari $skorRingkas
+                $skorItem = null;
+
+                // Matching berdasarkan cara yang berbeda tergantung jenis alat tes
+                foreach ($skorRingkas as $score) {
+                    $match = false;
+
+                    if ($namaAlat === 'IST') {
+                        // Format: nama_subtes seperti 'SE - Pengertian Umum'
+                        if (isset($score['nama_subtes'])) {
+                            $subtes = $score['nama_subtes'];
+                            // Ekstrak kode dari awalan (misal 'SE' dari 'SE - ...')
+                            $parts = explode(' - ', trim($subtes), 2);
+                            $kodeSubtes = trim($parts[0] ?? '');
+                            if ($kodeSubtes === $kodeDim) {
+                                $match = true;
+                            }
+                        }
+                    } elseif ($namaAlat === 'DISC' || $namaAlat === 'EPPS') {
+                        // Format: dimensi seperti 'D - Dominance'
+                        if (isset($score['dimensi'])) {
+                            $dimensi = $score['dimensi'];
+                            $parts = explode(' - ', trim($dimensi), 2);
+                            $kodeDimensi = trim($parts[0] ?? '');
+                            if ($kodeDimensi === $kodeDim) {
+                                $match = true;
+                            }
+                        }
+                    } elseif ($namaAlat === 'MMPI-2') {
+                        // Format: skala_klinis seperti 'Depresi', 'Paranoia', dst
+                        // Mencoba mencocokkan via substring pada nama_dimensi atau kode jika tersedia
+                        if (isset($score['skala_klinis'])) {
+                            $skala = $score['skala_klinis'];
+                            // Pertama, cek apakah kode dim muncul di string skala (bukan biasa)
+                            if (strpos($skala, $kodeDim) !== false) {
+                                $match = true;
+                            } else {
+                                // Lalu cek apakah nama_dimensi mengandung string skala atau sebaliknya
+                                if (stripos($dim['nama_dimensi'], $skala) !== false || stripos($skala, $dim['nama_dimensi']) !== false) {
+                                    $match = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if ($match) {
+                        $skorItem = $score;
+                        break; // cukup temukan yang pertama sesuai
+                    }
+                }
+
+                if (!$skorItem) {
+                    continue; // skor tidak ditemukan,跳过 dimensi ini
+                }
+
+                // Tentukan skor numeric yang akan digunakan untuk kategori
+                $skorNilai = $this->ambilSkorNumeric($skorItem, $dim, $namaAlat);
+                if ($skorNilai === null) {
+                    continue; // tidak skor numeric ditemukan, skip
+                }
+
+                // Hitung kategori
+                $kategori = $this->hitungBerdasarkanTipe($tipeKategori, $skorNilai, $dim);
+                if ($kategori === null) {
+                    continue;
+                }
+
+                // Siapkan data aspek
+                $aspek = [
+                    'nama_dimensi' => $namaDim,
+                    'deskripsi_aspek' => $deskripsi,
+                    'kategori_hasil' => $kategori,
+                    'sumber_alat_tes' => $namaAlat,
+                ];
+
+                // Untuk bidang Sensitif, tambahkan skor T jika tersedia
+                if ($bidang === 'Sensitif' && isset($skorItem['skor_t'])) {
+                    $aspek['skor_t'] = $skorItem['skor_t'];
+                }
+
+                // Masukkan ke dalam bidang psikogram yang sesuai
+                if (array_key_exists($bidang, $psikogram)) {
+                    $psikogram[$bidang][] = $aspek;
+                }
+            }
+        }
+
+        return $psikogram;
+    }
+
+    /**
+     * Ambil nilai skor numeric dari array skor berdasarkan jenis alat tes
+     */
+    protected function ambilSkorNumeric(array $skorItem, array $dim, string $namaAlat): ?float
+    {
+        // Prioritas: skor_skala > skor_t > skor_mentah
+        if (isset($skorItem['skor_skala'])) {
+            return (float) $skorItem['skor_skala'];
+        }
+        if (isset($skorItem['skor_t'])) {
+            return (float) $skorItem['skor_t'];
+        }
+        if (isset($skorItem['skor_mentah'])) {
+            return (float) $skorItem['skor_mentah'];
+        }
+        // Coba ambil nilai dari kolom lain yang mungkin disebut sebagai skor (misal langsung nilai numeric)
+        // Sebagai fallback, coba iterate semua value numeric
+        foreach ($skorItem as $val) {
+            if (is_numeric($val)) {
+                return (float) $val;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Hitung kategori berdasarkan tipe kategori dan ambang batas
+     */
+    protected function hitungBerdasarkanTipe(string $tipeKategori, float $skor, array $dim): ?string
+    {
+        if ($tipeKategori === 'psikogram') {
+            $ambangR = $dim['ambang_r'] ?? PHP_INT_MAX;
+            $ambangK = $dim['ambang_k'] ?? PHP_INT_MAX;
+            $ambangC = $dim['ambang_c'] ?? PHP_INT_MAX;
+            $ambangB = $dim['ambang_b'] ?? PHP_INT_MAX;
+
+            if ($skor <= $ambangR) return 'R';
+            if ($skor <= $ambangK) return 'K';
+            if ($skor <= $ambangC) return 'C';
+            if ($skor <= $ambangB) return 'B';
+            return 'BS';
+        }
+
+        if ($tipeKategori === 'klinis') {
+            $ambangNormal = $dim['ambang_normal'] ?? PHP_INT_MAX;
+            $ambangPerluPerhatian = $dim['ambang_perlu_perhatian'] ?? PHP_INT_MAX;
+
+            if ($skor >= $ambangPerluPerhatian) return 'Signifikan';
+            if ($skor >= $ambangNormal) return 'Perlu Perhatian';
+            return 'Normal';
+        }
+
+        return null;
     }
 }

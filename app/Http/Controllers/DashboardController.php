@@ -201,7 +201,72 @@ class DashboardController extends Controller
     }
 
     /**
-     * Placeholder untuk halaman pengerjaan tes
+     * Halaman instruksi pengerjaan tes
+     * Menampilkan daftar alat tes yang ditugaskan dan peraturan umum
+     */
+    public function instruksi($sesiId)
+    {
+        // Ambil data sesi berdasarkan $sesiId dari data dummy
+        $sesi = null;
+        $sesiDummy = $this->getSesiTesDummy();
+
+        foreach ($sesiDummy as $s) {
+            if ((string)$s['id'] === (string)$sesiId || (int)$s['id'] === (int)$sesiId) {
+                $sesi = $s;
+                break;
+            }
+        }
+
+        // Jika tidak ditemukan, redirect ke dashboard
+        if (!$sesi) {
+            return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
+        }
+
+        // Buat detail tambahan dummy per alat tes (durasi_menit, jumlah_soal, format_dasar)
+        $detailAlatTes = [
+            'IST'   => ['durasi_menit' => 45, 'jumlah_soal' => 30, 'format_dasar' => 'Pilihan Ganda'],
+            'DISC'  => ['durasi_menit' => 30, 'jumlah_soal' => 25, 'format_dasar' => 'Pilihan Ganda'],
+            'EPPS'  => ['durasi_menit' => 40, 'jumlah_soal' => 28, 'format_dasar' => 'Pilihan Ganda'],
+            'MMPI-2' => ['durasi_menit' => 90, 'jumlah_soal' => 175, 'format_dasar' => 'Pernyataan True/False'],
+        ];
+
+        $daftarAlatTesDenganDetail = [];
+        foreach ($sesi['daftar_alat_tes_ditugaskan'] as $kodeAlat) {
+            $daftarAlatTesDenganDetail[] = [
+                'nama_alat_tes' => $this->getNamaAlatTesFull($kodeAlat),
+                'kode_alat_tes' => $kodeAlat,
+                'durasi_menit'  => $detailAlatTes[$kodeAlat]['durasi_menit'] ?? 60,
+                'jumlah_soal'   => $detailAlatTes[$kodeAlat]['jumlah_soal'] ?? 50,
+                'format_dasar'  => $detailAlatTes[$kodeAlat]['format_dasar'] ?? 'Pilihan Ganda',
+            ];
+        }
+
+        return view('peserta.instruksi', [
+            'nama_sesi' => $sesi['nama_sesi'],
+            'daftar_alat_tes_ditugaskan' => $sesi['daftar_alat_tes_ditugaskan'],
+            'daftarAlatTesDenganDetail' => $daftarAlatTesDenganDetail,
+            'departemen_terkait' => $sesi['departemen_terkait'],
+            'sesiId' => $sesi['id'],
+        ]);
+    }
+
+    /**
+     * Dapatkan nama lengkap alat tes berdasarkan kode
+     */
+    private function getNamaAlatTesFull($kode): string
+    {
+        $namaLengkap = [
+            'IST'    => 'Intelligenz Struktur Test',
+            'DISC'   => 'Dominance, Influence, Steadiness, Compliance',
+            'EPPS'   => 'Edwards Personal Preference Schedule',
+            'MMPI-2' => 'Minnesota Multiphasic Personality Inventory-2',
+        ];
+
+        return $namaLengkap[$kode] ?? $kode;
+    }
+
+    /**
+     * Placeholder untuk halaman pengerjaan tes (sedang dikerjakan)
      * Akan diisi nanti ketika module tes sudah lengkap
      */
     public function mulaiTes($sesiId)

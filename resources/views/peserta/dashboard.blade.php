@@ -71,12 +71,12 @@ $warnaAlatTes = [
 
                         <!-- Tombol Aksi -->
                         @if ($sesi['status_pengerjaan'] == 'Belum Mengerjakan')
-                            <a href="{{ route('peserta.tes', $sesi['id'] ?? $loop->iteration) }}"
+                            <a href="{{ route('peserta.tes.instruksi', $sesi['id'] ?? $loop->iteration) }}"
                                class="inline-flex items-center rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-medium text-white hover:bg-[#1e4450] transition">
                                 Mulai Tes
                             </a>
                         @elseif ($sesi['status_pengerjaan'] == 'Sedang Berjalan')
-                            <a href="{{ route('peserta.tes', $sesi['id'] ?? $loop->iteration) }}"
+                            <a href="{{ route('peserta.tes.kerjakan', $sesi['id'] ?? $loop->iteration) }}"
                                class="inline-flex items-center rounded-md bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 transition">
                                 Lanjutkan Tes
                             </a>

@@ -37,8 +37,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/aktivitas', [DashboardController::class, 'aktivitas'])->name('admin.aktivitas.index');
     Route::get('/peserta/dashboard', [DashboardController::class, 'peserta'])->name('peserta.dashboard');
 
-    // Route untuk pengerjaan tes (placeholder)
-    Route::get('/peserta/tes/{sesiId}', [DashboardController::class, 'mulaiTes'])->name('peserta.tes');
+    // Route untuk instruksi tes (baru)
+    Route::get('/peserta/tes/{sesiId}/instruksi', [DashboardController::class, 'instruksi'])->name('peserta.tes.instruksi');
+
+    // Route untuk halaman pengerjaan tes (placeholder), rename agar lebih jelas
+    Route::get('/peserta/tes/{sesiId}', [DashboardController::class, 'mulaiTes'])->name('peserta.tes.kerjakan');
 
     Route::prefix('admin/akun-karyawan')->name('admin.akun-karyawan.')->group(function () {
         Route::get('/', [PenggunaController::class, 'index'])->middleware('izin:pengguna.lihat')->name('index');

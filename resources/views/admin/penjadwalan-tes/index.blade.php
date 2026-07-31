@@ -97,7 +97,7 @@
                         <span class="font-semibold text-slate-700">{{ $persen }}%</span>
                     </div>
                     <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                        <div class="h-full {{ $persen >= 100 ? 'bg-emerald-600' : 'bg-[#2C5F6F]' }} transition-all"
+                        <div class="h-full transition-all {{ $persen >= 100 ? 'bg-emerald-600' : 'bg-[#2C5F6F]' }}">
                              style="width: {{ $persen }}%"></div>
                     </div>
                 </div>

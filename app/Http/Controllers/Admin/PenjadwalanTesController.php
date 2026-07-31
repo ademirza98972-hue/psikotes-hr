@@ -95,4 +95,9 @@ class PenjadwalanTesController extends Controller
             'daftarKandidat' => self::DUMMY_KANDIDAT,
         ]);
     }
+
+    public function simpan()
+    {
+        return redirect()->route('admin.penjadwalan-tes.index')->with('alert', 'Fitur simpan akan aktif setelah backend selesai dibangun');
+    }
 }

@@ -37,6 +37,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/aktivitas', [DashboardController::class, 'aktivitas'])->name('admin.aktivitas.index');
     Route::get('/peserta/dashboard', [DashboardController::class, 'peserta'])->name('peserta.dashboard');
 
+    // Route untuk pengerjaan tes (placeholder)
+    Route::get('/peserta/tes/{sesiId}', [DashboardController::class, 'mulaiTes'])->name('peserta.tes');
+
     Route::prefix('admin/akun-karyawan')->name('admin.akun-karyawan.')->group(function () {
         Route::get('/', [PenggunaController::class, 'index'])->middleware('izin:pengguna.lihat')->name('index');
         Route::get('/tambah', [PenggunaController::class, 'tambah'])->middleware('izin:pengguna.tambah')->name('tambah');

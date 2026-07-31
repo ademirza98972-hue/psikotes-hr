@@ -12,6 +12,80 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    /**
+     * Data peserta login sebenarnya (auth()->user()) atau fallback ke dummy
+     * RETURN OBJEK agar kompatibel dengan view yang menggunakan $pengguna->property
+     */
+    private function getPesertaLoginSaatIni(): object
+    {
+        $userAsli = auth()->user(); // Ambil user asli yang sedang login
+
+        if ($userAsli) {
+            // Gunakan data asli jika tersedia
+            return (object) [
+                'id' => $userAsli->id,
+                'name' => $userAsli->name,
+                'email' => $userAsli->email,
+                'tipe_akun' => $userAsli->tipe_akun ?? 'peserta',
+                'foto_profil' => $userAsli->foto_profil,
+                'status' => $userAsli->status ?? 'aktif',
+            ];
+        }
+
+        // Fallback data dummy jika belum ada auth sungguhan
+        return (object) [
+            'id' => 1,
+            'name' => 'Andi Pratama',
+            'email' => 'andi.pratama@company.com',
+            'tipe_akun' => 'peserta',
+            'foto_profil' => null,
+            'status' => 'aktif',
+        ];
+    }
+
+    /**
+     * Data dummy sesi tes yang ditugaskan kepada peserta simulasi
+     * Minimal 3 sesi dengan status berbeda (Belum Mengerjakan, Sedang Berjalan, Selesai)
+     * Assignment bersifat per-individu, bukan paket bersama
+     */
+    private function getSesiTesDummy(): array
+    {
+        return [
+            // Sesi Belum Mengerjakan - jadwal depan
+            [
+                'id' => 1,
+                'nama_sesi' => 'Tes Rekrutmen Q3 2025',
+                'departemen_terkait' => 'Marketing',
+                'tanggal_mulai' => '2025-08-15',
+                'tanggal_selesai' => '2025-08-25',
+                'daftar_alat_tes_ditugaskan' => ['DISC'],
+                'status_pengerjaan' => 'Belum Mengerjakan',
+            ],
+
+            // Sesi Sedang Berjalan - jadwal tengah
+            [
+                'id' => 2,
+                'nama_sesi' => 'Evaluasi Kompetensi Internal',
+                'departemen_terkait' => 'IT Development',
+                'tanggal_mulai' => '2025-08-01',
+                'tanggal_selesai' => '2025-08-10',
+                'daftar_alat_tes_ditugaskan' => ['IST', 'DISC', 'EPPS'],
+                'status_pengerjaan' => 'Sedang Berjalan',
+            ],
+
+            // Sesi Selesai - jadwal selesai
+            [
+                'id' => 3,
+                'nama_sesi' => 'Assessment Awal Karyawan',
+                'departemen_terkait' => 'HR Administration',
+                'tanggal_mulai' => '2025-07-01',
+                'tanggal_selesai' => '2025-07-05',
+                'daftar_alat_tes_ditugaskan' => ['MMPI-2', 'IST'],
+                'status_pengerjaan' => 'Selesai',
+            ],
+        ];
+    }
+
     public function admin(Request $request): View
     {
         $totalKaryawan = User::where('tipe_akun', 'karyawan')->count();
@@ -114,8 +188,24 @@ class DashboardController extends Controller
 
     public function peserta(Request $request): View
     {
+        // Gunakan data peserta simulasi sementara
+        $pengguna = $this->getPesertaLoginSaatIni();
+
+        // Ambil data sesi tes yang ditugaskan ke peserta ini
+        $sesiTes = $this->getSesiTesDummy();
+
         return view('peserta.dashboard', [
-            'pengguna' => $request->user(),
+            'pengguna' => $pengguna,
+            'sesiTes' => $sesiTes,
         ]);
+    }
+
+    /**
+     * Placeholder untuk halaman pengerjaan tes
+     * Akan diisi nanti ketika module tes sudah lengkap
+     */
+    public function mulaiTes($sesiId)
+    {
+        return view('peserta.tes-placeholder');
     }
 }

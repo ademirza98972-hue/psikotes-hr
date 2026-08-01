@@ -1,4 +1,4 @@
-@extends('layouts.auth', ['judulHalaman' => 'Daftar Akun'])
+@extends('layouts.auth', ['judulHalaman' => 'Daftar Akun', 'showVisual' => false])
 
 @section('content')
 <div x-data="{

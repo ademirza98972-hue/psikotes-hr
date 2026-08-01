@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Akun Karyawan - Psikotes HR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-tertiary-fixed": "#131b2e", background: "#f7f9fb", "outline-variant": "#c0c8cb", "on-background": "#191c1e", "on-secondary": "#ffffff", "on-surface-variant": "#40484b", "on-secondary-fixed-variant": "#39485e", "on-tertiary-container": "#a5adc6", "surface-container-lowest": "#ffffff", "surface-container-highest": "#e0e3e5", tertiary: "#232b3f", "on-primary-fixed-variant": "#164d5d", "surface-bright": "#f7f9fb", "primary-fixed": "#b8eafe", outline: "#71787c", "on-surface": "#191c1e", "inverse-primary": "#9ccee1", secondary: "#505f76", "surface-container-low": "#f2f4f6", primary: "#00303c", "surface-tint": "#336576", "on-primary": "#ffffff", "primary-container": "#0d4757", "inverse-on-surface": "#eff1f3", "on-primary-fixed": "#001f28", surface: "#f7f9fb", "secondary-fixed": "#d4e3ff", "surface-variant": "#e0e3e5", "tertiary-fixed": "#dae2fd", "surface-dim": "#d8dadc", error: "#ba1a1a", "surface-container-high": "#e6e8ea", "on-tertiary": "#ffffff", "error-container": "#ffdad6", "on-tertiary-fixed-variant": "#3e465c", "on-error-container": "#93000a", "on-secondary-fixed": "#0c1c30", "on-primary-container": "#83b5c7", "secondary-fixed-dim": "#b8c7e2", "surface-container": "#eceef0", "tertiary-fixed-dim": "#bec6e0", "on-error": "#ffffff", "inverse-surface": "#2d3133", "on-secondary-container": "#56657c", "secondary-container": "#d4e3ff", "primary-fixed-dim": "#9ccee1", "tertiary-container": "#394156", "info-warning-text": "#854d0e", "info-warning-border": "#fef08a", "border-subtle": "#e0e3e5", "success-icon": "#0d4757", "info-warning-bg": "#fefce8"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {"stack-lg": "32px", "margin-mobile": "16px", gutter: "24px", "stack-sm": "8px", "container-max": "1440px", "sidebar-width": "280px", "stack-md": "16px", "header-height": "64px"}, fontFamily: {"body-md": ["Work Sans"], "display-lg-mobile": ["Work Sans"], "headline-md": ["Work Sans"], "display-lg": ["Work Sans"], "data-mono": ["Work Sans"], "label-sm": ["Work Sans"], "title-sm": ["Work Sans"], "body-lg": ["Work Sans"], "label-caps": ["Work Sans"]}, fontSize: {"body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}], "display-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "600"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "display-lg": ["36px", {lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "600"}], "data-mono": ["14px", {lineHeight: "20px", letterSpacing: "-0.01em", fontWeight: "400"}], "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "500"}], "title-sm": ["18px", {lineHeight: "24px", fontWeight: "600"}], "body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "label-caps": ["11px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}]}}}};</script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- SideNavBar Anchor -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col overflow-y-auto hide-scrollbar z-50">
+<div class="p-6 mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h1 class="text-title-sm font-title-sm font-bold text-primary">Psikotes HR</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Enterprise HR Portal</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-primary bg-primary-container/10 border-l-4 border-primary font-title-sm scale-[0.99] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">badge</span>
+<span>Akun Karyawan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">person_search</span>
+<span>Akun Kandidat</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Data Karyawan</span>
+</a>
+<div class="pt-4 pb-2 px-4">
+<span class="text-label-sm font-label-sm text-outline tracking-wider uppercase">Manajemen Tes</span>
+</div>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">database</span>
+<span>Bank Soal</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>Penjadwalan Tes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Hasil Tes</span>
+</a>
+<div class="pt-4 pb-2 px-4 border-t border-outline-variant mt-4">
+<span class="text-label-sm font-label-sm text-outline tracking-wider uppercase">Pengaturan</span>
+</div>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span>Kelola Peran &amp; Izin</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings_suggest</span>
+<span>Data Master</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-outline-variant">
+<div class="flex items-center gap-3 px-2 py-2">
+<img class="w-10 h-10 rounded-full border border-outline-variant" data-alt="A professional headshot of an HR executive, high quality lighting, corporate attire, neutral studio background, 8k resolution, centered composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfnPdwVSriAF1C0wd9j2tkxoLE1RwW13ePl8_Sc2gAbRmKv9_VAoVKZOa-1L8N9gCNd8EQPD-UrldrR2Kyeu476SbdMYUHZn2aC0WxPwbWq9ekM_Ycb4ceMCH5A9T9Ow2-kTa6ssFZXVDCgvM8tgK_8RduXVNO-Ksv2jldB9YLU5FAcvb7pz-OGRGex3O9NF0im5bjYyYgMDEsY-AkNAx0iKQ4wTAzXfR2bL3zpjZ530884NrvVLH7"/>
+<div class="overflow-hidden">
+<p class="text-body-md font-bold truncate">Admin HR</p>
+<p class="text-label-sm text-on-surface-variant truncate">admin@psikoteshr.com</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-[280px] min-h-screen flex flex-col">
+<!-- TopNavBar Anchor -->
+<header class="h-16 bg-surface flex justify-between items-center px-gutter sticky top-0 z-40 border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-outline">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-body-md w-64 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Cari menu atau data..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary font-bold font-body-md" href="#">Manajemen Akun</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Psikotes</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Pengaturan</a>
+</div>
+<div class="flex items-center gap-3 border-l border-outline-variant pl-6">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Breadcrumb & Page Header -->
+<section class="px-gutter pt-8 pb-4">
+<nav class="flex items-center gap-2 text-label-sm text-on-surface-variant mb-2">
+<a class="hover:text-primary" href="#">Manajemen Akun</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-medium">Akun Karyawan</span>
+</nav>
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Daftar Akun Karyawan</h2>
+<p class="text-body-md text-on-surface-variant mt-1">Kelola akses dan informasi akun seluruh karyawan perusahaan.</p>
+</div>
+<button class="bg-primary text-white px-5 py-2.5 rounded-lg flex items-center gap-2 hover:opacity-90 transition-all shadow-sm active:scale-95">
+<span class="material-symbols-outlined">person_add</span>
+<span class="font-medium text-body-md">Tambah Akun Karyawan</span>
+</button>
+</div>
+</section>
+<!-- Content Canvas -->
+<section class="px-gutter pb-stack-lg flex-1">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<!-- Table Filters -->
+<div class="p-6 border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-3 flex-1">
+<div class="relative w-full max-w-xs">
+<span class="absolute inset-y-0 left-3 flex items-center text-outline">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="w-full border border-outline-variant rounded-lg pl-10 pr-4 py-2 text-body-md focus:border-primary focus:ring-1 focus:ring-primary/10 outline-none transition-all" placeholder="Cari Nama atau NIK..." type="text"/>
+</div>
+<div class="relative">
+<select class="appearance-none border border-outline-variant rounded-lg pl-4 pr-10 py-2 text-body-md bg-white focus:border-primary focus:ring-1 focus:ring-primary/10 outline-none transition-all cursor-pointer">
+<option value="">Semua Departemen</option>
+<option value="it">Teknologi Informasi</option>
+<option value="hr">Human Resources</option>
+<option value="finance">Finance &amp; Accounting</option>
+<option value="marketing">Marketing</option>
+<option value="operations">Operations</option>
+</select>
+<span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">file_download</span>
+</button>
+</div>
+</div>
+<!-- Table Content -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Nama Karyawan</th>
+<th class="px-6 py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">NIK</th>
+<th class="px-6 py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Departemen</th>
+<th class="px-6 py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Posisi</th>
+<th class="px-6 py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider text-center">Status Akun</th>
+<th class="px-6 py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-label-sm">
+                                            AS
+                                        </div>
+<div>
+<p class="text-body-md font-semibold">Andi Saputra</p>
+<p class="text-label-sm text-on-surface-variant">andi.s@company.id</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md font-data-mono">202300451</td>
+<td class="px-6 py-4 text-body-md">Teknologi Informasi</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">Senior Developer</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-medium bg-green-100 text-green-800 border border-green-200">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-1.5"></span>
+                                        Aktif
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-bold text-label-sm">
+                                            BW
+                                        </div>
+<div>
+<p class="text-body-md font-semibold">Budi Wijaya</p>
+<p class="text-label-sm text-on-surface-variant">budi.w@company.id</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md font-data-mono">202300458</td>
+<td class="px-6 py-4 text-body-md">Marketing</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">Content Strategist</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-medium bg-green-100 text-green-800 border border-green-200">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-1.5"></span>
+                                        Aktif
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-label-sm">
+                                            CP
+                                        </div>
+<div>
+<p class="text-body-md font-semibold text-on-surface-variant">Citra Permata</p>
+<p class="text-label-sm text-on-surface-variant">citra.p@company.id</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md font-data-mono text-on-surface-variant">202300462</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">Human Resources</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">Recruiter</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant mr-1.5"></span>
+                                        Nonaktif
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary font-bold text-label-sm">
+                                            DR
+                                        </div>
+<div>
+<p class="text-body-md font-semibold">Dani Ramadhan</p>
+<p class="text-label-sm text-on-surface-variant">dani.r@company.id</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md font-data-mono">202300475</td>
+<td class="px-6 py-4 text-body-md">Finance &amp; Accounting</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">Tax Specialist</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-medium bg-green-100 text-green-800 border border-green-200">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-1.5"></span>
+                                        Aktif
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Area -->
+<div class="p-6 border-t border-outline-variant flex items-center justify-between">
+<p class="text-label-sm text-on-surface-variant">Menampilkan <span class="font-bold text-on-surface">1 - 4</span> dari <span class="font-bold text-on-surface">128</span> karyawan</p>
+<div class="flex items-center gap-2">
+<button class="w-9 h-9 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center bg-primary text-white rounded-lg font-bold text-label-sm">1</button>
+<button class="w-9 h-9 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-sm">2</button>
+<button class="w-9 h-9 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-sm">3</button>
+<span class="px-2 text-outline">...</span>
+<button class="w-9 h-9 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-sm">32</button>
+<button class="w-9 h-9 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer Note -->
+<footer class="px-gutter py-6 mt-auto border-t border-outline-variant text-center">
+<p class="text-label-sm text-on-surface-variant">© 2024 Psikotes HR Enterprise. Hak Cipta Dilindungi Undang-Undang.</p>
+</footer>
+</main>
+<!-- Micro-interactions Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Highlight row on click
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                row.addEventListener('click', () => {
+                    rows.forEach(r => r.classList.remove('bg-primary-container/5'));
+                    row.classList.add('bg-primary-container/5');
+                });
+            });
+
+            // Search input focus effect
+            const searchInput = document.querySelector('input[type="text"]');
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+            });
+        });
+    </script>
+</body></html>

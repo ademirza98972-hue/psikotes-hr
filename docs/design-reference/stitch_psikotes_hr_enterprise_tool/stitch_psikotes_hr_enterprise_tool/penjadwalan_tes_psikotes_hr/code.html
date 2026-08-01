@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Penjadwalan Tes - HR Assessment System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#164d5d",
+                    "on-error": "#ffffff",
+                    "success-icon": "#0d4757",
+                    "primary-container": "#0d4757",
+                    "on-secondary-fixed": "#0c1c30",
+                    "inverse-surface": "#2d3133",
+                    "on-surface": "#191c1e",
+                    "surface": "#f7f9fb",
+                    "border-subtle": "#e0e3e5",
+                    "surface-container": "#eceef0",
+                    "secondary": "#505f76",
+                    "on-secondary-fixed-variant": "#39485e",
+                    "surface-tint": "#336576",
+                    "primary": "#00303c",
+                    "on-tertiary-fixed-variant": "#3e465c",
+                    "on-primary-container": "#83b5c7",
+                    "inverse-on-surface": "#eff1f3",
+                    "surface-container-high": "#e6e8ea",
+                    "info-warning-bg": "#fefce8",
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#b8c7e2",
+                    "on-tertiary-fixed": "#131b2e",
+                    "on-primary-fixed": "#001f28",
+                    "info-warning-text": "#854d0e",
+                    "tertiary-fixed": "#dae2fd",
+                    "surface-bright": "#f7f9fb",
+                    "primary-fixed-dim": "#9ccee1",
+                    "info-warning-border": "#fef08a",
+                    "tertiary": "#232b3f",
+                    "secondary-fixed": "#d4e3ff",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#d4e3ff",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "outline-variant": "#c0c8cb",
+                    "on-background": "#191c1e",
+                    "surface-container-highest": "#e0e3e5",
+                    "primary-fixed": "#b8eafe",
+                    "on-surface-variant": "#40484b",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-container": "#56657c",
+                    "surface-container-low": "#f2f4f6",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-container": "#a5adc6",
+                    "inverse-primary": "#9ccee1",
+                    "surface-dim": "#d8dadc",
+                    "tertiary-container": "#394156",
+                    "background": "#f7f9fb",
+                    "outline": "#71787c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-lg": "32px",
+                    "sidebar-width": "280px",
+                    "gutter": "24px",
+                    "header-height": "64px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "headline-md": ["Work Sans"],
+                    "display-lg": ["Work Sans"],
+                    "body-md": ["Work Sans"],
+                    "label-sm": ["Work Sans"],
+                    "label-caps": ["Work Sans"]
+            },
+            "fontSize": {
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .sidebar-active {
+            background-color: #d4e3ff; /* secondary-container */
+            color: #56657c; /* on-secondary-container */
+            border-left: 4px solid #00303c; /* primary */
+            font-weight: 600;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c0c8cb;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-md z-30">
+<div class="px-gutter mb-stack-lg">
+<h1 class="font-title-sm text-title-sm font-bold text-primary">HR Portal</h1>
+<p class="font-label-sm text-label-sm text-secondary">Psychometric Testing</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-gutter py-3 text-secondary font-body-md hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-gutter py-3 text-secondary font-body-md hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">quiz</span>
+                Bank Soal
+            </a>
+<!-- Active State: Penjadwalan Tes -->
+<a class="flex items-center px-gutter py-3 bg-secondary-container text-on-secondary-container border-l-4 border-primary font-semibold font-body-md transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3" style="font-variation-settings: 'FILL' 1;">event_note</span>
+                Penjadwalan Tes
+            </a>
+<a class="flex items-center px-gutter py-3 text-secondary font-body-md hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span>
+                Hasil Tes
+            </a>
+</nav>
+<div class="mt-auto pt-stack-md border-t border-outline-variant space-y-1">
+<a class="flex items-center px-gutter py-3 text-secondary font-body-md hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+                Settings
+            </a>
+<a class="flex items-center px-gutter py-3 text-secondary font-body-md hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">help</span>
+                Bantuan
+            </a>
+</div>
+</aside>
+<!-- Header / Top Bar -->
+<header class="fixed top-0 right-0 h-header-height bg-surface border-b border-outline-variant z-20 flex items-center justify-between px-gutter w-[calc(100%-280px)] ml-sidebar-width">
+<div class="flex items-center space-x-4">
+<span class="font-headline-md text-headline-md font-bold text-primary">HR Assessment System</span>
+</div>
+<div class="flex items-center space-x-6">
+<div class="flex space-x-4 text-on-surface-variant font-label-sm">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary font-bold border-b-2 border-primary" href="#">Evaluasi</a>
+</div>
+<div class="flex items-center space-x-3">
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of an HR administrator with a warm and focused expression, set against a blurred modern office background with soft neutral lighting and corporate teal color accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaE07tNKMN80dRd_6_OLJd1bHdGfwitMioD5b80dNg1Zhld6OxvSywI5viYKmVjLv-fyFRtn77CpHs8_rJ1FAoMTpJdtu95hNFQVSD9gxWGAuaQWTd9U46hLI6K2CHbyViW85Oi2Dod2xgRSlpFZwPaB9HWmLREgiwzk051TUaMR6d9Vj8ECycKlr5R2Sjqudu-o2eoXvQmDUDoDtqfm1JUIejyWMq0CZK5QxXkRCDrwWB_jV14EQJ"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-header-height ml-sidebar-width min-h-screen">
+<div class="max-w-container-max mx-auto p-gutter">
+<!-- Page Header Actions -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-stack-lg space-y-4 md:space-y-0">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Penjadwalan Tes</h2>
+<p class="font-body-md text-on-surface-variant">Kelola daftar peserta dan penugasan alat tes psikometri.</p>
+</div>
+<button class="flex items-center justify-center space-x-2 bg-primary text-white px-6 py-2.5 rounded-xl font-body-md shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">task_alt</span>
+<span>Terapkan ke Semua Peserta</span>
+</button>
+</div>
+<!-- Filter & Search Bar -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 mb-stack-md flex flex-wrap gap-4 items-center">
+<div class="relative min-w-[200px]">
+<select class="w-full appearance-none bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2 font-body-md text-on-surface-variant focus:ring-2 focus:ring-primary outline-none transition-all">
+<option value="">Semua Departemen</option>
+<option value="hr">Human Resources</option>
+<option value="it">Information Technology</option>
+<option value="fin">Finance &amp; Accounting</option>
+<option value="sales">Sales &amp; Marketing</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+<div class="relative flex-1 min-w-[300px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-xl pl-10 pr-4 py-2 font-body-md text-on-surface focus:ring-2 focus:ring-primary outline-none transition-all" placeholder="Cari nama peserta atau posisi..." type="text"/>
+</div>
+<div class="flex items-center space-x-2 ml-auto">
+<span class="font-label-sm text-secondary">Urutkan:</span>
+<button class="flex items-center space-x-1 font-label-sm font-bold text-primary">
+<span>Terbaru</span>
+<span class="material-symbols-outlined text-[16px]">sort</span>
+</button>
+</div>
+</div>
+<!-- Table of Participants -->
+<div class="bg-white rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-6 py-4 font-label-caps text-on-surface-variant uppercase tracking-wider border-b border-outline-variant">Nama</th>
+<th class="px-6 py-4 font-label-caps text-on-surface-variant uppercase tracking-wider border-b border-outline-variant">Departemen</th>
+<th class="px-6 py-4 font-label-caps text-on-surface-variant uppercase tracking-wider border-b border-outline-variant">Posisi</th>
+<th class="px-6 py-4 font-label-caps text-on-surface-variant uppercase tracking-wider border-b border-outline-variant">Alat Tes yang Ditugaskan</th>
+<th class="px-6 py-4 font-label-caps text-on-surface-variant uppercase tracking-wider border-b border-outline-variant text-center">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle">
+<tr class="hover:bg-surface-container transition-colors duration-150">
+<td class="px-6 py-4 font-body-md font-semibold">Budi Santoso</td>
+<td class="px-6 py-4 font-body-md">Information Technology</td>
+<td class="px-6 py-4 font-body-md">Senior Developer</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-bold border border-blue-200">DISC</span>
+<span class="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[11px] font-bold border border-purple-200">IST</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-secondary hover:text-primary hover:bg-surface-container-high rounded-lg transition-all" onclick="openModal('Budi Santoso')">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors duration-150">
+<td class="px-6 py-4 font-body-md font-semibold">Siti Aminah</td>
+<td class="px-6 py-4 font-body-md">Human Resources</td>
+<td class="px-6 py-4 font-body-md">HRBP Specialist</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-bold border border-blue-200">DISC</span>
+<span class="px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 text-[11px] font-bold border border-green-200">EPPS</span>
+<span class="px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[11px] font-bold border border-orange-200">MMPI-2</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-secondary hover:text-primary hover:bg-surface-container-high rounded-lg transition-all" onclick="openModal('Siti Aminah')">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors duration-150">
+<td class="px-6 py-4 font-body-md font-semibold">Andi Wijaya</td>
+<td class="px-6 py-4 font-body-md">Finance &amp; Accounting</td>
+<td class="px-6 py-4 font-body-md">Internal Auditor</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[11px] font-bold border border-purple-200">IST</span>
+<span class="px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[11px] font-bold border border-orange-200">MMPI-2</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-secondary hover:text-primary hover:bg-surface-container-high rounded-lg transition-all" onclick="openModal('Andi Wijaya')">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors duration-150">
+<td class="px-6 py-4 font-body-md font-semibold">Dewi Lestari</td>
+<td class="px-6 py-4 font-body-md">Sales &amp; Marketing</td>
+<td class="px-6 py-4 font-body-md">Account Manager</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-bold border border-blue-200">DISC</span>
+<span class="px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 text-[11px] font-bold border border-green-200">EPPS</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-secondary hover:text-primary hover:bg-surface-container-high rounded-lg transition-all" onclick="openModal('Dewi Lestari')">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors duration-150">
+<td class="px-6 py-4 font-body-md font-semibold">Rian Hidayat</td>
+<td class="px-6 py-4 font-body-md">IT Support</td>
+<td class="px-6 py-4 font-body-md">Lead Technician</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-bold border border-blue-200">DISC</span>
+<span class="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[11px] font-bold border border-purple-200">IST</span>
+<span class="px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[11px] font-bold border border-orange-200">MMPI-2</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-secondary hover:text-primary hover:bg-surface-container-high rounded-lg transition-all" onclick="openModal('Rian Hidayat')">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-4 bg-surface-container-low flex items-center justify-between">
+<p class="font-label-sm text-secondary">Menampilkan 5 dari 128 peserta</p>
+<div class="flex space-x-2">
+<button class="px-3 py-1 border border-outline-variant rounded bg-white text-secondary hover:bg-surface-container transition-colors">Prev</button>
+<button class="px-3 py-1 border border-primary rounded bg-primary text-white">1</button>
+<button class="px-3 py-1 border border-outline-variant rounded bg-white text-secondary hover:bg-surface-container transition-colors">2</button>
+<button class="px-3 py-1 border border-outline-variant rounded bg-white text-secondary hover:bg-surface-container transition-colors">3</button>
+<button class="px-3 py-1 border border-outline-variant rounded bg-white text-secondary hover:bg-surface-container transition-colors">Next</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal: Assigning Tests (Open by default per prompt request) -->
+<div class="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 flex items-center justify-center p-4" id="modalOverlay">
+<div class="bg-white w-full max-w-md rounded-xl shadow-xl overflow-hidden border border-outline-variant animate-in fade-in zoom-in duration-200">
+<!-- Modal Header -->
+<div class="px-6 py-4 border-b border-outline-variant flex items-center justify-between">
+<h3 class="font-title-sm text-title-sm text-primary">Penugasan Alat Tes</h3>
+<button class="text-secondary hover:text-error transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Content -->
+<div class="p-6">
+<div class="mb-6 flex items-center p-3 bg-surface-container rounded-lg">
+<div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white mr-3">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-body-md font-bold text-primary" id="modalUserName">Budi Santoso</p>
+<p class="font-label-sm text-secondary">Atur instrumen yang akan dikerjakan</p>
+</div>
+</div>
+<div class="space-y-4">
+<p class="font-label-caps text-on-surface-variant uppercase tracking-widest">Pilih Instrumen</p>
+<label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:bg-surface-container transition-all cursor-pointer group">
+<div class="flex items-center">
+<span class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-[10px] mr-3">DISC</span>
+<div>
+<p class="font-body-md font-semibold text-primary">Dominance, Influence, Steadiness, Compliance</p>
+<p class="font-label-sm text-secondary">Profil perilaku kerja</p>
+</div>
+</div>
+<input checked="" class="h-5 w-5 rounded text-primary focus:ring-primary border-outline-variant transition-all" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:bg-surface-container transition-all cursor-pointer group">
+<div class="flex items-center">
+<span class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-[10px] mr-3">IST</span>
+<div>
+<p class="font-body-md font-semibold text-primary">Intelligenz Struktur Test</p>
+<p class="font-label-sm text-secondary">Pengukuran intelegensi umum</p>
+</div>
+</div>
+<input class="h-5 w-5 rounded text-primary focus:ring-primary border-outline-variant transition-all" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:bg-surface-container transition-all cursor-pointer group">
+<div class="flex items-center">
+<span class="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-[10px] mr-3">EPPS</span>
+<div>
+<p class="font-body-md font-semibold text-primary">Edwards Personal Preference Schedule</p>
+<p class="font-label-sm text-secondary">Kecenderungan kebutuhan psikologis</p>
+</div>
+</div>
+<input class="h-5 w-5 rounded text-primary focus:ring-primary border-outline-variant transition-all" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:bg-surface-container transition-all cursor-pointer group">
+<div class="flex items-center">
+<span class="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-[10px] mr-3">MMPI-2</span>
+<div>
+<p class="font-body-md font-semibold text-primary">Minnesota Multiphasic Personality Inventory</p>
+<p class="font-label-sm text-secondary">Skrining kesehatan mental klinis</p>
+</div>
+</div>
+<input class="h-5 w-5 rounded text-primary focus:ring-primary border-outline-variant transition-all" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline-variant flex justify-end space-x-3">
+<button class="px-4 py-2 border border-outline font-body-md rounded-xl hover:bg-white transition-colors" onclick="closeModal()">Batal</button>
+<button class="px-6 py-2 bg-primary text-white font-body-md font-bold rounded-xl shadow-sm hover:opacity-90 transition-opacity" onclick="closeModal()">Simpan Perubahan</button>
+</div>
+</div>
+</div>
+<script>
+        function openModal(userName) {
+            document.getElementById('modalUserName').innerText = userName;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            document.getElementById('modalOverlay').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+            document.getElementById('modalOverlay').classList.remove('flex');
+        }
+
+        // Close on clicking outside the modal content
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body></html>

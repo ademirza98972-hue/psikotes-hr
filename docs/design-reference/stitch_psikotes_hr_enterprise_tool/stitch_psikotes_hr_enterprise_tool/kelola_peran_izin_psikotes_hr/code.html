@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kelola Peran &amp; Izin - Psikotes HR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {outline: "#71787c", "secondary-fixed": "#d4e3ff", "on-background": "#191c1e", tertiary: "#232b3f", "on-tertiary-container": "#a5adc6", "on-secondary-container": "#56657c", "inverse-primary": "#9ccee1", "surface-container-low": "#f2f4f6", "on-secondary": "#ffffff", "on-error-container": "#93000a", "on-primary-fixed-variant": "#164d5d", "error-container": "#ffdad6", "on-primary-fixed": "#001f28", "primary-fixed": "#b8eafe", "on-primary-container": "#83b5c7", "inverse-on-surface": "#eff1f3", "on-surface": "#191c1e", "tertiary-fixed-dim": "#bec6e0", "surface-variant": "#e0e3e5", "on-tertiary-fixed": "#131b2e", "outline-variant": "#c0c8cb", primary: "#00303c", "on-secondary-fixed": "#0c1c30", "on-primary": "#ffffff", "secondary-container": "#d4e3ff", "on-tertiary": "#ffffff", error: "#ba1a1a", "on-secondary-fixed-variant": "#39485e", "tertiary-container": "#394156", "primary-fixed-dim": "#9ccee1", "tertiary-fixed": "#dae2fd", "surface-dim": "#d8dadc", "on-tertiary-fixed-variant": "#3e465c", "surface-container-high": "#e6e8ea", "secondary-fixed-dim": "#b8c7e2", secondary: "#505f76", "on-error": "#ffffff", surface: "#f7f9fb", "inverse-surface": "#2d3133", "surface-container": "#eceef0", "surface-bright": "#f7f9fb", "surface-container-lowest": "#ffffff", "primary-container": "#0d4757", "on-surface-variant": "#40484b", background: "#f7f9fb", "surface-container-highest": "#e0e3e5", "surface-tint": "#336576", "info-warning-text": "#854d0e", "info-warning-border": "#fef08a", "border-subtle": "#e0e3e5", "success-icon": "#0d4757", "info-warning-bg": "#fefce8"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {"stack-sm": "8px", gutter: "24px", "stack-md": "16px", "sidebar-width": "280px", "container-max": "1440px", "stack-lg": "32px", "margin-mobile": "16px", "header-height": "64px"}, fontFamily: {"title-sm": ["Work Sans"], "body-lg": ["Work Sans"], "label-sm": ["Work Sans"], "headline-md": ["Work Sans"], "display-lg": ["Work Sans"], "body-md": ["Work Sans"], "data-mono": ["Work Sans"], "label-caps": ["Work Sans"]}, fontSize: {"title-sm": ["18px", {lineHeight: "24px", fontWeight: "600"}], "body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "500"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "display-lg": ["36px", {lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "600"}], "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}], "data-mono": ["14px", {lineHeight: "20px", letterSpacing: "-0.01em", fontWeight: "400"}], "label-caps": ["11px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}]}}}};</script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c0c8cb; border-radius: 10px; }
+        .active-role-card { border-left: 4px solid #0d4757; background-color: #eceef0; }
+        .checkbox-custom:checked { background-color: #0d4757; border-color: #0d4757; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col z-50">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h1 class="font-title-sm text-title-sm font-bold text-primary">Psikotes HR</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise HR Portal</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-2 space-y-1 custom-scrollbar">
+<div class="px-4 py-2 mt-4">
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Main Menu</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded" href="#">
+<span class="material-symbols-outlined">badge</span>
+                Akun Karyawan
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded" href="#">
+<span class="material-symbols-outlined">person_search</span>
+                Akun Kandidat
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded" href="#">
+<span class="material-symbols-outlined">group</span>
+                Data Karyawan
+            </a>
+<div class="px-4 py-2 mt-4">
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Assessment</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded" href="#">
+<span class="material-symbols-outlined">database</span>
+                Bank Soal
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+                Penjadwalan Tes
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Hasil Tes
+            </a>
+<div class="px-4 py-2 mt-4">
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider">System</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-2 text-primary bg-primary-container/10 border-l-4 border-primary font-title-sm transition-transform duration-150 scale-[0.99]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+                Kelola Peran &amp; Izin
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded" href="#">
+<span class="material-symbols-outlined">settings_suggest</span>
+                Data Master
+            </a>
+</nav>
+<div class="p-4 border-t border-outline-variant">
+<div class="flex items-center gap-3 p-2">
+<img class="w-10 h-10 rounded-full bg-surface-container-highest object-cover" data-alt="Close up professional headshot of a corporate HR manager with a friendly expression, wearing professional attire, soft office lighting in the background, sharp focus, cinematic corporate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCYf6F_o7rkjyhdB718kMO6CQxmrI7xZdQXcU9igcE1f7SXy3BFFkzSbhl62FZx-qtM6IvkSgnnTy2YNbVbl_EIMsQWMeNNRIyrUAOzHKlZB5sU5Qs-idMoc0I3tk8puQCUDPHuqaWUkv8d7TnN4R7vI1Y2_etW_vcYds1lxkGM4YSFW1lbBU92A7WO67eTNJtu3EPIHDwYAcZTtQQdQKWbC00JP6iewl9eiEWUocwpzOjVHsmiWyk"/>
+<div class="overflow-hidden">
+<p class="font-title-sm text-sm font-bold truncate">Budi Santoso</p>
+<p class="font-label-sm text-xs text-on-surface-variant truncate">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Header Navigation Bar -->
+<header class="fixed top-0 left-[280px] w-[calc(100%-280px)] h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-gutter z-40">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-body-md transition-all" placeholder="Cari izin atau modul..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="font-body-md">Manajemen Akun</span>
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] mt-16 p-gutter min-h-screen">
+<div class="max-w-container-max mx-auto">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 mb-6">
+<span class="font-label-sm text-on-surface-variant">System</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+<span class="font-label-sm text-primary font-bold">Kelola Peran &amp; Izin</span>
+</div>
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-background">Konfigurasi Peran &amp; Hak Akses</h2>
+<p class="font-body-lg text-on-surface-variant">Atur batasan akses operasional untuk setiap kategori pengguna dalam portal.</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-title-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined">add</span>
+                    Tambah Peran Baru
+                </button>
+</div>
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Left Column: Role List -->
+<div class="col-span-12 lg:col-span-4 space-y-4">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="p-4 border-b border-outline-variant bg-surface-container-low">
+<h3 class="font-title-sm text-on-surface">Daftar Peran</h3>
+</div>
+<div class="divide-y divide-outline-variant">
+<!-- Super Admin Role -->
+<div class="p-5 active-role-card cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-title-sm font-bold text-primary">Super Admin</p>
+<p class="font-body-md text-on-surface-variant mt-1">Akses penuh ke seluruh modul sistem dan pengaturan data master.</p>
+</div>
+<span class="material-symbols-outlined text-primary">verified_user</span>
+</div>
+<div class="mt-4 flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-sm">person</span>
+<span class="font-label-sm">2 Pengguna aktif</span>
+</div>
+</div>
+<!-- Admin HR Role -->
+<div class="p-5 bg-white cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-title-sm font-bold text-on-surface">Admin HR</p>
+<p class="font-body-md text-on-surface-variant mt-1">Mengelola data karyawan, bank soal, dan hasil tes psikologi.</p>
+</div>
+<span class="material-symbols-outlined text-outline">shield</span>
+</div>
+<div class="mt-4 flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-sm">person</span>
+<span class="font-label-sm">5 Pengguna aktif</span>
+</div>
+</div>
+<!-- Staff HR Role -->
+<div class="p-5 bg-white cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-title-sm font-bold text-on-surface">Staff HR</p>
+<p class="font-body-md text-on-surface-variant mt-1">Terbatas pada input data karyawan dan pemantauan jadwal tes.</p>
+</div>
+<span class="material-symbols-outlined text-outline">security</span>
+</div>
+<div class="mt-4 flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-sm">person</span>
+<span class="font-label-sm">12 Pengguna aktif</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Yellow Info Box -->
+<div class="bg-yellow-50 border border-yellow-200 p-4 rounded-xl flex gap-3">
+<span class="material-symbols-outlined text-yellow-600">info</span>
+<div class="font-body-md text-yellow-800">
+<p class="font-bold">Informasi Penting</p>
+<p class="mt-1">Perubahan izin akan berdampak langsung pada seluruh akun yang terhubung dengan peran ini. Pastikan untuk meninjau kembali matriks izin sebelum menyimpan.</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Permission Matrix -->
+<div class="col-span-12 lg:col-span-8">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col h-full">
+<div class="p-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<div>
+<h3 class="font-title-sm text-on-surface">Matriks Izin: <span class="text-primary font-bold">Super Admin</span></h3>
+</div>
+<div class="flex items-center gap-2">
+<label class="font-label-sm text-outline flex items-center gap-2 cursor-pointer">
+<input checked="" class="checkbox-custom rounded text-primary focus:ring-primary" type="checkbox"/>
+                                    Pilih Semua
+                                </label>
+</div>
+</div>
+<!-- Table Grid -->
+<div class="flex-1 overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="px-6 py-4 font-label-sm text-outline uppercase">Nama Modul</th>
+<th class="px-4 py-4 font-label-sm text-outline uppercase text-center">Lihat</th>
+<th class="px-4 py-4 font-label-sm text-outline uppercase text-center">Tambah</th>
+<th class="px-4 py-4 font-label-sm text-outline uppercase text-center">Edit</th>
+<th class="px-4 py-4 font-label-sm text-outline uppercase text-center">Hapus</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Module: Data Karyawan -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-5">
+<p class="font-body-md font-bold text-on-surface">Data Karyawan</p>
+<p class="font-label-sm text-on-surface-variant">Manajemen profil dan histori kepegawaian</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+</tr>
+<!-- Module: Hasil Tes -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-5">
+<p class="font-body-md font-bold text-on-surface">Hasil Tes</p>
+<p class="font-label-sm text-on-surface-variant">Akses laporan psikogram dan analisis kandidat</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+</tr>
+<!-- Module: Bank Soal -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-5">
+<p class="font-body-md font-bold text-on-surface">Bank Soal</p>
+<p class="font-label-sm text-on-surface-variant">Pengaturan kategori dan butir soal psikotes</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+</tr>
+<!-- Module: Penjadwalan -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-5">
+<p class="font-body-md font-bold text-on-surface">Penjadwalan Tes</p>
+<p class="font-label-sm text-on-surface-variant">Pengaturan waktu dan kuota tes online</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+</tr>
+<!-- Module: Akun -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-5">
+<p class="font-body-md font-bold text-on-surface">Manajemen Akun</p>
+<p class="font-label-sm text-on-surface-variant">Pembuatan user login dan reset password</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+<td class="px-4 py-5 text-center"><input checked="" class="checkbox-custom rounded w-5 h-5 text-primary" type="checkbox"/></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer Actions -->
+<div class="p-6 border-t border-outline-variant bg-surface flex justify-end gap-3">
+<button class="px-6 py-2 border border-outline text-on-surface-variant rounded-lg font-title-sm hover:bg-surface-container-high transition-colors">
+                                Batalkan
+                            </button>
+<button class="px-8 py-2 bg-primary text-on-primary rounded-lg font-title-sm shadow-sm hover:opacity-90 transition-all active:scale-[0.98]">
+                                Simpan Perubahan
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple Micro-interactions
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const row = this.closest('tr');
+                if (row) {
+                    row.classList.add('bg-primary/5');
+                    setTimeout(() => row.classList.remove('bg-primary/5'), 300);
+                }
+            });
+        });
+
+        // Search highlight logic (mock)
+        const searchInput = document.querySelector('input[placeholder="Cari izin atau modul..."]');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Psikotes HR - Data Master</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c0c8cb;
+            border-radius: 10px;
+        }
+        
+        .tab-active {
+            border-bottom: 2px solid #0d4757;
+            color: #0d4757;
+            font-weight: 600;
+        }
+
+        /* Tonal Layering for Depth */
+        .card-level-1 {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0; /* Slate-200 equivalent */
+        }
+    </style>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {outline: "#71787c", "secondary-fixed": "#d4e3ff", "on-background": "#191c1e", tertiary: "#232b3f", "on-tertiary-container": "#a5adc6", "on-secondary-container": "#56657c", "inverse-primary": "#9ccee1", "surface-container-low": "#f2f4f6", "on-secondary": "#ffffff", "on-error-container": "#93000a", "on-primary-fixed-variant": "#164d5d", "error-container": "#ffdad6", "on-primary-fixed": "#001f28", "primary-fixed": "#b8eafe", "on-primary-container": "#83b5c7", "inverse-on-surface": "#eff1f3", "on-surface": "#191c1e", "tertiary-fixed-dim": "#bec6e0", "surface-variant": "#e0e3e5", "on-tertiary-fixed": "#131b2e", "outline-variant": "#c0c8cb", primary: "#00303c", "on-secondary-fixed": "#0c1c30", "on-primary": "#ffffff", "secondary-container": "#d4e3ff", "on-tertiary": "#ffffff", error: "#ba1a1a", "on-secondary-fixed-variant": "#39485e", "tertiary-container": "#394156", "primary-fixed-dim": "#9ccee1", "tertiary-fixed": "#dae2fd", "surface-dim": "#d8dadc", "on-tertiary-fixed-variant": "#3e465c", "surface-container-high": "#e6e8ea", "secondary-fixed-dim": "#b8c7e2", secondary: "#505f76", "on-error": "#ffffff", surface: "#f7f9fb", "inverse-surface": "#2d3133", "surface-container": "#eceef0", "surface-bright": "#f7f9fb", "surface-container-lowest": "#ffffff", "primary-container": "#0d4757", "on-surface-variant": "#40484b", background: "#f7f9fb", "surface-container-highest": "#e0e3e5", "surface-tint": "#336576", "info-warning-text": "#854d0e", "info-warning-border": "#fef08a", "border-subtle": "#e0e3e5", "success-icon": "#0d4757", "info-warning-bg": "#fefce8"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {"stack-sm": "8px", gutter: "24px", "stack-md": "16px", "sidebar-width": "280px", "container-max": "1440px", "stack-lg": "32px", "margin-mobile": "16px", "header-height": "64px"}, fontFamily: {"title-sm": ["Work Sans"], "body-lg": ["Work Sans"], "label-sm": ["Work Sans"], "headline-md": ["Work Sans"], "display-lg": ["Work Sans"], "body-md": ["Work Sans"], "display-lg-mobile": ["Work Sans"], "data-mono": ["Work Sans"], "label-caps": ["Work Sans"]}, fontSize: {"title-sm": ["18px", {lineHeight: "24px", fontWeight: "600"}], "body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "500"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "display-lg": ["36px", {lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "600"}], "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}], "display-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "600"}], "data-mono": ["14px", {lineHeight: "20px", letterSpacing: "-0.01em", fontWeight: "400"}], "label-caps": ["11px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}]}}}};</script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Sidebar Wrapper -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col z-50" id="sidebar">
+<!-- Brand Header -->
+<div class="px-6 py-8 flex flex-col gap-1">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h1 class="text-title-sm font-title-sm font-bold text-primary">Psikotes HR</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant opacity-70">Enterprise HR Portal</p>
+</div>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 overflow-y-auto px-4 custom-scrollbar">
+<div class="mb-4">
+<span class="px-4 text-[10px] uppercase font-bold tracking-widest text-outline">Main Menu</span>
+<ul class="mt-2 space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+<span>Akun Karyawan</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">person_search</span>
+<span>Akun Kandidat</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="mb-4">
+<span class="px-4 text-[10px] uppercase font-bold tracking-widest text-outline">Operation</span>
+<ul class="mt-2 space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span>Data Karyawan</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">database</span>
+<span>Bank Soal</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span>Penjadwalan Tes</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="mb-4">
+<span class="px-4 text-[10px] uppercase font-bold tracking-widest text-outline">System</span>
+<ul class="mt-2 space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+<span>Kelola Peran &amp; Izin</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2 text-primary bg-primary-container/10 border-l-4 border-primary font-title-sm rounded-r-lg transition-transform duration-150 scale-[0.99]" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+<span>Data Master</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Sidebar Footer -->
+<div class="p-4 border-t border-outline-variant bg-surface-container-lowest">
+<div class="flex items-center gap-3 p-2">
+<img class="w-10 h-10 rounded-full bg-surface-container object-cover" data-alt="A professional headshot of a corporate HR manager, mid-40s, smiling confidently. High-end studio lighting with a neutral gray background. Modern minimalist aesthetic consistent with an enterprise software interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlOVYRDFI9OPaiGo6fEz3RBGMc7tfM-BYaPAN8Qpu07qKp2npFbfxMvdlZCGPbx9I487YQLC0MT6aWS74RwnIAiQYDOastU0XSkSOlVOSz_O1GQR1ecTNAAzAlgb-wUCXaNThmtkYf2_JtRcF4o5H0R3psPkXNX1P1B3miLk7Bskt-O7E5r7RVxpHINT-s420ErvBrOt4E4CfQOthszYI5wEurwwzZq19_oxGvWzVnE6zO35q0r3b2"/>
+<div class="flex-1 overflow-hidden">
+<p class="text-body-md font-bold truncate">Admin HR</p>
+<p class="text-label-sm text-on-surface-variant truncate">admin@psikotes.hr</p>
+</div>
+<button class="p-1.5 hover:bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-on-surface-variant">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-gutter z-40 transition-all ml-[280px] w-[calc(100%-280px)]">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary/20 focus:bg-surface transition-all text-body-md outline-none" placeholder="Cari data master..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<nav class="hidden md:flex items-center gap-6 mr-6">
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Manajemen Akun</a>
+<a class="text-primary font-bold transition-colors" href="#">Pengaturan</a>
+</nav>
+<div class="flex items-center gap-1 border-l border-outline-variant pl-4">
+<button class="p-2 hover:bg-surface-container rounded-full text-on-surface-variant transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-full text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] pt-16 min-h-screen bg-background">
+<div class="p-gutter max-w-container-max mx-auto">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<nav class="flex items-center gap-2 text-label-sm text-outline mb-2">
+<span>Sistem</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Data Master</span>
+</nav>
+<h2 class="text-display-lg font-display-lg text-on-surface">Data Master</h2>
+<p class="text-body-md text-on-surface-variant mt-1">Kelola struktur organisasi perusahaan anda secara efisien.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-5 py-2.5 bg-primary text-on-primary rounded-lg font-body-md font-bold shadow-sm hover:opacity-90 transition-all active:scale-95" id="addBtn">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Tambah Data</span>
+</button>
+</div>
+</div>
+<!-- Tabs Section -->
+<div class="card-level-1 rounded-xl overflow-hidden shadow-sm">
+<div class="border-b border-outline-variant px-6 flex items-center justify-between bg-surface-container-lowest">
+<div class="flex gap-8">
+<button class="py-4 text-body-md font-medium transition-all relative tab-active" id="tab-departemen" onclick="switchTab('departemen')">
+                            Departemen
+                        </button>
+<button class="py-4 text-body-md font-medium text-on-surface-variant hover:text-primary transition-all relative" id="tab-posisi" onclick="switchTab('posisi')">
+                            Posisi
+                        </button>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">file_download</span>
+</button>
+</div>
+</div>
+<!-- Table Content: Departemen -->
+<div class="block" id="content-departemen">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 text-label-sm font-bold text-outline uppercase tracking-wider">Nama Departemen</th>
+<th class="px-6 py-4 text-label-sm font-bold text-outline uppercase tracking-wider text-center">Jumlah Karyawan</th>
+<th class="px-6 py-4 text-label-sm font-bold text-outline uppercase tracking-wider text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[18px]">account_tree</span>
+</div>
+<span class="font-bold text-on-surface">Human Resources</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-3 py-1 bg-surface-container rounded-full text-data-mono font-bold">12</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary-container/10 text-primary rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</div>
+<span class="font-bold text-on-surface">Engineering &amp; Tech</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-3 py-1 bg-surface-container rounded-full text-data-mono font-bold">45</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary-container/10 text-primary rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+</div>
+<span class="font-bold text-on-surface">Finance &amp; Accounting</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-3 py-1 bg-surface-container rounded-full text-data-mono font-bold">08</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary-container/10 text-primary rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[18px]">campaign</span>
+</div>
+<span class="font-bold text-on-surface">Marketing &amp; Creative</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-3 py-1 bg-surface-container rounded-full text-data-mono font-bold">22</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary-container/10 text-primary rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-6 border-t border-outline-variant flex items-center justify-between">
+<p class="text-label-sm text-on-surface-variant">Menampilkan 1-4 dari 12 departemen</p>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container transition-colors disabled:opacity-50" disabled=""><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-on-primary rounded font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container transition-colors font-bold">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container transition-colors font-bold">3</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</div>
+<!-- Table Content: Posisi (Hidden by default) -->
+<div class="hidden" id="content-posisi">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 text-label-sm font-bold text-outline uppercase tracking-wider">Nama Posisi</th>
+<th class="px-6 py-4 text-label-sm font-bold text-outline uppercase tracking-wider">Departemen Terkait</th>
+<th class="px-6 py-4 text-label-sm font-bold text-outline uppercase tracking-wider text-center">Jumlah Karyawan</th>
+<th class="px-6 py-4 text-label-sm font-bold text-outline uppercase tracking-wider text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<span class="font-bold text-on-surface">Senior Software Engineer</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-secondary-fixed text-on-secondary-fixed text-label-sm rounded border border-secondary-fixed-dim">Engineering &amp; Tech</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-3 py-1 bg-surface-container rounded-full text-data-mono font-bold">12</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary-container/10 text-primary rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<span class="font-bold text-on-surface">HR Specialist</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-secondary-fixed text-on-secondary-fixed text-label-sm rounded border border-secondary-fixed-dim">Human Resources</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-3 py-1 bg-surface-container rounded-full text-data-mono font-bold">04</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary-container/10 text-primary rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<span class="font-bold text-on-surface">Product Designer</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-secondary-fixed text-on-secondary-fixed text-label-sm rounded border border-secondary-fixed-dim">Engineering &amp; Tech</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-3 py-1 bg-surface-container rounded-full text-data-mono font-bold">06</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary-container/10 text-primary rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<span class="font-bold text-on-surface">Accounting Manager</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-secondary-fixed text-on-secondary-fixed text-label-sm rounded border border-secondary-fixed-dim">Finance &amp; Accounting</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-3 py-1 bg-surface-container rounded-full text-data-mono font-bold">02</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary-container/10 text-primary rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-6 border-t border-outline-variant flex items-center justify-between">
+<p class="text-label-sm text-on-surface-variant">Menampilkan 1-4 dari 32 posisi</p>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container transition-colors disabled:opacity-50" disabled=""><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-on-primary rounded font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container transition-colors font-bold">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container transition-colors font-bold">3</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Summary Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+<div class="card-level-1 p-6 rounded-xl flex flex-col justify-between">
+<div>
+<p class="text-label-sm font-bold text-outline uppercase tracking-wider mb-2">Total Departemen</p>
+<h3 class="text-headline-md font-headline-md text-on-surface">12 Unit</h3>
+</div>
+<div class="flex items-center gap-2 mt-4 text-emerald-600 text-label-sm font-bold">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+1 baru bulan ini</span>
+</div>
+</div>
+<div class="card-level-1 p-6 rounded-xl flex flex-col justify-between">
+<div>
+<p class="text-label-sm font-bold text-outline uppercase tracking-wider mb-2">Total Posisi</p>
+<h3 class="text-headline-md font-headline-md text-on-surface">32 Jabatan</h3>
+</div>
+<div class="flex items-center gap-2 mt-4 text-primary text-label-sm font-bold">
+<span class="material-symbols-outlined text-[16px]">info</span>
+<span>Stabil sejak Jan 2024</span>
+</div>
+</div>
+<div class="card-level-1 p-6 rounded-xl flex flex-col justify-between bg-primary-container/5">
+<div>
+<p class="text-label-sm font-bold text-outline uppercase tracking-wider mb-2">Karyawan Terdaftar</p>
+<h3 class="text-headline-md font-headline-md text-on-surface">1,248 Orang</h3>
+</div>
+<div class="flex items-center gap-2 mt-4 text-on-surface-variant text-label-sm">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-200"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-300"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-400"></div>
+</div>
+<span class="ml-2">98.2% Penempatan departemen</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Simple Feedback Toast (Micro-interaction) -->
+<div class="fixed bottom-8 right-8 bg-inverse-surface text-inverse-on-surface px-6 py-3 rounded-lg shadow-xl translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-[60]" id="toast">
+<span class="material-symbols-outlined text-emerald-400">check_circle</span>
+<span id="toast-message">Data berhasil diperbarui</span>
+</div>
+<script>
+        function switchTab(tab) {
+            const departemenTab = document.getElementById('tab-departemen');
+            const posisiTab = document.getElementById('tab-posisi');
+            const departemenContent = document.getElementById('content-departemen');
+            const posisiContent = document.getElementById('content-posisi');
+            const addBtnText = document.querySelector('#addBtn span:last-child');
+
+            if (tab === 'departemen') {
+                departemenTab.classList.add('tab-active', 'text-primary');
+                departemenTab.classList.remove('text-on-surface-variant');
+                posisiTab.classList.remove('tab-active', 'text-primary');
+                posisiTab.classList.add('text-on-surface-variant');
+                
+                departemenContent.classList.remove('hidden');
+                departemenContent.classList.add('block');
+                posisiContent.classList.add('hidden');
+                posisiContent.classList.remove('block');
+                
+                addBtnText.textContent = 'Tambah Departemen';
+            } else {
+                posisiTab.classList.add('tab-active', 'text-primary');
+                posisiTab.classList.remove('text-on-surface-variant');
+                departemenTab.classList.remove('tab-active', 'text-primary');
+                departemenTab.classList.add('text-on-surface-variant');
+                
+                posisiContent.classList.remove('hidden');
+                posisiContent.classList.add('block');
+                departemenContent.classList.add('hidden');
+                departemenContent.classList.remove('block');
+                
+                addBtnText.textContent = 'Tambah Posisi';
+            }
+        }
+
+        // Action Buttons Simulation
+        document.getElementById('addBtn').addEventListener('click', () => {
+            const btnText = document.querySelector('#addBtn span:last-child').textContent;
+            showToast(`Membuka dialog: ${btnText}`);
+        });
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-message');
+            msg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initialize button text
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#addBtn span:last-child').textContent = 'Tambah Departemen';
+        });
+    </script>
+</body></html>

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PenggunaAdminController;
 use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\AutentikasiController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PengerjaanTesController;
 use App\Http\Controllers\ProfilController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,8 +41,10 @@ Route::middleware('auth')->group(function () {
     // Route untuk instruksi tes (baru)
     Route::get('/peserta/tes/{sesiId}/instruksi', [DashboardController::class, 'instruksi'])->name('peserta.tes.instruksi');
 
-    // Route untuk halaman pengerjaan tes (placeholder), rename agar lebih jelas
-    Route::get('/peserta/tes/{sesiId}', [DashboardController::class, 'mulaiTes'])->name('peserta.tes.kerjakan');
+    // Route untuk halaman pengerjaan tes (sekarang mengarah ke PengerjaanTesController)
+    Route::get('/peserta/tes/{sesiId}', [PengerjaanTesController::class, 'kerjakan'])->name('peserta.tes.kerjakan');
+    Route::post('/peserta/tes/{sesiId}/jawab', [PengerjaanTesController::class, 'jawab'])->name('peserta.tes.jawab');
+    Route::get('/peserta/tes/{sesiId}/selesai', [PengerjaanTesController::class, 'selesai'])->name('peserta.tes.selesai');
 
     Route::prefix('admin/akun-karyawan')->name('admin.akun-karyawan.')->group(function () {
         Route::get('/', [PenggunaController::class, 'index'])->middleware('izin:pengguna.lihat')->name('index');

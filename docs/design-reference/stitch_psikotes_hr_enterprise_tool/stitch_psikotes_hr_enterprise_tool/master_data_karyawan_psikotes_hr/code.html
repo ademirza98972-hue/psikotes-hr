@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Data Karyawan - Psikotes HR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Theme Config -->
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-tertiary-fixed": "#131b2e", background: "#f7f9fb", "outline-variant": "#c0c8cb", "on-background": "#191c1e", "on-secondary": "#ffffff", "on-surface-variant": "#40484b", "on-secondary-fixed-variant": "#39485e", "on-tertiary-container": "#a5adc6", "surface-container-lowest": "#ffffff", "surface-container-highest": "#e0e3e5", tertiary: "#232b3f", "on-primary-fixed-variant": "#164d5d", "surface-bright": "#f7f9fb", "primary-fixed": "#b8eafe", outline: "#71787c", "on-surface": "#191c1e", "inverse-primary": "#9ccee1", secondary: "#505f76", "surface-container-low": "#f2f4f6", primary: "#00303c", "surface-tint": "#336576", "on-primary": "#ffffff", "primary-container": "#0d4757", "inverse-on-surface": "#eff1f3", "on-primary-fixed": "#001f28", surface: "#f7f9fb", "secondary-fixed": "#d4e3ff", "surface-variant": "#e0e3e5", "tertiary-fixed": "#dae2fd", "surface-dim": "#d8dadc", error: "#ba1a1a", "surface-container-high": "#e6e8ea", "on-tertiary": "#ffffff", "error-container": "#ffdad6", "on-tertiary-fixed-variant": "#3e465c", "on-error-container": "#93000a", "on-secondary-fixed": "#0c1c30", "on-primary-container": "#83b5c7", "secondary-fixed-dim": "#b8c7e2", "surface-container": "#eceef0", "tertiary-fixed-dim": "#bec6e0", "on-error": "#ffffff", "inverse-surface": "#2d3133", "on-secondary-container": "#56657c", "secondary-container": "#d4e3ff", "primary-fixed-dim": "#9ccee1", "tertiary-container": "#394156", "info-warning-text": "#854d0e", "info-warning-border": "#fef08a", "border-subtle": "#e0e3e5", "success-icon": "#0d4757", "info-warning-bg": "#fefce8"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {"stack-lg": "32px", "margin-mobile": "16px", gutter: "24px", "stack-sm": "8px", "container-max": "1440px", "sidebar-width": "280px", "stack-md": "16px", "header-height": "64px"}, fontFamily: {"body-md": ["Work Sans"], "headline-md": ["Work Sans"], "label-sm": ["Work Sans"], "title-sm": ["Work Sans"], "body-lg": ["Work Sans"], "display-lg": ["Work Sans"], "label-caps": ["Work Sans"]}, fontSize: {"body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "500"}], "title-sm": ["18px", {lineHeight: "24px", fontWeight: "600"}], "display-lg": ["36px", {lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "600"}], "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "label-caps": ["11px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}]}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Work Sans', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c0c8cb; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col overflow-y-auto">
+<div class="p-gutter flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<h1 class="font-title-sm text-title-sm font-bold text-primary">Psikotes HR</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Enterprise HR Portal</p>
+</div>
+</div>
+<nav class="mt-4 flex-1">
+<!-- Navigation Items Mapping from JSON -->
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">badge</span> Akun Karyawan
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">person_search</span> Akun Kandidat
+            </a>
+<!-- Active State: Data Karyawan -->
+<a class="flex items-center gap-3 px-6 py-3 text-primary bg-primary-container/10 border-l-4 border-primary font-title-sm" href="#">
+<span class="material-symbols-outlined">group</span> Data Karyawan
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">database</span> Bank Soal
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span> Penjadwalan Tes
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span> Hasil Tes
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span> Kelola Peran &amp; Izin
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">settings_suggest</span> Data Master
+            </a>
+</nav>
+<div class="p-gutter border-t border-outline-variant">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border border-outline-variant" data-alt="A professional headshot of an HR administrator with a neutral expression, wearing a clean white shirt, against a soft-lit modern corporate office background. The lighting is bright and even, reinforcing a professional light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFfqREYlBBl3Es_xBzi5FC78OPN95cQg17zqHyY6vkcJet-2emBibc_iQzuS9gSNPz54Gd07pjPhWjqWs15FDi3o0YtJm9yESmUEOPfLsyCKcgMwzH5dDqPRC5gXCZCoQocopl-AO7TmlFCdPOUgJj1uM0AUeA1dO-T9n2SLxREauUTgmp8tVBC6S91HNEOEgS5V30P9lzh5dsrWXZLcTM8RIv9lA60Ml4lARBA3IoWcZth8ui2jVE"/>
+<div>
+<p class="font-label-sm text-label-sm font-bold">Admin HR</p>
+<p class="font-label-sm text-[10px] text-on-surface-variant">admin@psikoteshr.com</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 left-[280px] h-16 bg-surface border-b border-outline-variant z-10 flex items-center justify-between px-gutter">
+<div class="flex items-center gap-4">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Manajemen Akun</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Data Karyawan</span>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container border border-outline-variant rounded-lg text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all w-64" placeholder="Cari NIK atau Nama..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="ml-[280px] mt-16 p-gutter min-h-[calc(100vh-64px)]">
+<div class="grid grid-cols-12 gap-gutter items-start">
+<!-- Left: Master Data Table Section -->
+<section class="col-span-12 lg:col-span-8 space-y-6">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Daftar Karyawan</h2>
+<p class="font-body-md text-on-surface-variant">Kelola basis data utama seluruh karyawan perusahaan.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2.5 rounded-lg font-label-sm hover:opacity-90 transition-all shadow-sm" onclick="openForm()">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                        Tambah Karyawan
+                    </button>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant text-on-surface-variant">
+<th class="px-6 py-4 text-left font-label-sm uppercase tracking-wider">NIK</th>
+<th class="px-6 py-4 text-left font-label-sm uppercase tracking-wider">Nama Lengkap</th>
+<th class="px-6 py-4 text-left font-label-sm uppercase tracking-wider">Departemen</th>
+<th class="px-6 py-4 text-left font-label-sm uppercase tracking-wider">Posisi</th>
+<th class="px-6 py-4 text-left font-label-sm uppercase tracking-wider">Tgl Gabung</th>
+<th class="px-6 py-4 text-center font-label-sm uppercase tracking-wider">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-4 font-data-mono text-data-mono">20230001</td>
+<td class="px-6 py-4 font-body-md font-bold">Andi Pratama</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Human Resources</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Recruiter</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">12 Jan 2023</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4 font-data-mono text-data-mono">20230002</td>
+<td class="px-6 py-4 font-body-md font-bold">Siska Amelia</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Teknologi</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Frontend Dev</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">05 Feb 2023</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4 font-data-mono text-data-mono">20230003</td>
+<td class="px-6 py-4 font-body-md font-bold">Bambang Wijaya</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Operasional</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Supervisor</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">20 Mar 2023</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4 font-data-mono text-data-mono">20230004</td>
+<td class="px-6 py-4 font-body-md font-bold">Maya Indah</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Keuangan</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Accountant</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">10 Apr 2023</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4 font-data-mono text-data-mono">20230005</td>
+<td class="px-6 py-4 font-body-md font-bold">Doni Kurniawan</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Pemasaran</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">Content Creator</td>
+<td class="px-6 py-4 font-body-md text-on-surface-variant">15 Mei 2023</td>
+<td class="px-6 py-4 text-center">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-sm text-on-surface-variant">Menampilkan 5 dari 128 Karyawan</span>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-on-primary rounded font-label-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container-high transition-colors font-label-sm">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Right: Form Section (Sticky / In-page Side Panel) -->
+<section class="col-span-12 lg:col-span-4 transition-all duration-300 transform" id="employeeForm">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 sticky top-20">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-title-sm text-title-sm font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">edit_note</span>
+                            Detail Karyawan
+                        </h3>
+<span class="font-label-sm px-2 py-1 bg-secondary-container text-on-secondary-container rounded" id="formStatus">Mode Tambah</span>
+</div>
+<form action="#" class="space-y-4">
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant">NIK (Nomor Induk Karyawan)</label>
+<input class="w-full px-4 py-2 border border-outline-variant rounded-lg text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Contoh: 20230001" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant">Nama Lengkap</label>
+<input class="w-full px-4 py-2 border border-outline-variant rounded-lg text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Masukkan nama sesuai KTP" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant">Departemen</label>
+<select class="w-full px-4 py-2 border border-outline-variant rounded-lg text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white">
+<option disabled="" selected="" value="">Pilih Departemen</option>
+<option>Human Resources</option>
+<option>Teknologi</option>
+<option>Keuangan</option>
+<option>Pemasaran</option>
+<option>Operasional</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant">Posisi</label>
+<select class="w-full px-4 py-2 border border-outline-variant rounded-lg text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white">
+<option disabled="" selected="" value="">Pilih Jabatan</option>
+<option>Manager</option>
+<option>Supervisor</option>
+<option>Staff Senior</option>
+<option>Staff</option>
+<option>Junior Staff</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant">Tanggal Bergabung</label>
+<div class="relative">
+<input class="w-full px-4 py-2 border border-outline-variant rounded-lg text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" type="date"/>
+</div>
+</div>
+<div class="pt-6 flex flex-col gap-3">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold shadow-md hover:opacity-90 transition-all active:scale-[0.98]" type="submit">
+                                Simpan Data
+                            </button>
+<button class="w-full border border-outline-variant text-on-surface-variant py-3 rounded-lg font-medium hover:bg-surface-container-high transition-all" onclick="resetForm()" type="button">
+                                Batal
+                            </button>
+</div>
+</form>
+<div class="mt-8 p-4 bg-surface-container-low rounded-lg border border-outline-variant border-dashed">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="font-label-sm text-on-surface-variant">Pastikan NIK tidak ganda. Data yang disimpan akan langsung terhubung dengan modul penjadwalan psikotes.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Success Toast (Hidden by default) -->
+<div class="fixed bottom-8 right-8 flex items-center gap-3 bg-inverse-surface text-inverse-on-surface px-6 py-4 rounded-xl shadow-2xl translate-y-24 opacity-0 transition-all duration-500 z-50" id="toast">
+<span class="material-symbols-outlined text-primary-fixed">check_circle</span>
+<span class="font-body-md">Data karyawan berhasil diperbarui.</span>
+</div>
+<script>
+        function openForm() {
+            const form = document.getElementById('employeeForm');
+            const status = document.getElementById('formStatus');
+            status.innerText = "Mode Tambah Baru";
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Subtle highlight animation
+            form.querySelector('div').classList.add('ring-2', 'ring-primary/30');
+            setTimeout(() => {
+                form.querySelector('div').classList.remove('ring-2', 'ring-primary/30');
+            }, 1000);
+        }
+
+        function resetForm() {
+            document.querySelector('form').reset();
+            const status = document.getElementById('formStatus');
+            status.innerText = "Mode Tambah";
+        }
+
+        // Mock form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+                resetForm();
+            }, 3000);
+        });
+
+        // Search bar interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('w-80');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('w-80');
+        });
+    </script>
+</body></html>

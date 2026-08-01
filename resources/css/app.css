@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -6,4 +8,34 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-body: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+
+    /* Project primary */
+    --color-psikotes: #2C5F6F;
+    --color-psikotes-light: #4A8A9B;
+    --color-psikotes-subtle: #E8F0F2;
+    --color-psikotes-glow: rgba(44, 95, 111, 0.12);
+
+    /* Surface / text — reuses slate palette for consistency */
+    --color-surface-variant: #E0E3E5;
+    --color-on-surface-variant: #40484B;
+    --color-outline-variant: #C0C8CB;
+    --color-on-surface: #191C1E;
+    --color-inverse-surface: #2D3133;
+}
+
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
 }

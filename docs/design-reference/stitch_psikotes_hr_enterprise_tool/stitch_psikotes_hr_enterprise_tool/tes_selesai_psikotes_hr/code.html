@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Psikotes HR - Tes Selesai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#603716",
+                    "primary": "#0d4757",
+                    "on-primary-fixed": "#001f28",
+                    "secondary-fixed": "#dde4e5",
+                    "surface-variant": "#e0e3e5",
+                    "primary-fixed-dim": "#9ccee1",
+                    "on-tertiary-fixed-variant": "#663d1b",
+                    "secondary-container": "#dae1e2",
+                    "outline": "#71787c",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-surface-variant": "#40484b",
+                    "on-background": "#191c1e",
+                    "on-primary-fixed-variant": "#164d5c",
+                    "on-tertiary-container": "#ffc398",
+                    "inverse-surface": "#2d3133",
+                    "tertiary-fixed-dim": "#f7ba8e",
+                    "on-secondary-fixed": "#161d1e",
+                    "surface-tint": "#326575",
+                    "on-secondary-fixed-variant": "#414849",
+                    "surface-bright": "#f7f9fb",
+                    "on-secondary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#7b4e2b",
+                    "inverse-primary": "#9ccee1",
+                    "on-secondary-container": "#5d6465",
+                    "tertiary-fixed": "#ffdcc5",
+                    "primary-fixed": "#b8eafd",
+                    "background": "#f7f9fb",
+                    "on-tertiary-fixed": "#301400",
+                    "outline-variant": "#c0c8cb",
+                    "surface-container-high": "#e6e8ea",
+                    "on-surface": "#191c1e",
+                    "secondary-fixed-dim": "#c1c8c9",
+                    "surface-container": "#eceef0",
+                    "surface": "#f7f9fb",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#a5d7ea",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#f2f4f6",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#2c5f6f",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#586061"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max-width": "720px",
+                    "gutter-md": "1.5rem",
+                    "gap-stack-xl": "3rem",
+                    "margin-page": "2rem"
+            },
+            "fontFamily": {
+                    "headline-md": ["Work Sans"],
+                    "timer-display": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "display-lg": ["Work Sans"],
+                    "body-md": ["Work Sans"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "timer-display": ["20px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .check-animation {
+            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes scaleIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface fixed top-0 w-full z-50">
+<div class="flex justify-between items-center w-full px-margin-page py-4 max-w-container-max-width mx-auto">
+<div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+                Psikotes HR
+            </div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full scale-95 duration-100" title="Help">
+                    help
+                </button>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-secondary-container">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a calm individual in a modern corporate setting, representing a participant in a psychometric test. The lighting is soft and natural, emphasizing a serene and professional atmosphere. The color palette is composed of soft teals, greys, and crisp whites to match the overall UI branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbusiNAGcMcFbNVG0ucYlZI-S7P_VXDGOXawYpF0X0s94SE9JPi5rJWZq_KgdtXyf3Tm2F-p4J_yi2ZAeARKKWYrwDZ1aSS2rdJOTKzI2w4OP0UZgd_jSV6bM3jxw47a7Y5t7cALCRQw9yeCl1gLSRt9KdzOG4o9u__iLRCOpvVc1OVIeRvpBUoZcxFY8AGw6zIi9JGv9qG7_lYHktDQQKXOKa2SJNVPWneaKwQ8FoSHRrYRFX1O6A"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex items-center justify-center pt-24 pb-12 px-margin-page relative">
+<!-- Background Subtle Pattern -->
+<div class="absolute inset-0 z-0 opacity-40">
+
+</div>
+<div class="max-w-container-max-width w-full bg-surface-container-lowest rounded-xl p-8 md:p-12 shadow-sm border border-outline-variant relative z-10 flex flex-col items-center text-center fade-in-up">
+<!-- Success Icon -->
+<div class="mb-8 relative">
+<div class="absolute inset-0 bg-green-100 rounded-full scale-150 blur-2xl opacity-50"></div>
+<div class="w-24 h-24 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg check-animation">
+<span class="material-symbols-outlined !text-6xl" style="font-variation-settings: 'wght' 700;">
+                        check
+                    </span>
+</div>
+</div>
+<!-- Content -->
+<div class="space-y-4 mb-gap-stack-xl">
+<h1 class="font-display-lg text-display-lg text-primary">
+                    Tes Berhasil Diselesaikan
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[560px] mx-auto">
+                    Terima kasih atas partisipasi Anda. Jawaban Anda telah tersimpan dengan aman dan akan segera diproses oleh tim HR.
+                </p>
+</div>
+<!-- Illustration / Data visualization placeholder -->
+<div class="w-full max-w-[400px] aspect-video bg-surface-container rounded-lg mb-gap-stack-xl overflow-hidden border border-outline-variant relative group">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A minimalist and calm abstract digital illustration showing a series of checkmarks and data nodes connecting in a harmonious web. The colors are predominantly primary teal and soft grey, reflecting a completed process and psychological clarity. Soft gradients create a sense of depth and relief." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB2yToqzLhKSWldTiSAfXSWhcSTJqZ_2ME5bEXZEwBcH79ypOqBHpxjth4Hw_zwcH01i6Wwr9KZg4d9T-mVpbNueOzJY_yR88sgz1My2jGKOlxbyy9K2v_xH4zhnWA9ZIUs4ZOSvXBmid8O3RW9-2RzwZiCyw76qQdRI3_6nbeCNnOXK-vxsgsQ-NRplLEtXEcQFthiYi9KX2kSmUyCZUsvgvvod6k2w1d7rBkxQX3bcMOAPfxZJj3b')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+</div>
+<!-- Summary Card -->
+<div class="w-full grid grid-cols-2 gap-4 mb-gap-stack-xl text-left">
+<div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-1">DURASI PENYELESAIAN</span>
+<span class="font-headline-md text-headline-md text-primary">24:15</span>
+</div>
+<div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-1">STATUS JAWABAN</span>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-primary">100%</span>
+<span class="font-label-caps text-label-caps bg-green-100 text-green-700 px-2 py-0.5 rounded">TERKIRIM</span>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="w-full flex flex-col sm:flex-row gap-4 justify-center">
+<a class="bg-primary text-on-primary font-headline-md text-headline-md rounded-lg px-12 py-4 min-h-[56px] flex items-center justify-center hover:opacity-90 transition-opacity active:scale-[0.98]" href="#">
+                    Lanjut ke Tes Berikutnya
+                </a>
+<a class="bg-secondary-container text-on-secondary-container font-headline-md text-headline-md rounded-lg px-8 py-4 min-h-[56px] flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-[0.98]" href="#">
+                    Dashboard
+                </a>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-8 text-center text-on-surface-variant">
+<p class="font-label-caps text-label-caps">© 2024 PSIKOTES HR. ALL RIGHTS RESERVED.</p>
+</footer>
+<!-- Interactive Elements Script -->
+<script>
+        // Simple micro-interaction for button press feel
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.style.transform = 'scale(0.98)';
+            });
+            el.addEventListener('mouseup', () => {
+                el.style.transform = 'scale(1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simulating a successful "saved" state
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Session data synced and secured.');
+            
+            // Add a subtle particle effect for "Success" if needed
+            // But keeping it 'calm' per instructions
+        });
+    </script>
+</body></html>

@@ -1,24 +1,28 @@
-@extends('layouts.auth', ['judulHalaman' => 'Login'])
+@extends('layouts.auth', ['judulHalaman' => 'Login Admin'])
 
 @section('content')
-    <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 class="mb-6 text-lg font-semibold text-slate-900">Masuk ke akun</h2>
+<div x-data="{ showPwd: false }" class="space-y-6">
+    <div class="space-y-1">
+        <h2 class="font-body font-semibold text-2xl text-on-surface">Masuk ke Dashboard</h2>
+        <p class="font-body text-sm text-on-surface-variant">Silakan masukkan kredensial admin Anda untuk melanjutkan.</p>
+    </div>
 
-        @if ($errors->any())
-            <div class="mb-4 rounded-md border border-rose-600 bg-rose-600 px-4 py-3 text-sm text-white">
-                <ul class="list-disc space-y-1 pl-5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    @if ($errors->any())
+        <div class="rounded-sm border border-rose-600 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <ul class="list-disc space-y-1 pl-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-4">
-            @csrf
+    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+        @csrf
 
-            <div>
-                <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
+        <div class="space-y-1.5">
+            <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email">Alamat Email</label>
+            <div class="relative focused-input group">
                 <input
                     id="email"
                     name="email"
@@ -27,37 +31,66 @@
                     required
                     autofocus
                     autocomplete="email"
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    placeholder="nama@perusahaan.com"
+                    class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @enderror"
                 >
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
             </div>
+            @error('email')
+                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
+        <div class="space-y-1.5">
+            <div class="flex justify-between items-center">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="password">Kata Sandi</label>
+            </div>
+            <div class="relative focused-input group">
                 <input
                     id="password"
                     name="password"
-                    type="password"
+                    :type="showPwd ? 'text' : 'password'"
                     required
                     autocomplete="current-password"
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    placeholder="••••••••"
+                    class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors"
                 >
+                <button
+                    type="button"
+                    @click="showPwd = !showPwd"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant hover:text-on-surface transition-colors flex items-center"
+                >
+                    <span class="material-symbols-outlined text-lg" x-text="showPwd ? 'visibility_off' : 'visibility'"></span>
+                </button>
             </div>
+            @error('password')
+                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-            <div class="flex items-center">
-                <input id="ingat_saya" name="ingat_saya" type="checkbox" value="1" {{ old('ingat_saya') ? 'checked' : '' }}
-                    class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
-                <label for="ingat_saya" class="ml-2 text-sm text-slate-600">Ingat saya</label>
-            </div>
+        <div class="flex items-center gap-2 py-1">
+            <input
+                id="ingat_saya"
+                name="ingat_saya"
+                type="checkbox"
+                value="1"
+                {{ old('ingat_saya') ? 'checked' : '' }}
+                class="w-4 h-4 rounded-sm border-outline-variant text-psikotes focus:ring-psikotes cursor-pointer"
+            >
+            <label for="ingat_saya" class="font-body text-sm text-on-surface-variant cursor-pointer select-none">Ingat saya di perangkat ini</label>
+        </div>
 
-            <button type="submit"
-                class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                Masuk
-            </button>
-        </form>
+        <button type="submit"
+            class="w-full bg-psikotes text-white font-body font-semibold text-sm py-3.5 rounded-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm shadow-psikotes/20">
+            <span>Masuk</span>
+            <span class="material-symbols-outlined text-[18px]">login</span>
+        </button>
+    </form>
+
+    <div class="pt-6 border-t border-surface-variant">
+        <p class="font-body text-sm text-on-surface-variant text-center">
+            Membutuhkan bantuan akses? <a href="#" class="text-psikotes font-medium hover:underline">Hubungi IT Support</a>
+        </p>
     </div>
-
-    <p class="mt-6 text-center text-sm text-slate-600">
-        Belum punya akun?
-        <a href="{{ route('register') }}" class="font-medium text-indigo-600 hover:text-indigo-700">Daftar di sini</a>
-    </p>
+</div>
 @endsection

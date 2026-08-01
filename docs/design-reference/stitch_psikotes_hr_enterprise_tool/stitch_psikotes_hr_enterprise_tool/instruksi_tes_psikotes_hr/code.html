@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Instruksi Tes DISC | Psikotes HR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Style Guidance Tokens -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#603716",
+                    "primary": "#0d4757",
+                    "on-primary-fixed": "#001f28",
+                    "secondary-fixed": "#dde4e5",
+                    "surface-variant": "#e0e3e5",
+                    "primary-fixed-dim": "#9ccee1",
+                    "on-tertiary-fixed-variant": "#663d1b",
+                    "secondary-container": "#dae1e2",
+                    "outline": "#71787c",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-surface-variant": "#40484b",
+                    "on-background": "#191c1e",
+                    "on-primary-fixed-variant": "#164d5c",
+                    "on-tertiary-container": "#ffc398",
+                    "inverse-surface": "#2d3133",
+                    "tertiary-fixed-dim": "#f7ba8e",
+                    "on-secondary-fixed": "#161d1e",
+                    "surface-tint": "#326575",
+                    "on-secondary-fixed-variant": "#414849",
+                    "surface-bright": "#f7f9fb",
+                    "on-secondary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#7b4e2b",
+                    "inverse-primary": "#9ccee1",
+                    "on-secondary-container": "#5d6465",
+                    "tertiary-fixed": "#ffdcc5",
+                    "primary-fixed": "#b8eafd",
+                    "background": "#f7f9fb",
+                    "on-tertiary-fixed": "#301400",
+                    "outline-variant": "#c0c8cb",
+                    "surface-container-high": "#e6e8ea",
+                    "on-surface": "#191c1e",
+                    "secondary-fixed-dim": "#c1c8c9",
+                    "surface-container": "#eceef0",
+                    "surface": "#f7f9fb",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#a5d7ea",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#f2f4f6",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#2c5f6f",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#586061"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max-width": "720px",
+                    "gutter-md": "1.5rem",
+                    "gap-stack-xl": "3rem",
+                    "margin-page": "2rem"
+            },
+            "fontFamily": {
+                    "headline-md": ["Work Sans"],
+                    "timer-display": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "display-lg": ["Work Sans"],
+                    "body-md": ["Work Sans"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "timer-display": ["20px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f7f9fb;
+            font-family: 'Work Sans', sans-serif;
+            color: #191c1e;
+        }
+        .instruction-number {
+            color: #326575; /* Primary Teal */
+            font-weight: 700;
+        }
+        .info-box-yellow {
+            background-color: #FFF9C4;
+            border-left: 4px solid #FBC02D;
+            color: #5D4037;
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- Top AppBar (Simplified for Instructions) -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-margin-page py-4 max-w-container-max-width mx-auto">
+<div class="text-headline-md font-headline-md font-bold text-primary">
+            Psikotes HR
+        </div>
+<div class="flex gap-4">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-2 rounded-full" data-icon="help">help</button>
+</div>
+</header>
+<!-- Main Content: Centered Focus Model -->
+<main class="flex-grow flex flex-col items-center justify-center px-4 py-12 md:py-20">
+<div class="w-full max-w-container-max-width fade-in">
+<!-- Hero Section -->
+<div class="text-center mb-10">
+<h1 class="font-display-lg text-display-lg text-primary mb-4">Instruksi Tes DISC</h1>
+<div class="flex justify-center items-center gap-6 text-on-surface-variant font-label-caps tracking-widest uppercase">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">assignment</span>
+<span>24 Soal</span>
+</div>
+<div class="w-1 h-1 bg-outline-variant rounded-full"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span>Estimasi 20 Menit</span>
+</div>
+</div>
+</div>
+<!-- Visual Context Image -->
+<div class="mb-12 rounded-xl overflow-hidden shadow-sm h-64 relative">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist high-key photograph of a modern office space featuring a wooden desk with a laptop and a steaming cup of coffee. The environment is bathed in soft, natural morning light, creating a calm and focused atmosphere suitable for an assessment session. The color palette is dominated by soft teals, warm wood tones, and pristine whites, reflecting a professional yet tranquil corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPUNa0-ZTmXBvirCK2hRbZ3uMnoF0xNV4jCjS-oWhSXzRJ2SaLXcfoC6v8f2hbHX6bs99494PrjNezTAlGO3e4XIKpQfRVO0c4ACCmZAZ9uPIWU4EMAU6COjPkSkus5L5uf_AGj0FHz-GT-LrrCx7EkRQGsFDf8k2Yf3_SbxPUwMZoihjHHQGAGn-QXiuHyynz8FiGV8fa3nwwfxQrlCiOk4QBk1KxR-KK3Dq1i731J3xw15luGGkA"/>
+<div class="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
+</div>
+<!-- Instruction List -->
+<div class="space-y-6 mb-10">
+<div class="flex gap-4 items-start">
+<span class="font-display-lg text-primary/30 leading-none select-none">01</span>
+<p class="font-body-lg text-body-lg pt-2">Jawab sesuai kondisi Anda yang sebenarnya saat ini.</p>
+</div>
+<div class="flex gap-4 items-start">
+<span class="font-display-lg text-primary/30 leading-none select-none">02</span>
+<p class="font-body-lg text-body-lg pt-2">Pilih satu pernyataan yang paling menggambarkan diri Anda.</p>
+</div>
+<div class="flex gap-4 items-start">
+<span class="font-display-lg text-primary/30 leading-none select-none">03</span>
+<p class="font-body-lg text-body-lg pt-2">Tidak ada jawaban benar atau salah dalam tes ini.</p>
+</div>
+<div class="flex gap-4 items-start">
+<span class="font-display-lg text-primary/30 leading-none select-none">04</span>
+<p class="font-body-lg text-body-lg pt-2">Pastikan Anda berada di lingkungan yang tenang tanpa gangguan.</p>
+</div>
+</div>
+<!-- Alert Box (Info Kuning) -->
+<div class="info-box-yellow p-6 rounded-lg flex gap-4 items-start mb-16">
+<span class="material-symbols-outlined text-[#FBC02D]" style="font-variation-settings: 'FILL' 1;">info</span>
+<p class="font-body-md text-body-md leading-relaxed">
+                    Tes ini menggunakan timer keseluruhan sesi. Anda masih dapat meninjau soal sebelumnya sebelum menekan tombol <strong>Selesai</strong>.
+                </p>
+</div>
+<!-- Action Area -->
+<div class="flex flex-col items-center gap-4">
+<button class="bg-primary text-on-primary font-headline-md text-headline-md py-4 px-12 rounded-xl w-full md:w-auto min-h-[56px] shadow-lg hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-95 duration-100 flex items-center justify-center gap-3" onclick="startTest()">
+                    Mulai Mengerjakan
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<p class="text-on-surface-variant font-label-caps text-label-caps opacity-60">
+                    Sesi akan dimulai segera setelah tombol ditekan.
+                </p>
+</div>
+</div>
+</main>
+<!-- Simple Footer Background Element -->
+<div class="h-32 pointer-events-none overflow-hidden relative opacity-20 mt-12">
+
+</div>
+<script>
+        function startTest() {
+            // Micro-interaction simulation
+            const btn = document.querySelector('button');
+            btn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Menyiapkan Tes...
+            `;
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Mengarahkan ke halaman Tes DISC...');
+            }, 800);
+        }
+
+        // Initialize any micro-interactions
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Instruction Page Loaded. Ready for assessment.");
+        });
+    </script>
+</body></html>

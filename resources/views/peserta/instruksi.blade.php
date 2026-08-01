@@ -13,7 +13,7 @@
             <table class="min-w-full text-sm">
                 <thead>
                     <tr class="bg-slate-50">
-                        <th class="px-4 py-3 text-left text-slate-700 font-medium">#</th>
+                        <th class="px-4 py-3 text-left text-slate-700 font-medium">No</th>
                         <th class="px-4 py-3 text-left text-slate-700 font-medium">Nama Alat Tes</th>
                         <th class="px-4 py-3 text-left text-slate-700 font-medium">Format Soal</th>
                         <th class="px-4 py-3 text-left text-slate-700 font-medium">Jumlah Soal</th>

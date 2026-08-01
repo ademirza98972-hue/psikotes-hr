@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard Peserta - Psikotes HR</title>
+<!-- Google Fonts: Work Sans -->
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#603716",
+                    "primary": "#0d4757",
+                    "on-primary-fixed": "#001f28",
+                    "secondary-fixed": "#dde4e5",
+                    "surface-variant": "#e0e3e5",
+                    "primary-fixed-dim": "#9ccee1",
+                    "on-tertiary-fixed-variant": "#663d1b",
+                    "secondary-container": "#dae1e2",
+                    "outline": "#71787c",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-surface-variant": "#40484b",
+                    "on-background": "#191c1e",
+                    "on-primary-fixed-variant": "#164d5c",
+                    "on-tertiary-container": "#ffc398",
+                    "inverse-surface": "#2d3133",
+                    "tertiary-fixed-dim": "#f7ba8e",
+                    "on-secondary-fixed": "#161d1e",
+                    "surface-tint": "#326575",
+                    "on-secondary-fixed-variant": "#414849",
+                    "surface-bright": "#f7f9fb",
+                    "on-secondary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#7b4e2b",
+                    "inverse-primary": "#9ccee1",
+                    "on-secondary-container": "#5d6465",
+                    "tertiary-fixed": "#ffdcc5",
+                    "primary-fixed": "#b8eafd",
+                    "background": "#f7f9fb",
+                    "on-tertiary-fixed": "#301400",
+                    "outline-variant": "#c0c8cb",
+                    "surface-container-high": "#e6e8ea",
+                    "on-surface": "#191c1e",
+                    "secondary-fixed-dim": "#c1c8c9",
+                    "surface-container": "#eceef0",
+                    "surface": "#f7f9fb",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#a5d7ea",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#f2f4f6",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#2c5f6f",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#586061"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max-width": "720px",
+                    "gutter-md": "1.5rem",
+                    "gap-stack-xl": "3rem",
+                    "margin-page": "2rem"
+            },
+            "fontFamily": {
+                    "headline-md": ["Work Sans"],
+                    "timer-display": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "display-lg": ["Work Sans"],
+                    "body-md": ["Work Sans"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "timer-display": ["20px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .choice-card-shadow {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- TopAppBar Navigation Shell -->
+<nav class="bg-surface dark:bg-surface flex justify-between items-center w-full px-margin-page py-4 max-w-container-max-width mx-auto sticky top-0 z-50">
+<div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+            Psikotes HR
+        </div>
+<div class="flex items-center gap-4">
+<button class="hover:bg-surface-container-low transition-colors p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help">help</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a young male professional in his late 20s, Aditya Rahman, with a clean and friendly expression. He is wearing a minimalist dark teal polo shirt against a soft, bright architectural background with natural lighting. The image maintains a calm, corporate minimalist aesthetic with high clarity and a focus on reliability and focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUIwn7t1Aoi3Da4ZXboD8ckuJo4FQ0szverQJ6bacvGIJ8JRUwG0qIokMBe86HJHdkgrY54esLbr6KbFImxs1E46CJ2lrmPU6lR5hnfmpWsfj7KwhMEDCgS5Uk7Y2FcFx194BlSu6CJbpkwHC0cjXzsh2RZYJObRKte8MfwK87H9bf8TO-bAFdGVvSk2uX2UsSHftje-hb5OEQCzqpt_YzaXpnnjfMhQRCCl9oxn3AEn1bbCiLx192"/>
+</div>
+<button class="hover:bg-surface-container-low transition-colors p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="logout">logout</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Container -->
+<main class="max-w-container-max-width mx-auto px-4 md:px-0 pt-8 pb-32">
+<!-- Header Section -->
+<header class="mb-gap-stack-xl">
+<h1 class="font-display-lg text-display-lg text-primary mb-2">Selamat datang, Aditya Rahman</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Pastikan Anda berada di lingkungan yang tenang sebelum memulai evaluasi.</p>
+</header>
+<!-- Assessment Section -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface">Daftar Tes Anda</h2>
+<div class="text-label-caps font-label-caps text-on-surface-variant">TOTAL 3 MODUL</div>
+</div>
+<!-- Test Cards Grid -->
+<div class="space-y-4">
+<!-- Card 1: DISC (Sedang Berjalan) -->
+<div class="bg-surface-container-lowest border-2 border-primary-container p-6 rounded-xl choice-card-shadow transition-all duration-200 active:scale-98">
+<div class="flex justify-between items-start mb-4">
+<div class="space-y-1">
+<span class="bg-[#F9E996] text-[#604D00] px-3 py-1 rounded-full text-label-caps font-label-caps">Sedang Berjalan</span>
+<h3 class="font-headline-md text-headline-md text-primary pt-2">DISC - Karakteristik Personal</h3>
+</div>
+<div class="flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined mr-1 text-[20px]" data-icon="schedule">schedule</span>
+<span class="text-label-caps font-label-caps">20 MENIT</span>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="bg-primary text-on-primary rounded-lg px-8 py-4 font-label-caps text-label-caps hover:opacity-90 transition-opacity flex items-center gap-2 min-h-[56px] shadow-sm">
+                            Lanjutkan
+                            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 2: IST (Belum Dikerjakan) -->
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl choice-card-shadow transition-all duration-200 hover:border-primary-container group">
+<div class="flex justify-between items-start mb-4">
+<div class="space-y-1">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-caps font-label-caps">Belum Dikerjakan</span>
+<h3 class="font-headline-md text-headline-md text-on-surface pt-2">IST - Inteligensi Struktur</h3>
+</div>
+<div class="flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined mr-1 text-[20px]" data-icon="schedule">schedule</span>
+<span class="text-label-caps font-label-caps">45 MENIT</span>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="bg-primary text-on-primary rounded-lg px-8 py-4 font-label-caps text-label-caps hover:opacity-90 transition-opacity flex items-center gap-2 min-h-[56px]">
+                            Mulai Tes
+                            <span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Card 3: EPPS (Selesai) -->
+<div class="bg-surface-container-low border border-transparent p-6 rounded-xl opacity-75 grayscale-[0.5]">
+<div class="flex justify-between items-start mb-4">
+<div class="space-y-1">
+<span class="bg-[#D1E9D2] text-[#144D17] px-3 py-1 rounded-full text-label-caps font-label-caps">Selesai</span>
+<h3 class="font-headline-md text-headline-md text-on-surface-variant pt-2">EPPS - Edwards Personal Preference Schedule</h3>
+</div>
+<div class="flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined mr-1 text-[20px]" data-icon="check_circle">check_circle</span>
+<span class="text-label-caps font-label-caps">TERKIRIM</span>
+</div>
+</div>
+<div class="mt-8 flex items-center gap-2 text-on-surface-variant font-label-caps text-label-caps italic">
+<span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+                        Hasil telah disimpan secara otomatis pada sistem.
+                    </div>
+</div>
+</div>
+</section>
+<!-- Information Footer -->
+<footer class="mt-gap-stack-xl pt-12 border-t border-outline-variant flex flex-col md:flex-row justify-between gap-8">
+<div class="max-w-xs">
+<h4 class="font-label-caps text-label-caps text-primary mb-2">BANTUAN TEKNIS</h4>
+<p class="text-body-md text-on-surface-variant">Jika mengalami kendala koneksi atau teknis, silakan hubungi pengawas melalui fitur chat bantuan.</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="font-label-caps text-label-caps text-on-surface-variant">WAKTU SISTEM</p>
+<p class="font-timer-display text-timer-display text-primary" id="system-clock">00:00:00</p>
+</div>
+<div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+</div>
+</div>
+</footer>
+</main>
+<!-- Bottom Navigation (Mobile Only Context) -->
+<div class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-margin-page py-6 max-w-container-max-width mx-auto bg-surface md:hidden shadow-lg border-t border-outline-variant">
+<button class="bg-secondary-container text-on-secondary-container rounded-lg px-6 py-3 min-h-[56px] flex items-center justify-center flex-1 mr-2 font-label-caps text-label-caps transition-transform active:scale-95">
+<span class="material-symbols-outlined mr-2" data-icon="chevron_left">chevron_left</span>
+            KEMBALI
+        </button>
+<button class="bg-primary text-on-primary rounded-lg px-6 py-3 min-h-[56px] flex items-center justify-center flex-1 ml-2 font-label-caps text-label-caps transition-transform active:scale-95">
+            LOGOUT
+            <span class="material-symbols-outlined ml-2" data-icon="logout">logout</span>
+</button>
+</div>
+<script>
+        // Simple micro-interaction for the system clock
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            const display = document.getElementById('system-clock');
+            if(display) display.textContent = `${h}:${m}:${s}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Smooth entry animation for cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.choice-card-shadow');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease-out';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * (index + 1));
+            });
+        });
+    </script>
+</body></html>

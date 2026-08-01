@@ -6,315 +6,245 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $judulHalaman ?? 'Dashboard Admin' }} — Sistem Psikotes HR</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        :root {
+            --psikotes: #2C5F6F;
+            --psikotes-light: #4A8A9B;
+            --psikotes-subtle: #E8F0F2;
+            --surface-container-low: #f2f4f6;
+            --surface-container-high: #e6e8ea;
+            --outline-variant: #c0c8cb;
+            --on-surface: #191c1e;
+            --on-surface-variant: #40484b;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 24px;
+            color: var(--on-surface-variant);
+            font-size: 14px;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+        }
+        .sidebar-link:hover {
+            background: var(--surface-container-high);
+            color: var(--on-surface);
+        }
+        .sidebar-link.active {
+            background: color-mix(in srgb, var(--psikotes) 8%, white);
+            color: var(--psikotes);
+            border-left-color: var(--psikotes);
+            font-weight: 600;
+        }
+        .sidebar-link.active .material-symbols-outlined {
+            color: var(--psikotes);
+        }
+        .section-label {
+            padding: 16px 24px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #919eab;
+        }
+        .nav-divider {
+            height: 1px;
+            background: var(--outline-variant);
+            margin: 8px 24px;
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-[#F7F8FA] text-slate-800 antialiased">
+<body class="min-h-screen bg-[#f7f9fb] font-body antialiased">
 
-<div class="flex h-full min-h-screen">
+<div class="flex h-screen overflow-hidden">
 
-    {{-- SIDEBAR (fixed pin ke viewport) --}}
-    <aside class="fixed inset-y-0 left-0 z-40 hidden w-64 shrink-0 border-r border-white/10 bg-[#162A30] md:flex">
-        <div class="flex h-full flex-col">
-            <div class="flex h-16 items-center border-b border-white/10 px-6">
-                <img src="{{ asset('images/logo.png') }}" alt="Psikotes HR Logo" class="h-10 w-auto object-contain brightness-200 contrast-150">
-                <div class="ml-2">
-                    <p class="text-sm font-semibold text-white">Psikotes HR</p>
-                    <p class="text-xs text-slate-400">PT Jhonlin Group</p>
-                </div>
+    {{-- SIDEBAR --}}
+    <aside class="fixed inset-y-0 left-0 z-50 w-[280px] flex flex-col bg-white border-r border-[#e0e3e5] overflow-y-auto">
+
+        {{-- Logo --}}
+        <div class="flex items-center gap-3 px-6 h-16 border-b border-[#e0e3e5] shrink-0">
+            <img src="{{ asset('images/logo.png') }}" alt="Psikotes HR Logo" class="h-9 w-auto object-contain">
+            <div>
+                <p class="text-sm font-bold text-[#2C5F6F] leading-none">Psikotes HR</p>
+                <p class="text-[11px] text-[#40484b] mt-0.5">Admin Panel</p>
             </div>
-
-            <nav class="flex-1 overflow-y-auto space-y-1 px-3 py-4">
-
-                {{-- GROUP: standalone menu items --}}
-                @auth
-                    @if(auth()->user()->hasIzin('dashboard.lihat'))
-                        <a href="{{ route('admin.dashboard') }}"
-                           @class([
-                               'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                               'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.dashboard'),
-                               'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.dashboard'),
-                           ])>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                 stroke="currentColor" stroke-width="2"
-                                 @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.dashboard'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.dashboard')])>
-                                <rect x="3" y="3" width="7" height="7" rx="1"/>
-                                <rect x="14" y="3" width="7" height="7" rx="1"/>
-                                <rect x="3" y="14" width="7" height="7" rx="1"/>
-                                <rect x="14" y="14" width="7" height="7" rx="1"/>
-                            </svg>
-                            <span>Dashboard</span>
-                        </a>
-                    @endif
-
-                    {{-- GROUP: Manajemen Karyawan --}}
-                    @if(auth()->user()->hasIzin('pengguna.lihat') || auth()->user()->hasIzin('data_karyawan.kelola'))
-                        <div class="pt-4 mt-4 border-t border-white/10">
-                            <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Manajemen Karyawan</p>
-
-                            @if(auth()->user()->hasIzin('data_karyawan.kelola'))
-                                <a href="{{ route('admin.data-karyawan.index') }}"
-                                   @class([
-                                       'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                       'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.data-karyawan.*'),
-                                       'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.data-karyawan.*'),
-                                   ])>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke="currentColor" stroke-width="2"
-                                         @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.data-karyawan.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.data-karyawan.*')])>
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="9" cy="7" r="4"/>
-                                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                    </svg>
-                                    <span>Data Karyawan</span>
-                                </a>
-                            @endif
-
-                            @if(auth()->user()->hasIzin('pengguna.lihat'))
-                                <a href="{{ route('admin.akun-karyawan.index') }}"
-                                   @class([
-                                       'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                       'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.akun-karyawan.*'),
-                                       'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.akun-karyawan.*'),
-                                   ])>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke="currentColor" stroke-width="2"
-                                         @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.akun-karyawan.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.akun-karyawan.*')])>
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="8.5" cy="7" r="4"/>
-                                        <polyline points="17 11 19 13 23 9"/>
-                                    </svg>
-                                    <span>Akun Karyawan</span>
-                                </a>
-                            @endif
-                        </div>
-                    @endif
-
-                    {{-- GROUP: Manajemen Kandidat --}}
-                    @if(auth()->user()->hasIzin('pengguna.lihat'))
-                        <div class="pt-4 mt-4 border-t border-white/10">
-                            <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Manajemen Kandidat</p>
-
-                            <a href="{{ route('admin.data-kandidat.index') }}"
-                               @class([
-                                   'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                   'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.data-kandidat.*'),
-                                   'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.data-kandidat.*'),
-                               ])>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke="currentColor" stroke-width="2"
-                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.data-kandidat.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.data-kandidat.*')])>
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="8.5" cy="7" r="4"/>
-                                    <line x1="20" y1="8" x2="20" y2="14"/>
-                                    <line x1="23" y1="11" x2="17" y2="11"/>
-                                </svg>
-                                <span>Data Kandidat</span>
-                            </a>
-                        </div>
-                    @endif
-
-                    {{-- GROUP: Manajemen Tes --}}
-                    @if(auth()->user()->hasIzin('soal.lihat') || auth()->user()->hasIzin('kategori_tes.kelola') || auth()->user()->hasIzin('hasil_tes.lihat'))
-                        <div class="pt-4 mt-4 border-t border-white/10">
-                            <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Manajemen Tes</p>
-
-                            <a href="{{ route('admin.alat-tes.index') }}"
-                               @class([
-                                   'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                   'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.alat-tes.*'),
-                                   'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.alat-tes.*'),
-                               ])>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke="currentColor" stroke-width="2"
-                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.alat-tes.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.alat-tes.*')])>
-                                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-                                    <polyline points="2 17 12 22 22 17"/>
-                                    <polyline points="2 12 12 17 22 12"/>
-                                </svg>
-                                <span>Kelola Alat Tes</span>
-                            </a>
-
-                            <a href="{{ route('admin.bank-soal.index') }}"
-                               @class([
-                                   'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                   'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.bank-soal.*'),
-                                   'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.bank-soal.*'),
-                               ])>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke="currentColor" stroke-width="2"
-                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.bank-soal.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.bank-soal.*')])>
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                    <polyline points="14 2 14 8 20 8"/>
-                                    <path d="M9 13l2 2 4-4"/>
-                                </svg>
-                                <span>Bank Soal</span>
-                            </a>
-
-                            <a href="{{ route('admin.penjadwalan-tes.index') }}"
-                               @class([
-                                   'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                   'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.penjadwalan-tes.*'),
-                                   'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.penjadwalan-tes.*'),
-                               ])>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke="currentColor" stroke-width="2"
-                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.penjadwalan-tes.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.penjadwalan-tes.*')])>
-                                    <rect x="3" y="4" width="18" height="18" rx="2"/>
-                                    <line x1="16" y1="2" x2="16" y2="6"/>
-                                    <line x1="8" y1="2" x2="8" y2="6"/>
-                                    <line x1="3" y1="10" x2="21" y2="10"/>
-                                </svg>
-                                <span>Penjadwalan Tes</span>
-                            </a>
-
-                            @if(auth()->user()->hasIzin('hasil_tes.lihat'))
-                                <a href="{{ route('admin.hasil-tes.index') }}"
-                                   class="group flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors duration-150 hover:bg-white/5 hover:text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke="currentColor" stroke-width="2"
-                                         class="w-5 h-5 shrink-0 text-slate-400 group-hover:text-slate-200">
-                                        <line x1="12" y1="20" x2="12" y2="10"/>
-                                        <line x1="18" y1="20" x2="18" y2="4"/>
-                                        <line x1="6" y1="20" x2="6" y2="16"/>
-                                        <line x1="3" y1="20" x2="21" y2="20"/>
-                                    </svg>
-                                    <span>Hasil Tes</span>
-                                </a>
-                            @endif
-                        </div>
-                    @endif
-
-                    {{-- GROUP: Data Master --}}
-                    @if(auth()->user()->hasIzin('master_data.kelola'))
-                        <div class="pt-4 mt-4 border-t border-white/10">
-                            <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Data Master</p>
-
-                            <a href="{{ route('admin.departemen.index') }}"
-                               @class([
-                                   'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                   'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.departemen.*'),
-                                   'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.departemen.*'),
-                               ])>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke="currentColor" stroke-width="2"
-                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.departemen.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.departemen.*')])>
-                                    <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18z"/>
-                                    <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>
-                                    <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>
-                                    <path d="M10 6h4"/>
-                                    <path d="M10 10h4"/>
-                                    <path d="M10 14h4"/>
-                                    <path d="M10 18h4"/>
-                                </svg>
-                                <span>Departemen</span>
-                            </a>
-                            <a href="{{ route('admin.posisi.index') }}"
-                               @class([
-                                   'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                   'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.posisi.*'),
-                                   'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.posisi.*'),
-                               ])>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke="currentColor" stroke-width="2"
-                                     @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.posisi.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.posisi.*')])>
-                                    <rect x="3" y="4" width="18" height="16" rx="2"/>
-                                    <circle cx="9" cy="10" r="2"/>
-                                    <path d="M15 8h2"/>
-                                    <path d="M15 12h2"/>
-                                    <path d="M7 16h10"/>
-                                </svg>
-                                <span>Posisi</span>
-                            </a>
-                        </div>
-                    @endif
-
-                    {{-- GROUP: Pengaturan Sistem --}}
-                    @if(auth()->user()->hasIzin('peran.kelola') || auth()->user()->hasIzin('pengguna_admin.kelola'))
-                        <div class="pt-4 mt-4 border-t border-white/10">
-                            <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Pengaturan Sistem</p>
-
-                            @if(auth()->user()->hasIzin('peran.kelola'))
-                                <a href="{{ route('admin.peran.index') }}"
-                                   @class([
-                                       'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                       'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.peran.*'),
-                                       'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.peran.*'),
-                                   ])>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke="currentColor" stroke-width="2"
-                                         @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.peran.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.peran.*')])>
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                    </svg>
-                                    <span>Kelola Peran</span>
-                                </a>
-                            @endif
-
-                            @if(auth()->user()->hasIzin('pengguna_admin.kelola'))
-                                <a href="{{ route('admin.pengguna-admin.index') }}"
-                                   @class([
-                                       'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                       'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.pengguna-admin.*'),
-                                       'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.pengguna-admin.*'),
-                                   ])>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke="currentColor" stroke-width="2"
-                                         @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.pengguna-admin.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.pengguna-admin.*')])>
-                                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="12" cy="7" r="4"/>
-                                        <path d="M12 11v2"/>
-                                        <circle cx="12" cy="15" r="1"/>
-                                    </svg>
-                                    <span>Kelola Admin/Staff</span>
-                                </a>
-                            @endif
-
-                            @if(auth()->user()->hasIzin('data_terhapus.kelola'))
-                                @php
-                                    $jumlahTrash = (int) \App\Models\User::where('tipe_akun','karyawan')->onlyTrashed()->count()
-                                        + (int) \App\Models\User::where('tipe_akun','kandidat')->onlyTrashed()->count()
-                                        + (int) \App\Models\User::where('tipe_akun','custom')->onlyTrashed()->count()
-                                        + (int) \App\Models\DataKaryawan::onlyTrashed()->count()
-                                        + (int) \App\Models\Departemen::onlyTrashed()->count()
-                                        + (int) \App\Models\Posisi::onlyTrashed()->count()
-                                        + (int) \App\Models\Peran::onlyTrashed()->count();
-                                @endphp
-                                <a href="{{ route('admin.data-terhapus.index') }}"
-                                   @class([
-                                       'group flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                                       'border-teal-400 bg-white/10 text-white' => request()->routeIs('admin.data-terhapus.*'),
-                                       'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' => ! request()->routeIs('admin.data-terhapus.*'),
-                                   ])>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke="currentColor" stroke-width="2"
-                                         @class(['w-5 h-5 shrink-0', 'text-teal-300' => request()->routeIs('admin.data-terhapus.*'), 'text-slate-400 group-hover:text-slate-200' => ! request()->routeIs('admin.data-terhapus.*')])>
-                                        <path d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"/>
-                                    </svg>
-                                    <span>Data Terhapus</span>
-                                    @if ($jumlahTrash > 0)
-                                        <span class="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">{{ $jumlahTrash }}</span>
-                                    @endif
-                                </a>
-                            @endif
-                        </div>
-                    @endif
-                @endauth
-            </nav>
         </div>
+
+        {{-- Navigation --}}
+        <nav class="flex-1 py-2">
+            @auth
+
+            {{-- MENU UTAMA --}}
+            <div class="section-label">Menu Utama</div>
+
+            @if(auth()->user()->hasIzin('dashboard.lihat'))
+                <a href="{{ route('admin.dashboard') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+            @endif
+
+            @if(auth()->user()->hasIzin('data_karyawan.kelola') || auth()->user()->hasIzin('pengguna.lihat'))
+                <a href="{{ route('admin.akun-karyawan.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.akun-karyawan.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">badge</span>
+                    <span>Akun Karyawan</span>
+                </a>
+
+                <a href="{{ route('admin.data-karyawan.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.data-karyawan.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">group</span>
+                    <span>Data Karyawan</span>
+                </a>
+            @endif
+
+            @if(auth()->user()->hasIzin('pengguna.lihat'))
+                <a href="{{ route('admin.data-kandidat.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.data-kandidat.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">person_search</span>
+                    <span>Akun Kandidat</span>
+                </a>
+            @endif
+
+            <div class="nav-divider"></div>
+
+            {{-- TES & ASSESSMENT --}}
+            <div class="section-label">Tes &amp; Assessment</div>
+
+            @if(auth()->user()->hasIzin('soal.lihat') || auth()->user()->hasIzin('kategori_tes.kelola'))
+                <a href="{{ route('admin.bank-soal.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.bank-soal.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">database</span>
+                    <span>Bank Soal</span>
+                </a>
+
+                <a href="{{ route('admin.penjadwalan-tes.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.penjadwalan-tes.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                    <span>Penjadwalan Tes</span>
+                </a>
+            @endif
+
+            @if(auth()->user()->hasIzin('hasil_tes.lihat'))
+                <a href="{{ route('admin.hasil-tes.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.hasil-tes.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">analytics</span>
+                    <span>Hasil Tes</span>
+                </a>
+            @endif
+
+            <div class="nav-divider"></div>
+
+            {{-- SYSTEM --}}
+            <div class="section-label">System</div>
+
+            @if(auth()->user()->hasIzin('peran.kelola'))
+                <a href="{{ route('admin.peran.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.peran.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+                    <span>Kelola Peran &amp; Izin</span>
+                </a>
+            @endif
+
+            @if(auth()->user()->hasIzin('pengguna_admin.kelola'))
+                <a href="{{ route('admin.pengguna-admin.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.pengguna-admin.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">settings_suggest</span>
+                    <span>Kelola Admin/Staff</span>
+                </a>
+            @endif
+
+            @if(auth()->user()->hasIzin('master_data.kelola'))
+                <a href="{{ route('admin.departemen.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.departemen.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">apartment</span>
+                    <span>Data Departemen</span>
+                </a>
+            @endif
+
+            @if(auth()->user()->hasIzin('data_terhapus.kelola'))
+                @php
+                    $jumlahTrash = (int) \App\Models\User::where('tipe_akun','karyawan')->onlyTrashed()->count()
+                        + (int) \App\Models\User::where('tipe_akun','kandidat')->onlyTrashed()->count()
+                        + (int) \App\Models\User::where('tipe_akun','custom')->onlyTrashed()->count()
+                        + (int) \App\Models\DataKaryawan::onlyTrashed()->count()
+                        + (int) \App\Models\Departemen::onlyTrashed()->count()
+                        + (int) \App\Models\Posisi::onlyTrashed()->count()
+                        + (int) \App\Models\Peran::onlyTrashed()->count();
+                @endphp
+                <a href="{{ route('admin.data-terhapus.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.data-terhapus.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">delete_outline</span>
+                    <span>Data Terhapus</span>
+                    @if ($jumlahTrash > 0)
+                        <span class="ml-auto rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{{ $jumlahTrash }}</span>
+                    @endif
+                </a>
+            @endif
+
+            @endauth
+        </nav>
+
+        {{-- Bottom User Card --}}
+        <div class="border-t border-[#e0e3e5] p-4 shrink-0">
+            @auth
+            <div class="flex items-center gap-3">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}">
+                    @if(auth()->user()->foto_profil)
+                        <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
+                             class="h-9 w-9 rounded-full object-cover" alt="Foto Profil">
+                    @else
+                        <span class="text-xs font-bold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
+                    @endif
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-[#191c1e] truncate">{{ auth()->user()->name }}</p>
+                    <p class="text-[11px] text-[#40484b] truncate">{{ auth()->user()->peran->nama_peran ?? '-' }}</p>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1" title="Keluar">
+                        <span class="material-symbols-outlined text-[18px]">logout</span>
+                    </button>
+                </form>
+            </div>
+            @endauth
+        </div>
+
     </aside>
 
-    {{-- MAIN CONTENT AREA (offset untuk sidebar) --}}
-    <div class="flex-1 flex-col ml-[16rem] min-h-screen transition-all duration-300">
+    {{-- MAIN AREA --}}
+    <div class="flex-1 flex flex-col ml-[280px] min-h-screen overflow-hidden">
 
         {{-- HEADER --}}
-        <header class="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm shrink-0">
-            <div class="flex items-center gap-3">
-                <h1 class="text-base font-semibold text-slate-900">{{ $judulHalaman ?? 'Dashboard' }}</h1>
+        <header class="flex h-16 items-center justify-between border-b border-[#e0e3e5] bg-white px-6 shrink-0 sticky top-0 z-40">
+
+            <div class="flex items-center gap-4">
+                {{-- Breadcrumb --}}
+                <nav class="flex items-center gap-2 text-[13px] text-[#40484b]">
+                    <a href="{{ route('admin.dashboard') }}" class="hover:text-[#2C5F6F] transition-colors">Home</a>
+                    <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                    <span class="font-semibold text-[#2C5F6F]">{{ $judulHalaman ?? 'Dashboard' }}</span>
+                </nav>
             </div>
 
-            @auth
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 border-r border-[#e0e3e5] pr-4">
+                    <button class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1.5 rounded-md hover:bg-[#f2f4f6]" title="Notifikasi">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                    </button>
+                    <button class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1.5 rounded-md hover:bg-[#f2f4f6]" title="Bantuan">
+                        <span class="material-symbols-outlined text-[20px]">help_outline</span>
+                    </button>
+                </div>
+
+                @auth
                 <div class="relative" x-data="{ open: false }" @click.away="open = false">
                     <button @click="open = ! open"
-                            class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-slate-50">
+                            class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-[#f2f4f6]">
                         <div class="flex h-8 w-8 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}">
                             @if(auth()->user()->foto_profil)
                                 <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
@@ -323,10 +253,8 @@
                                 <span class="text-xs font-semibold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                             @endif
                         </div>
-                        <span class="text-slate-700">{{ auth()->user()->name }}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
+                        <span class="text-[#191c1e] hidden sm:inline">{{ auth()->user()->name }}</span>
+                        <span class="material-symbols-outlined text-[16px] text-[#40484b]">expand_more</span>
                     </button>
 
                     <div x-show="open"
@@ -336,10 +264,10 @@
                          x-transition:leave="transition ease-in duration-75"
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute right-0 top-full z-50 mt-1 w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-slate-200 focus:outline-none">
+                         class="absolute right-0 top-full z-50 mt-1 w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-[#e0e3e5] focus:outline-none">
 
                         <div class="p-4">
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 mb-3">
                                 <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}">
                                     @if(auth()->user()->foto_profil)
                                         <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
@@ -348,22 +276,17 @@
                                         <span class="text-base font-semibold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                                     @endif
                                 </div>
-                                <div>
-                                    <p class="text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</p>
-                                    <p class="text-xs text-slate-500">{{ auth()->user()->email }}</p>
-                                    <p class="mt-0.5 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                                        {{ auth()->user()->peran->nama_peran ?? '-' }}
-                                    </p>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-[#191c1e] truncate">{{ auth()->user()->name }}</p>
+                                    <p class="text-xs text-[#40484b] truncate">{{ auth()->user()->email }}</p>
                                 </div>
                             </div>
 
-                            <hr class="my-3 border-slate-200">
+                            <hr class="border-[#e0e3e5] mb-3">
 
                             <a href="{{ route('profil.index') }}"
-                               class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
+                               class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-[#191c1e] hover:bg-[#f2f4f6] transition">
+                                <span class="material-symbols-outlined text-[18px]">person</span>
                                 Edit Profil
                             </a>
 
@@ -371,20 +294,20 @@
                                 @csrf
                                 <button type="submit"
                                         class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
+                                    <span class="material-symbols-outlined text-[18px]">logout</span>
                                     Keluar
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
-            @endauth
+                @endauth
+            </div>
+
         </header>
 
         {{-- CONTENT --}}
-        <main class="flex-1 overflow-y-auto px-6 py-4">
+        <main class="flex-1 overflow-y-auto px-6 py-6">
             @if (session('sukses'))
                 <div class="mb-4 rounded-md border border-emerald-600 bg-emerald-600 px-4 py-3 text-sm text-white">
                     {{ session('sukses') }}
@@ -398,6 +321,7 @@
 
             @yield('content')
         </main>
+
     </div>
 
 </div>

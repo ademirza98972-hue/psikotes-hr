@@ -192,12 +192,14 @@
         <div class="border-t border-[#e0e3e5] p-4 shrink-0">
             @auth
             <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}" id="avatar-sidebar-{{ auth()->id() }}">
                     @if(auth()->user()->foto_profil)
                         <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
-                             class="h-9 w-9 rounded-full object-cover" alt="Foto Profil">
+                             class="h-9 w-9 rounded-full object-cover" alt="Foto Profil"
+                             onerror="handleAvatarError(this, 'avatar-sidebar-{{ auth()->id() }}-fallback')">
+                        <span id="avatar-sidebar-{{ auth()->id() }}-fallback" class="hidden text-xs font-bold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                     @else
-                        <span class="text-xs font-bold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
+                        <span>{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                     @endif
                 </div>
                 <div class="min-w-0 flex-1">
@@ -245,10 +247,12 @@
                 <div class="relative" x-data="{ open: false }" @click.away="open = false">
                     <button @click="open = ! open"
                             class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-[#f2f4f6]">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}" id="avatar-header-{{ auth()->id() }}">
                             @if(auth()->user()->foto_profil)
                                 <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
-                                     class="h-8 w-8 rounded-full object-cover" alt="Foto Profil">
+                                     class="h-8 w-8 rounded-full object-cover" alt="Foto Profil"
+                                     onerror="handleAvatarError(this, 'avatar-header-{{ auth()->id() }}-fallback')">
+                                <span id="avatar-header-{{ auth()->id() }}-fallback" class="hidden text-xs font-semibold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                             @else
                                 <span class="text-xs font-semibold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                             @endif
@@ -268,10 +272,12 @@
 
                         <div class="p-4">
                             <div class="flex items-center gap-3 mb-3">
-                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}" id="avatar-dropdown-{{ auth()->id() }}">
                                     @if(auth()->user()->foto_profil)
                                         <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
-                                             class="h-11 w-11 rounded-full object-cover" alt="Foto Profil">
+                                             class="h-11 w-11 rounded-full object-cover" alt="Foto Profil"
+                                             onerror="handleAvatarError(this, 'avatar-dropdown-{{ auth()->id() }}-fallback')">
+                                        <span id="avatar-dropdown-{{ auth()->id() }}-fallback" class="hidden text-base font-semibold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                                     @else
                                         <span class="text-base font-semibold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                                     @endif
@@ -326,5 +332,12 @@
 
 </div>
 
+    <script>
+        function handleAvatarError(imgElement, fallbackId) {
+            imgElement.style.display = 'none';
+            const fallback = document.getElementById(fallbackId);
+            if (fallback) fallback.style.display = 'flex';
+        }
+    </script>
 </body>
 </html>

@@ -24,4 +24,9 @@ class ProfilKandidat extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function posisi(): BelongsTo
+    {
+        return $this->belongsTo(Posisi::class, 'posisi_dilamar', 'id');
+    }
 }

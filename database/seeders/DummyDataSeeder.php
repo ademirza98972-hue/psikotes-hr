@@ -151,7 +151,7 @@ class DummyDataSeeder extends Seeder
     /**
      * 3. DATA KANDIDAT (users + profil_kandidat) - 8 akun
      *  - 3 aktif, 3 menunggu_verifikasi, 2 ditolak
-     *  - posisi_dilamar = ID dari tabel posisi
+     *  - posisi_dilamar = nama posisi (string)
      */
     private function seedKandidat(): void
     {
@@ -225,7 +225,7 @@ class DummyDataSeeder extends Seeder
             ProfilKandidat::create([
                 'user_id' => $user->id,
                 'nama_kandidat' => $nama,
-                'posisi_dilamar' => $posisi->id,
+                'posisi_dilamar' => $posisi->nama_posisi,
                 'pendidikan_terakhir' => $listPendidikan[$index],
                 'nik_kandidat' => $nik,
             ]);

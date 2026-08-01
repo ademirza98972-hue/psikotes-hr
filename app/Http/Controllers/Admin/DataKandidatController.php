@@ -56,7 +56,8 @@ class DataKandidatController extends Controller
             $q->whereHas('profilKandidat', fn ($pk) => $pk->where('posisi_dilamar', $filterPosisiNama));
         });
 
-        $kandidat = $query->orderBy('name')
+        $kandidat = $query->with(['profilKandidat.posisi'])
+            ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 

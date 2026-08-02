@@ -88,17 +88,19 @@
             @endif
 
             @if(auth()->user()->hasIzin('data_karyawan.kelola') || auth()->user()->hasIzin('pengguna.lihat'))
+                <a href="{{ route('admin.data-karyawan.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.data-karyawan.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">group</span>
+                    <span>Data Karyawan</span>
+                </a>
+                
                 <a href="{{ route('admin.akun-karyawan.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.akun-karyawan.*') ? 'active' : '' }}">
                     <span class="material-symbols-outlined text-[20px]">badge</span>
                     <span>Akun Karyawan</span>
                 </a>
 
-                <a href="{{ route('admin.data-karyawan.index') }}"
-                   class="sidebar-link {{ request()->routeIs('admin.data-karyawan.*') ? 'active' : '' }}">
-                    <span class="material-symbols-outlined text-[20px]">group</span>
-                    <span>Data Karyawan</span>
-                </a>
+                
             @endif
 
             @if(auth()->user()->hasIzin('pengguna.lihat'))

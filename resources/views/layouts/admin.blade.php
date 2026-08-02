@@ -117,6 +117,12 @@
             <div class="section-label">Tes &amp; Assessment</div>
 
             @if(auth()->user()->hasIzin('soal.lihat') || auth()->user()->hasIzin('kategori_tes.kelola'))
+                <a href="{{ route('admin.alat-tes.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.alat-tes.*') ? 'active' : '' }}">
+                    <span class="material-symbols-outlined text-[20px]">quiz</span>
+                    <span>Alat Tes</span>
+                </a>
+
                 <a href="{{ route('admin.bank-soal.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.bank-soal.*') ? 'active' : '' }}">
                     <span class="material-symbols-outlined text-[20px]">database</span>

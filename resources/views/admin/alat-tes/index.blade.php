@@ -3,141 +3,213 @@
 @section('content')
 @php
     $warnaFormat = [
-        'Pilihan Ganda' => 'bg-blue-600',
-        'Skala Likert'  => 'bg-indigo-600',
-        'Forced Choice' => 'bg-amber-600',
+        'Pilihan Ganda' => 'border-[#71787c] text-[#40484b]',
+        'Skala Likert'  => 'border-[#71787c] text-[#40484b]',
+        'Forced Choice' => 'border-[#71787c] text-[#40484b]',
     ];
 
-    $warnaBidang = [
-        'Intelektual'    => 'bg-sky-100 text-sky-700 border-sky-200',
-        'Sikap Kerja'    => 'bg-amber-100 text-amber-700 border-amber-200',
-        'Kepribadian'    => 'bg-violet-100 text-violet-700 border-violet-200',
-        'Potensi Kerja'  => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-        'Sensitif'       => 'bg-rose-100 text-rose-700 border-rose-200',
-    ];
+    // TODO: tambahkan field `status` (enum: aktif/nonaktif) ke tabel alat_tes saat backend siap
+    // Saat ini semua alat tes dianggap Aktif
+    $totalAlat = count($alatTes);
+    $totalSoal = array_sum(array_column($alatTes, 'jumlah_soal'));
 @endphp
 
-<div x-data="{ openDimensiId: null }" class="w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
+<div class="space-y-6">
 
-    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    {{-- PAGE HEADER --}}
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h2 class="text-base font-semibold text-slate-900">Daftar Alat Tes</h2>
-            <p class="mt-0.5 text-xs text-slate-500">Konfigurasi alat tes yang tersedia untuk kandidat dan karyawan.</p>
+            <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">Daftar Alat Tes</h2>
+            <p class="mt-0.5 text-[14px] text-[#40484b]">Kelola jenis instrumen tes psikometri yang tersedia dalam sistem.</p>
         </div>
+        @if(auth()->user()->hasIzin('kategori_tes.kelola'))
         <a href="{{ route('admin.alat-tes.tambah') }}"
-           class="self-start rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] whitespace-nowrap">
-            + Tambah Alat Tes
+           class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            Tambah Alat Tes
         </a>
+        @endif
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-            <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                <tr>
-                    <th class="px-4 py-3">Nama</th>
-                    <th class="px-4 py-3">Format Dasar</th>
-                    <th class="px-4 py-3 text-center">Durasi Total</th>
-                    <th class="px-4 py-3 text-center">Batas per Soal</th>
-                    <th class="px-4 py-3 text-center">Jumlah Soal</th>
-                    <th class="px-4 py-3 text-center">Dimensi</th>
-                    <th class="px-4 py-3 text-center">Status</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse ($alatTes as $alat)
-                    <tr class="hover:bg-slate-50" :class="{ 'bg-slate-50': openDimensiId === {{ $alat['id'] }} }">
-                        <td class="px-4 py-3 font-medium text-slate-900">{{ $alat['nama'] }}</td>
-                        <td class="px-4 py-3">
-                            <span class="inline-block rounded-md {{ $warnaFormat[$alat['format_dasar']] ?? 'bg-slate-600' }} px-2 py-0.5 text-xs font-semibold text-white">
-                                {{ $alat['format_dasar'] }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-center text-slate-600">
-                            @if ($alat['durasi_total_menit'])
-                                {{ $alat['durasi_total_menit'] }} menit
-                            @else
-                                <span class="text-slate-400">—</span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            @if ($alat['batas_waktu_per_soal_aktif'])
-                                <span class="inline-block rounded-md bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white">
-                                    Aktif ({{ $alat['batas_waktu_per_soal_detik'] }} dtk)
-                                </span>
-                            @else
-                                <span class="inline-block rounded-md bg-slate-300 px-2 py-0.5 text-xs font-semibold text-slate-700">
-                                    Mati
-                                </span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3 text-center text-slate-600">{{ $alat['jumlah_soal'] }}</td>
-                        <td class="px-4 py-3 text-center">
-                            @php $jumlahDimensi = count($alat['dimensi'] ?? []); @endphp
-                            @if ($jumlahDimensi > 0)
-                                <div class="flex flex-col items-center gap-1">
-                                    <span class="text-xs text-slate-600">
-                                        {{ $jumlahDimensi }} dimensi dikonfigurasi
-                                    </span>
-                                    <button type="button"
-                                            @click="openDimensiId = (openDimensiId === {{ $alat['id'] }} ? null : {{ $alat['id'] }})"
-                                            class="text-xs font-medium text-[#2C5F6F] hover:text-[#234853] hover:underline">
-                                        <span x-show="openDimensiId !== {{ $alat['id'] }}">Lihat Detail Dimensi ▾</span>
-                                        <span x-show="openDimensiId === {{ $alat['id'] }}" x-cloak>Sembunyikan ▴</span>
-                                    </button>
-                                </div>
-                            @else
-                                <span class="text-xs text-slate-400">—</span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            @if ($alat['is_sensitif'])
-                                <span class="inline-block rounded-md bg-rose-600 px-2 py-0.5 text-xs font-semibold text-white">
-                                    Sensitif
-                                </span>
-                            @else
-                                <span class="text-slate-400">—</span>
-                            @endif
-                        </td>
+    {{-- STATS CARDS --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white border border-[#e0e3e5] rounded-xl p-4 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                <span class="material-symbols-outlined text-[22px]">quiz</span>
+            </div>
+            <div>
+                <p class="text-[11px] text-[#40484b] uppercase tracking-wider font-semibold">Total Instrumen</p>
+                <p class="text-[18px] leading-6 font-bold text-[#191c1e]">{{ $totalAlat }}</p>
+            </div>
+        </div>
+        <div class="bg-white border border-[#e0e3e5] rounded-xl p-4 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                <span class="material-symbols-outlined text-[22px]">check_circle</span>
+            </div>
+            <div>
+                <p class="text-[11px] text-[#40484b] uppercase tracking-wider font-semibold">Aktif</p>
+                <p class="text-[18px] leading-6 font-bold text-[#191c1e]">{{ $totalAlat }}</p>
+            </div>
+        </div>
+        <div class="bg-white border border-[#e0e3e5] rounded-xl p-4 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-full bg-violet-50 flex items-center justify-center text-violet-600 shrink-0">
+                <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+            </div>
+            <div>
+                <p class="text-[11px] text-[#40484b] uppercase tracking-wider font-semibold">Total Soal</p>
+                <p class="text-[18px] leading-6 font-bold text-[#191c1e]">{{ number_format($totalSoal) }}</p>
+            </div>
+        </div>
+        <div class="bg-white border border-[#e0e3e5] rounded-xl p-4 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                <span class="material-symbols-outlined text-[22px]">trending_up</span>
+            </div>
+            <div>
+                <p class="text-[11px] text-[#40484b] uppercase tracking-wider font-semibold">Terpopuler</p>
+                <p class="text-[14px] leading-5 font-bold text-[#191c1e]">
+                    @php $maxSoal = max(array_column($alatTes, 'jumlah_soal')); $populer = collect($alatTes)->first(fn($a) => $a['jumlah_soal'] === $maxSoal); @endphp
+                    {{ $populer['nama'] ?? '-' }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {{-- TABLE CARD --}}
+    <div class="bg-white border border-[#e0e3e5] rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+                <thead>
+                    <tr class="bg-[#f2f4f6] border-b border-[#e0e3e5]">
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] w-24">KODE</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b]">Nama Alat Tes</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] text-center">Soal</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b]">Format</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b]">Status</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] text-right">Aksi</th>
                     </tr>
-                    @if ($jumlahDimensi > 0)
-                        <tr x-show="openDimensiId === {{ $alat['id'] }}" x-cloak>
-                            <td colspan="7" class="bg-slate-50 px-4 py-4">
-                                <div class="rounded-md border border-slate-200 bg-white p-4">
-                                    <div class="mb-2 flex items-center justify-between">
-                                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                            Detail Dimensi — {{ $alat['nama'] }}
-                                        </p>
-                                        <span class="text-xs text-slate-500">
-                                            Tipe kategori: <span class="font-medium">{{ $alat['dimensi'][0]['tipe_kategori'] }}</span>
-                                        </span>
-                                    </div>
-                                    <div class="flex flex-wrap gap-2">
-                                        @foreach ($alat['dimensi'] as $dimensi)
-                                            <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs {{ $warnaBidang[$dimensi['bidang_psikogram']] ?? 'bg-slate-100 text-slate-700 border-slate-200' }}">
-                                                @if (!empty($dimensi['kode']))
-                                                    <span class="font-mono text-[10px] font-semibold opacity-70">[{{ $dimensi['kode'] }}]</span>
-                                                @endif
-                                                <span class="font-medium">{{ $dimensi['nama_dimensi'] }}</span>
-                                                <span class="text-[10px] opacity-60">·</span>
-                                                <span class="text-[10px]">{{ $dimensi['bidang_psikogram'] }}</span>
-                                            </span>
-                                        @endforeach
-                                    </div>
+                </thead>
+                <tbody class="divide-y divide-[#e0e3e5]/60">
+                    @forelse ($alatTes as $alat)
+                        @php
+                            // TODO: gunakan field `kode` dari database jika sudah ada.
+                            // Saat ini ekstrak dari nama karena field kode belum tersedia.
+                            $kodeMap = [
+                                'DISC' => 'DISC',
+                                'IST' => 'IST',
+                                'EPPS' => 'EPPS',
+                                'MMPI-2' => 'MMPI-2',
+                            ];
+                            $kode = $kodeMap[$alat['nama']] ?? strtoupper(mb_substr($alat['nama'], 0, 4));
+
+                            $warnaKode = [
+                                'DISC' => 'bg-blue-100 text-blue-700',
+                                'IST'  => 'bg-violet-100 text-violet-700',
+                                'EPPS' => 'bg-emerald-100 text-emerald-700',
+                                'MMPI-2' => 'bg-orange-100 text-orange-700',
+                            ];
+                            $badgeKode = $warnaKode[$kode] ?? 'bg-slate-100 text-slate-700';
+                        @endphp
+                        <tr class="hover:bg-[#f2f4f6] transition-colors group">
+                            <td class="px-5 py-3.5">
+                                <span class="inline-block px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $badgeKode }}">
+                                    {{ $kode }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                <p class="font-semibold text-[#191c1e]">{{ $alat['nama'] }}</p>
+                                <p class="text-[11px] text-[#40484b] mt-0.5">{{ $alat['format_dasar'] }}</p>
+                            </td>
+                            <td class="px-5 py-3.5 text-center font-medium text-[#40484b]">
+                                {{ $alat['jumlah_soal'] }}
+                            </td>
+                            <td class="px-5 py-3.5">
+                                <span class="inline-block border border-[#c0c8cb] px-3 py-1 rounded-full text-[12px] font-medium text-[#40484b]">
+                                    {{ $alat['format_dasar'] }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                @if ($alat['is_sensitif'])
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[11px] font-bold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                                        Sensitif
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                        Aktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-3.5 text-right">
+                                <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    @if(auth()->user()->hasIzin('kategori_tes.kelola'))
+                                    <a href="{{ route('admin.alat-tes.tambah') }}"
+                                       class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                       title="Edit">
+                                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                                    </a>
+                                    @endif
+                                    @if(auth()->user()->hasIzin('kategori_tes.kelola'))
+                                    <button type="button"
+                                            class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                                            title="Hapus"
+                                            onclick="confirm('Yakin hapus alat tes {{ $alat['nama'] }}?')">
+                                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                                    </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
-                    @endif
-                @empty
-                    <tr>
-                        <td colspan="7" class="px-4 py-10 text-center text-sm text-slate-500">
-                            Belum ada data alat tes.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-5 py-12 text-center text-sm text-[#40484b]">
+                                Belum ada data alat tes.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Pagination info --}}
+        @if ($totalAlat > 0)
+        <div class="px-5 py-3.5 flex items-center justify-between border-t border-[#e0e3e5] bg-[#f2f4f6]">
+            <p class="text-[12px] text-[#40484b]">
+                Menampilkan <span class="font-semibold text-[#191c1e]">{{ $totalAlat }}</span> data
+            </p>
+        </div>
+        @endif
     </div>
+
+    {{-- INFO CARD --}}
+    <div class="p-5 bg-[#0d4757]/5 border border-[#0d4757]/10 rounded-xl flex items-start gap-4">
+        <div class="p-2 bg-[#0d4757]/10 rounded-lg text-[#2C5F6F] shrink-0">
+            <span class="material-symbols-outlined text-[20px]">info</span>
+        </div>
+        <div>
+            <h4 class="text-[14px] font-semibold text-[#00303c]">Informasi Status</h4>
+            <p class="text-[13px] text-[#40484b] mt-1">
+                Alat tes bertanda <span class="inline-flex items-center gap-1 text-rose-600 font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-rose-600 inline-block"></span>Sensitif</span> memuat konten psikologis klinis dan hanya dapat diakses oleh psikolog terverifikasi.
+                Status Nonaktif akan menyembunyikan instrumen dari panel peserta.
+            </p>
+        </div>
+    </div>
+
 </div>
 
-<style>[x-cloak] { display: none !important; }</style>
+@push('scripts')
+<script>
+    // Search highlight simulation (optional enhancement)
+    const searchInput = document.querySelector('#alat-tes-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(val) ? '' : 'none';
+            });
+        });
+    }
+</script>
+@endpush
 @endsection

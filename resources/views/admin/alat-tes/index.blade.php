@@ -141,8 +141,8 @@
                                 @endif
                             </td>
                             <td class="px-5 py-3.5 text-right">
-                                <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    @if(auth()->user()->hasIzin('kategori_tes.kelola'))
+                                @if(auth()->user()->hasIzin('kategori_tes.kelola'))
+                                <div class="flex items-center justify-end gap-1">
                                     <a href="{{ route('admin.alat-tes.tambah') }}"
                                        class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
                                        title="Edit">

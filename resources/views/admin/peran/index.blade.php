@@ -1,83 +1,147 @@
-@extends('layouts.admin', ['judulHalaman' => 'Kelola Peran'])
+@extends('layouts.admin', ['judulHalaman' => 'Kelola Peran & Izin'])
 
 @section('content')
 <div x-data="{ modalHapus: false, idHapus: null, namaHapus: '' }">
 
-    <div class="w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
-
-        {{-- FILTER BAR --}}
-        <form method="GET" action="{{ route('admin.peran.index') }}" class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="flex flex-1 flex-wrap items-end gap-2">
-                {{-- Search --}}
-                <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama peran..."
-                    class="block w-56 rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-
-                <button type="submit" class="rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
+    {{-- Header Section --}}
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div>
+            <nav class="flex items-center gap-2 mb-2 text-[#40484b] text-sm">
+                <a href="{{ route('admin.dashboard') }}" class="hover:text-[#2C5F6F] transition-colors">Dashboard</a>
+                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                <span class="font-semibold text-[#2C5F6F]">Kelola Peran & Izin</span>
+            </nav>
+            <h2 class="text-[32px] leading-[40px] font-bold text-[#001a22]">Kelola Peran & Izin</h2>
+            <p class="text-[14px] leading-[20px] text-[#40484b] mt-1">Kelola hak akses dan tanggung jawab pengguna dalam sistem.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <form method="GET" action="{{ route('admin.peran.index') }}" class="flex items-center gap-2">
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#40484b] text-[20px] transition-colors group-focus-within:text-[#2C5F6F]">search</span>
+                    <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama peran..."
+                        class="pl-10 pr-4 py-2.5 w-64 bg-white border border-[#c0c8cb] rounded-xl focus:ring-2 focus:ring-[#2C5F6F] focus:border-[#2C5F6F] outline-none text-[14px] leading-[20px] transition-all shadow-sm">
+                </div>
+                <button type="submit" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#c0c8cb] rounded-xl text-[12px] leading-[16px] font-medium text-[#191c1e] hover:bg-[#f2f4f6] transition-colors shadow-sm">
+                    <span class="material-symbols-outlined text-[20px]">filter_list</span>
                     Terapkan Filter
                 </button>
-
                 @if ($kataKunci)
                     <a href="{{ route('admin.peran.index') }}"
-                        class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300 whitespace-nowrap">
-                        Reset Filter
+                        class="px-4 py-2.5 bg-white border border-[#c0c8cb] rounded-xl text-[12px] leading-[16px] font-medium text-[#191c1e] hover:bg-[#f2f4f6] transition-colors shadow-sm">
+                        Reset
                     </a>
                 @endif
-            </div>
-
+            </form>
             @auth
                 @if(auth()->user()->hasIzin('peran.kelola'))
                     <a href="{{ route('admin.peran.tambah') }}"
-                       class="self-start rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] whitespace-nowrap">
-                        + Tambah Peran
+                       class="flex items-center gap-2 px-5 py-2.5 bg-[#2C5F6F] text-white rounded-xl text-[12px] leading-[16px] font-medium hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-[#2C5F6F]/20">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                        Tambah Peran
                     </a>
                 @endif
             @endauth
-        </form>
-
-        {{-- INDICATOR --}}
-        <div class="mb-2 text-xs text-slate-500">
-            Menampilkan <strong>{{ $peran->firstItem() ?? $peran->total() }}</strong> dari <strong>{{ $peran->total() }}</strong> peran
         </div>
+    </div>
 
+    {{-- Role Stats / Info --}}
+    <div class="mb-4 flex items-center justify-between">
+        <span class="text-[12px] leading-[16px] font-medium text-[#40484b] bg-[#e6e8ea] px-3 py-1 rounded-full">
+            Menampilkan <strong>{{ $peran->firstItem() ?? $peran->total() }}</strong> dari <strong>{{ $peran->total() }}</strong> peran
+        </span>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                <span class="text-[11px] font-medium text-[#40484b] uppercase tracking-wider">System Role</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-[#2C5F6F]"></div>
+                <span class="text-[11px] font-medium text-[#40484b] uppercase tracking-wider">Custom Role</span>
+            </div>
+        </div>
+    </div>
+
+    {{-- Warning Info --}}
+    <div class="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 flex items-start gap-3">
+        <span class="material-symbols-outlined text-[#d97706] text-[20px] mt-0.5 shrink-0">warning</span>
+        <div>
+            <p class="text-sm font-medium text-amber-800">Perubahan izin berlaku langsung</p>
+            <p class="text-xs text-amber-700 mt-0.5">Perubahan hak akses pada peran akan langsung mempengaruhi semua pengguna dengan peran tersebut.</p>
+        </div>
+    </div>
+
+    {{-- Table Card --}}
+    <div class="bg-white border border-[#c0c8cb] rounded-xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                    <tr>
-                        <th class="px-4 py-3">Nama Peran</th>
-                        <th class="px-4 py-3">Deskripsi</th>
-                        <th class="px-4 py-3 text-center">Jumlah Izin</th>
-                        <th class="px-4 py-3 text-center">Jumlah Pengguna</th>
-                        <th class="px-4 py-3 text-right">Aksi</th>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-[#f2f4f6] border-b border-[#c0c8cb]">
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b]">Nama Peran</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b]">Deskripsi</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b] text-center">Jumlah Izin</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b] text-center">Jumlah Pengguna</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b] text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-[#c0c8cb]/30">
                     @forelse ($peran as $p)
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 font-medium text-slate-900">
-                                {{ $p->nama_peran }}
-                                @if ($p->nama_peran === 'Super Admin')
-                                    <span class="ml-2 inline-block rounded-md border border-indigo-700 bg-indigo-600 px-2 py-0.5 text-xs font-medium text-white">Protected</span>
+                        <tr class="hover:bg-[#f2f4f6]/50 transition-colors group">
+                            <td class="px-6 py-5 whitespace-nowrap">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-[18px] leading-[24px] font-semibold text-[#001a22]">{{ $p->nama_peran }}</span>
+                                    @if ($p->nama_peran === 'Super Admin')
+                                        <span class="px-2 py-0.5 rounded-md bg-purple-50 border border-purple-200 text-[10px] font-bold text-purple-700 uppercase tracking-tight">Protected</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-6 py-5 max-w-xs">
+                                <p class="text-[14px] leading-[20px] text-[#40484b] line-clamp-2">{{ $p->deskripsi ?? '-' }}</p>
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#eceef0] text-[#001a22] font-semibold text-[14px] leading-[20px]">{{ $p->izin_count }}</span>
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                @if ($p->pengguna_count > 0)
+                                    <div class="flex items-center justify-center -space-x-2">
+                                        @foreach($p->pengguna()->limit(3)->get() as $user)
+                                            <div class="w-8 h-8 rounded-full border-2 border-white {{ $loop->first ? 'bg-[#c0e9f9]' : 'bg-[#eceef0]' }} flex items-center justify-center overflow-hidden">
+                                                @if($user->foto_profil)
+                                                    <img src="{{ asset('storage/' . $user->foto_profil) }}" class="w-full h-full object-cover" alt="">
+                                                @else
+                                                    <span class="text-[10px] font-bold text-[#39485e]">{{ strtoupper(mb_substr(explode(' ', $user->name)[0], 0, 2)) }}</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                        @if ($p->pengguna_count > 3)
+                                            <div class="w-8 h-8 rounded-full border-2 border-white bg-[#eceef0] text-[10px] font-medium text-[#40484b] flex items-center justify-center">
+                                                +{{ $p->pengguna_count - 3 }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="text-[11px] font-bold text-[#40484b] bg-[#eceef0] rounded-lg px-2 py-1">0 Users</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-slate-600">{{ $p->deskripsi ?? '-' }}</td>
-                            <td class="px-4 py-3 text-center text-slate-600">{{ $p->izin_count }}</td>
-                            <td class="px-4 py-3 text-center text-slate-600">{{ $p->pengguna_count }}</td>
-                            <td class="px-4 py-3 text-right">
-                                <div class="inline-flex justify-end gap-2">
+                            <td class="px-6 py-5 text-right">
+                                <div class="flex items-center justify-end gap-2">
                                     @auth
                                         @if(auth()->user()->hasIzin('peran.kelola'))
                                             <a href="{{ route('admin.peran.ubah', $p->id) }}"
-                                               class="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">Edit</a>
+                                               class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
+                                            </a>
                                             @if ($p->nama_peran === 'Super Admin')
                                                 <button type="button" disabled
                                                         title="Peran Super Admin tidak dapat dihapus."
-                                                        class="cursor-not-allowed rounded-md bg-slate-300 px-3 py-1.5 text-xs font-semibold text-white opacity-60">
-                                                    Hapus
+                                                        class="p-2 text-[#40484b] cursor-not-allowed" title="System protected">
+                                                    <span class="material-symbols-outlined text-[20px]">delete</span>
                                                 </button>
                                             @else
                                                 <button type="button"
                                                         @click="modalHapus = true; idHapus = {{ $p->id }}; namaHapus = '{{ addslashes($p->nama_peran) }}'"
-                                                        class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-red-700">Hapus</button>
+                                                        class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors" title="Hapus">
+                                                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                                                </button>
                                             @endif
                                         @endif
                                     @endauth
@@ -86,17 +150,17 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-4 py-10 text-center">
+                            <td colspan="5" class="px-6 py-10 text-center">
                                 @if ($kataKunci)
-                                    <p class="text-sm text-slate-500">Tidak ada peran yang cocok dengan pencarian "{{ $kataKunci }}".</p>
+                                    <p class="text-[14px] text-[#40484b]">Tidak ada peran yang cocok dengan pencarian "{{ $kataKunci }}".</p>
                                     <div class="mt-3">
                                         <a href="{{ route('admin.peran.index') }}"
-                                            class="inline-block rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">
+                                            class="inline-block rounded-xl border border-[#c0c8cb] bg-white px-4 py-2 text-[12px] font-medium text-[#191c1e] hover:bg-[#f2f4f6] transition-colors">
                                             Reset Filter
                                         </a>
                                     </div>
                                 @else
-                                    <p class="text-sm text-slate-500">Belum ada data peran.</p>
+                                    <p class="text-[14px] text-[#40484b]">Belum ada data peran.</p>
                                 @endif
                             </td>
                         </tr>
@@ -106,27 +170,48 @@
         </div>
 
         @if ($peran->hasPages())
-            <div class="mt-4">
+            <div class="px-6 py-4 bg-white border-t border-[#c0c8cb] flex items-center justify-between">
+                <span class="text-[12px] leading-[16px] font-medium text-[#40484b]">
+                    Halaman {{ $peran->currentPage() }} dari {{ $peran->lastPage() }}
+                </span>
+                <div class="flex gap-2">
+                    <button {{ $peran->onFirstPage() ? 'disabled' : '' }}
+                        class="p-2 rounded-lg border border-[#c0c8cb] text-[#40484b] {{ $peran->onFirstPage() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#f2f4f6] transition-colors' }}">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button {{ !$peran->hasMorePages() ? 'disabled' : '' }}
+                        class="p-2 rounded-lg border border-[#c0c8cb] text-[#40484b] {{ !$peran->hasMorePages() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#f2f4f6] transition-colors' }}">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-[#c0c8cb]">
                 {{ $peran->links() }}
             </div>
         @endif
     </div>
 
-    <div x-show="modalHapus" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
-        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl" @click.outside="modalHapus = false">
-            <h3 class="text-base font-semibold text-slate-900">Hapus Peran</h3>
-            <p class="mt-2 text-sm text-slate-600">
-                Apakah Anda yakin ingin menghapus peran <span class="font-semibold" x-text="namaHapus"></span>?
+    {{-- Delete Modal --}}
+    <div x-show="modalHapus" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center bg-[#191c1e]/50 px-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" @click.outside="modalHapus = false">
+            <h3 class="text-[16px] leading-[24px] font-semibold text-[#191c1e]">Hapus Peran</h3>
+            <p class="mt-2 text-[14px] leading-[20px] text-[#40484b]">
+                Apakah Anda yakin ingin menghapus peran <span class="font-semibold text-[#191c1e]" x-text="namaHapus"></span>?
                 Tindakan ini tidak dapat dibatalkan.
             </p>
             <div class="mt-6 flex justify-end gap-2">
                 <button type="button" @click="modalHapus = false"
-                        class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</button>
+                        class="rounded-xl border border-[#c0c8cb] bg-white px-4 py-2.5 text-[14px] leading-[20px] font-medium text-[#191c1e] hover:bg-[#f2f4f6] transition-all">
+                    Batal
+                </button>
                 <form :action="`{{ url('admin/peran') }}/${idHapus}`" method="POST">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
-                            class="rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Hapus</button>
+                            class="rounded-xl bg-[#ba1a1a] px-4 py-2.5 text-[14px] leading-[20px] font-semibold text-white hover:brightness-110 transition-all">
+                        Hapus
+                    </button>
                 </form>
             </div>
         </div>

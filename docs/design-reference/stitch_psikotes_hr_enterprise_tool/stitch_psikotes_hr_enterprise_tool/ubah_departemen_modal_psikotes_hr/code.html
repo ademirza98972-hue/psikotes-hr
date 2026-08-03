@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ubah Departemen - Psikotes HR Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001f28",
+                    "on-tertiary-fixed": "#131b2e",
+                    "on-primary-container": "#7198a7",
+                    "secondary-fixed": "#d4e3ff",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-high": "#e6e8ea",
+                    "error-muted": "#fef2f2",
+                    "inverse-on-surface": "#eff1f3",
+                    "surface-tint": "#3d6471",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c1c7cb",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "secondary-fixed-dim": "#b8c7e2",
+                    "inverse-primary": "#a5cddc",
+                    "secondary": "#505f76",
+                    "on-secondary-container": "#56657c",
+                    "surface-container": "#eceef0",
+                    "on-background": "#191c1e",
+                    "outline": "#71787b",
+                    "primary-fixed": "#c0e9f9",
+                    "primary": "#001a22",
+                    "surface-bright": "#f7f9fb",
+                    "inverse-surface": "#2d3133",
+                    "surface": "#f7f9fb",
+                    "on-surface-variant": "#41484b",
+                    "surface-dim": "#d8dadc",
+                    "action-teal": "#2C5F6F",
+                    "background": "#f7f9fb",
+                    "tertiary": "#0e1629",
+                    "on-tertiary-container": "#8a92aa",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#232b3f",
+                    "secondary-container": "#d4e3ff",
+                    "on-surface": "#191c1e",
+                    "on-secondary-fixed": "#0c1c30",
+                    "surface-container-low": "#f2f4f6",
+                    "on-primary-fixed-variant": "#244c59",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "success-muted": "#f0fdf4",
+                    "on-secondary-fixed-variant": "#39485e",
+                    "primary-fixed-dim": "#a5cddc",
+                    "on-tertiary-fixed-variant": "#3e465c",
+                    "surface-container-highest": "#e0e3e5",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#dae2fd",
+                    "primary-container": "#00303c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "header-height": "64px",
+                    "container-max": "1440px",
+                    "stack-lg": "32px",
+                    "stack-md": "16px",
+                    "sidebar-width": "280px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Work Sans"],
+                    "headline-md": ["Work Sans"],
+                    "label-sm": ["Work Sans"],
+                    "title-sm": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "display-lg": ["Work Sans"],
+                    "body-md": ["Work Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+            background-color: rgba(25, 28, 30, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-surface-bright text-on-surface">
+<!-- Persistent SideNav Anchor -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-lg z-10">
+<div class="px-gutter mb-10">
+<h1 class="font-headline-md text-headline-md text-action-teal font-bold tracking-tight">HR Portal</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Enterprise Management</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer group">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</div>
+<!-- Active State for Departments -->
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-action-teal font-semibold bg-surface-container cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">corporate_fare</span>
+<span class="font-body-md text-body-md">Departments</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Employees</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Payroll</span>
+</div>
+<div class="mt-auto flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</div>
+</nav>
+</aside>
+<!-- TopAppBar Anchor -->
+<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-header-height bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-gutter z-10">
+<div class="flex items-center gap-4">
+<h2 class="font-title-sm text-title-sm text-on-surface">Department Management</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative flex items-center bg-surface-container-low rounded-full px-4 py-2 w-64">
+<span class="material-symbols-outlined text-outline mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-body-md w-full focus:ring-0" placeholder="Search department..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-2 border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a corporate HR manager with a friendly expression, set against a soft-focus office background with teal and white accents. High-quality corporate photography style, bright lighting, and professional attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfP2xrUohMQuNXiyGmyozuHh7xv5EXV_6-1s2ALU5coDtmY_ZU6A-RTCzy76hobndh7rg1kZqbH4oRxSu6pEH3awSEz0oBExaun3GWtEWYuC5FjVj0L9pyiDR1y6a3zOyaZfM0iKsTTnt-5VpKZD80-b-JcsHMuz1DhFzm3UDE3QFg6034lTqs94vj6Fg7Nv60GcTaUOnKL6VZOMVSart9tvKuTKwMq9MIZm-MxlGuE1_8DULVVKwv"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas (Daftar Departemen Background) -->
+<main class="ml-[280px] pt-header-height p-gutter min-h-screen">
+<div class="max-w-container-max mx-auto space-y-stack-lg">
+<div class="flex justify-between items-end">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Daftar Departemen</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage organization structure and psychological test parameters per department.</p>
+</div>
+<button class="bg-action-teal text-on-primary px-6 py-2.5 rounded-xl font-body-md flex items-center gap-2 hover:opacity-90 transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                    Tambah Departemen
+                </button>
+</div>
+<!-- Bento-style Statistics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-stack-md">
+<div class="bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-action-teal">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">corporate_fare</span>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant uppercase">Total Dept</p>
+<p class="text-title-sm font-title-sm text-on-surface">12</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant uppercase">Total Staff</p>
+<p class="text-title-sm font-title-sm text-on-surface">458</p>
+</div>
+</div>
+<!-- ... other stats ... -->
+</div>
+<!-- Table Section -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">KODE</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">NAMA DEPARTEMEN</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">TOTAL KARYAWAN</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">STATUS</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">AKSI</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container-low/50 transition-colors cursor-default">
+<td class="px-6 py-4 font-body-md text-body-md font-semibold text-action-teal">FIN-01</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface">Finance</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">24 Members</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full bg-success-muted border border-green-200 text-green-700 text-[11px] font-bold">Aktif</span>
+</td>
+<td class="px-6 py-4">
+<button class="text-action-teal hover:underline font-body-md">Ubah</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-body-md text-body-md font-semibold text-action-teal">OPS-02</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface">Operations</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">156 Members</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full bg-success-muted border border-green-200 text-green-700 text-[11px] font-bold">Aktif</span>
+</td>
+<td class="px-6 py-4">
+<button class="text-action-teal hover:underline font-body-md">Ubah</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-body-md text-body-md font-semibold text-action-teal">MKT-03</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface">Marketing</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">42 Members</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full bg-success-muted border border-green-200 text-green-700 text-[11px] font-bold">Aktif</span>
+</td>
+<td class="px-6 py-4">
+<button class="text-action-teal hover:underline font-body-md">Ubah</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- MODAL OVERLAY: UBAH DEPARTEMEN -->
+<div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop transition-opacity duration-300" id="modalOverlay">
+<div class="bg-surface-container-lowest w-[400px] rounded-xl shadow-2xl border border-outline-variant p-6 transform transition-all duration-300 scale-100 animate-in fade-in zoom-in duration-300">
+<!-- Modal Header -->
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-headline-md text-headline-md text-on-surface">Ubah Departemen</h4>
+<button class="text-on-surface-variant hover:text-error transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Content -->
+<form class="space-y-6" onsubmit="return false;">
+<div class="space-y-2">
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase" for="deptName">Nama Departemen</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 font-body-md text-on-surface focus:ring-2 focus:ring-action-teal focus:border-action-teal outline-none transition-all" id="deptName" placeholder="Masukkan nama departemen" type="text" value="Finance"/>
+</div>
+<div class="bg-surface-container p-4 rounded-lg flex items-start gap-3">
+<span class="material-symbols-outlined text-action-teal text-[20px]">info</span>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">
+                        Perubahan nama departemen akan otomatis diperbarui pada seluruh profil karyawan yang terhubung.
+                    </p>
+</div>
+<!-- Modal Footer -->
+<div class="flex items-center justify-end gap-3 pt-2">
+<button class="px-5 py-2.5 rounded-xl font-body-md border border-outline text-on-surface-variant hover:bg-surface-container transition-all active:scale-95" onclick="closeModal()" type="button">
+                        Batal
+                    </button>
+<button class="px-6 py-2.5 rounded-xl font-body-md bg-action-teal text-on-primary font-semibold hover:opacity-90 shadow-sm transition-all active:scale-95" onclick="closeModal()" type="submit">
+                        Simpan
+                    </button>
+</div>
+</form>
+</div>
+</div>
+<script>
+        function closeModal() {
+            const modal = document.getElementById('modalOverlay');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            // Remove scale effect
+            modal.querySelector('div').classList.add('scale-95');
+        }
+
+        // Handle Escape Key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Simple interaction for the main background buttons to "reopen" for demo
+        document.querySelectorAll('button:not([onclick])').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const modal = document.getElementById('modalOverlay');
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.querySelector('div').classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>

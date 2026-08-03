@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hasil Tes - Per Peserta | HR Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#244c59",
+                    "secondary-fixed-dim": "#b8c7e2",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "primary-fixed": "#c0e9f9",
+                    "on-background": "#191c1e",
+                    "success-muted": "#f0fdf4",
+                    "secondary-container": "#d4e3ff",
+                    "tertiary-container": "#232b3f",
+                    "on-tertiary": "#ffffff",
+                    "action-teal": "#2C5F6F",
+                    "inverse-surface": "#2d3133",
+                    "surface-container": "#eceef0",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#a5cddc",
+                    "on-secondary": "#ffffff",
+                    "background": "#f7f9fb",
+                    "on-secondary-container": "#56657c",
+                    "on-secondary-fixed-variant": "#39485e",
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-high": "#e6e8ea",
+                    "primary-container": "#00303c",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed": "#131b2e",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#3d6471",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#8a92aa",
+                    "outline-variant": "#c0c8cb",
+                    "on-secondary-fixed": "#0c1c30",
+                    "on-tertiary-fixed-variant": "#3e465c",
+                    "on-surface-variant": "#41484b",
+                    "error-muted": "#fef2f2",
+                    "on-surface": "#191c1e",
+                    "on-primary-fixed": "#001f28",
+                    "primary": "#001a22",
+                    "surface-container-low": "#f2f4f6",
+                    "tertiary": "#0e1629",
+                    "secondary": "#505f76",
+                    "on-primary-container": "#7198a7",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface-bright": "#f7f9fb",
+                    "tertiary-fixed": "#dae2fd",
+                    "outline": "#71787b",
+                    "inverse-primary": "#a5cddc",
+                    "secondary-fixed": "#d4e3ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sidebar-width": "280px",
+                    "header-height": "64px",
+                    "container-max": "1440px",
+                    "gutter": "24px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "headline-md": ["Work Sans"],
+                    "title-sm": ["Work Sans"],
+                    "display-lg": ["Work Sans"],
+                    "body-md": ["Work Sans"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .active-tab-indicator { position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background-color: #2C5F6F; }
+        .participant-card:hover { border-color: #2C5F6F; transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-surface">
+<!-- SIDEBAR -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-md z-20">
+<div class="px-gutter mb-stack-lg">
+<h1 class="font-title-sm text-title-sm font-bold text-primary">HR Portal</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Psychometric Testing</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-surface-container-low transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-surface-container-low transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">quiz</span>
+                Bank Soal
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-surface-container-low transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">event_note</span>
+                Penjadwalan Tes
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-secondary-container text-on-secondary-container border-l-4 border-primary font-semibold font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Hasil Tes
+            </a>
+</nav>
+<div class="mt-auto px-4 space-y-1">
+<button class="w-full mb-4 py-3 px-4 bg-action-teal text-on-primary rounded-xl font-body-md text-body-md flex items-center justify-center gap-2 transition-opacity active:opacity-90">
+<span class="material-symbols-outlined">add</span>
+                Buat Tes Baru
+            </button>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-surface-container-low transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-surface-container-low transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">help</span>
+                Bantuan
+            </a>
+</div>
+</aside>
+<!-- TOP NAVBAR -->
+<header class="fixed top-0 right-0 h-header-height z-10 bg-surface border-b border-outline-variant flex items-center justify-between px-gutter w-[calc(100%-280px)] ml-sidebar-width">
+<div class="flex items-center gap-stack-md">
+<h2 class="font-headline-md text-headline-md font-bold text-primary">HR Assessment System</h2>
+<div class="h-6 w-[1px] bg-outline-variant mx-2"></div>
+<nav class="flex gap-stack-md">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="font-label-sm text-label-sm text-primary font-bold border-b-2 border-primary" href="#">Evaluasi</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary transition-colors">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female HR administrator in her late 30s, wearing a modern business casual navy blazer. She has a friendly, professional expression. The background is a brightly lit, clean office environment with soft focus. High-quality corporate photography style with natural lighting and a minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCddihaXxxzSdxFHxMtjXYJ8maLrmdSEwRF5EVjxcqQSeEZFdX3zXMW_hMoVXl3EAkCJXZhwRKFhIMI2tt3PIThNSx8Sa3OrKRY2VreV5LUajHP9NqsemYbCTwgMrg6csx3Yreg9xY8xza9CQE-2ghhqOMzUgRgpyHZjBoR9KWqE5ZI4CzdJOAcwquWowwoOGIx_fFbUO4Xq-HcJIOWkM-TepVB7ve8FQ2epKwuMQAgzlAd0MVne4IZ"/>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main class="ml-sidebar-width pt-header-height min-h-screen">
+<div class="max-w-container-max mx-auto p-gutter">
+<!-- Page Header & Tabs -->
+<div class="mb-stack-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-stack-md">
+<div>
+<h3 class="font-display-lg text-display-lg text-primary">Hasil Evaluasi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Kelola dan tinjau performa peserta tes dari berbagai sesi.</p>
+</div>
+<div class="flex items-center bg-surface-container-low rounded-xl p-1 w-fit">
+<button class="px-6 py-2 rounded-lg font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all">Sesi Tes</button>
+<button class="px-6 py-2 rounded-lg font-label-sm text-label-sm bg-surface-container-lowest text-action-teal shadow-sm font-bold transition-all">Per Peserta</button>
+</div>
+</div>
+<!-- Controls -->
+<div class="flex flex-col md:flex-row gap-4 items-center">
+<div class="relative flex-1 w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-action-teal focus:border-transparent outline-none font-body-md text-body-md transition-all" placeholder="Cari Nama Peserta..." type="text"/>
+</div>
+<button class="flex items-center gap-2 px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-secondary hover:bg-surface-container-high transition-colors font-body-md text-body-md">
+<span class="material-symbols-outlined">filter_list</span>
+                        Filter Dept
+                    </button>
+<button class="flex items-center gap-2 px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-secondary hover:bg-surface-container-high transition-colors font-body-md text-body-md">
+<span class="material-symbols-outlined">download</span>
+                        Export Semua
+                    </button>
+</div>
+</div>
+<!-- Participant Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-stack-lg">
+<!-- Card 1 -->
+<div class="participant-card bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="p-stack-md flex items-start gap-4 border-b border-outline-variant bg-surface-container-low/30">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface-container-lowest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a male candidate in his 20s, wearing a crisp white shirt. Clean-shaven, short hair, looking confidently towards the camera. Bright, modern lighting in a professional studio setting. The aesthetic is clean, minimalist, and corporate, emphasizing reliability and intelligence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp1wCl3yWICyBILyxBaWoz2LS9yacBibiCPNsYGCabJyRXF1otKhh_wF0QoRHCm_TQEyC75XTMzR-P0p53lidnq09GRWzVTl1O3zZZF-qwGHmGIsEnbj9y69ZDiEn0wd6lfN6kkVJXjwbEdR4s4Dt6WWpcK6wqj87otvtiCWO493IVP1s6-tHf004biRpPR4GbbHKxqVYQ6jrPCj3Egcrrn63NiW58eGyC7-w_55RSyIvD2t1Jwg8Q"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2 mb-1">
+<h4 class="font-title-sm text-title-sm text-primary truncate">Aditya Pratama</h4>
+<span class="px-2 py-0.5 rounded-full border border-primary/20 bg-primary-fixed/30 text-primary font-label-caps text-label-caps">KARYAWAN</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">Finance - Senior Accounting</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">mail</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">aditya.p@company.com</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">id_card</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">ID: 882910</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-stack-md flex-1">
+<h5 class="font-label-caps text-label-caps text-on-surface-variant mb-stack-md uppercase tracking-wider">Riwayat Tes</h5>
+<div class="space-y-stack-sm">
+<!-- History Item -->
+<div class="flex items-center justify-between p-stack-sm rounded-lg hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-primary">Psikotes Promosi 2024</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">12 Jan 2024 • Selesai</p>
+</div>
+</div>
+<button class="px-3 py-1.5 text-action-teal border border-action-teal/30 rounded-lg font-label-sm text-label-sm hover:bg-action-teal hover:text-on-primary transition-all">Lihat Detail</button>
+</div>
+<!-- History Item -->
+<div class="flex items-center justify-between p-stack-sm rounded-lg hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-primary">Annual Soft Skill Review</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">15 Nov 2023 • Selesai</p>
+</div>
+</div>
+<button class="px-3 py-1.5 text-action-teal border border-action-teal/30 rounded-lg font-label-sm text-label-sm hover:bg-action-teal hover:text-on-primary transition-all">Lihat Detail</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="participant-card bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="p-stack-md flex items-start gap-4 border-b border-outline-variant bg-surface-container-low/30">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface-container-lowest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Professional studio portrait of a woman in her late 20s, candidate for a creative role. She has a warm, intelligent smile and is wearing a modern teal blouse that matches the corporate branding. Neutral grey background, high-end commercial photography style with soft wrap-around lighting. Elegant and modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjsL4YGkPRX4YB_y9uBEcfVRpZNB0WeGxMAog6QQkaUvPA1jE9jknBmtgnTuhCz7hU5FfQ02E8W9r-QswAPDZzQONCMwfpKGJC1P90UIuuewPRgD4S-z-H9RnSX0U2248E-8X9Q1z_Q1Raz7aBYHx_zcbRgcqgP2-QtQF97QHQECPW58bQyNMmg7ZzgcJGS1xJjRaaaAGXO-0P_UkzlB-ghPDEmrG5F3SSiw3WFVCy1RfQ4EyCJCJH"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2 mb-1">
+<h4 class="font-title-sm text-title-sm text-primary truncate">Siti Nurhaliza</h4>
+<span class="px-2 py-0.5 rounded-full border border-tertiary/20 bg-tertiary-fixed/30 text-tertiary font-label-caps text-label-caps">KANDIDAT</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">Creative - UI/UX Designer</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">mail</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">siti.n@gmail.com</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">location_on</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Jakarta</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-stack-md flex-1">
+<h5 class="font-label-caps text-label-caps text-on-surface-variant mb-stack-md uppercase tracking-wider">Riwayat Tes</h5>
+<div class="space-y-stack-sm">
+<!-- History Item -->
+<div class="flex items-center justify-between p-stack-sm rounded-lg hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-primary">Rekrutmen Q1 2024</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">02 Feb 2024 • Selesai</p>
+</div>
+</div>
+<button class="px-3 py-1.5 text-action-teal border border-action-teal/30 rounded-lg font-label-sm text-label-sm hover:bg-action-teal hover:text-on-primary transition-all">Lihat Detail</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="participant-card bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="p-stack-md flex items-start gap-4 border-b border-outline-variant bg-surface-container-low/30">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface-container-lowest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a mature male executive in his 40s, wearing a dark grey suit and glasses. He has a look of experienced authority and professionalism. The lighting is sophisticated, with clear definitions and a shallow depth of field, blurring a modern office background. High-quality corporate executive photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADVH-urHjkuHGEncFa3G673usu5fu6YTfqWZuINOyilQTn_82QsfLxnDMev35jak9x8Kco7T5KjJ_2dz9YdGeMUaOI8BCZiifHht0qqKkhQn43qxR3CQi_H9gUJFBjXFPHdklColwbkAsAJn9SvRoB6L_VrG0d_Q6KzHyGhKlcYus8g6vsyxAzcnyE_akIr7hlAvOxMyMQShQz_Gckk0IXIdMSWi9P2SFV2zY0lYSNlIfE0JkrLpic"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2 mb-1">
+<h4 class="font-title-sm text-title-sm text-primary truncate">Budi Santoso</h4>
+<span class="px-2 py-0.5 rounded-full border border-primary/20 bg-primary-fixed/30 text-primary font-label-caps text-label-caps">KARYAWAN</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">Operation - Manager</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">mail</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">budi.san@company.com</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">id_card</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">ID: 102231</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-stack-md flex-1">
+<h5 class="font-label-caps text-label-caps text-on-surface-variant mb-stack-md uppercase tracking-wider">Riwayat Tes</h5>
+<div class="space-y-stack-sm">
+<div class="flex items-center justify-between p-stack-sm rounded-lg hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-primary">Leadership Assessment 2024</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">20 Jan 2024 • Selesai</p>
+</div>
+</div>
+<button class="px-3 py-1.5 text-action-teal border border-action-teal/30 rounded-lg font-label-sm text-label-sm hover:bg-action-teal hover:text-on-primary transition-all">Lihat Detail</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="participant-card bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="p-stack-md flex items-start gap-4 border-b border-outline-variant bg-surface-container-low/30">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface-container-lowest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Portrait of a young professional woman in her early 20s, newly graduated candidate. She wears a minimalist beige blazer and has a bright, eager expression. The background is a clean white wall with soft natural light coming from the side. Professional, approachable, and clean aesthetic, high-resolution digital photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg5pX4hPpUIWUDymJsN4uXuTvlcxI0dSpkju7YsRq3tPKoCCi8GPc_2PHlr2rhRkd24EDxuvsUHJfk6sgdwUZyD97eTx3EuPayFTV1IbwkB8eU7KZQ0FHKFIg3sRF9kzUFPpEfMKStrK8ZvGQeZHOocti9S97kHf8BuY-2ZdrgR5sjIsKRxhsixnNAR_FUCnqb-l9rPCVyvh9A47mb0pC_fdTmAIy7mwVQ1PAenbKQII6c3-buuQgz"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2 mb-1">
+<h4 class="font-title-sm text-title-sm text-primary truncate">Riana Wijaya</h4>
+<span class="px-2 py-0.5 rounded-full border border-tertiary/20 bg-tertiary-fixed/30 text-tertiary font-label-caps text-label-caps">KANDIDAT</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">IT - Backend Developer</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">mail</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">riana.w@outlook.com</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">location_on</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Bandung</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-stack-md flex-1">
+<h5 class="font-label-caps text-label-caps text-on-surface-variant mb-stack-md uppercase tracking-wider">Riwayat Tes</h5>
+<div class="space-y-stack-sm">
+<div class="flex items-center justify-between p-stack-sm rounded-lg hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-primary">Technical Dev Test Q1</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">10 Feb 2024 • Sedang Berlangsung</p>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-action-teal text-on-primary rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-all">Monitor</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-stack-lg flex items-center justify-between">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Menampilkan 4 dari 128 peserta</p>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-lg text-secondary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center bg-action-teal text-on-primary rounded-lg font-label-sm text-label-sm">1</button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-lg text-secondary hover:bg-surface-container-low transition-colors font-label-sm text-label-sm">2</button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-lg text-secondary hover:bg-surface-container-low transition-colors font-label-sm text-label-sm">3</button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-lg text-secondary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Simple search highlight effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+
+        // Tab switching simulation (visual only as requested)
+        const tabs = document.querySelectorAll('.flex.items-center.bg-surface-container-low button');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => {
+                    t.classList.remove('bg-surface-container-lowest', 'text-action-teal', 'shadow-sm', 'font-bold');
+                    t.classList.add('text-on-surface-variant');
+                });
+                tab.classList.add('bg-surface-container-lowest', 'text-action-teal', 'shadow-sm', 'font-bold');
+                tab.classList.remove('text-on-surface-variant');
+            });
+        });
+    </script>
+</body></html>

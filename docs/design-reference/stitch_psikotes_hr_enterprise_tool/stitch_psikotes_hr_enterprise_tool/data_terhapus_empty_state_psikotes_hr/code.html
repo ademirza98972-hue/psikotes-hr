@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2d3133",
+                    "surface-container": "#eceef0",
+                    "outline": "#71787b",
+                    "tertiary": "#0e1629",
+                    "outline-variant": "#c0c8cb",
+                    "error-muted": "#fef2f2",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#41484b",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "on-tertiary-container": "#8a92aa",
+                    "inverse-on-surface": "#eff1f3",
+                    "action-teal": "#2C5F6F",
+                    "on-primary-container": "#7198a7",
+                    "surface-dim": "#d8dadc",
+                    "primary-fixed-dim": "#a5cddc",
+                    "tertiary-fixed": "#dae2fd",
+                    "on-background": "#191c1e",
+                    "background": "#f7f9fb",
+                    "primary-fixed": "#c0e9f9",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#232b3f",
+                    "secondary-container": "#d4e3ff",
+                    "on-tertiary-fixed-variant": "#3e465c",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#191c1e",
+                    "surface-variant": "#e0e3e5",
+                    "on-secondary-fixed-variant": "#39485e",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#f7f9fb",
+                    "surface-container-low": "#f2f4f6",
+                    "inverse-primary": "#a5cddc",
+                    "success-muted": "#f0fdf4",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001f28",
+                    "primary": "#001a22",
+                    "surface": "#f7f9fb",
+                    "surface-tint": "#3d6471",
+                    "on-secondary-fixed": "#0c1c30",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#00303c",
+                    "on-primary-fixed-variant": "#244c59",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container-highest": "#e0e3e5",
+                    "secondary-fixed-dim": "#b8c7e2",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed": "#131b2e",
+                    "secondary-fixed": "#d4e3ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sidebar-width": "280px",
+                    "stack-md": "16px",
+                    "stack-sm": "8px",
+                    "gutter": "24px",
+                    "stack-lg": "32px",
+                    "container-max": "1440px",
+                    "header-height": "64px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Work Sans"],
+                    "label-sm": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "headline-md": ["Work Sans"],
+                    "body-md": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "display-lg": ["Work Sans"]
+            },
+            "fontSize": {
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .active-tab {
+            color: #2C5F6F;
+            border-bottom: 2px solid #2C5F6F;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex overflow-hidden">
+<!-- SideNavBar (Mandatory Shell) -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface-container-low border-r border-outline-variant flex flex-col p-stack-md z-50">
+<div class="flex items-center gap-stack-sm mb-stack-lg px-2">
+<div class="w-10 h-10 bg-action-teal rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">corporate_fare</span>
+</div>
+<div>
+<h2 class="text-title-sm font-title-sm text-action-teal">HR Portal</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Enterprise Admin</p>
+</div>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-sm font-label-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="text-label-sm font-label-sm">Karyawan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">corporate_fare</span>
+<span class="text-label-sm font-label-sm">Organization</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-sm font-label-sm">Laporan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-secondary-container text-on-secondary-container rounded-lg font-semibold transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">delete</span>
+<span class="text-label-sm font-label-sm">Data Terhapus</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-stack-md">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-label-sm font-label-sm">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-width flex-grow h-screen overflow-y-auto bg-surface-bright">
+<!-- TopNavBar (Mandatory Shell) -->
+<header class="sticky top-0 z-40 bg-surface-container-lowest border-b border-outline-variant h-header-height flex items-center px-gutter justify-between">
+<div class="flex items-center gap-4 flex-grow">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container border-none rounded-xl pl-10 pr-4 py-2 text-body-md focus:ring-2 focus:ring-action-teal transition-all" placeholder="Cari data..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-stack-md ml-gutter">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-2 cursor-pointer group">
+<img class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional studio portrait of a modern executive administrator, with a focused yet friendly expression, set against a clean corporate office background. The lighting is bright and professional, highlighting a reliable and authoritative persona consistent with a high-end enterprise management system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGEV-dNgrOB6PPGv5US_0KeofafRlf8Yu56gcxP1uLQstrCuKRbMVYutDDvCERBmmP5EsZu1j4LlcXQWyr4CzMcwg0QrTpGnhTdR2ULS7DyzJRbFAjf-ElTmICkDfKJDEKLqhMNa1mUSGklC8N4IVibY2gj1MHzxWOu008ju76z2AZofC4ksRx0gpu6fEHQ7PeYe23Pstw4F5mii3S3d7GjrcMWJfJk4JgKqIWIFHcrBNFEJGFGsr3"/>
+<span class="text-label-sm font-label-sm text-on-surface hidden lg:block">Admin HR</span>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="max-w-container-max mx-auto p-gutter animate-fade-in">
+<!-- Header Section -->
+<section class="mb-stack-lg">
+<h1 class="text-headline-md font-headline-md text-on-surface mb-1">Data Terhapus</h1>
+<p class="text-body-md font-body-md text-on-surface-variant">Pulihkan data yang tidak sengaja dihapus atau hapus permanen dari sistem.</p>
+</section>
+<!-- Horizontal Tabs -->
+<nav class="flex items-center gap-stack-lg border-b border-outline-variant mb-stack-md overflow-x-auto whitespace-nowrap scrollbar-hide">
+<button class="active-tab pb-3 text-label-sm transition-all">Akun Karyawan</button>
+<button class="pb-3 text-label-sm text-on-surface-variant hover:text-action-teal transition-all">Akun Kandidat</button>
+<button class="pb-3 text-label-sm text-on-surface-variant hover:text-action-teal transition-all">Akun Admin/Staff</button>
+<button class="pb-3 text-label-sm text-on-surface-variant hover:text-action-teal transition-all">Data Karyawan</button>
+<button class="pb-3 text-label-sm text-on-surface-variant hover:text-action-teal transition-all">Departemen</button>
+<button class="pb-3 text-label-sm text-on-surface-variant hover:text-action-teal transition-all">Posisi</button>
+<button class="pb-3 text-label-sm text-on-surface-variant hover:text-action-teal transition-all">Peran</button>
+</nav>
+<!-- Warning Banner -->
+<div class="bg-[#FFFBEB] border border-[#FEF3C7] rounded-xl p-4 flex items-start gap-3 mb-stack-lg shadow-sm">
+<span class="material-symbols-outlined text-[#D97706] mt-0.5">info</span>
+<div class="text-body-md font-body-md text-[#92400E]">
+                    Data di sini akan otomatis terhapus permanen setelah 30 hari.
+                </div>
+</div>
+<!-- Table Header Stats -->
+<div class="flex justify-between items-center mb-stack-sm">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Menampilkan 0 dari 0 akun karyawan</span>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-3 py-1.5 border border-outline-variant rounded-lg text-label-sm text-on-surface hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-[18px]">filter_list</span> Filter
+                    </button>
+</div>
+</div>
+<!-- Empty State Container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden min-h-[500px] flex flex-col items-center justify-center relative">
+<!-- Background Decoration (Subtle Pattern) -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#2C5F6F 1px, transparent 1px); background-size: 24px 24px;"></div>
+<div class="relative z-10 flex flex-col items-center text-center px-gutter">
+<!-- Large Trash Icon Container -->
+<div class="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[48px] text-outline" style="font-variation-settings: 'wght' 300;">delete_outline</span>
+</div>
+<h3 class="text-title-sm font-title-sm text-on-surface-variant mb-1">Tidak ada akun karyawan yang dihapus.</h3>
+<p class="text-body-md font-body-md text-outline max-w-sm">
+                        Saat ini folder sampah kosong. Semua akun karyawan yang dihapus dalam 30 hari terakhir akan muncul di sini.
+                    </p>
+<div class="mt-stack-lg flex gap-3">
+<button class="px-gutter py-2.5 bg-action-teal text-white rounded-xl text-label-sm font-bold shadow-sm hover:opacity-90 active:scale-95 transition-all">
+                            Refresh Data
+                        </button>
+</div>
+</div>
+<!-- Subtle Decorative Elements -->
+<div class="absolute bottom-4 right-4 flex gap-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant opacity-50"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant opacity-25"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        document.querySelectorAll('nav button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('nav button').forEach(b => {
+                    b.classList.remove('active-tab');
+                    b.classList.add('text-on-surface-variant');
+                });
+                button.classList.add('active-tab');
+                button.classList.remove('text-on-surface-variant');
+            });
+        });
+
+        // Simple entrance animation trigger
+        window.addEventListener('load', () => {
+            document.body.classList.add('opacity-100');
+        });
+    </script>
+<style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

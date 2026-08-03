@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daftar Penjadwalan Tes - Psikotes HR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Load Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-primary": "#ffffff",
+                "tertiary": "#0e1629",
+                "on-tertiary": "#ffffff",
+                "action-teal": "#2C5F6F",
+                "inverse-surface": "#2d3133",
+                "secondary": "#505f76",
+                "on-primary-fixed-variant": "#244c59",
+                "on-error": "#ffffff",
+                "on-primary-fixed": "#001f28",
+                "on-surface-variant": "#41484b",
+                "on-secondary-container": "#56657c",
+                "inverse-primary": "#a5cddc",
+                "surface-container": "#eceef0",
+                "secondary-fixed-dim": "#b8c7e2",
+                "primary": "#001a22",
+                "outline": "#71787b",
+                "surface-bright": "#f7f9fb",
+                "on-primary-container": "#7198a7",
+                "tertiary-fixed-dim": "#bec6e0",
+                "surface": "#f7f9fb",
+                "error": "#ba1a1a",
+                "on-secondary": "#ffffff",
+                "surface-tint": "#3d6471",
+                "error-muted": "#fef2f2",
+                "background": "#f7f9fb",
+                "surface-dim": "#d8dadc",
+                "inverse-on-surface": "#eff1f3",
+                "surface-container-low": "#f2f4f6",
+                "secondary-fixed": "#d4e3ff",
+                "outline-variant": "#c1c7cb",
+                "on-tertiary-fixed": "#131b2e",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-fixed": "#dae2fd",
+                "primary-fixed-dim": "#a5cddc",
+                "on-surface": "#191c1e",
+                "tertiary-container": "#232b3f",
+                "on-tertiary-fixed-variant": "#3e465c",
+                "surface-container-highest": "#e0e3e5",
+                "surface-variant": "#e0e3e5",
+                "error-container": "#ffdad6",
+                "on-error-container": "#93000a",
+                "surface-container-high": "#e6e8ea",
+                "on-background": "#191c1e",
+                "primary-container": "#00303c",
+                "primary-fixed": "#c0e9f9",
+                "success-muted": "#f0fdf4",
+                "secondary-container": "#d4e3ff",
+                "on-secondary-fixed": "#0c1c30",
+                "on-secondary-fixed-variant": "#39485e",
+                "on-tertiary-container": "#8a92aa"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "stack-md": "16px",
+                "header-height": "64px",
+                "gutter": "24px",
+                "sidebar-width": "280px",
+                "stack-lg": "32px",
+                "container-max": "1440px",
+                "stack-sm": "8px"
+            },
+            "fontFamily": {
+                "label-sm": ["Work Sans"],
+                "body-md": ["Work Sans"],
+                "label-caps": ["Work Sans"],
+                "display-lg": ["Work Sans"],
+                "body-lg": ["Work Sans"],
+                "headline-md": ["Work Sans"],
+                "title-sm": ["Work Sans"]
+            },
+            "fontSize": {
+                "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            border-color: #2C5F6F;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="text-on-background min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="bg-surface sticky top-0 z-50 border-b border-outline-variant">
+<div class="max-w-[1440px] mx-auto h-16 px-gutter flex justify-between items-center">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-action-teal rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[20px]">psychology</span>
+</div>
+<span class="font-title-sm text-title-sm text-primary font-bold">Psikotes HR</span>
+</div>
+<nav class="hidden md:flex gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Manajemen Akun</a>
+<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Psikotes</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Pengaturan</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a corporate HR manager with a friendly expression, wearing a navy blue blazer. The background is a blurred high-end office environment with soft, natural lighting. The overall image style is clean, sharp, and modern, aligning with a professional enterprise software aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMvz331mjpTI1O6IF37gnMWkaHnBRe2QmaM-BV5OK3dM8i1YiWpd6XpZWPmwgUP_Q0Uf_GeIIsracqnFuivH1t_TUAXowfHc82_tL-v7jHXrQMq0uIGswNnlsYTPx1vKHfxUMcB5Z_fvSq393LjFv_sDSWC8nrhR_AdfXECPPho2-FBNUWSNN-FrNrLCpdmRrd-JrCzUDerMP0Q0XUT8J820uq4WlSOR9BXhUMi8KT8cRp0MRv29rj"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-[1440px] mx-auto px-gutter py-stack-lg">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-stack-lg">
+<div>
+<h1 class="font-headline-md text-headline-md text-primary mb-1">Daftar Penjadwalan Tes</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Sesi tes yang dijadwalkan untuk kandidat dan karyawan.</p>
+</div>
+<button class="bg-action-teal text-white px-6 py-3 rounded-xl font-body-md font-semibold flex items-center gap-2 hover:opacity-90 transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                Tambah Penjadwalan
+            </button>
+</div>
+<!-- Filter & Search (Visual Context) -->
+<div class="flex flex-wrap items-center gap-4 mb-stack-md">
+<div class="relative flex-1 min-w-[280px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-action-teal focus:border-transparent outline-none transition-all font-body-md" placeholder="Cari nama sesi atau departemen..." type="text"/>
+</div>
+<button class="px-4 py-2 border border-outline-variant rounded-xl font-body-md flex items-center gap-2 bg-white hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                Filter
+            </button>
+</div>
+<!-- Cards Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-stack-md">
+<!-- Card 1: Active -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 transition-all duration-300 card-hover flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-title-sm text-title-sm text-primary font-bold">Rekrutmen Staff Finance Batch 1</h3>
+<span class="px-3 py-1 rounded-full bg-success-muted text-green-700 text-[11px] font-bold border border-green-200">Aktif</span>
+</div>
+<div class="space-y-2 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">business</span>
+<span class="font-body-md text-body-md">Departemen: <span class="font-semibold">Finance</span></span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-body-md text-body-md">Periode: <span class="font-semibold">01 Jan 2024 – 15 Jan 2024</span></span>
+</div>
+</div>
+<div class="mb-6">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALAT TES:</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[11px] font-bold border border-blue-200">DISC</span>
+<span class="px-2 py-0.5 rounded bg-violet-50 text-violet-600 text-[11px] font-bold border border-violet-200">IST</span>
+<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[11px] font-bold border border-emerald-200">EPPS</span>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Progres Peserta: <span class="text-primary font-bold">8/20 selesai</span></span>
+<span class="font-label-sm text-label-sm text-action-teal font-bold">40%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden mb-6">
+<div class="h-full bg-action-teal w-[40%] rounded-full"></div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-outline-variant pt-4">
+<button class="px-4 py-2 text-action-teal font-semibold hover:bg-action-teal/5 rounded-lg transition-colors text-body-md">Detail</button>
+<button class="px-4 py-2 text-on-surface-variant font-semibold hover:bg-surface-container rounded-lg transition-colors text-body-md">Ubah</button>
+<button class="px-4 py-2 text-error font-semibold hover:bg-error/5 rounded-lg transition-colors text-body-md">Hapus</button>
+</div>
+</div>
+</div>
+<!-- Card 2: Finished -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 transition-all duration-300 card-hover flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-title-sm text-title-sm text-primary font-bold">Promotion Test: Lead Engineer</h3>
+<span class="px-3 py-1 rounded-full bg-secondary-container text-secondary text-[11px] font-bold border border-outline-variant">Selesai</span>
+</div>
+<div class="space-y-2 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">business</span>
+<span class="font-body-md text-body-md">Departemen: <span class="font-semibold">Engineering</span></span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-body-md text-body-md">Periode: <span class="font-semibold">20 Des 2023 – 30 Des 2023</span></span>
+</div>
+</div>
+<div class="mb-6">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALAT TES:</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 rounded bg-violet-50 text-violet-600 text-[11px] font-bold border border-violet-200">IST</span>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Progres Peserta: <span class="text-primary font-bold">12/12 selesai</span></span>
+<span class="font-label-sm text-label-sm text-action-teal font-bold">100%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden mb-6">
+<div class="h-full bg-action-teal w-full rounded-full"></div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-outline-variant pt-4">
+<button class="px-4 py-2 text-action-teal font-semibold hover:bg-action-teal/5 rounded-lg transition-colors text-body-md">Detail</button>
+<button class="px-4 py-2 text-on-surface-variant font-semibold hover:bg-surface-container rounded-lg transition-colors text-body-md">Ubah</button>
+<button class="px-4 py-2 text-error font-semibold hover:bg-error/5 rounded-lg transition-colors text-body-md">Hapus</button>
+</div>
+</div>
+</div>
+<!-- Card 3: Draft -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 transition-all duration-300 card-hover flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-title-sm text-title-sm text-primary font-bold">Internship Program Q1 2024</h3>
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-bold border border-outline-variant">Draft</span>
+</div>
+<div class="space-y-2 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">business</span>
+<span class="font-body-md text-body-md">Departemen: <span class="font-semibold">Human Resources</span></span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-body-md text-body-md">Periode: <span class="font-semibold">01 Feb 2024 – 10 Feb 2024</span></span>
+</div>
+</div>
+<div class="mb-6">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALAT TES:</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[11px] font-bold border border-blue-200">DISC</span>
+<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[11px] font-bold border border-emerald-200">EPPS</span>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Progres Peserta: <span class="text-primary font-bold">0/30 selesai</span></span>
+<span class="font-label-sm text-label-sm text-action-teal font-bold">0%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden mb-6">
+<div class="h-full bg-action-teal w-0 rounded-full"></div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-outline-variant pt-4">
+<button class="px-4 py-2 text-action-teal font-semibold hover:bg-action-teal/5 rounded-lg transition-colors text-body-md">Lanjutkan</button>
+<button class="px-4 py-2 text-on-surface-variant font-semibold hover:bg-surface-container rounded-lg transition-colors text-body-md">Ubah</button>
+<button class="px-4 py-2 text-error font-semibold hover:bg-error/5 rounded-lg transition-colors text-body-md">Hapus</button>
+</div>
+</div>
+</div>
+<!-- Card 4: Active -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 transition-all duration-300 card-hover flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-title-sm text-title-sm text-primary font-bold">Sales Executive Screening</h3>
+<span class="px-3 py-1 rounded-full bg-success-muted text-green-700 text-[11px] font-bold border border-green-200">Aktif</span>
+</div>
+<div class="space-y-2 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">business</span>
+<span class="font-body-md text-body-md">Departemen: <span class="font-semibold">Sales</span></span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-body-md text-body-md">Periode: <span class="font-semibold">05 Jan 2024 – 20 Jan 2024</span></span>
+</div>
+</div>
+<div class="mb-6">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALAT TES:</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[11px] font-bold border border-blue-200">DISC</span>
+<span class="px-2 py-0.5 rounded bg-violet-50 text-violet-600 text-[11px] font-bold border border-violet-200">IST</span>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Progres Peserta: <span class="text-primary font-bold">18/25 selesai</span></span>
+<span class="font-label-sm text-label-sm text-action-teal font-bold">72%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden mb-6">
+<div class="h-full bg-action-teal w-[72%] rounded-full"></div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-outline-variant pt-4">
+<button class="px-4 py-2 text-action-teal font-semibold hover:bg-action-teal/5 rounded-lg transition-colors text-body-md">Detail</button>
+<button class="px-4 py-2 text-on-surface-variant font-semibold hover:bg-surface-container rounded-lg transition-colors text-body-md">Ubah</button>
+<button class="px-4 py-2 text-error font-semibold hover:bg-error/5 rounded-lg transition-colors text-body-md">Hapus</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination (Visual Context) -->
+<div class="mt-stack-lg flex items-center justify-between border-t border-outline-variant pt-6">
+<p class="font-body-md text-body-md text-on-surface-variant">Menampilkan 4 dari 12 jadwal</p>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-action-teal text-white font-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors font-bold text-on-surface-variant">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors font-bold text-on-surface-variant">3</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<footer class="mt-stack-lg py-8 text-center border-t border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Psikotes HR Enterprise. Seluruh hak cipta dilindungi.</p>
+</footer>
+<script>
+        // Micro-interactions for action buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+            button.addEventListener('mouseleave', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>

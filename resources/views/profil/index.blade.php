@@ -1,120 +1,146 @@
-@extends('layouts.' . (auth()->user()->tipe_akun === 'kandidat' ? 'peserta' : 'admin'), ['judulHalaman' => 'Edit Profil'])
+@extends('layouts.' . (auth()->user()->tipe_akun === 'kandidat' ? 'peserta' : 'admin'), ['judulHalaman' => 'Profil Saya'])
 
 @section('content')
-    <div class="w-full px-4 py-4 space-y-6">
+    @php
+        $tipe = auth()->user()->tipe_akun ?? null;
+        $profilKaryawan = $user->profilKaryawan;
+        $profilKandidat = $user->profilKandidat;
+        $dataKaryawan = $profilKaryawan?->dataKaryawan;
+        $inisial = mb_substr(explode(' ', $user->name)[0], 0, 1);
+    @endphp
 
-        @php
-            $tipe = auth()->user()->tipe_akun ?? null;
-            $profilKaryawan = $user->profilKaryawan;
-            $profilKandidat = $user->profilKandidat;
-            $dataKaryawan = $profilKaryawan?->dataKaryawan;
-            $inisial = mb_substr(explode(' ', $user->name)[0], 0, 1);
-        @endphp
+    <div class="max-w-[800px] w-full space-y-8">
 
         {{-- ============================================================ --}}
-        {{-- CARD FOTO PROFIL                                               --}}
+        {{-- CARD 1: FOTO PROFIL                                           --}}
         {{-- ============================================================ --}}
-        <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div class="border-b border-slate-200 px-6 py-4">
-                <h2 class="text-base font-semibold text-slate-900">Foto Profil</h2>
-                <p class="mt-1 text-xs text-slate-500">
+        <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 md:p-8">
+            <div class="mb-6">
+                <h2 class="text-title-sm font-title-sm text-on-surface">Foto Profil</h2>
+                <p class="text-body-md text-on-surface-variant mt-1">
                     Unggah foto profil Anda. Format yang didukung: JPG, JPEG, PNG. Ukuran maksimal 2 MB.
                 </p>
             </div>
 
-            <form method="POST" action="{{ route('profil.unggah-foto') }}" enctype="multipart/form-data" class="px-6 py-5">
+            <form method="POST" action="{{ route('profil.unggah-foto') }}" enctype="multipart/form-data">
                 @csrf
 
-                <div class="flex flex-col items-center gap-6 sm:flex-row">
-                    {{-- Preview foto / inisial --}}
-                    <div class="shrink-0">
-                        @if($user->foto_profil)
-                            <img src="{{ asset('storage/' . $user->foto_profil) }}"
-                                 alt="Foto Profil"
-                                 class="h-32 w-32 rounded-full border-4 border-slate-200 object-cover">
-                        @else
-                            <div class="flex h-32 w-32 items-center justify-center rounded-full border-4 border-slate-200 bg-[#2C5F6F]/10 text-4xl font-semibold text-[#2C5F6F]">
-                                {{ $inisial }}
-                            </div>
-                        @endif
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-8 py-4">
+                    {{-- Avatar --}}
+                    <div class="relative group shrink-0">
+                        <div class="w-32 h-32 rounded-full border-4 border-surface-container-high overflow-hidden bg-surface-container">
+                            @if($user->foto_profil)
+                                <img src="{{ asset('storage/' . $user->foto_profil) }}"
+                                     alt="Foto Profil"
+                                     class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center bg-[#2C5F6F]/10 text-[#2C5F6F] text-4xl font-semibold">
+                                    {{ $inisial }}
+                                </div>
+                            @endif
+                        </div>
+                        <div class="absolute inset-0 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity pointer-events-none">
+                            <span class="material-symbols-outlined text-white text-3xl">photo_camera</span>
+                        </div>
                     </div>
 
-                    {{-- Input file --}}
-                    <div class="flex-1 w-full">
-                        <label for="foto_profil" class="block text-sm font-medium text-slate-700">Pilih Foto Baru</label>
-                        <input id="foto_profil" name="foto_profil" type="file"
-                               accept="image/jpeg,image/jpg,image/png"
-                               class="mt-1 block w-full text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#234853] focus:outline-none">
-                        <p class="mt-1 text-xs text-slate-400">File akan mengganti foto profil yang lama (jika ada).</p>
-                        @error('foto_profil')
-                            <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                        @enderror
+                    {{-- Upload Controls --}}
+                    <div class="flex-1 space-y-4 text-center md:text-left w-full">
+                        <div class="space-y-1.5">
+                            <label for="foto_profil" class="block text-label-sm font-label-sm text-on-surface">Pilih Foto Baru</label>
+                            <div>
+                                <input id="foto_profil" name="foto_profil" type="file"
+                                       accept="image/jpeg,image/jpg,image/png"
+                                       class="block w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-action-teal file:text-on-primary hover:file:opacity-90 cursor-pointer border border-outline-variant rounded-lg px-3 py-2 bg-white transition-colors @error('foto_profil') border-rose-500 @enderror">
+                            </div>
+                            <p class="text-[11px] text-on-surface-variant italic">File akan mengganti foto profil yang lama (jika ada).</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end pt-4">
+                @error('foto_profil')
+                    <p class="text-xs text-rose-600 mt-1 ml-1">{{ $message }}</p>
+                @enderror
+
+                <div class="flex justify-end mt-6 pt-6 border-t border-surface-container">
                     <button type="submit"
-                            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853]">
+                            class="bg-action-teal text-on-primary px-5 py-2.5 rounded-xl text-body-md font-semibold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-[20px]">upload</span>
                         Unggah Foto
                     </button>
                 </div>
             </form>
-        </div>
+        </section>
 
         {{-- ============================================================ --}}
-        {{-- CARD 1 - DATA DIRI                                             --}}
+        {{-- CARD 2: DATA DIRI                                             --}}
         {{-- ============================================================ --}}
-        <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div class="border-b border-slate-200 px-6 py-4">
-                <h2 class="text-base font-semibold text-slate-900">Data Diri</h2>
-                <p class="mt-1 text-xs text-slate-500">
+        <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 md:p-8">
+            <div class="mb-6">
+                <h2 class="text-title-sm font-title-sm text-on-surface">Data Diri</h2>
+                <p class="text-body-md text-on-surface-variant mt-1">
                     Hanya kolom No. HP yang dapat Anda ubah sendiri. Untuk data lainnya, silakan hubungi Admin/HR.
                 </p>
             </div>
 
-            <form method="POST" action="{{ route('profil.perbarui') }}" class="px-6 py-5 space-y-5">
+            <form method="POST" action="{{ route('profil.perbarui') }}" class="space-y-stack-md">
                 @csrf
                 @method('PUT')
 
-                {{-- Nama --}}
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Nama Lengkap</label>
-                    <input type="text" value="{{ $user->name }}" disabled
-                           class="mt-1 block w-full cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
-                    <p class="mt-1 text-xs text-slate-400">Untuk mengubah data ini, hubungi Admin/HR.</p>
+                {{-- Nama Lengkap --}}
+                <div class="space-y-1.5">
+                    <label class="block text-label-sm font-label-sm text-on-surface">Nama Lengkap</label>
+                    <input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed"
+                           disabled readonly type="text" value="{{ $user->name }}">
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[14px]">info</span>
+                        <span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+                    </div>
                 </div>
 
                 {{-- Email --}}
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Email</label>
-                    <input type="email" value="{{ $user->email }}" disabled
-                           class="mt-1 block w-full cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
-                    <p class="mt-1 text-xs text-slate-400">Untuk mengubah data ini, hubungi Admin/HR.</p>
+                <div class="space-y-1.5">
+                    <label class="block text-label-sm font-label-sm text-on-surface">Email</label>
+                    <input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed"
+                           disabled readonly type="email" value="{{ $user->email }}">
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[14px]">info</span>
+                        <span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+                    </div>
                 </div>
 
                 {{-- Field khusus karyawan --}}
                 @if($tipe === 'karyawan' || $profilKaryawan)
                     @if($profilKaryawan)
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700">NIK Karyawan</label>
-                            <input type="text" value="{{ $profilKaryawan->nik_karyawan ?? '-' }}" disabled
-                                   class="mt-1 block w-full cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
-                            <p class="mt-1 text-xs text-slate-400">Untuk mengubah data ini, hubungi Admin/HR.</p>
+                        <div class="space-y-1.5">
+                            <label class="block text-label-sm font-label-sm text-on-surface">NIK Karyawan</label>
+                            <input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed"
+                                   disabled readonly type="text" value="{{ $profilKaryawan->nik_karyawan ?? '-' }}">
+                            <div class="flex items-center gap-1 text-on-surface-variant">
+                                <span class="material-symbols-outlined text-[14px]">info</span>
+                                <span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700">Departemen</label>
-                            <input type="text" value="{{ $dataKaryawan->departemen ?? $profilKaryawan->departemen ?? '-' }}" disabled
-                                   class="mt-1 block w-full cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
-                            <p class="mt-1 text-xs text-slate-400">Untuk mengubah data ini, hubungi Admin/HR.</p>
+                        <div class="space-y-1.5">
+                            <label class="block text-label-sm font-label-sm text-on-surface">Departemen</label>
+                            <input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed"
+                                   disabled readonly type="text" value="{{ $dataKaryawan->departemen ?? $profilKaryawan->departemen ?? '-' }}">
+                            <div class="flex items-center gap-1 text-on-surface-variant">
+                                <span class="material-symbols-outlined text-[14px]">info</span>
+                                <span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700">Jabatan</label>
-                            <input type="text" value="{{ $dataKaryawan->jabatan ?? $profilKaryawan->jabatan ?? '-' }}" disabled
-                                   class="mt-1 block w-full cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
-                            <p class="mt-1 text-xs text-slate-400">Untuk mengubah data ini, hubungi Admin/HR.</p>
+                        <div class="space-y-1.5">
+                            <label class="block text-label-sm font-label-sm text-on-surface">Jabatan</label>
+                            <input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed"
+                                   disabled readonly type="text" value="{{ $dataKaryawan->jabatan ?? $profilKaryawan->jabatan ?? '-' }}">
+                            <div class="flex items-center gap-1 text-on-surface-variant">
+                                <span class="material-symbols-outlined text-[14px]">info</span>
+                                <span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+                            </div>
                         </div>
                     @else
-                        <div class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
+                        <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
                             Profil karyawan belum tersedia. Hubungi Admin/HR.
                         </div>
                     @endif
@@ -123,104 +149,146 @@
                 {{-- Field khusus kandidat --}}
                 @if($tipe === 'kandidat' || $profilKandidat)
                     @if($profilKandidat)
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700">NIK KTP (Kandidat)</label>
-                            <input type="text" value="{{ $profilKandidat->nik_kandidat ?? '-' }}" disabled
-                                   class="mt-1 block w-full cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
-                            <p class="mt-1 text-xs text-slate-400">Untuk mengubah data ini, hubungi Admin/HR.</p>
+                        <div class="space-y-1.5">
+                            <label class="block text-label-sm font-label-sm text-on-surface">NIK KTP (Kandidat)</label>
+                            <input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed"
+                                   disabled readonly type="text" value="{{ $profilKandidat->nik_kandidat ?? '-' }}">
+                            <div class="flex items-center gap-1 text-on-surface-variant">
+                                <span class="material-symbols-outlined text-[14px]">info</span>
+                                <span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700">Posisi Dilamar</label>
-                            <input type="text" value="{{ $profilKandidat->posisi_dilamar ?? '-' }}" disabled
-                                   class="mt-1 block w-full cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
-                            <p class="mt-1 text-xs text-slate-400">Untuk mengubah data ini, hubungi Admin/HR.</p>
+                        <div class="space-y-1.5">
+                            <label class="block text-label-sm font-label-sm text-on-surface">Posisi Dilamar</label>
+                            <input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed"
+                                   disabled readonly type="text" value="{{ $profilKandidat->posisi_dilamar ?? '-' }}">
+                            <div class="flex items-center gap-1 text-on-surface-variant">
+                                <span class="material-symbols-outlined text-[14px]">info</span>
+                                <span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700">Pendidikan Terakhir</label>
-                            <input type="text" value="{{ $profilKandidat->pendidikan_terakhir ?? '-' }}" disabled
-                                   class="mt-1 block w-full cursor-not-allowed rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
-                            <p class="mt-1 text-xs text-slate-400">Untuk mengubah data ini, hubungi Admin/HR.</p>
+                        <div class="space-y-1.5">
+                            <label class="block text-label-sm font-label-sm text-on-surface">Pendidikan Terakhir</label>
+                            <input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed"
+                                   disabled readonly type="text" value="{{ $profilKandidat->pendidikan_terakhir ?? '-' }}">
+                            <div class="flex items-center gap-1 text-on-surface-variant">
+                                <span class="material-symbols-outlined text-[14px]">info</span>
+                                <span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+                            </div>
                         </div>
                     @else
-                        <div class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
+                        <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
                             Profil kandidat belum tersedia. Hubungi Admin/HR.
                         </div>
                     @endif
                 @endif
 
                 {{-- No HP - FIELD YANG BISA DIEDIT --}}
-                <div>
-                    <label for="no_hp" class="block text-sm font-medium text-slate-700">No. HP</label>
-                    <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp', $user->no_hp) }}"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                <div class="space-y-1.5">
+                    <label class="block text-label-sm font-label-sm text-on-surface" for="no_hp">No. HP</label>
+                    <div class="focused-input">
+                        <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp', $user->no_hp) }}"
+                               placeholder="0812XXXXXXXX"
+                               class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg text-on-surface font-body-md transition-all focus:outline-none @error('no_hp') border-rose-500 @enderror">
+                    </div>
                     @error('no_hp')
-                        <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Tombol Submit --}}
-                <div class="flex justify-end pt-2">
+                <div class="flex justify-end mt-8 pt-6 border-t border-surface-container">
                     <button type="submit"
-                            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853]">
+                            class="bg-action-teal text-on-primary px-5 py-2.5 rounded-xl text-body-md font-semibold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-[20px]">save</span>
                         Simpan Perubahan
                     </button>
                 </div>
             </form>
-        </div>
+        </section>
 
         {{-- ============================================================ --}}
-        {{-- CARD 2 - UBAH PASSWORD                                         --}}
+        {{-- CARD 3: UBAH PASSWORD                                         --}}
         {{-- ============================================================ --}}
-        <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div class="border-b border-slate-200 px-6 py-4">
-                <h2 class="text-base font-semibold text-slate-900">Ubah Password</h2>
-                <p class="mt-1 text-xs text-slate-500">
+        <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 md:p-8">
+            <div class="mb-6">
+                <h2 class="text-title-sm font-title-sm text-on-surface">Ubah Password</h2>
+                <p class="text-body-md text-on-surface-variant mt-1">
                     Demi keamanan akun Anda, gunakan password minimal 8 karakter yang belum pernah dipakai sebelumnya.
                 </p>
             </div>
 
-            <form method="POST" action="{{ route('profil.ubah-password') }}" class="px-6 py-5 space-y-5">
+            <form method="POST" action="{{ route('profil.ubah-password') }}" class="space-y-stack-md">
                 @csrf
                 @method('PUT')
 
                 {{-- Password Lama --}}
-                <div>
-                    <label for="password_lama" class="block text-sm font-medium text-slate-700">Password Lama</label>
-                    <input id="password_lama" name="password_lama" type="password"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                <div class="space-y-1.5 relative" x-data="{ showPwd: false }">
+                    <label class="block text-label-sm font-label-sm text-on-surface" for="password_lama">Password Lama</label>
+                    <div class="focused-input">
+                        <input id="password_lama" name="password_lama"
+                               :type="showPwd ? 'text' : 'password'"
+                               placeholder="••••••••"
+                               class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg text-on-surface font-body-md transition-all focus:outline-none pr-10 @error('password_lama') border-rose-500 @enderror">
+                        <button type="button"
+                                @click="showPwd = !showPwd"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-action-teal transition-colors flex items-center">
+                            <span class="material-symbols-outlined text-lg" x-text="showPwd ? 'visibility_off' : 'visibility'"></span>
+                        </button>
+                    </div>
                     @error('password_lama')
-                        <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 {{-- Password Baru --}}
-                <div>
-                    <label for="password_baru" class="block text-sm font-medium text-slate-700">Password Baru</label>
-                    <input id="password_baru" name="password_baru" type="password" minlength="8"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                    <p class="mt-1 text-xs text-slate-400">Minimal 8 karakter.</p>
+                <div class="space-y-1.5 relative" x-data="{ showPwd: false }">
+                    <label class="block text-label-sm font-label-sm text-on-surface" for="password_baru">Password Baru</label>
+                    <div class="focused-input">
+                        <input id="password_baru" name="password_baru" minlength="8"
+                               :type="showPwd ? 'text' : 'password'"
+                               placeholder="••••••••"
+                               class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg text-on-surface font-body-md transition-all focus:outline-none pr-10 @error('password_baru') border-rose-500 @enderror">
+                        <button type="button"
+                                @click="showPwd = !showPwd"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-action-teal transition-colors flex items-center">
+                            <span class="material-symbols-outlined text-lg" x-text="showPwd ? 'visibility_off' : 'visibility'"></span>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant">Minimal 8 karakter.</p>
                     @error('password_baru')
-                        <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 {{-- Konfirmasi Password Baru --}}
-                <div>
-                    <label for="konfirmasi_password_baru" class="block text-sm font-medium text-slate-700">Konfirmasi Password Baru</label>
-                    <input id="konfirmasi_password_baru" name="password_baru_confirmation" type="password" minlength="8"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                    <p class="mt-1 text-xs text-slate-400">Ketik ulang password baru Anda.</p>
+                <div class="space-y-1.5 relative" x-data="{ showPwd: false }">
+                    <label class="block text-label-sm font-label-sm text-on-surface" for="konfirmasi_password_baru">Konfirmasi Password Baru</label>
+                    <div class="focused-input">
+                        <input id="konfirmasi_password_baru" name="password_baru_confirmation" minlength="8"
+                               :type="showPwd ? 'text' : 'password'"
+                               placeholder="••••••••"
+                               class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg text-on-surface font-body-md transition-all focus:outline-none pr-10 @error('password_baru_confirmation') border-rose-500 @enderror">
+                        <button type="button"
+                                @click="showPwd = !showPwd"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-action-teal transition-colors flex items-center">
+                            <span class="material-symbols-outlined text-lg" x-text="showPwd ? 'visibility_off' : 'visibility'"></span>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant">Ketik ulang password baru Anda.</p>
+                    @error('password_baru_confirmation')
+                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                {{-- Tombol Submit --}}
-                <div class="flex justify-end pt-2">
+                <div class="flex justify-end mt-8 pt-6 border-t border-surface-container">
                     <button type="submit"
-                            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853]">
+                            class="bg-action-teal text-on-primary px-5 py-2.5 rounded-xl text-body-md font-semibold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-[20px]">lock_reset</span>
                         Ubah Password
                     </button>
                 </div>
             </form>
-        </div>
+        </section>
 
     </div>
 @endsection

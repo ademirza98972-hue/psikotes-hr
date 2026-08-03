@@ -2,89 +2,114 @@
 
 @section('content')
 @php
-    $warnaFormat = [
-        'Pilihan Ganda' => 'bg-blue-600',
-        'Skala Likert'  => 'bg-indigo-600',
-        'Forced Choice' => 'bg-amber-600',
+    // Mapping kode alat tes → warna badge (konsisten dengan halaman Alat Tes)
+    $warnaKode = [
+        'DISC'   => 'bg-blue-100 text-blue-700',
+        'IST'    => 'bg-violet-100 text-violet-700',
+        'EPPS'   => 'bg-emerald-100 text-emerald-700',
+        'MMPI-2' => 'bg-orange-100 text-orange-700',
     ];
 @endphp
 
-<div class="space-y-4">
+<div class="space-y-6">
+
+    {{-- PAGE HEADER --}}
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">Bank Soal</h2>
+            <p class="mt-0.5 text-[14px] text-[#40484b]">Kelola kumpulan instrumen tes psikologi.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            @if(auth()->user()->hasIzin('soal.tambah'))
+            @if($alatTesTerpilih)
+                <a href="{{ route('admin.bank-soal.tambah', $alatTesTerpilih['id']) }}"
+                   class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                    Tambah Soal
+                </a>
+            @else
+                {{-- Tampilkan tombol Tambah Soal tanpa filter (ambil dari alat tes pertama) --}}
+                @php $alatFirst = $alatTesSemua[0] ?? null; @endphp
+                @if($alatFirst)
+                <a href="{{ route('admin.bank-soal.tambah', $alatFirst['id']) }}"
+                   class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                    Tambah Soal
+                </a>
+                @endif
+            @endif
+            @endif
+            {{-- TODO: implementasi import Excel saat backend siap --}}
+            <button type="button" disabled
+                    class="cursor-not-allowed rounded-xl bg-[#e6e8ea] px-4 py-2 text-sm font-semibold text-[#40484b] opacity-60 whitespace-nowrap">
+                <span class="material-symbols-outlined text-[18px]">upload_file</span>
+                Import Excel
+            </button>
+        </div>
+    </div>
 
     {{-- FILTER PILIH ALAT TES --}}
-    <div class="w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
+    <div class="bg-white border border-[#e0e3e5] rounded-xl p-4">
         <form method="GET" action="{{ route('admin.bank-soal.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div class="flex flex-1 flex-wrap items-end gap-2">
                 <div>
-                    <label for="alat_tes_id" class="block text-sm font-medium text-slate-700">Pilih Alat Tes</label>
+                    <label for="alat_tes_id" class="block text-[11px] uppercase tracking-wider font-semibold text-[#40484b] mb-1">Filter Instrumen</label>
                     <select id="alat_tes_id" name="alat_tes_id"
-                            class="mt-1 block w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                        <option value="">— Pilih —</option>
-                        @foreach ($alatTes as $alat)
+                            class="block w-64 rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                        <option value="">Semua Instrumen</option>
+                        @foreach ($alatTesSemua as $alat)
                             <option value="{{ $alat['id'] }}" @selected((int) request('alat_tes_id') === $alat['id'])>
                                 {{ $alat['nama'] }} ({{ $alat['format_dasar'] }})
                             </option>
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
+                <button type="submit" class="rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
                     Tampilkan Soal
                 </button>
                 @if (request('alat_tes_id'))
                     <a href="{{ route('admin.bank-soal.index') }}"
-                       class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300 whitespace-nowrap">
+                       class="rounded-xl bg-[#f2f4f6] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#e6e8ea] whitespace-nowrap transition-colors">
                         Reset
                     </a>
-                @endif
-            </div>
-
-            <div class="flex flex-wrap gap-2">
-                @if ($alatTesTerpilih)
-                    <a href="{{ route('admin.bank-soal.tambah', $alatTesTerpilih['id']) }}"
-                       class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] whitespace-nowrap">
-                        + Tambah Soal
-                    </a>
-                    <button type="button" disabled
-                            class="cursor-not-allowed rounded-md bg-slate-300 px-4 py-2 text-sm font-semibold text-white opacity-60">
-                        Import Excel
-                    </button>
-                @else
-                    <button type="button" disabled
-                            class="cursor-not-allowed rounded-md bg-slate-300 px-4 py-2 text-sm font-semibold text-white opacity-60">
-                        + Tambah Soal
-                    </button>
-                    <button type="button" disabled
-                            class="cursor-not-allowed rounded-md bg-slate-300 px-4 py-2 text-sm font-semibold text-white opacity-60">
-                        Import Excel
-                    </button>
                 @endif
             </div>
         </form>
     </div>
 
-    {{-- STATE KOSONG: BELUM PILIH ALAT TES --}}
-    @unless ($alatTesTerpilih)
-        <div class="w-full rounded-lg border border-dashed border-slate-300 bg-white px-6 py-12 text-center shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p class="mt-3 text-sm text-slate-600">Pilih Alat Tes untuk melihat soal.</p>
-        </div>
-    @else
+    {{-- TAMPILAN: MODE TERPILIH (satu alat tes) --}}
+    @if($alatTesTerpilih)
+        @php
+            $kodeAlat = '';
+            foreach (['DISC', 'IST', 'EPPS', 'MMPI-2'] as $k) {
+                if (str_contains($alatTesTerpilih['nama'], $k)) {
+                    $kodeAlat = $k;
+                    break;
+                }
+            }
+        @endphp
+
         {{-- HEADER ALAT TES TERPILIH --}}
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <h2 class="text-base font-semibold text-slate-900">{{ $alatTesTerpilih['nama'] }}</h2>
-                <span class="inline-block rounded-md {{ $warnaFormat[$alatTesTerpilih['format_dasar']] ?? 'bg-slate-600' }} px-2 py-0.5 text-xs font-semibold text-white">
+                @php
+                    $namaTampil = ($alatTesTerpilih['nama'] === $kodeAlat)
+                        ? 'Instrument ' . $kodeAlat
+                        : $alatTesTerpilih['nama'];
+                @endphp
+                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $warnaKode[$kodeAlat] ?? 'bg-slate-100 text-slate-700' }}">
+                    {{ $kodeAlat }}
+                </span>
+                <h2 class="text-base font-semibold text-[#191c1e]">{{ $namaTampil }}</h2>
+                <span class="inline-block rounded-full border border-[#c0c8cb] px-2.5 py-0.5 text-[11px] font-medium text-[#40484b]">
                     {{ $alatTesTerpilih['format_dasar'] }}
                 </span>
             </div>
-            <span class="text-xs text-slate-500">{{ count($daftarSoal) }} soal terdaftar</span>
+            <span class="text-[12px] text-[#40484b]">{{ count($daftarSoal) }} soal terdaftar</span>
         </div>
 
-        {{-- DAFTAR SOAL BERDASARKAN FORMAT --}}
         @if (empty($daftarSoal))
-            <div class="w-full rounded-lg border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500 shadow-sm">
+            <div class="bg-white border border-dashed border-[#c0c8cb] rounded-xl px-6 py-10 text-center text-sm text-[#40484b]">
                 Belum ada soal untuk alat tes ini.
             </div>
         @else
@@ -94,11 +119,67 @@
                         'nomor'       => $idx + 1,
                         'soal'        => $soal,
                         'format'      => $alatTesTerpilih['format_dasar'],
-                        'warnaFormat' => $warnaFormat,
+                        'kodeAlat'    => $kodeAlat,
+                        'warnaKode'   => $warnaKode,
                     ])
                 @endforeach
             </div>
         @endif
-    @endunless
+
+    {{-- TAMPILAN: MODE SEMUA (tanpa filter) --}}
+    @else
+        @if(count($kelompokSoalSemua) === 0)
+            <div class="bg-white border border-dashed border-[#c0c8cb] rounded-xl px-6 py-12 text-center">
+                <span class="material-symbols-outlined text-[40px] text-[#c0c8cb] mb-3">quiz</span>
+                <p class="text-sm text-[#40484b]">Belum ada soal tersedia.</p>
+            </div>
+        @else
+            @foreach($kelompokSoalSemua as $alatId => $kelompok)
+                @if($kelompok['alat'] === null) @continue @endif
+                @php
+                    $kodeAlat = '';
+                    foreach (['DISC', 'IST', 'EPPS', 'MMPI-2'] as $k) {
+                        if (str_contains($kelompok['alat']['nama'], $k)) {
+                            $kodeAlat = $k;
+                            break;
+                        }
+                    }
+                @endphp
+
+                {{-- Section Header --}}
+                <div class="flex items-center justify-between mt-6 first:mt-0">
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $warnaKode[$kodeAlat] ?? 'bg-slate-100 text-slate-700' }}">
+                            {{ $kodeAlat }}
+                        </span>
+                        @php
+                            $namaTampilAll = ($kelompok['alat']['nama'] === $kodeAlat)
+                                ? 'Instrument ' . $kodeAlat
+                                : $kelompok['alat']['nama'];
+                        @endphp
+                        <h3 class="text-sm font-semibold text-[#191c1e]">{{ $namaTampilAll }}</h3>
+                        <span class="inline-block rounded-full border border-[#c0c8cb] px-2.5 py-0.5 text-[11px] font-medium text-[#40484b]">
+                            {{ $kelompok['alat']['format_dasar'] }}
+                        </span>
+                    </div>
+                    <span class="text-[12px] text-[#40484b]">{{ $kelompok['jumlahSoal'] }} soal</span>
+                </div>
+
+                {{-- Soal Cards --}}
+                <div class="space-y-3 mt-3">
+                    @foreach($kelompok['soal'] as $idx => $soal)
+                        @include('admin.bank-soal.partials.kartu-soal', [
+                            'nomor'       => $idx + 1,
+                            'soal'        => $soal,
+                            'format'      => $kelompok['alat']['format_dasar'],
+                            'kodeAlat'    => $kodeAlat,
+                            'warnaKode'   => $warnaKode,
+                        ])
+                    @endforeach
+                </div>
+            @endforeach
+        @endif
+    @endif
+
 </div>
 @endsection

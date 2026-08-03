@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HR Assessment System - Hasil Tes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#244c59",
+                    "secondary-fixed-dim": "#b8c7e2",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "primary-fixed": "#c0e9f9",
+                    "on-background": "#191c1e",
+                    "success-muted": "#f0fdf4",
+                    "secondary-container": "#d4e3ff",
+                    "tertiary-container": "#232b3f",
+                    "on-tertiary": "#ffffff",
+                    "action-teal": "#2C5F6F",
+                    "inverse-surface": "#2d3133",
+                    "surface-container": "#eceef0",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#a5cddc",
+                    "on-secondary": "#ffffff",
+                    "background": "#f7f9fb",
+                    "on-secondary-container": "#56657c",
+                    "on-secondary-fixed-variant": "#39485e",
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-high": "#e6e8ea",
+                    "primary-container": "#00303c",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed": "#131b2e",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#3d6471",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#8a92aa",
+                    "outline-variant": "#c0c8cb",
+                    "on-secondary-fixed": "#0c1c30",
+                    "on-tertiary-fixed-variant": "#3e465c",
+                    "on-surface-variant": "#41484b",
+                    "error-muted": "#fef2f2",
+                    "on-surface": "#191c1e",
+                    "on-primary-fixed": "#001f28",
+                    "primary": "#001a22",
+                    "surface-container-low": "#f2f4f6",
+                    "tertiary": "#0e1629",
+                    "secondary": "#505f76",
+                    "on-primary-container": "#7198a7",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface-bright": "#f7f9fb",
+                    "tertiary-fixed": "#dae2fd",
+                    "outline": "#71787b",
+                    "inverse-primary": "#a5cddc",
+                    "secondary-fixed": "#d4e3ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sidebar-width": "280px",
+                    "header-height": "64px",
+                    "container-max": "1440px",
+                    "gutter": "24px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "headline-md": ["Work Sans"],
+                    "title-sm": ["Work Sans"],
+                    "display-lg": ["Work Sans"],
+                    "body-md": ["Work Sans"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .tab-active { border-bottom: 2px solid #2C5F6F; color: #2C5F6F; font-weight: 600; }
+        .sidebar-item-active { background-color: #d4e3ff; color: #001f28; border-left: 4px solid #001a22; font-weight: 600; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c0c8cb; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-on-background">
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-md z-20">
+<div class="px-6 mb-10">
+<h1 class="font-title-sm text-title-sm font-bold text-primary">HR Portal</h1>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Psychometric Testing</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-6 py-3 text-secondary font-body-md text-body-md hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-6 py-3 text-secondary font-body-md text-body-md hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">quiz</span>
+                Bank Soal
+            </a>
+<a class="flex items-center px-6 py-3 text-secondary font-body-md text-body-md hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">event_note</span>
+                Penjadwalan Tes
+            </a>
+<a class="flex items-center px-6 py-3 sidebar-item-active text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span>
+                Hasil Tes
+            </a>
+</nav>
+<div class="px-6 py-6 border-t border-outline-variant mt-auto">
+<button class="w-full bg-action-teal text-on-primary py-3 rounded-xl flex items-center justify-center font-label-sm text-label-sm shadow-sm hover:opacity-90 transition-all">
+<span class="material-symbols-outlined mr-2">add</span>
+                Buat Tes Baru
+            </button>
+<div class="mt-6 space-y-2">
+<a class="flex items-center text-secondary font-body-md text-body-md hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+                    Settings
+                </a>
+<a class="flex items-center text-secondary font-body-md text-body-md hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">help</span>
+                    Bantuan
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 h-header-height z-10 flex items-center justify-between px-gutter w-[calc(100%-280px)] bg-surface border-b border-outline-variant">
+<div class="flex items-center">
+<h2 class="font-headline-md text-headline-md font-bold text-primary">HR Assessment System</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="absolute inset-y-0 left-3 flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-body-md font-body-md focus:ring-2 focus:ring-action-teal w-64 transition-all" placeholder="Cari hasil tes..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female HR administrator in a business setting, with soft focus of an office background. She has a confident smile and wears a professional dark blazer. The lighting is crisp and modern, matching a corporate SaaS aesthetic with a high-key, bright light-mode finish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAagxXn9PXn_n-jDgxmU5qU4H9AFEXsS8OjH8NxuoXerTydut7gnTY_uveZ5WqFGnNjn8pHUqpIwUSLdNcqrswsQYrCQmb4TtcnZS59t4oZrGXGZFRB4r_ZYbAVo44dXyvcmsR9wFaaUVlnU3sQSdanFFdH7aa0ahUuHXnvqBDPwKyu15XXTSma-m1VYsVdojQb5iTUDvGvAE509q2rJ1n3jZOdnu3vjH-OSlrHPUmldQxYlv4Mowem"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="pt-24 pb-stack-lg px-gutter max-w-container-max mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-stack-lg gap-4">
+<div>
+<h3 class="font-display-lg text-display-lg text-primary">Hasil Tes Psikotes</h3>
+<p class="text-on-surface-variant font-body-lg text-body-lg">Pantau kemajuan dan kelola laporan hasil penilaian psikologi peserta.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-xl text-on-surface font-label-sm text-label-sm hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined mr-2">filter_list</span>
+                        Filter Lanjutan
+                    </button>
+<button class="flex items-center px-4 py-2 bg-action-teal text-on-primary rounded-xl font-label-sm text-label-sm hover:opacity-90 transition-all shadow-sm">
+<span class="material-symbols-outlined mr-2">download</span>
+                        Cetak PDF Terpilih
+                    </button>
+</div>
+</div>
+<!-- Tab Navigation -->
+<div class="flex border-b border-outline-variant mb-stack-lg">
+<button class="px-6 py-3 font-label-sm text-label-sm tab-active transition-all">Per Sesi Penjadwalan</button>
+<button class="px-6 py-3 font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all">Per Peserta</button>
+</div>
+<!-- Session Selection & Card -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-stack-md mb-stack-lg">
+<div class="lg:col-span-1">
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">PILIH SESI PENJADWALAN</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-3 pl-4 pr-10 appearance-none text-body-md font-body-md focus:ring-2 focus:ring-action-teal outline-none cursor-pointer">
+<option>Rekrutmen Management Trainee 2024 - Batch 1</option>
+<option>Internal Promotion - Senior Developer</option>
+<option>Assessment Managerial - Level 3</option>
+</select>
+<span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">expand_more</span>
+</span>
+</div>
+</div>
+<div class="lg:col-span-2">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">event_available</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<h4 class="font-title-sm text-title-sm text-primary">Rekrutmen MT 2024 - Batch 1</h4>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded border border-green-200">AKTIF</span>
+</div>
+<div class="flex flex-wrap gap-x-6 gap-y-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center"><span class="material-symbols-outlined text-[16px] mr-1">business</span> Human Resources</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-[16px] mr-1">calendar_today</span> 15 - 20 Okt 2024</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-[16px] mr-1">group</span> 48 Peserta</span>
+</div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-action-teal hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Participant Table Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="py-4 px-6 w-12">
+<input class="w-4 h-4 rounded border-outline-variant text-action-teal focus:ring-action-teal cursor-pointer" type="checkbox"/>
+</th>
+<th class="py-4 px-4 font-label-caps text-label-caps text-on-surface-variant">PESERTA</th>
+<th class="py-4 px-4 font-label-caps text-label-caps text-on-surface-variant">DEPARTEMEN / POSISI</th>
+<th class="py-4 px-4 font-label-caps text-label-caps text-on-surface-variant">ALAT TES</th>
+<th class="py-4 px-4 font-label-caps text-label-caps text-on-surface-variant">STATUS</th>
+<th class="py-4 px-6 text-right font-label-caps text-label-caps text-on-surface-variant">AKSI</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Row 1: Selesai -->
+<tr class="hover:bg-surface-container/30 transition-colors group">
+<td class="py-4 px-6">
+<input class="w-4 h-4 rounded border-outline-variant text-action-teal focus:ring-action-teal cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-[13px]">AN</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-semibold">Aditya Nugraha</p>
+<p class="text-on-surface-variant text-[11px]">ID: 24001</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<p class="font-body-md text-body-md text-on-surface">HRD</p>
+<p class="text-on-surface-variant text-[11px]">Generalist Officer</p>
+</td>
+<td class="py-4 px-4">
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded border border-blue-100">DISC</span>
+<span class="px-2 py-0.5 bg-violet-50 text-violet-600 text-[10px] font-bold rounded border border-violet-100">IST</span>
+<span class="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded border border-emerald-100">EPPS</span>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="flex items-center text-green-600 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                        Selesai
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="bg-action-teal text-on-primary px-4 py-1.5 rounded-lg font-label-sm text-label-sm hover:shadow-md transition-all">Lihat Hasil</button>
+</td>
+</tr>
+<!-- Row 2: Sedang Berjalan -->
+<tr class="hover:bg-surface-container/30 transition-colors group">
+<td class="py-4 px-6">
+<input class="w-4 h-4 rounded border-outline-variant text-action-teal focus:ring-action-teal cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim flex items-center justify-center text-on-primary-fixed-variant font-bold text-[13px]">BP</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-semibold">Bambang Pamungkas</p>
+<p class="text-on-surface-variant text-[11px]">ID: 24002</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<p class="font-body-md text-body-md text-on-surface">Operation</p>
+<p class="text-on-surface-variant text-[11px]">Shift Supervisor</p>
+</td>
+<td class="py-4 px-4">
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded border border-blue-100">DISC</span>
+<span class="px-2 py-0.5 bg-orange-50 text-orange-600 text-[10px] font-bold rounded border border-orange-100">MMPI-2</span>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="flex items-center text-amber-600 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">pending</span>
+                                        Sedang Berjalan
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="bg-surface-container-high text-on-surface-variant/50 px-4 py-1.5 rounded-lg font-label-sm text-label-sm cursor-not-allowed" disabled="">Lihat Hasil</button>
+</td>
+</tr>
+<!-- Row 3: Belum Mengerjakan -->
+<tr class="hover:bg-surface-container/30 transition-colors group">
+<td class="py-4 px-6">
+<input class="w-4 h-4 rounded border-outline-variant text-action-teal focus:ring-action-teal cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed font-bold text-[13px]">CL</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-semibold">Citra Lestari</p>
+<p class="text-on-surface-variant text-[11px]">ID: 24003</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<p class="font-body-md text-body-md text-on-surface">IT Support</p>
+<p class="text-on-surface-variant text-[11px]">Admin Infrastruktur</p>
+</td>
+<td class="py-4 px-4">
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded border border-blue-100">DISC</span>
+<span class="px-2 py-0.5 bg-violet-50 text-violet-600 text-[10px] font-bold rounded border border-violet-100">IST</span>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-1">history</span>
+                                        Belum Mengerjakan
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="bg-surface-container-high text-on-surface-variant/50 px-4 py-1.5 rounded-lg font-label-sm text-label-sm cursor-not-allowed" disabled="">Lihat Hasil</button>
+</td>
+</tr>
+<!-- Row 4: Selesai -->
+<tr class="hover:bg-surface-container/30 transition-colors group">
+<td class="py-4 px-6">
+<input class="w-4 h-4 rounded border-outline-variant text-action-teal focus:ring-action-teal cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-on-tertiary-container flex items-center justify-center text-white font-bold text-[13px]">DS</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-semibold">Dian Sastro</p>
+<p class="text-on-surface-variant text-[11px]">ID: 24004</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<p class="font-body-md text-body-md text-on-surface">Marketing</p>
+<p class="text-on-surface-variant text-[11px]">Senior Executive</p>
+</td>
+<td class="py-4 px-4">
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded border border-blue-100">DISC</span>
+<span class="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded border border-emerald-100">EPPS</span>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="flex items-center text-green-600 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                        Selesai
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="bg-action-teal text-on-primary px-4 py-1.5 rounded-lg font-label-sm text-label-sm hover:shadow-md transition-all">Lihat Hasil</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline-variant flex flex-col sm:flex-row items-center justify-between gap-4">
+<p class="text-body-md font-body-md text-on-surface-variant">Menampilkan 4 dari 48 Peserta</p>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-action-teal text-on-primary font-label-sm text-label-sm">1</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-variant font-label-sm text-label-sm transition-colors">2</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-variant font-label-sm text-label-sm transition-colors">3</button>
+<span class="text-on-surface-variant">...</span>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-variant font-label-sm text-label-sm transition-colors">12</button>
+<button class="p-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Stats Overview (Asymmetric/Bento hint) -->
+<div class="mt-stack-lg grid grid-cols-1 md:grid-cols-4 gap-stack-md">
+<div class="md:col-span-1 bg-blue-50 border border-blue-100 rounded-xl p-5">
+<h5 class="text-blue-800 font-label-caps text-label-caps mb-3">TINGKAT PENYELESAIAN</h5>
+<div class="flex items-end justify-between">
+<span class="text-blue-900 font-display-lg text-display-lg">82%</span>
+<div class="text-blue-700 font-label-sm text-label-sm mb-2">+5% vs Batch 2</div>
+</div>
+</div>
+<div class="md:col-span-1 bg-emerald-50 border border-emerald-100 rounded-xl p-5">
+<h5 class="text-emerald-800 font-label-caps text-label-caps mb-3">STATUS SELESAI</h5>
+<div class="flex items-end justify-between">
+<span class="text-emerald-900 font-display-lg text-display-lg">39</span>
+<div class="text-emerald-700 font-label-sm text-label-sm mb-2">/ 48 Peserta</div>
+</div>
+</div>
+<div class="md:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl p-5 flex items-center justify-between">
+<div>
+<h5 class="text-on-surface-variant font-label-caps text-label-caps mb-1">PROGRES KOLEKTIF</h5>
+<p class="text-body-md font-body-md text-primary font-semibold mb-3">Estimasi selesai: 2 Hari lagi</p>
+<div class="w-full bg-surface-container rounded-full h-2 min-w-[200px]">
+<div class="bg-action-teal h-2 rounded-full" style="width: 82%"></div>
+</div>
+</div>
+<div class="hidden lg:block text-right">
+<button class="text-action-teal font-label-sm text-label-sm flex items-center hover:underline">
+                            Lihat Detail Progres <span class="material-symbols-outlined text-[18px] ml-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for table row checkboxes
+        const selectAll = document.querySelector('thead input[type="checkbox"]');
+        const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        
+        if(selectAll) {
+            selectAll.addEventListener('change', (e) => {
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+            });
+        }
+
+        // Toggle hover effect state visually if needed via JS
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                const row = this.closest('tr');
+                if(this.checked) {
+                    row.classList.add('bg-primary-fixed/10');
+                } else {
+                    row.classList.remove('bg-primary-fixed/10');
+                }
+            });
+        });
+    </script>
+</body></html>

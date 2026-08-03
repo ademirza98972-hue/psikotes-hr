@@ -1,27 +1,31 @@
 @extends('layouts.admin', ['judulHalaman' => 'Tambah Penjadwalan Tes'])
 
 @php
-    $warnaFormat = [
-        'Pilihan Ganda' => 'bg-blue-600',
-        'Skala Likert'  => 'bg-indigo-600',
-        'Forced Choice' => 'bg-amber-600',
+    $warnaAlatTes = [
+        'DISC'   => 'bg-blue-50 text-blue-700 border border-blue-200',
+        'IST'    => 'bg-violet-50 text-violet-700 border border-violet-200',
+        'EPPS'   => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+        'MMPI-2' => 'bg-orange-50 text-orange-700 border border-orange-200',
     ];
 @endphp
 
 @section('content')
-<div class="w-full rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
-     x-data="formPenjadwalan()">
+<div class="space-y-6" x-data="formPenjadwalan()">
 
-    <div class="mb-4 flex items-center justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="text-lg font-semibold text-slate-900">Tambah Penjadwalan Tes</h2>
-            <p class="mt-0.5 text-xs text-slate-500">Lengkapi formulir di bawah untuk menjadwalkan sesi tes baru.</p>
+            <h2 class="text-lg font-bold text-[#191c1e]">Tambah Penjadwalan Tes</h2>
+            <p class="mt-0.5 text-sm text-[#41484b]">Buat sesi penilaian psikologis baru untuk karyawan atau kandidat.</p>
         </div>
-        <a href="{{ route('admin.penjadwalan-tes.index') }}" class="text-sm text-slate-600 hover:text-slate-800">&larr; Kembali</a>
+        <a href="{{ route('admin.penjadwalan-tes.index') }}"
+           class="inline-flex items-center gap-1 text-[#2C5F6F] font-semibold text-sm hover:opacity-80 transition-opacity">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            Kembali
+        </a>
     </div>
 
     @if ($errors->any())
-        <div class="mb-4 rounded-md border border-rose-600 bg-rose-600 px-4 py-3 text-sm text-white">
+        <div class="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-700">
             <ul class="list-disc space-y-1 pl-5">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -30,153 +34,196 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.penjadwalan-tes.simpan') }}" class="space-y-6">
+    <form method="POST" action="{{ route('admin.penjadwalan-tes.simpan') }}" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         @csrf
 
-        {{-- SECTION 1: IDENTITAS SESI --}}
-        <section>
-            <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-700">Identitas Sesi</h3>
-            <div class="grid gap-4 md:grid-cols-2">
-                <div>
-                    <label for="nama_sesi" class="block text-sm font-medium text-slate-700">Nama Sesi <span class="text-rose-500">*</span></label>
-                    <input id="nama_sesi" name="nama_sesi" type="text" value="{{ old('nama_sesi') }}" required maxlength="255"
-                           placeholder="mis. Rekrutmen Staff Finance Batch 1"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                </div>
-                <div>
-                    <label for="departemen_terkait" class="block text-sm font-medium text-slate-700">Departemen Terkait <span class="text-slate-400">(opsional)</span></label>
-                    <select id="departemen_terkait" name="departemen_terkait"
-                            class="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                        <option value="">— Tidak terikat departemen —</option>
-                        <option value="Lintas Departemen / Campuran" @selected(old('departemen_terkait') === 'Lintas Departemen / Campuran')>— Lintas Departemen / Campuran —</option>
-                        @foreach ($daftarDepartemen as $dept)
-                            <option value="{{ $dept }}" @selected(old('departemen_terkait') === $dept)>{{ $dept }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="tanggal_mulai" class="block text-sm font-medium text-slate-700">Tanggal Mulai <span class="text-rose-500">*</span></label>
-                    <input id="tanggal_mulai" name="tanggal_mulai" type="date" value="{{ old('tanggal_mulai') }}" required
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                </div>
-                <div>
-                    <label for="tanggal_selesai" class="block text-sm font-medium text-slate-700">Tanggal Selesai <span class="text-rose-500">*</span></label>
-                    <input id="tanggal_selesai" name="tanggal_selesai" type="date" value="{{ old('tanggal_selesai') }}" required
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                </div>
-            </div>
-        </section>
+        {{-- LEFT COLUMN: SECTION 1 + 2 --}}
+        <div class="lg:col-span-4 space-y-5">
 
-        {{-- SECTION 2: PILIH PESERTA (filter departemen + nama) --}}
-        <section>
-            <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-700">Pilih Peserta</h3>
-
-            <div class="grid gap-3 md:grid-cols-3">
-                <div>
-                    <label for="sumber_peserta" class="block text-sm font-medium text-slate-700">Sumber Peserta</label>
-                    <select id="sumber_peserta" x-model="sumber"
-                            class="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                        <option value="karyawan">Data Karyawan</option>
-                        <option value="kandidat">Data Kandidat</option>
-                    </select>
+            {{-- SECTION 1: Identitas Sesi --}}
+            <section class="rounded-xl border border-[#c1c7cb] bg-white p-5 shadow-sm">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="material-symbols-outlined text-[#2C5F6F]">info</span>
+                    <h3 class="text-base font-semibold text-[#191c1e]">Identitas Sesi</h3>
                 </div>
-                <div>
-                    <label for="filter_departemen" class="block text-sm font-medium text-slate-700">Filter Departemen</label>
-                    <select id="filter_departemen" x-model="filterDepartemen"
-                            class="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                        <option value="Semua Departemen">Semua Departemen</option>
-                        @foreach ($daftarDepartemen as $dept)
-                            <option value="{{ $dept }}">{{ $dept }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="cari_peserta" class="block text-sm font-medium text-slate-700">Cari Nama</label>
-                    <input id="cari_peserta" type="text" x-model="cariPeserta"
-                           placeholder="Ketik nama peserta..."
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                </div>
-            </div>
-
-            <div class="mt-4 max-h-72 overflow-y-auto rounded-md border border-slate-200 bg-slate-50 p-2">
-                <template x-for="peserta in pesertaTampil" :key="peserta.name">
-                    <label class="mb-1 flex cursor-pointer items-start gap-3 rounded-md p-2 text-sm hover:bg-white transition"
-                           :class="pilihanPeserta[peserta.name] ? 'bg-white ring-1 ring-[#2C5F6F]/30' : ''">
-                        <input type="checkbox" :value="peserta.name"
-                               @change="togglePeserta(peserta.name, $event.target.checked)"
-                               :checked="!!pilihanPeserta[peserta.name]"
-                               class="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#2C5F6F] focus:ring-[#2C5F6F]">
-                        <div class="min-w-0 flex-1">
-                            <div class="truncate font-medium text-slate-800" x-text="peserta.name"></div>
-                            <div class="mt-0.5 text-xs text-slate-500">
-                                Departemen: <strong class="text-slate-700" x-text="peserta.departemen"></strong>
-                                <span class="mx-1 text-slate-300">·</span>
-                                Posisi: <span class="text-slate-600" x-text="peserta.posisi"></span>
-                            </div>
+                <div class="space-y-4">
+                    <div>
+                        <label for="nama_sesi" class="block text-[12px] font-medium text-[#41484b] mb-1.5">Nama Sesi <span class="text-rose-500">*</span></label>
+                        <input id="nama_sesi" name="nama_sesi" type="text" value="{{ old('nama_sesi') }}" required maxlength="255"
+                               placeholder="mis. Rekrutmen Staff Finance Batch 1"
+                               class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                    </div>
+                    <div>
+                        <label for="departemen_terkait" class="block text-[12px] font-medium text-[#41484b] mb-1.5">Departemen Terkait <span class="text-[#919eab]">(opsional)</span></label>
+                        <select id="departemen_terkait" name="departemen_terkait"
+                                class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                            <option value="">— Tidak terikat departemen —</option>
+                            <option value="Lintas Departemen / Campuran" @selected(old('departemen_terkait') === 'Lintas Departemen / Campuran')>— Lintas Departemen / Campuran —</option>
+                            @foreach ($daftarDepartemen as $dept)
+                                <option value="{{ $dept }}" @selected(old('departemen_terkait') === $dept)>{{ $dept }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="tanggal_mulai" class="block text-[12px] font-medium text-[#41484b] mb-1.5">Tanggal Mulai <span class="text-rose-500">*</span></label>
+                            <input id="tanggal_mulai" name="tanggal_mulai" type="date" value="{{ old('tanggal_mulai') }}" required
+                                   class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
                         </div>
-                    </label>
-                </template>
-                <p x-show="pesertaTampil.length === 0" class="py-6 text-center text-xs text-slate-500">
-                    Tidak ada peserta yang cocok dengan filter.
-                </p>
-            </div>
-            <p class="mt-2 text-xs text-slate-500">
-                <span x-text="jumlahPesertaTerpilih"></span> peserta dipilih dari
-                <span x-text="sumber === 'karyawan' ? @js(count($daftarKaryawan)) : @js(count($daftarKandidat))"></span> tersedia.
-            </p>
-        </section>
-
-        {{-- SECTION 3: ASSIGN ALAT TES PER PESERTA --}}
-        <section class="border-t border-slate-200 pt-6">
-            <div class="mb-3 flex items-center justify-between">
-                <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-700">Assign Alat Tes per Peserta</h3>
-                <button type="button" @click="terapkanKeSemua()"
-                        :disabled="jumlahPesertaTerpilih < 2"
-                        :class="jumlahPesertaTerpilih >= 2 ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-300 cursor-not-allowed'"
-                        class="rounded-md px-3 py-1.5 text-xs font-semibold text-white shadow-sm">
-                    Terapkan ke Semua Peserta
-                </button>
-            </div>
-
-            <div x-show="jumlahPesertaTerpilih === 0" class="rounded-md border border-dashed border-slate-300 bg-white py-8 text-center text-sm text-slate-500">
-                Pilih peserta terlebih dahulu di atas.
-            </div>
-
-            <div x-show="jumlahPesertaTerpilih > 0" class="space-y-3">
-                <template x-for="(state, nama) in pilihanPeserta" :key="nama">
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                        <div class="mb-3 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-semibold text-slate-900" x-text="nama"></p>
-                                <p class="text-xs text-slate-500" x-text="getInfoPeserta(nama)"></p>
-                            </div>
-                            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
-                                Peserta Terpilih
-                            </span>
-                        </div>
-
-                        <div class="grid gap-2 sm:grid-cols-2">
-                            <template x-for="alat in daftarAlatTes" :key="alat.id">
-                                <label class="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
-                                       :class="state.alat_tes.includes(alat.id) ? 'border-emerald-300 bg-emerald-50' : ''">
-                                    <input type="checkbox" :value="alat.id"
-                                           @change="toggleAlatTes(nama, alat.id, $event.target.checked)"
-                                           :checked="state.alat_tes.includes(alat.id)"
-                                           class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600">
-                                    <span class="font-medium text-slate-800" x-text="alat.nama"></span>
-                                    <span class="ml-auto inline-block rounded-md bg-slate-700 px-2 py-0.5 text-[10px] font-semibold text-white"
-                                          x-text="alat.format_dasar"></span>
-                                </label>
-                            </template>
+                        <div>
+                            <label for="tanggal_selesai" class="block text-[12px] font-medium text-[#41484b] mb-1.5">Tanggal Selesai <span class="text-rose-500">*</span></label>
+                            <input id="tanggal_selesai" name="tanggal_selesai" type="date" value="{{ old('tanggal_selesai') }}" required
+                                   class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
                         </div>
                     </div>
-                </template>
-            </div>
-        </section>
+                </div>
+            </section>
 
-        <div class="sticky bottom-0 -mx-6 mt-6 flex justify-end gap-2 border-t border-slate-200 bg-white px-6 py-4 shadow-[0_-2px_4px_rgba(0,0,0,0.04)]">
-            <a href="{{ route('admin.penjadwalan-tes.index') }}" class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</a>
-            <button type="submit" class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853]">Simpan</button>
+            {{-- SECTION 2: Pilih Peserta --}}
+            <section class="rounded-xl border border-[#c1c7cb] bg-white p-5 shadow-sm">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="material-symbols-outlined text-[#2C5F6F]">person_add</span>
+                    <h3 class="text-base font-semibold text-[#191c1e]">Pilih Peserta</h3>
+                </div>
+
+                <div class="space-y-3 mb-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="sumber_peserta" class="block text-[12px] font-medium text-[#41484b] mb-1.5">Sumber Peserta</label>
+                            <select id="sumber_peserta" x-model="sumber"
+                                    class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                                <option value="karyawan">Data Karyawan</option>
+                                <option value="kandidat">Data Kandidat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="filter_departemen" class="block text-[12px] font-medium text-[#41484b] mb-1.5">Filter Departemen</label>
+                            <select id="filter_departemen" x-model="filterDepartemen"
+                                    class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                                <option value="Semua Departemen">Semua Departemen</option>
+                                @foreach ($daftarDepartemen as $dept)
+                                    <option value="{{ $dept }}">{{ $dept }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#41484b]">search</span>
+                        <input id="cari_peserta" type="text" x-model="cariPeserta"
+                               placeholder="Cari nama peserta..."
+                               class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                    </div>
+                </div>
+
+                <div class="border border-[#c1c7cb] rounded-xl overflow-hidden">
+                    <div class="max-h-64 overflow-y-auto">
+                        <template x-for="peserta in pesertaTampil" :key="peserta.name">
+                            <label class="flex items-start gap-3 p-3 hover:bg-[#f2f4f6] transition-colors border-b border-[#e0e3e5] last:border-b-0 cursor-pointer"
+                                   :class="pilihanPeserta[peserta.name] ? 'bg-[#f0fdf4] ring-1 ring-emerald-200' : ''">
+                                <input type="checkbox" :value="peserta.name"
+                                       @change="togglePeserta(peserta.name, $event.target.checked)"
+                                       :checked="!!pilihanPeserta[peserta.name]"
+                                       class="mt-0.5 h-4 w-4 rounded border-[#c1c7cb] text-[#2C5F6F] focus:ring-[#2C5F6F]">
+                                <div>
+                                    <p class="font-semibold text-[#191c1e] text-sm leading-tight" x-text="peserta.name"></p>
+                                    <p class="text-[11px] text-[#41484b] mt-0.5">
+                                        Departemen: <strong class="text-[#191c1e]" x-text="peserta.departemen"></strong>
+                                        <span class="mx-1 text-[#c1c7cb]">·</span>
+                                        Posisi: <span class="text-[#41484b]" x-text="peserta.posisi"></span>
+                                    </p>
+                                </div>
+                            </label>
+                        </template>
+                        <p x-show="pesertaTampil.length === 0" class="py-6 text-center text-sm text-[#41484b]">
+                            Tidak ada peserta yang cocok dengan filter.
+                        </p>
+                    </div>
+                </div>
+                <p class="mt-3 text-sm text-[#41484b] text-center">
+                    <span class="font-bold text-[#2C5F6F]" x-text="jumlahPesertaTerpilih"></span> peserta dipilih dari
+                    <span x-text="sumber === 'karyawan' ? @js(count($daftarKaryawan)) : @js(count($daftarKandidat))"></span> tersedia.
+                </p>
+            </section>
+
+        </div>
+
+        {{-- RIGHT COLUMN: SECTION 3 --}}
+        <div class="lg:col-span-8">
+            <section>
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#2C5F6F]">rule</span>
+                        <h3 class="text-base font-semibold text-[#191c1e]">Assign Alat Tes per Peserta</h3>
+                    </div>
+                    <button type="button" @click="terapkanKeSemua()"
+                            :disabled="jumlahPesertaTerpilih < 2"
+                            :class="jumlahPesertaTerpilih >= 2 ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-300 cursor-not-allowed'"
+                            class="rounded-xl px-4 py-2 text-[11px] font-bold text-white transition-all shadow-sm flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]">done_all</span>
+                        Terapkan ke Semua Peserta
+                    </button>
+                </div>
+
+                <div x-show="jumlahPesertaTerpilih === 0" class="rounded-xl border border-dashed border-[#c1c7cb] bg-white py-8 text-center text-sm text-[#41484b]">
+                    Pilih peserta terlebih dahulu di atas.
+                </div>
+
+                <div x-show="jumlahPesertaTerpilih > 0" class="space-y-4">
+                    <template x-for="(state, nama) in pilihanPeserta" :key="nama">
+                        <div class="rounded-xl border border-[#c1c7cb] bg-white p-5 hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-sm" x-text="getInitials(nama)"></div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="font-bold text-[#191c1e] text-base" x-text="nama"></h4>
+                                            <span class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                                Peserta Terpilih
+                                            </span>
+                                        </div>
+                                        <p class="text-[11px] text-[#41484b] mt-0.5" x-text="getInfoPeserta(nama)"></p>
+                                    </div>
+                                </div>
+                                <button type="button" @click="togglePeserta(nama, false)"
+                                        class="text-[#41484b] hover:text-rose-600 transition-colors p-1 rounded-lg hover:bg-rose-50">
+                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <template x-for="alat in daftarAlatTes" :key="alat.id">
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-[#c1c7cb] hover:bg-[#f2f4f6] transition-all cursor-pointer"
+                                           :class="state.alat_tes.includes(alat.id) ? 'border-emerald-300 bg-emerald-50' : ''">
+                                        <input type="checkbox" :value="alat.id"
+                                               @change="toggleAlatTes(nama, alat.id, $event.target.checked)"
+                                               :checked="state.alat_tes.includes(alat.id)"
+                                               class="h-5 w-5 rounded border-[#c1c7cb] text-[#2C5F6F] focus:ring-[#2C5F6F]">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <span class="font-semibold text-[#191c1e] text-sm" x-text="alat.nama"></span>
+                                                <span class="bg-[#e6e8ea] text-[#41484b] text-[10px] font-bold px-2 py-0.5 rounded border border-[#c1c7cb]"
+                                                      x-text="alat.format_dasar"></span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+        </div>
+
+        {{-- STICKY FOOTER --}}
+        <div class="lg:col-span-12 sticky bottom-0 -mx-2 bg-white border-t border-[#c1c7cb] px-6 py-4 flex justify-end gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] z-10">
+            <a href="{{ route('admin.penjadwalan-tes.index') }}"
+               class="px-5 py-2.5 rounded-xl border border-[#c1c7cb] text-[#41484b] text-sm font-medium hover:bg-[#f2f4f6] transition-colors">
+                Batal
+            </a>
+            <button type="submit"
+                    class="px-6 py-2.5 rounded-xl bg-[#2C5F6F] text-white text-sm font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-md">
+                Simpan Penjadwalan
+            </button>
         </div>
     </form>
 </div>
@@ -187,15 +234,13 @@ document.addEventListener('alpine:init', () => {
         sumber: 'karyawan',
         filterDepartemen: 'Semua Departemen',
         cariPeserta: '',
-        pilihanPeserta: {}, // { nama: { alat_tes: [id1, id2] } }
+        pilihanPeserta: {},
 
         daftarKaryawan: @json($daftarKaryawan),
         daftarKandidat: @json($daftarKandidat),
         daftarAlatTes: @json($daftarAlatTes),
 
-        init() {
-            // Auto-init struktur pilihanPeserta tetap kosong hingga user ceklis
-        },
+        init() {},
 
         get pesertaTampil() {
             const q = this.cariPeserta.toLowerCase().trim();
@@ -216,6 +261,10 @@ document.addEventListener('alpine:init', () => {
             const p = all.find(x => x.name === nama);
             if (!p) return '';
             return p.departemen + ' · ' + p.posisi;
+        },
+
+        getInitials(nama) {
+            return nama.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
         },
 
         togglePeserta(nama, checked) {

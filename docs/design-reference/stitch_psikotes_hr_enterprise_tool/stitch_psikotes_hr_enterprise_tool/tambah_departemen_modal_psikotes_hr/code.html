@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tambah Departemen - Psikotes HR Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001f28",
+                        "on-tertiary-fixed": "#131b2e",
+                        "on-primary-container": "#7198a7",
+                        "secondary-fixed": "#d4e3ff",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-high": "#e6e8ea",
+                        "error-muted": "#fef2f2",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-tint": "#3d6471",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c1c7cb",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "secondary-fixed-dim": "#b8c7e2",
+                        "inverse-primary": "#a5cddc",
+                        "secondary": "#505f76",
+                        "on-secondary-container": "#56657c",
+                        "surface-container": "#eceef0",
+                        "on-background": "#191c1e",
+                        "outline": "#71787b",
+                        "primary-fixed": "#c0e9f9",
+                        "primary": "#001a22",
+                        "surface-bright": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "surface": "#f7f9fb",
+                        "on-surface-variant": "#41484b",
+                        "surface-dim": "#d8dadc",
+                        "action-teal": "#2C5F6F",
+                        "background": "#f7f9fb",
+                        "tertiary": "#0e1629",
+                        "on-tertiary-container": "#8a92aa",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#232b3f",
+                        "secondary-container": "#d4e3ff",
+                        "on-surface": "#191c1e",
+                        "on-secondary-fixed": "#0c1c30",
+                        "surface-container-low": "#f2f4f6",
+                        "on-primary-fixed-variant": "#244c59",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "success-muted": "#f0fdf4",
+                        "on-secondary-fixed-variant": "#39485e",
+                        "primary-fixed-dim": "#a5cddc",
+                        "on-tertiary-fixed-variant": "#3e465c",
+                        "surface-container-highest": "#e0e3e5",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#dae2fd",
+                        "primary-container": "#00303c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "header-height": "64px",
+                        "container-max": "1440px",
+                        "stack-lg": "32px",
+                        "stack-md": "16px",
+                        "sidebar-width": "280px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Work Sans"],
+                        "headline-md": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "title-sm": ["Work Sans"],
+                        "label-caps": ["Work Sans"],
+                        "display-lg": ["Work Sans"],
+                        "body-md": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SIDEBAR ANCHOR -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-lg z-10">
+<div class="px-gutter mb-stack-lg">
+<h1 class="font-headline-md text-headline-md text-action-teal font-bold">HR Portal</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Enterprise Management</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<div class="flex items-center px-4 py-3 rounded-xl cursor-pointer text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl cursor-pointer text-action-teal font-semibold bg-surface-container">
+<span class="material-symbols-outlined mr-3">corporate_fare</span>
+<span class="font-body-md text-body-md">Departments</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl cursor-pointer text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined mr-3">group</span>
+<span class="font-body-md text-body-md">Employees</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl cursor-pointer text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined mr-3">payments</span>
+<span class="font-body-md text-body-md">Payroll</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl cursor-pointer text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</div>
+</nav>
+</aside>
+<!-- MAIN CONTENT (Background List View) -->
+<main class="ml-[280px] min-h-screen pb-stack-lg">
+<!-- Top App Bar -->
+<header class="h-header-height bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-gutter sticky top-0 z-20">
+<h2 class="font-title-sm text-title-sm text-action-teal">Department Management</h2>
+<div class="flex items-center gap-stack-md">
+<div class="bg-surface p-2 rounded-full flex items-center px-4 w-64 border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full font-body-md" placeholder="Cari departemen..." type="text"/>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">help_outline</span>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a business administrator in a modern office environment, soft natural lighting, authoritative but friendly expression, high-quality corporate photography style, muted professional color palette matching the teal and white UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2rM0aSXRXJlXdjFdGvRbf6Hq_ub4LJQyalXCHlEZDEaShbzetnS-MZ4sQQmeji4yxYam0xJwCtqLULRyeTW_t7K6GqJYitNZcdR1XxUjVXS0TXftTuuxFG192gnEJZ3zEUXwnHPdd1cP4ELYleyxVCJglmGojYWQAxk99vCf3emuCz1T8qyV6igSlxrd3ly9rueUDdCNuw35_RwsMW4STBDQ5lNvxZ5ZJesX32KY4bY2eSpX35wnH"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-gutter max-w-container-max mx-auto">
+<div class="flex justify-between items-end mb-stack-lg">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Daftar Departemen</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Kelola struktur organisasi perusahaan Anda secara presisi.</p>
+</div>
+<button class="bg-action-teal text-white px-6 py-2 rounded-xl flex items-center gap-2 font-body-md font-semibold transition-all hover:opacity-90 active:scale-95 shadow-sm">
+<span class="material-symbols-outlined">add</span>
+                    Tambah Departemen
+                </button>
+</div>
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-stack-md mb-stack-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-stack-md rounded-xl">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">TOTAL DEPARTEMEN</p>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-display-lg text-on-surface">12</span>
+<div class="w-10 h-10 rounded-full bg-action-teal/10 flex items-center justify-center text-action-teal">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-stack-md rounded-xl">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">AKTIF</p>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-display-lg text-on-surface">10</span>
+<div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-stack-md rounded-xl">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">NON-AKTIF</p>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-display-lg text-on-surface">2</span>
+<div class="w-10 h-10 rounded-full bg-error-container/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined">block</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-stack-md rounded-xl">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">RATIO PSIKOTES</p>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-display-lg text-on-surface">84%</span>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Table Container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">NAMA DEPARTEMEN</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">KEPALA DEPARTEMEN</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">TOTAL KARYAWAN</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">STATUS</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">AKSI</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 font-body-md text-body-md">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4 font-semibold">Human Resources</td>
+<td class="px-6 py-4">Budi Santoso</td>
+<td class="px-6 py-4">15 Orang</td>
+<td class="px-6 py-4">
+<span class="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-label-sm text-label-sm">Aktif</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-on-surface-variant hover:text-action-teal transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4 font-semibold">Engineering</td>
+<td class="px-6 py-4">Siti Aminah</td>
+<td class="px-6 py-4">42 Orang</td>
+<td class="px-6 py-4">
+<span class="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-label-sm text-label-sm">Aktif</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-on-surface-variant hover:text-action-teal transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4 font-semibold">Marketing &amp; Sales</td>
+<td class="px-6 py-4">Agus Wijaya</td>
+<td class="px-6 py-4">28 Orang</td>
+<td class="px-6 py-4">
+<span class="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-label-sm text-label-sm">Aktif</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-on-surface-variant hover:text-action-teal transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4 font-semibold">Operations</td>
+<td class="px-6 py-4">Lina Marlina</td>
+<td class="px-6 py-4">35 Orang</td>
+<td class="px-6 py-4">
+<span class="bg-surface-variant text-on-surface-variant border border-outline-variant px-2 py-0.5 rounded-full font-label-sm text-label-sm">Non-Aktif</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-on-surface-variant hover:text-action-teal transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-6 py-4 bg-surface-container-low flex items-center justify-between border-t border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Menampilkan 1-4 dari 12 Departemen</p>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-surface text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-action-teal text-white font-label-sm text-label-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-surface text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-sm text-label-sm">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-surface text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- MODAL OVERLAY (THE TARGET COMPONENT) -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-inverse-surface/40 backdrop-blur-[2px] transition-opacity duration-300" id="modal-overlay">
+<!-- Modal Card -->
+<div class="bg-surface-container-lowest w-full max-w-[440px] rounded-xl shadow-2xl border border-outline-variant animate-in fade-in zoom-in duration-200">
+<!-- Modal Header -->
+<div class="px-gutter py-stack-md border-b border-outline-variant flex items-center justify-between">
+<h4 class="font-title-sm text-title-sm text-on-surface">Tambah Departemen</h4>
+<button class="text-on-surface-variant hover:text-error transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="p-gutter">
+<div class="space-y-stack-md">
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant" for="dept-name">NAMA DEPARTEMEN</label>
+<input autofocus="" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-action-teal focus:border-transparent transition-all placeholder:text-on-surface-variant/40" id="dept-name" placeholder="Contoh: Marketing" type="text"/>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant italic">Pastikan nama departemen belum terdaftar sebelumnya di sistem.</p>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-gutter py-stack-md bg-surface-container-low rounded-b-xl flex justify-end gap-stack-md">
+<button class="px-6 py-2.5 rounded-xl border border-outline font-body-md font-semibold text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95" onclick="closeModal()">
+                    Batal
+                </button>
+<button class="px-6 py-2.5 rounded-xl bg-action-teal text-white font-body-md font-semibold hover:opacity-90 transition-all active:scale-95 shadow-sm" onclick="saveDepartment()">
+                    Simpan
+                </button>
+</div>
+</div>
+</div>
+<script>
+        function closeModal() {
+            const modal = document.getElementById('modal-overlay');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function saveDepartment() {
+            const input = document.getElementById('dept-name').value;
+            if (input.trim() === "") {
+                alert("Harap masukkan nama departemen.");
+                return;
+            }
+            // Logic simulated
+            console.log("Saving department:", input);
+            closeModal();
+        }
+
+        // Close on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body></html>

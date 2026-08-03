@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tambah Peran Baru - HR Precision</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-container": "#00303c",
+                    "on-secondary-fixed": "#0c1c30",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#b8c7e2",
+                    "primary": "#001a22",
+                    "outline-variant": "#c0c8cb",
+                    "primary-fixed": "#c0e9f9",
+                    "background": "#f7f9fb",
+                    "surface-container-high": "#e6e8ea",
+                    "on-surface-variant": "#41484b",
+                    "on-primary-container": "#7198a7",
+                    "on-tertiary-fixed": "#131b2e",
+                    "inverse-primary": "#a5cddc",
+                    "success-muted": "#f0fdf4",
+                    "inverse-surface": "#2d3133",
+                    "surface-container": "#eceef0",
+                    "on-background": "#191c1e",
+                    "on-secondary-container": "#56657c",
+                    "secondary-fixed": "#d4e3ff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "on-secondary-fixed-variant": "#39485e",
+                    "action-teal": "#2C5F6F",
+                    "error-muted": "#fef2f2",
+                    "tertiary-fixed": "#dae2fd",
+                    "surface-container-low": "#f2f4f6",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed": "#001f28",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#71787b",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "surface-tint": "#3d6471",
+                    "on-tertiary-container": "#8a92aa",
+                    "on-surface": "#191c1e",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f7f9fb",
+                    "tertiary": "#0e1629",
+                    "secondary-container": "#d4e3ff",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#a5cddc",
+                    "surface-dim": "#d8dadc",
+                    "secondary": "#505f76",
+                    "tertiary-container": "#232b3f",
+                    "surface-variant": "#e0e3e5",
+                    "on-tertiary-fixed-variant": "#3e465c",
+                    "on-primary-fixed-variant": "#244c59",
+                    "surface-container-highest": "#e0e3e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "32px",
+                    "header-height": "64px",
+                    "gutter": "24px",
+                    "container-max": "1440px",
+                    "sidebar-width": "280px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Work Sans"],
+                    "label-sm": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "body-md": ["Work Sans"],
+                    "headline-md": ["Work Sans"],
+                    "display-lg": ["Work Sans"]
+            },
+            "fontSize": {
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        /* Custom Checkbox Styling */
+        input[type="checkbox"]:checked {
+            background-color: #2C5F6F;
+            border-color: #2C5F6F;
+        }
+        input[type="checkbox"] {
+            border-radius: 4px;
+            border-color: #c0c8cb;
+            color: #2C5F6F;
+        }
+        input[type="checkbox"]:focus {
+            ring-color: #2C5F6F;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface dark:bg-primary-container border-r border-outline-variant dark:border-on-primary-container flex flex-col p-stack-md transition-all duration-200 ease-in-out">
+<div class="mb-stack-lg px-4">
+<h1 class="font-headline-md text-headline-md text-action-teal dark:text-primary-fixed">HR Precision</h1>
+<p class="font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container opacity-70">Enterprise Admin</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-4 py-3 rounded-xl font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center px-4 py-3 rounded-xl font-body-md text-body-md text-primary dark:text-on-primary-fixed-variant font-bold border-r-4 border-action-teal bg-surface-container dark:bg-primary-container/50" href="#">
+<span class="material-symbols-outlined mr-3">admin_panel_settings</span> User Roles
+            </a>
+<a class="flex items-center px-4 py-3 rounded-xl font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">badge</span> Employee Data
+            </a>
+<a class="flex items-center px-4 py-3 rounded-xl font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span> Test Results
+            </a>
+<a class="flex items-center px-4 py-3 rounded-xl font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">quiz</span> Question Bank
+            </a>
+<a class="flex items-center px-4 py-3 rounded-xl font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:bg-surface-container dark:hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">settings</span> System Settings
+            </a>
+</nav>
+<div class="mt-auto space-y-1 pt-stack-md border-t border-outline-variant/30">
+<a class="flex items-center px-4 py-2 rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-on-surface-variant">help</span> Help Center
+            </a>
+<a class="flex items-center px-4 py-2 rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-on-surface-variant">logout</span> Logout
+            </a>
+</div>
+</aside>
+<!-- Top AppBar -->
+<header class="fixed top-0 left-[280px] right-0 h-[64px] bg-surface-container-lowest border-b border-outline-variant z-10">
+<div class="flex items-center justify-between px-gutter h-full w-full max-w-[calc(1440px-280px)] mx-auto">
+<div class="flex items-center space-x-4">
+<span class="font-title-sm text-title-sm text-on-surface">Tambah Peran Baru</span>
+</div>
+<div class="flex items-center space-x-6">
+<a class="text-action-teal font-label-sm text-label-sm hover:underline flex items-center transition-all" href="#">
+<span class="material-symbols-outlined text-[18px] mr-1">arrow_back</span> Kembali
+                </a>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-[280px] pt-[64px] pb-[100px] min-h-screen">
+<div class="max-w-[calc(1440px-280px)] mx-auto p-gutter">
+<form class="space-y-stack-lg" id="roleForm">
+<!-- Form Row 1: 2-column grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="namaPeran">Nama Peran *</label>
+<input class="w-full rounded-xl border-outline-variant bg-surface focus:border-action-teal focus:ring-action-teal font-body-md text-body-md px-4 py-3 transition-all" id="namaPeran" placeholder="Contoh: HR Manager" required="" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="deskripsiPeran">Deskripsi (opsional)</label>
+<textarea class="w-full rounded-xl border-outline-variant bg-surface focus:border-action-teal focus:ring-action-teal font-body-md text-body-md px-4 py-3 transition-all resize-none" id="deskripsiPeran" placeholder="Berikan deskripsi singkat tentang peran ini..." rows="1"></textarea>
+</div>
+</div>
+<!-- Section: Daftar Izin -->
+<section class="space-y-stack-md">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="space-y-1">
+<h2 class="font-title-sm text-title-sm text-on-surface">Daftar Izin *</h2>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80">Centang izin-izin yang dimiliki peran ini.</p>
+</div>
+<div class="flex space-x-stack-sm">
+<button class="px-4 py-2 border border-outline text-on-surface font-label-sm text-label-sm rounded-xl hover:bg-surface-container transition-colors active:scale-95 flex items-center" onclick="toggleAll(true)" type="button">
+<span class="material-symbols-outlined text-[16px] mr-2">check_circle</span> Centang Semua
+                            </button>
+<button class="px-4 py-2 border border-outline text-on-surface font-label-sm text-label-sm rounded-xl hover:bg-surface-container transition-colors active:scale-95 flex items-center" onclick="toggleAll(false)" type="button">
+<span class="material-symbols-outlined text-[16px] mr-2">cancel</span> Batalkan Semua
+                            </button>
+</div>
+</div>
+<!-- Permission Sub-groups (Bento-like Cards) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- 1. ADMIN & STAFF -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">ADMIN &amp; STAFF</h3>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Kelola Admin &amp; Staff</span>
+</label>
+</div>
+<!-- 2. DASHBOARD -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">DASHBOARD</h3>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Akses Dashboard</span>
+</label>
+</div>
+<!-- 3. DATA KARYAWAN -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">DATA KARYAWAN</h3>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Kelola Data Karyawan</span>
+</label>
+</div>
+<!-- 4. DATA TERHAPUS -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">DATA TERHAPUS</h3>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Kelola Data Terhapus</span>
+</label>
+</div>
+<!-- 5. HASIL TES -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 md:col-span-2 lg:col-span-2 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">HASIL TES</h3>
+<div class="flex flex-wrap gap-x-8 gap-y-4">
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Lihat Hasil Tes</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Lihat Hasil Tes Sensitif (MMPI-2)</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Review Hasil Tes</span>
+</label>
+</div>
+</div>
+<!-- 6. IZIN & HAK AKSES -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">IZIN &amp; HAK AKSES</h3>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Kelola Izin Sistem</span>
+</label>
+</div>
+<!-- 7. KATEGORI TES -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">KATEGORI TES</h3>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Kelola Kategori Tes</span>
+</label>
+</div>
+<!-- 8. MASTER DATA -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">MASTER DATA</h3>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Kelola Master Data Departemen &amp; Posisi</span>
+</label>
+</div>
+<!-- 9. PENGGUNA -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 md:col-span-3 lg:col-span-3 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">PENGGUNA</h3>
+<div class="flex flex-wrap gap-x-8 gap-y-4">
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Edit Pengguna</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Hapus Pengguna</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Lihat Pengguna</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Tambah Pengguna</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Verifikasi Kandidat</span>
+</label>
+</div>
+</div>
+<!-- 10. PERAN -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">PERAN</h3>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Kelola Peran</span>
+</label>
+</div>
+<!-- 11. SOAL -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 md:col-span-2 lg:col-span-2 hover:border-action-teal/40 transition-colors group">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">SOAL</h3>
+<div class="flex flex-wrap gap-x-8 gap-y-4">
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Edit Soal</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Hapus Soal</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Lihat Soal</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer select-none">
+<input class="w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Tambah Soal</span>
+</label>
+</div>
+</div>
+</div>
+</section>
+</form>
+</div>
+</main>
+<!-- Sticky Bottom Footer -->
+<footer class="fixed bottom-0 left-[280px] right-0 bg-surface-container-lowest border-t border-outline-variant shadow-[0_-4px_20px_rgba(0,0,0,0.03)] z-20">
+<div class="max-w-[calc(1440px-280px)] mx-auto px-gutter h-[80px] flex items-center justify-end space-x-4">
+<button class="px-8 py-3 rounded-xl border border-outline text-on-surface font-body-md text-body-md hover:bg-surface-container transition-all active:scale-95" type="button">
+                Batal
+            </button>
+<button class="px-10 py-3 rounded-xl bg-action-teal text-on-primary font-title-sm text-title-sm shadow-lg shadow-action-teal/20 hover:brightness-110 transition-all active:scale-95" form="roleForm" type="submit">
+                Simpan
+            </button>
+</div>
+</footer>
+<script>
+        function toggleAll(checked) {
+            const checkboxes = document.querySelectorAll('#roleForm input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = checked);
+            
+            // Visual feedback
+            const btn = event.currentTarget;
+            btn.classList.add('scale-95', 'opacity-70');
+            setTimeout(() => btn.classList.remove('scale-95', 'opacity-70'), 150);
+        }
+
+        // Micro-interaction for textareas to auto-expand slightly
+        const textarea = document.getElementById('deskripsiPeran');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Form Submission Logic
+        document.getElementById('roleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = 'Menyimpan...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Peran berhasil ditambahkan!');
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }, 1000);
+        });
+    </script>
+</body></html>

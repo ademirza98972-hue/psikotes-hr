@@ -12,7 +12,7 @@
                 @auth
                     @if(auth()->user()->hasIzin('pengguna.tambah'))
                         <a href="{{ route('admin.akun-karyawan.tambah') }}"
-                           class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">
+                           class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1E414C]">
                             <span class="material-symbols-outlined text-[18px]">add</span>
                             Tambah Karyawan
                         </a>
@@ -20,7 +20,7 @@
 
                     @if(auth()->user()->hasIzin('pengguna.tambah'))
                         <a href="{{ route('admin.data-kandidat.tambah') }}"
-                           class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">
+                           class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1E414C]">
                             <span class="material-symbols-outlined text-[18px]">add</span>
                             Tambah Kandidat
                         </a>
@@ -28,7 +28,7 @@
 
                     @if(auth()->user()->hasIzin('peran.kelola'))
                         <a href="{{ route('admin.peran.tambah') }}"
-                           class="inline-flex items-center gap-2 rounded-lg bg-[#232b3f] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">
+                           class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1E414C]">
                             <span class="material-symbols-outlined text-[18px]">add</span>
                             Tambah Peran
                         </a>

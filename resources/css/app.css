@@ -16,12 +16,79 @@
     --color-psikotes-subtle: #E8F0F2;
     --color-psikotes-glow: rgba(44, 95, 111, 0.12);
 
-    /* Surface / text — reuses slate palette for consistency */
-    --color-surface-variant: #E0E3E5;
-    --color-on-surface-variant: #40484B;
-    --color-outline-variant: #C0C8CB;
-    --color-on-surface: #191C1E;
-    --color-inverse-surface: #2D3133;
+    /* Material Design 3 tokens from Stitch reference */
+    --color-primary: #001a22;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #00303c;
+    --color-on-primary-container: #7198a7;
+    --color-secondary: #505f76;
+    --color-on-secondary: #ffffff;
+    --color-tertiary: #0e1629;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-fixed: #dae2fd;
+    --color-on-tertiary-fixed: #131b2e;
+    --color-tertiary-fixed-dim: #bec6e0;
+    --color-on-tertiary: #ffffff;
+    --color-primary-fixed: #c0e9f9;
+    --color-primary-fixed-dim: #a5cddc;
+    --color-on-primary-fixed: #001f28;
+    --color-on-primary-fixed-variant: #244c59;
+    --color-on-secondary-container: #56657c;
+    --color-surface: #f7f9fb;
+    --color-surface-dim: #d8dadc;
+    --color-surface-container: #eceef0;
+    --color-surface-container-highest: #e0e3e5;
+    --color-surface-container-high: #e6e8ea;
+    --color-surface-container-low: #f2f4f6;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-bright: #f7f9fb;
+    --color-surface-variant: #e0e3e5;
+    --color-on-surface-variant: #41484b;
+    --color-outline-variant: #c0c8cb;
+    --color-outline: #71787b;
+    --color-inverse-surface: #2d3133;
+    --color-inverse-on-surface: #eff1f3;
+    --color-error: #ba1a1a;
+    --color-error-container: #ffdad6;
+    --color-on-error: #ffffff;
+    --color-on-error-container: #93000a;
+    --color-placeholder: #919eab;
+
+    /* Stitch reference — action teal */
+    --color-action-teal: #2C5F6F;
+    --color-on-action-teal: #ffffff;
+
+    /* Stitch reference — typography scale */
+    --text-display-lg: 36px/44px;
+    --text-headline-md: 24px/32px;
+    --text-body-lg: 16px/24px;
+    --text-body-md: 14px/20px;
+    --text-title-sm: 18px/24px;
+    --text-label-sm: 12px/16px;
+    --text-label-caps: 11px/16px;
+
+    /* Stitch reference — spacing */
+    --spacing-sidebar-width: 280px;
+    --spacing-gutter: 24px;
+    --spacing-stack-lg: 32px;
+    --spacing-stack-md: 16px;
+    --spacing-stack-sm: 8px;
+    --spacing-header-height: 64px;
+    --spacing-container-max: 1440px;
+}
+
+@layer base {
+    html { font-family: 'Work Sans', ui-sans-serif, system-ui, sans-serif; }
+}
+
+@layer utilities {
+    .font-display-lg { font-size: var(--text-display-lg); font-weight: 600; }
+    .font-headline-md { font-size: var(--text-headline-md); font-weight: 600; }
+    .font-body-lg { font-size: var(--text-body-lg); font-weight: 400; }
+    .font-body-md { font-size: var(--text-body-md); font-weight: 400; }
+    .font-title-sm { font-size: var(--text-title-sm); font-weight: 600; }
+    .font-label-sm { font-size: var(--text-label-sm); font-weight: 500; }
+    .font-label-caps { font-size: var(--text-label-caps); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
 }
 
 .material-symbols-outlined {
@@ -39,3 +106,6 @@
     font-feature-settings: 'liga';
     -webkit-font-smoothing: antialiased;
 }
+
+.focused-input { position: relative; }
+.focused-input :focus-within { border-color: var(--color-psikotes) !important; box-shadow: 0 0 0 1px var(--color-psikotes); }

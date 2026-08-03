@@ -56,12 +56,30 @@ class BankSoalController extends Controller
 
     public function index(): View
     {
+        $alatTesSemua = self::DUMMY_ALAT_TES;
+
+        // Kelompokkan semua soal per alat tes untuk tampilan tanpa filter
+        $kelompokSoalSemua = [];
+        foreach (self::DUMMY_SOAL as $alatId => $soalList) {
+            $kelompokSoalSemua[$alatId] = [
+                'alat'      => null,
+                'soal'      => $soalList,
+                'jumlahSoal' => count($soalList),
+            ];
+            foreach ($alatTesSemua as $alat) {
+                if ($alat['id'] === $alatId) {
+                    $kelompokSoalSemua[$alatId]['alat'] = $alat;
+                    break;
+                }
+            }
+        }
+
         $alatTesTerpilih = null;
         $daftarSoal = [];
 
         $idDipilih = (int) request('alat_tes_id', 0);
         if ($idDipilih > 0) {
-            foreach (self::DUMMY_ALAT_TES as $alat) {
+            foreach ($alatTesSemua as $alat) {
                 if ($alat['id'] === $idDipilih) {
                     $alatTesTerpilih = $alat;
                     $daftarSoal = self::DUMMY_SOAL[$idDipilih] ?? [];
@@ -71,9 +89,11 @@ class BankSoalController extends Controller
         }
 
         return view('admin.bank-soal.index', [
-            'alatTes' => self::DUMMY_ALAT_TES,
+            'alatTesSemua'   => $alatTesSemua,
+            'kelompokSoalSemua' => $kelompokSoalSemua,
             'alatTesTerpilih' => $alatTesTerpilih,
-            'daftarSoal' => $daftarSoal,
+            'daftarSoal'     => $daftarSoal,
+            'totalSemuaSoal' => array_sum(array_map('count', self::DUMMY_SOAL)),
         ]);
     }
 

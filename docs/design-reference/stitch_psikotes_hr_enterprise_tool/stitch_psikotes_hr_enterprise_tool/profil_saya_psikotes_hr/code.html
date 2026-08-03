@@ -3,298 +3,311 @@
 <html class="light" lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Profil Saya | Psikotes HR</title>
+<title>Profil Saya | HR Enterprise System</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- Theme Configuration -->
-<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {outline: "#71787c", "secondary-fixed": "#d4e3ff", "on-background": "#191c1e", tertiary: "#232b3f", "on-tertiary-container": "#a5adc6", "on-secondary-container": "#56657c", "inverse-primary": "#9ccee1", "surface-container-low": "#f2f4f6", "on-secondary": "#ffffff", "on-error-container": "#93000a", "on-primary-fixed-variant": "#164d5d", "error-container": "#ffdad6", "on-primary-fixed": "#001f28", "primary-fixed": "#b8eafe", "on-primary-container": "#83b5c7", "inverse-on-surface": "#eff1f3", "on-surface": "#191c1e", "tertiary-fixed-dim": "#bec6e0", "surface-variant": "#e0e3e5", "on-tertiary-fixed": "#131b2e", "outline-variant": "#c0c8cb", primary: "#00303c", "on-secondary-fixed": "#0c1c30", "on-primary": "#ffffff", "secondary-container": "#d4e3ff", "on-tertiary": "#ffffff", error: "#ba1a1a", "on-secondary-fixed-variant": "#39485e", "tertiary-container": "#394156", "primary-fixed-dim": "#9ccee1", "tertiary-fixed": "#dae2fd", "surface-dim": "#d8dadc", "on-tertiary-fixed-variant": "#3e465c", "surface-container-high": "#e6e8ea", "secondary-fixed-dim": "#b8c7e2", secondary: "#505f76", "on-error": "#ffffff", surface: "#f7f9fb", "inverse-surface": "#2d3133", "surface-container": "#eceef0", "surface-bright": "#f7f9fb", "surface-container-lowest": "#ffffff", "primary-container": "#0d4757", "on-surface-variant": "#40484b", background: "#f7f9fb", "surface-container-highest": "#e0e3e5", "surface-tint": "#336576", "info-warning-text": "#854d0e", "info-warning-border": "#fef08a", "border-subtle": "#e0e3e5", "success-icon": "#0d4757", "info-warning-bg": "#fefce8"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {"stack-sm": "8px", gutter: "24px", "stack-md": "16px", "sidebar-width": "280px", "container-max": "1440px", "stack-lg": "32px", "margin-mobile": "16px", "header-height": "64px"}, fontFamily: {"title-sm": ["Work Sans"], "body-lg": ["Work Sans"], "label-sm": ["Work Sans"], "headline-md": ["Work Sans"], "display-lg": ["Work Sans"], "body-md": ["Work Sans"], "display-lg-mobile": ["Work Sans"], "data-mono": ["Work Sans"], "label-caps": ["Work Sans"]}, fontSize: {"title-sm": ["18px", {lineHeight: "24px", fontWeight: "600"}], "body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "500"}], "headline-md": ["24px", {lineHeight: "32px", fontWeight: "600"}], "display-lg": ["36px", {lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "600"}], "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}], "display-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "600"}], "data-mono": ["14px", {lineHeight: "20px", letterSpacing: "-0.01em", fontWeight: "400"}], "label-caps": ["11px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}]}}}};</script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#41484b",
+                    "surface-container": "#eceef0",
+                    "surface-container-high": "#e6e8ea",
+                    "on-background": "#191c1e",
+                    "inverse-primary": "#a5cddc",
+                    "outline": "#71787b",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#505f76",
+                    "surface-container-low": "#f2f4f6",
+                    "secondary-fixed": "#d4e3ff",
+                    "primary-fixed-dim": "#a5cddc",
+                    "error-container": "#ffdad6",
+                    "action-teal": "#2C5F6F",
+                    "secondary-fixed-dim": "#b8c7e2",
+                    "primary-fixed": "#c0e9f9",
+                    "outline-variant": "#c0e8eb", // Adjusted slightly for cleaner borders
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e0e3e5",
+                    "on-surface": "#191c1e",
+                    "on-error": "#ffffff",
+                    "tertiary": "#0e1629",
+                    "background": "#f7f9fb",
+                    "inverse-surface": "#2d3133",
+                    "primary-container": "#00303c",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#d4e3ff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-primary": "#ffffff",
+                    "error-muted": "#fef2f2",
+                    "success-muted": "#f0fdf4",
+                    "on-primary-container": "#7198a7",
+                    "on-tertiary-fixed-variant": "#3e465c",
+                    "on-primary-fixed-variant": "#244c59",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface": "#f7f9fb",
+                    "on-primary-fixed": "#001f28",
+                    "primary": "#001a22",
+                    "tertiary-fixed": "#dae2fd",
+                    "on-secondary-container": "#56657c",
+                    "tertiary-container": "#232b3f",
+                    "on-secondary-fixed-variant": "#39485e",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#d8dadc",
+                    "surface-bright": "#f7f9fb",
+                    "on-tertiary-container": "#8a92aa",
+                    "surface-tint": "#3d6471",
+                    "on-tertiary-fixed": "#131b2e",
+                    "on-secondary-fixed": "#0c1c30"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "header-height": "64px",
+                    "container-max": "1440px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "sidebar-width": "280px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Work Sans"],
+                    "label-sm": ["Work Sans"],
+                    "display-lg": ["Work Sans"],
+                    "label-caps": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "headline-md": ["Work Sans"],
+                    "body-md": ["Work Sans"]
+            },
+            "fontSize": {
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
 <style>
-        body { font-family: 'Work Sans', sans-serif; }
+        body {
+            font-family: 'Work Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
         }
-        /* Custom scrollbar for Sidebar */
-        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
-        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        
-        /* Interaction States */
-        .btn-hover-effect:active { transform: scale(0.98); }
+        input:focus {
+            outline: none !important;
+            border-color: #2C5F6F !important;
+            box-shadow: 0 0 0 1px #2C5F6F !important;
+        }
+        .file-input-custom::-webkit-file-upload-button {
+            visibility: hidden;
+            display: none;
+        }
+        .file-input-custom::before {
+            content: 'Choose File';
+            display: inline-block;
+            background: white;
+            border: 1px solid #c0c8cb;
+            border-radius: 4px;
+            padding: 4px 12px;
+            outline: none;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        .file-input-custom:hover::before {
+            border-color: #2C5F6F;
+        }
     </style>
 </head>
-<body class="bg-background text-on-surface">
-<!-- SIDEBAR (Anchor Component) -->
-<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col z-50">
-<div class="p-6">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 bg-primary rounded flex items-center justify-center text-on-primary">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<body class="bg-surface text-on-surface">
+<!-- Navigation Shell (Using Shared Components Logic) -->
+<header class="bg-surface-container-lowest sticky top-0 z-40 border-b border-outline-variant">
+<div class="flex justify-between items-center w-full px-gutter h-header-height max-w-container-max mx-auto">
+<div class="flex items-center gap-stack-md">
+<span class="text-title-sm font-bold text-action-teal">HR Enterprise System</span>
 </div>
-<div class="flex flex-col">
-<span class="text-title-sm font-title-sm font-bold text-primary">Psikotes HR</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant opacity-70">Enterprise HR Portal</span>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant hover:bg-surface-container transition-colors px-3 py-2 rounded-lg text-body-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:bg-surface-container transition-colors px-3 py-2 rounded-lg text-body-md" href="#">Karyawan</a>
+<a class="text-action-teal font-bold border-b-2 border-action-teal pb-1 text-body-md" href="#">Profil Saya</a>
 </div>
-</div>
-</div>
-<nav class="flex-1 sidebar-scroll overflow-y-auto px-4 space-y-1">
-<div class="py-2">
-<p class="px-4 text-[10px] uppercase tracking-wider font-bold text-outline mb-2">Main Menu</p>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
-<span class="material-symbols-outlined">dashboard</span>
-<span>Dashboard</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
-<span class="material-symbols-outlined">badge</span>
-<span>Akun Karyawan</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
-<span class="material-symbols-outlined">person_search</span>
-<span>Akun Kandidat</span>
-</a>
-</div>
-<div class="py-2">
-<p class="px-4 text-[10px] uppercase tracking-wider font-bold text-outline mb-2">Operational</p>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
-<span class="material-symbols-outlined">database</span>
-<span>Bank Soal</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
-<span class="material-symbols-outlined">calendar_month</span>
-<span>Penjadwalan Tes</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
-<span class="material-symbols-outlined">analytics</span>
-<span>Hasil Tes</span>
-</a>
-</div>
-<div class="py-2">
-<p class="px-4 text-[10px] uppercase tracking-wider font-bold text-outline mb-2">System</p>
-<!-- Active Item: Profile Settings -->
-<a class="flex items-center gap-3 px-4 py-3 text-primary bg-primary-container/10 border-l-4 border-primary font-title-sm btn-hover-effect" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
-<span>Kelola Peran &amp; Izin</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
-<span class="material-symbols-outlined">settings_suggest</span>
-<span>Data Master</span>
-</a>
-</div>
-</nav>
-<div class="p-4 mt-auto border-t border-outline-variant">
-<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-container transition-colors cursor-pointer">
-<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="Close-up professional portrait of a confident male HR administrator in his 40s, wearing a dark navy blazer and white crisp shirt. The background is a soft-focus modern corporate office with clean lines and warm wooden accents. The lighting is bright and professional, emphasizing reliability and authority in a contemporary HR setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIq_8zBD5HIHq2N-E4S3zXt54CCSzJ3RQ9KQfsJ_iuTE50bJl-XnsySVqtQjGFaXeccs2OSXY6U2VoH-VW7LvcvJizQcWtiXQFsHXl_DmGCV3Njh6TMku4JT3neH4U7sw1zVePbU9fCGxfDukCnU9GYq8A8Gs1nSnY9m8ls7Dy7DVhGxpMbZc2o-rATB1LU9aH3CwzavzlboJVHWJQE5dOwjnxEkxfVHsPcMOSHJqfqvHGJwGro3DC"/>
-<div class="flex flex-col">
-<span class="font-title-sm text-[14px]">Aditya Perkasa</span>
-<span class="font-label-sm text-outline">Super Admin</span>
-</div>
-</div>
-</div>
-</aside>
-<!-- TOP NAVBAR (Anchor Component) -->
-<header class="fixed top-0 left-[280px] w-[calc(100%-280px)] h-16 bg-surface border-b border-outline-variant flex items-center justify-between px-gutter z-40">
 <div class="flex items-center gap-4">
-<h1 class="font-headline-md text-headline-md text-primary">Profil Saya</h1>
-</div>
-<div class="flex items-center gap-6">
-<div class="flex items-center gap-4 text-on-surface-variant">
-<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-container rounded-full transition-colors relative">
-<span class="material-symbols-outlined">notifications</span>
-<span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full"></span>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
 </button>
-<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-container rounded-full transition-colors">
-<span class="material-symbols-outlined">help_outline</span>
-</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a corporate HR administrator with a warm and inviting expression. The lighting is studio-quality and soft, set against a neutral, minimalist office background that aligns with the corporate modern aesthetic of the application. The image conveys high reliability and systematic precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC898biMdCekEUy5FRkaOn6ADDWiHZqetr07rHx8bW1Hs_qnzyvSlxG32OD4W7UwuuszIeJ9xKvMoENblqbDIpKKlrejiI15nAVF1lH8NqYtikr30nkQdZyXMWNdlPrP7VmW0K4VySch8Hb2P7CEKpm8ZjVBj0AQU2FTDv495l_TWDCCwVSRV9bZSl_qRkCMBJRiObPLVXOAm1jfgnFEkd3XPlQDk26Kbm6-IALMLagPWy-F7g_UhZj"/>
 </div>
-<div class="h-8 w-[1px] bg-outline-variant"></div>
-<div class="flex items-center gap-2">
-<span class="font-label-sm text-on-surface-variant">Admin Mode</span>
-<span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
 </div>
 </div>
 </header>
-<!-- MAIN CANVAS -->
-<main class="ml-[280px] pt-16 min-h-screen">
-<div class="max-w-[1200px] mx-auto p-gutter space-y-stack-lg">
-<!-- Breadcrumbs -->
-<nav class="flex items-center gap-2 text-label-sm text-outline font-label-sm">
-<a class="hover:text-primary transition-colors" href="#">Pengaturan</a>
-<span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span class="text-on-surface">Profil Saya</span>
-</nav>
-<!-- Profile Section Card -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
-<div class="grid grid-cols-1 md:grid-cols-12 gap-0">
-<!-- Left: Avatar & Action -->
-<div class="md:col-span-4 bg-surface-container-low/50 p-stack-lg flex flex-col items-center justify-center border-r border-outline-variant">
+<!-- Main Content Canvas -->
+<main class="max-w-[800px] mx-auto px-gutter py-stack-lg min-h-screen">
+<header class="mb-stack-lg">
+<h1 class="text-headline-md font-headline-md text-on-surface mb-2">Profil Saya</h1>
+<p class="text-body-md text-on-surface-variant">Kelola informasi profil dan keamanan akun Anda dalam satu tempat.</p>
+</header>
+<div class="space-y-stack-lg">
+<!-- CARD 1: Foto Profil -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 md:p-8">
+<div class="mb-6">
+<h2 class="text-title-sm font-title-sm text-on-surface">Foto Profil</h2>
+<p class="text-body-md text-on-surface-variant mt-1">Unggah foto profil Anda. Format yang didukung: JPG, JPEG, PNG. Ukuran maksimal 2 MB.</p>
+</div>
+<div class="flex flex-col md:flex-row items-center md:items-start gap-8 py-4">
+<!-- Circular Avatar -->
 <div class="relative group">
-<div class="w-48 h-48 rounded-full border-4 border-white shadow-md overflow-hidden bg-surface-variant">
-<img class="w-full h-full object-cover" data-alt="Detailed professional headshot of a corporate executive with a clean-cut look, smiling warmly into the camera. The setting is a minimalist, brightly lit executive suite with soft teal and white color accents that match the institutional HR brand. High-resolution quality with natural skin tones and sophisticated professional lighting." id="profile-preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5kV6_Ph8KezM5nPGsobOoLiTPpJiWoxGryWnFu2YO6yqt4Fp2uMMYIvwukbRB95S26IFxamYuak1iEKP631vwvi67IJadWPlhfohuxtcO2uf5LA_BmzLFRHLf1tNWVKhohYwg3N3XT-cUp9TT9WnDFzeE0A8LzWN20apvkt4kPjKb4lE_a5fL_cgvLzptQMqjvOWP_zaZFyJ5dqlyc7Z8q02Vad5ASwvcSezmoyHxHPCnUG4QGSqK"/>
+<div class="w-32 h-32 rounded-full border-4 border-surface-container-high overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a professional individual intended for an HR profile avatar. The background is a clean, solid pale grey to maintain focus on the subject. The lighting is soft and even, highlighting a trustworthy and authoritative corporate presence consistent with a high-end SaaS management platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFg7H7EBir7rIVlt26SOdYoWzAF3vs1gX0dgNff-0JhYgP7kSN9VO9C9GWWdpLl91KkpDwDajxlv9ZPIO4DgJl5YQhkqcURyJRf4-MMzpCHpZvOSxYRsGLx1BSDudS0UZYVrzDEFQoDTHMnVkIOcEBgfCS7dNpADtBm6YmDTj88EyeSd88_Fhu4tTvP4BnH41JRIlNKBSotD-SF1hX89x9Cv6YrFFjblHXD1R0iDVAt-9xU4K8Tf_V"/>
 </div>
-<label class="absolute bottom-2 right-2 w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-primary-container transition-all active:scale-95" for="avatar-upload">
-<span class="material-symbols-outlined">photo_camera</span>
-<input accept="image/*" class="hidden" id="avatar-upload" type="file"/>
-</label>
+<div class="absolute inset-0 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-white text-3xl">photo_camera</span>
 </div>
-<div class="mt-6 text-center">
-<h2 class="font-title-sm text-title-sm text-on-surface">Aditya Perkasa</h2>
-<p class="font-body-md text-on-surface-variant">Administrator Utama</p>
-<p class="font-label-sm text-outline mt-1 uppercase tracking-tighter">ID: ADM-2023-001</p>
 </div>
-<button class="mt-8 px-6 py-2 border border-primary text-primary font-label-sm rounded hover:bg-primary/5 transition-colors btn-hover-effect">
-                            Ubah Foto Profil
-                        </button>
-<p class="mt-4 text-[11px] text-outline text-center max-w-[200px]">Besar file maks. 2MB. Format: JPG, PNG, atau WEBP.</p>
+<!-- Upload Controls -->
+<div class="flex-1 space-y-4 text-center md:text-left">
+<div class="space-y-1">
+<label class="block text-label-sm font-label-sm text-on-surface">Pilih Foto Baru</label>
+<div class="flex items-center justify-center md:justify-start">
+<input class="file-input-custom text-body-md text-on-surface-variant cursor-pointer" type="file"/>
 </div>
-<!-- Right: Basic Info Form -->
-<div class="md:col-span-8 p-stack-lg">
-<div class="mb-8 border-b border-outline-variant pb-4">
-<h3 class="font-title-sm text-title-sm text-primary flex items-center gap-2">
-<span class="material-symbols-outlined text-[20px]">person_outline</span>
-                                Informasi Pribadi
-                            </h3>
-<p class="font-body-md text-on-surface-variant">Data ini akan digunakan untuk keperluan administrasi dan log sistem.</p>
+<p class="text-[11px] text-on-surface-variant italic">File akan mengganti foto profil yang lama (jika ada).</p>
 </div>
-<form class="space-y-6">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="font-label-sm text-on-surface-variant block">Nama Lengkap</label>
-<input class="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all font-body-md outline-none" type="text" value="Aditya Perkasa"/>
 </div>
-<div class="space-y-2">
-<label class="font-label-sm text-on-surface-variant block">Email Perusahaan</label>
-<input class="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all font-body-md outline-none" type="email" value="aditya.perkasa@hrpsikotes.com"/>
 </div>
-<div class="space-y-2">
-<label class="font-label-sm text-on-surface-variant block">Nomor Telepon</label>
+<div class="flex justify-end mt-6 pt-6 border-t border-surface-container">
+<button class="bg-action-teal text-on-primary px-stack-md py-2.5 rounded-xl text-body-md font-semibold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">upload</span>
+                        Unggah Foto
+                    </button>
+</div>
+</section>
+<!-- CARD 2: Data Diri -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 md:p-8">
+<div class="mb-6">
+<h2 class="text-title-sm font-title-sm text-on-surface">Data Diri</h2>
+<p class="text-body-md text-on-surface-variant mt-1">Hanya kolom No. HP yang dapat Anda ubah sendiri. Untuk data lainnya, silakan hubungi Admin/HR.</p>
+</div>
+<div class="space-y-stack-md">
+<!-- Nama Lengkap (Disabled) -->
+<div class="space-y-1.5">
+<label class="block text-label-sm font-label-sm text-on-surface">Nama Lengkap</label>
+<input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed" disabled="" readonly="" type="text" value="Ahmad Sulistyo"/>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">info</span>
+<span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+</div>
+</div>
+<!-- Email (Disabled) -->
+<div class="space-y-1.5">
+<label class="block text-label-sm font-label-sm text-on-surface">Email</label>
+<input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant font-body-md cursor-not-allowed" disabled="" readonly="" type="email" value="ahmad.sulistyo@enterprise.com"/>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">info</span>
+<span class="text-[11px]">Untuk mengubah data ini, hubungi Admin/HR.</span>
+</div>
+</div>
+<!-- No HP (Editable) -->
+<div class="space-y-1.5">
+<label class="block text-label-sm font-label-sm text-on-surface">No. HP</label>
+<input class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg text-on-surface font-body-md transition-all focus:border-action-teal" placeholder="0812XXXXXXXX" type="text" value="081234567890"/>
+</div>
+</div>
+<div class="flex justify-end mt-8 pt-6 border-t border-surface-container">
+<button class="bg-action-teal text-on-primary px-stack-md py-2.5 rounded-xl text-body-md font-semibold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                        Simpan Perubahan
+                    </button>
+</div>
+</section>
+<!-- CARD 3: Ubah Password -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 md:p-8">
+<div class="mb-6">
+<h2 class="text-title-sm font-title-sm text-on-surface">Ubah Password</h2>
+<p class="text-body-md text-on-surface-variant mt-1">Demi keamanan akun Anda, gunakan password minimal 8 karakter yang belum pernah dipakai sebelumnya.</p>
+</div>
+<div class="space-y-stack-md">
+<!-- Password Lama -->
+<div class="space-y-1.5 relative">
+<label class="block text-label-sm font-label-sm text-on-surface">Password Lama</label>
 <div class="relative">
-<span class="absolute left-4 top-1/2 -translate-y-1/2 text-outline font-body-md">+62</span>
-<input class="w-full h-10 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all font-body-md outline-none" type="text" value="81234567890"/>
-</div>
-</div>
-<div class="space-y-2">
-<label class="font-label-sm text-on-surface-variant block">Departemen</label>
-<input class="w-full h-10 px-4 bg-surface-container border border-outline-variant rounded-lg font-body-md text-outline cursor-not-allowed" disabled="" type="text" value="Human Resources Technology"/>
-</div>
-</div>
-<div class="pt-6 flex justify-end">
-<button class="bg-primary text-on-primary px-8 py-2.5 rounded font-title-sm hover:opacity-90 shadow-md transition-all btn-hover-effect" type="button">
-                                    Simpan Perubahan
-                                </button>
-</div>
-</form>
-</div>
-</div>
-</div>
-<!-- Security Section Card (Separate) -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
-<div class="p-stack-lg">
-<div class="mb-8 border-b border-outline-variant pb-4">
-<h3 class="font-title-sm text-title-sm text-primary flex items-center gap-2">
-<span class="material-symbols-outlined text-[20px]">lock_reset</span>
-                            Keamanan Akun
-                        </h3>
-<p class="font-body-md text-on-surface-variant">Pastikan kata sandi Anda kuat dan diperbarui secara berkala.</p>
-</div>
-<form class="max-w-2xl">
-<div class="space-y-6">
-<div class="space-y-2">
-<label class="font-label-sm text-on-surface-variant block">Kata Sandi Saat Ini</label>
-<div class="relative">
-<input class="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all font-body-md outline-none" placeholder="••••••••" type="password"/>
-<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary" type="button">
-<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+<input class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg text-on-surface font-body-md transition-all" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-action-teal transition-colors" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
 </button>
 </div>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="font-label-sm text-on-surface-variant block">Kata Sandi Baru</label>
-<input class="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all font-body-md outline-none" placeholder="Minimal 8 karakter" type="password"/>
+<!-- Password Baru -->
+<div class="space-y-1.5 relative">
+<label class="block text-label-sm font-label-sm text-on-surface">Password Baru</label>
+<div class="relative">
+<input class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg text-on-surface font-body-md transition-all" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-action-teal transition-colors" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
 </div>
-<div class="space-y-2">
-<label class="font-label-sm text-on-surface-variant block">Konfirmasi Kata Sandi Baru</label>
-<input class="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all font-body-md outline-none" placeholder="Ulangi kata sandi" type="password"/>
+<p class="text-[11px] text-on-surface-variant">Minimal 8 karakter.</p>
 </div>
+<!-- Konfirmasi Password -->
+<div class="space-y-1.5 relative">
+<label class="block text-label-sm font-label-sm text-on-surface">Konfirmasi Password Baru</label>
+<div class="relative">
+<input class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg text-on-surface font-body-md transition-all" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-action-teal transition-colors" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
 </div>
-<div class="p-4 bg-secondary-container/30 rounded-lg flex gap-3">
-<span class="material-symbols-outlined text-on-secondary-container">info</span>
-<div class="space-y-1">
-<p class="font-label-sm text-on-secondary-container font-bold">Persyaratan Kata Sandi:</p>
-<ul class="font-label-sm text-on-secondary-container list-disc ml-4 opacity-80">
-<li>Minimal 8 karakter alfanumerik.</li>
-<li>Gunakan kombinasi huruf besar, kecil, dan angka.</li>
-<li>Hindari penggunaan nama atau tanggal lahir.</li>
-</ul>
-</div>
-</div>
-<div class="pt-2">
-<button class="bg-secondary text-on-secondary px-8 py-2.5 rounded font-title-sm hover:opacity-90 transition-all btn-hover-effect" type="button">
-                                    Perbarui Kata Sandi
-                                </button>
+<p class="text-[11px] text-on-surface-variant">Ketik ulang password baru Anda.</p>
 </div>
 </div>
-</form>
+<div class="flex justify-end mt-8 pt-6 border-t border-surface-container">
+<button class="bg-action-teal text-on-primary px-stack-md py-2.5 rounded-xl text-body-md font-semibold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">lock_reset</span>
+                        Ubah Password
+                    </button>
 </div>
+</section>
 </div>
-<!-- Danger Zone -->
-<div class="p-6 border border-error/30 bg-error-container/10 rounded-xl flex items-center justify-between">
-<div>
-<h4 class="font-title-sm text-error font-bold">Keluar Sesi</h4>
-<p class="font-body-md text-on-surface-variant">Keluar dari semua perangkat yang terhubung saat ini.</p>
-</div>
-<button class="px-6 py-2 border border-error text-error font-title-sm rounded hover:bg-error/5 transition-colors btn-hover-effect">
-                    Keluar Sesi
-                </button>
-</div>
-</div>
-<!-- Footer Info -->
-<footer class="max-w-[1200px] mx-auto px-gutter py-8 border-t border-outline-variant flex justify-between text-label-sm text-outline">
-<span>© 2024 Psikotes HR Portal. Versi 2.4.0-stable</span>
-<div class="flex gap-4">
-<a class="hover:underline" href="#">Syarat &amp; Ketentuan</a>
-<a class="hover:underline" href="#">Kebijakan Privasi</a>
-</div>
-</footer>
+<footer class="mt-12 text-center text-label-sm text-on-surface-variant opacity-60">
+            © 2024 HR Enterprise System • Versi 2.1.0
+        </footer>
 </main>
+<!-- Simple micro-interaction for password visibility -->
 <script>
-        // Simple Interaction logic
-        document.getElementById('avatar-upload')?.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('profile-preview').src = event.target.result;
-                    // In a real app, you'd trigger an upload here
+        document.querySelectorAll('button[type="button"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('.material-symbols-outlined');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.textContent = 'visibility';
+                } else {
+                    input.type = 'password';
+                    icon.textContent = 'visibility_off';
                 }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Form Submission visual feedback
-        const buttons = document.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if(btn.innerText.includes('Simpan') || btn.innerText.includes('Perbarui')) {
-                btn.addEventListener('click', () => {
-                    const originalText = btn.innerText;
-                    btn.innerHTML = '<span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span>';
-                    btn.disabled = true;
-                    
-                    setTimeout(() => {
-                        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span> Berhasil';
-                        btn.classList.replace('bg-primary', 'bg-emerald-600');
-                        btn.classList.replace('bg-secondary', 'bg-emerald-600');
-                        
-                        setTimeout(() => {
-                            btn.innerText = originalText;
-                            btn.classList.replace('bg-emerald-600', 'bg-primary');
-                            btn.classList.replace('bg-emerald-600', 'bg-secondary');
-                            btn.disabled = false;
-                        }, 2000);
-                    }, 1000);
-                });
-            }
+            });
         });
     </script>
 </body></html>

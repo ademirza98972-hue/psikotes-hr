@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tambah Pengguna Internal - Psikotes HR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #f7f9fb;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-container": "#7198a7",
+                      "primary-fixed": "#c0e9f9",
+                      "outline-variant": "#c0c8cb",
+                      "on-error-container": "#93000a",
+                      "tertiary": "#0e1629",
+                      "on-tertiary-fixed-variant": "#3e465c",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed": "#131b2e",
+                      "error": "#ba1a1a",
+                      "surface-bright": "#f7f9fb",
+                      "on-surface": "#191c1e",
+                      "surface-container": "#eceef0",
+                      "surface-variant": "#e0e3e5",
+                      "on-primary-fixed": "#001f28",
+                      "success-muted": "#f0fdf4",
+                      "action-teal": "#2C5F6F",
+                      "secondary-container": "#d4e3ff",
+                      "error-muted": "#fef2f2",
+                      "on-surface-variant": "#41484b",
+                      "tertiary-fixed": "#dae2fd",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "surface-tint": "#3d6471",
+                      "secondary-fixed-dim": "#b8c7e2",
+                      "outline": "#71787b",
+                      "primary": "#001a22",
+                      "on-secondary-container": "#56657c",
+                      "on-secondary-fixed": "#0c1c30",
+                      "tertiary-fixed-dim": "#bec6e0",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-secondary-fixed-variant": "#39485e",
+                      "inverse-surface": "#2d3133",
+                      "background": "#f7f9fb",
+                      "inverse-primary": "#a5cddc",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-tertiary-container": "#8a92aa",
+                      "surface": "#f7f9fb",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "primary-fixed-dim": "#a5cddc",
+                      "tertiary-container": "#232b3f",
+                      "on-background": "#191c1e",
+                      "secondary": "#505f76",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed-variant": "#244c59",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container-high": "#e6e8ea",
+                      "primary-container": "#00303c",
+                      "secondary-fixed": "#d4e3ff",
+                      "surface-dim": "#d8dadc"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-lg": "32px",
+                      "stack-md": "16px",
+                      "sidebar-width": "280px",
+                      "container-max": "1440px",
+                      "stack-sm": "8px",
+                      "header-height": "64px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Work Sans"],
+                      "body-lg": ["Work Sans"],
+                      "title-sm": ["Work Sans"],
+                      "label-caps": ["Work Sans"],
+                      "headline-md": ["Work Sans"],
+                      "display-lg": ["Work Sans"],
+                      "body-md": ["Work Sans"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SIDEBAR -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col z-50">
+<div class="px-6 py-8 flex items-center gap-3">
+<div class="w-10 h-10 bg-action-teal rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h1 class="font-title-sm text-title-sm font-bold text-primary">Psikotes HR</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Portal</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-primary bg-primary-container/10 border-l-4 border-primary font-title-sm transition-transform duration-150 scale-[0.99] rounded-r-lg" href="#">
+<span class="material-symbols-outlined">badge</span> Akun Karyawan
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">person_search</span> Akun Kandidat
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span> Data Karyawan
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">database</span> Bank Soal
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_month</span> Penjadwalan Tes
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span> Hasil Tes
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span> Kelola Peran &amp; Izin
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">settings_suggest</span> Data Master
+            </a>
+</nav>
+<div class="p-6 border-t border-outline-variant">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A professional headshot of a female HR executive in a clean corporate office setting. She has a warm, professional expression. The background is softly blurred with modern architectural elements. Professional high-key lighting creates a sophisticated enterprise software user profile look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBik3shNCaw8hvPy7cjX39f6g2oyH2OiwmLrxXh3YFRWaF4f140RwWolXXoyT5yuPsMqeo60i56gcAtoLg8vaAvtLffL8BcyDcUTf81SefTrz_QKefjUcQ8Sqdmtyr4_h5eviWXVjBUEFuOrDs9ziqVdrFeMq6VqxUXv6s6kYlKHkE4jC5FefrPQBQ4DJbfn3MuGSJ03V9aZ2gxlQBJL4Di_UFCQlDQOHY-e3zU_s_7OabjejS95nOs"/>
+<div class="flex-1 overflow-hidden">
+<p class="font-label-sm text-on-surface font-bold truncate">Admin HR</p>
+<p class="font-label-sm text-on-surface-variant truncate">admin@psikoteshr.com</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="ml-[280px] min-h-screen flex flex-col">
+<!-- TOP NAV -->
+<header class="h-16 px-gutter flex justify-between items-center bg-surface border-b border-outline-variant">
+<div class="flex items-center bg-surface-container-low px-4 py-2 rounded-full w-96">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full" placeholder="Cari data..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</header>
+<!-- CONTENT AREA -->
+<div class="p-gutter flex-1 overflow-y-auto">
+<div class="max-w-container-max mx-auto">
+<!-- HEADER SECTION -->
+<div class="flex justify-between items-center mb-stack-lg">
+<h2 class="font-headline-md text-headline-md text-primary">Tambah Pengguna Internal</h2>
+<a class="flex items-center gap-2 text-action-teal hover:underline font-body-md" href="#">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                        Kembali
+                    </a>
+</div>
+<!-- FORM CONTAINER -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<form class="p-8 space-y-stack-lg">
+<!-- ROLE SECTION -->
+<div class="space-y-stack-sm max-w-2xl">
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Peran</label>
+<select class="w-full bg-surface-bright border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-action-teal focus:ring-1 focus:ring-action-teal transition-all">
+<option disabled="" selected="" value="">-- Pilih Peran Internal --</option>
+<option value="super_admin">Super Admin</option>
+<option value="admin">Admin HR</option>
+<option value="psikolog">Psikolog</option>
+<option value="reviewer">Reviewer</option>
+</select>
+<p class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                                Hanya peran internal (bukan Kandidat/Karyawan) yang tersedia di sini.
+                            </p>
+</div>
+<hr class="border-outline-variant opacity-30"/>
+<!-- ACCOUNT SECTION -->
+<div class="space-y-stack-md">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest border-l-4 border-action-teal pl-3">Akun</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<!-- Nama Lengkap -->
+<div class="space-y-stack-sm">
+<label class="block font-label-sm text-label-sm text-on-surface">Nama Lengkap</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-action-teal focus:ring-1 focus:ring-action-teal transition-all" placeholder="Contoh: Budi Santoso" type="text"/>
+</div>
+<!-- Email -->
+<div class="space-y-stack-sm">
+<label class="block font-label-sm text-label-sm text-on-surface">Email</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-action-teal focus:ring-1 focus:ring-action-teal transition-all" placeholder="email@perusahaan.com" type="email"/>
+</div>
+<!-- No HP -->
+<div class="space-y-stack-sm">
+<label class="block font-label-sm text-label-sm text-on-surface">No HP</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-action-teal focus:ring-1 focus:ring-action-teal transition-all" placeholder="081234567890" type="tel"/>
+</div>
+<!-- Status -->
+<div class="space-y-stack-sm">
+<label class="block font-label-sm text-label-sm text-on-surface">Status</label>
+<select class="w-full bg-surface-bright border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-action-teal focus:ring-1 focus:ring-action-teal transition-all">
+<option value="aktif">Aktif</option>
+<option value="nonaktif">Nonaktif</option>
+</select>
+</div>
+</div>
+</div>
+<hr class="border-outline-variant opacity-30"/>
+<!-- PASSWORD SECTION -->
+<div class="space-y-stack-md">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest border-l-4 border-action-teal pl-3">Password</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<!-- Password -->
+<div class="space-y-stack-sm">
+<label class="block font-label-sm text-label-sm text-on-surface">Password</label>
+<div class="relative">
+<input class="w-full bg-surface-bright border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-action-teal focus:ring-1 focus:ring-action-teal transition-all pr-12" placeholder="Masukkan password" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Minimal 8 karakter.</p>
+</div>
+<!-- Konfirmasi Password -->
+<div class="space-y-stack-sm">
+<label class="block font-label-sm text-label-sm text-on-surface">Konfirmasi Password</label>
+<div class="relative">
+<input class="w-full bg-surface-bright border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-action-teal focus:ring-1 focus:ring-action-teal transition-all pr-12" placeholder="Ulangi password" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- FOOTER ACTIONS -->
+<div class="flex justify-end items-center gap-4 pt-8 border-t border-outline-variant">
+<button class="px-6 py-2.5 rounded-xl border border-outline text-on-surface font-body-md hover:bg-surface-container transition-colors" type="button">
+                                Batal
+                            </button>
+<button class="px-8 py-2.5 rounded-xl bg-action-teal text-white font-body-md font-semibold hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                                Simpan
+                            </button>
+</div>
+</form>
+</div>
+<!-- BENTO INFORMATIONAL GRID -->
+<div class="mt-stack-lg grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="p-6 bg-surface-container-low border border-outline-variant rounded-xl flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div>
+<p class="font-title-sm text-on-surface">Keamanan Berlapis</p>
+<p class="font-body-md text-on-surface-variant">Setiap akun internal dilindungi dengan enkripsi AES-256 untuk data sensitif.</p>
+</div>
+</div>
+<div class="p-6 bg-surface-container-low border border-outline-variant rounded-xl flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">history_edu</span>
+</div>
+<div>
+<p class="font-title-sm text-on-surface">Audit Log</p>
+<p class="font-body-md text-on-surface-variant">Aktivitas penambahan pengguna dicatat dalam sistem audit untuk transparansi.</p>
+</div>
+</div>
+<div class="p-6 bg-surface-container-low border border-outline-variant rounded-xl flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<div>
+<p class="font-title-sm text-on-surface">Verifikasi Peran</p>
+<p class="font-body-md text-on-surface-variant">Pastikan pemilihan peran sesuai dengan matriks otoritas organisasi Anda.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- FOOTER BAR -->
+<footer class="p-6 text-center text-label-sm text-on-surface-variant bg-surface-bright">
+            © 2023 Psikotes HR Enterprise. Seluruh hak cipta dilindungi.
+        </footer>
+</main>
+<script>
+        // Micro-interactions for form inputs
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', () => {
+                element.parentElement.classList.add('scale-[1.01]');
+            });
+            element.addEventListener('blur', () => {
+                element.parentElement.classList.remove('scale-[1.01]');
+            });
+        });
+
+        // Simple Password Toggle (Logic only for visualization)
+        document.querySelectorAll('button[type="button"] .material-symbols-outlined').forEach(btn => {
+            btn.parentElement.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.type === "password") {
+                    input.type = "text";
+                    this.textContent = "visibility_off";
+                } else {
+                    input.type = "password";
+                    this.textContent = "visibility";
+                }
+            });
+        });
+    </script>
+</body></html>

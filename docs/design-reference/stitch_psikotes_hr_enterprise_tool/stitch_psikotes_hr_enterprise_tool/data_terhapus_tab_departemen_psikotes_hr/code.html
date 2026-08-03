@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HR Enterprise System - Data Terhapus</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .sidebar-active {
+            background-color: #d4e3ff; /* secondary-container */
+            color: #56657c; /* on-secondary-container */
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#2d3133",
+                      "surface-container": "#eceef0",
+                      "outline": "#71787b",
+                      "tertiary": "#0e1629",
+                      "outline-variant": "#c0c8cb",
+                      "error-muted": "#fef2f2",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#41484b",
+                      "tertiary-fixed-dim": "#bec6e0",
+                      "on-tertiary-container": "#8a92aa",
+                      "inverse-on-surface": "#eff1f3",
+                      "action-teal": "#2C5F6F",
+                      "on-primary-container": "#7198a7",
+                      "surface-dim": "#d8dadc",
+                      "primary-fixed-dim": "#a5cddc",
+                      "tertiary-fixed": "#dae2fd",
+                      "on-background": "#191c1e",
+                      "background": "#f7f9fb",
+                      "primary-fixed": "#c0e9f9",
+                      "on-error": "#ffffff",
+                      "tertiary-container": "#232b3f",
+                      "secondary-container": "#d4e3ff",
+                      "on-tertiary-fixed-variant": "#3e465c",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-container": "#56657c",
+                      "secondary": "#505f76",
+                      "on-primary": "#ffffff",
+                      "on-surface": "#191c1e",
+                      "surface-variant": "#e0e3e5",
+                      "on-secondary-fixed-variant": "#39485e",
+                      "error-container": "#ffdad6",
+                      "surface-bright": "#f7f9fb",
+                      "surface-container-low": "#f2f4f6",
+                      "inverse-primary": "#a5cddc",
+                      "success-muted": "#f0fdf4",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed": "#001f28",
+                      "primary": "#001a22",
+                      "surface": "#f7f9fb",
+                      "surface-tint": "#3d6471",
+                      "on-secondary-fixed": "#0c1c30",
+                      "on-secondary": "#ffffff",
+                      "primary-container": "#00303c",
+                      "on-primary-fixed-variant": "#244c59",
+                      "surface-container-high": "#e6e8ea",
+                      "surface-container-highest": "#e0e3e5",
+                      "secondary-fixed-dim": "#b8c7e2",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed": "#131b2e",
+                      "secondary-fixed": "#d4e3ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sidebar-width": "280px",
+                      "stack-md": "16px",
+                      "stack-sm": "8px",
+                      "gutter": "24px",
+                      "stack-lg": "32px",
+                      "container-max": "1440px",
+                      "header-height": "64px"
+              },
+              "fontFamily": {
+                      "title-sm": ["Work Sans"],
+                      "label-sm": ["Work Sans"],
+                      "label-caps": ["Work Sans"],
+                      "headline-md": ["Work Sans"],
+                      "body-md": ["Work Sans"],
+                      "body-lg": ["Work Sans"],
+                      "display-lg": ["Work Sans"]
+              },
+              "fontSize": {
+                      "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant dark:border-outline flex flex-col p-stack-md z-50">
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-10 h-10 bg-action-teal rounded-lg flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined" data-icon="corporate_fare">corporate_fare</span>
+</div>
+<div>
+<h1 class="text-headline-md font-headline-md text-action-teal leading-tight">HR Portal</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Enterprise Admin</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-label-sm font-label-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="text-label-sm font-label-sm">Karyawan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="corporate_fare">corporate_fare</span>
+<span class="text-label-sm font-label-sm">Organization</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-label-sm font-label-sm">Laporan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-lg font-semibold transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+<span class="text-label-sm font-label-sm">Data Terhapus</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-4">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="text-label-sm font-label-sm">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-sidebar-width flex-1 flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-40 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline h-header-height flex items-center px-gutter">
+<div class="flex justify-between items-center w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-xl pl-10 pr-4 py-2 focus:ring-2 focus:ring-action-teal transition-all text-body-md" placeholder="Cari data yang dihapus..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full hover:bg-surface-container transition-colors flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container transition-colors flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container transition-colors flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer">
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A professional headshot of a corporate administrator, female, wearing a sharp charcoal blazer over a crisp white shirt. Soft studio lighting, minimalist office background with a hint of warm wood paneling. The photo has a clean, high-end corporate aesthetic with a neutral color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBqWcBLZFffsIz4OUAnTyDmLWuyamlIGYoUmaBr1ROL349kpJnODVKhX1qTWxygk1nKAyttY8Bd47hRbSTzCeaPs6_JCs4kvnVaPyRKPX2h4nBrQ3La8t2q0GCIZZ-ZdOwe9hYvaOVw6AjzotREKJ-C9hUPC9DQDUTFKiyhG_GQHAL3Hvr9Bd90ykqp1jP3mXtB9pNBCdPso5mPQQNZ-56s3KlTvVmYXw9J-4yXgeqzhQPsOFoDNC"/>
+<span class="text-label-sm font-label-sm hidden lg:block">Administrator</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 p-gutter max-w-container-max w-full mx-auto space-y-stack-lg">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-display-lg font-display-lg text-primary">Data Terhapus</h2>
+<p class="text-body-lg text-on-surface-variant mt-1">Kelola data yang telah dihapus untuk dipulihkan atau dihapus secara permanen.</p>
+</div>
+<div class="bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant">
+<span class="text-label-sm text-on-surface-variant">Menampilkan <span class="font-bold text-action-teal">2</span> dari 2 departemen</span>
+</div>
+</div>
+<!-- Warning Banner -->
+<div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl flex items-start gap-4">
+<span class="material-symbols-outlined text-amber-600 mt-0.5" data-icon="warning">warning</span>
+<div class="space-y-1">
+<h4 class="text-label-sm font-bold text-amber-900 uppercase">Peringatan Penghapusan Otomatis</h4>
+<p class="text-body-md text-amber-800">Data yang berada di tempat sampah selama lebih dari 30 hari akan dihapus secara <span class="font-bold">permanen oleh sistem</span> secara otomatis. Tindakan ini tidak dapat dibatalkan.</p>
+</div>
+</div>
+<!-- Horizontal Tabs -->
+<div class="border-b border-outline-variant">
+<nav class="flex overflow-x-auto no-scrollbar gap-8">
+<a class="pb-3 text-label-sm font-label-sm text-on-surface-variant hover:text-action-teal whitespace-nowrap transition-colors" href="#">Akun Karyawan</a>
+<a class="pb-3 text-label-sm font-label-sm text-on-surface-variant hover:text-action-teal whitespace-nowrap transition-colors" href="#">Akun Kandidat</a>
+<a class="pb-3 text-label-sm font-label-sm text-on-surface-variant hover:text-action-teal whitespace-nowrap transition-colors" href="#">Akun Admin/Staff</a>
+<a class="pb-3 text-label-sm font-label-sm text-on-surface-variant hover:text-action-teal whitespace-nowrap transition-colors" href="#">Data Karyawan</a>
+<a class="pb-3 text-action-teal font-bold border-b-2 border-action-teal whitespace-nowrap" href="#">Departemen</a>
+<a class="pb-3 text-label-sm font-label-sm text-on-surface-variant hover:text-action-teal whitespace-nowrap transition-colors" href="#">Posisi</a>
+<a class="pb-3 text-label-sm font-label-sm text-on-surface-variant hover:text-action-teal whitespace-nowrap transition-colors" href="#">Peran</a>
+</nav>
+</div>
+<!-- Table Section -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 text-label-caps text-on-surface-variant uppercase tracking-wider">Nama Departemen</th>
+<th class="px-6 py-4 text-label-caps text-on-surface-variant uppercase tracking-wider">Jumlah Posisi Terkait</th>
+<th class="px-6 py-4 text-label-caps text-on-surface-variant uppercase tracking-wider">Dihapus Pada</th>
+<th class="px-6 py-4 text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container/30 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-action-teal">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+</div>
+<span class="font-semibold text-primary">Riset &amp; Pengembangan</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="inline-flex items-center px-2 py-1 rounded bg-secondary-container/30 border border-secondary-container text-on-secondary-container">
+<span class="text-label-sm font-bold">5 posisi</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-body-md text-on-surface font-medium">12 Okt 2023</span>
+<span class="text-label-sm text-on-surface-variant">(3 hari lalu)</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex items-center justify-end gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border-2 border-action-teal text-action-teal rounded-xl hover:bg-action-teal/5 transition-all text-label-sm font-bold active:opacity-80">
+<span class="material-symbols-outlined text-[20px]" data-icon="restore_from_trash">restore_from_trash</span>
+                                        Pulihkan
+                                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-error text-on-error rounded-xl shadow-lg shadow-error/20 hover:bg-error/90 transition-all text-label-sm font-bold active:opacity-80 border-2 border-error">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete_forever">delete_forever</span>
+                                        Hapus Permanen
+                                    </button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container/30 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-action-teal">
+<span class="material-symbols-outlined" data-icon="store">store</span>
+</div>
+<span class="font-semibold text-primary">Cabang Lama</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="inline-flex items-center px-2 py-1 rounded bg-secondary-container/30 border border-secondary-container text-on-secondary-container">
+<span class="text-label-sm font-bold">2 posisi</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-body-md font-bold text-amber-600">20 Sep 2023</span>
+<span class="text-label-sm text-amber-600/80">(25 hari lalu)</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex items-center justify-end gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border-2 border-action-teal text-action-teal rounded-xl hover:bg-action-teal/5 transition-all text-label-sm font-bold active:opacity-80">
+<span class="material-symbols-outlined text-[20px]" data-icon="restore_from_trash">restore_from_trash</span>
+                                        Pulihkan
+                                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-error text-on-error rounded-xl shadow-lg shadow-error/20 hover:bg-error/90 transition-all text-label-sm font-bold active:opacity-80 border-2 border-error">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete_forever">delete_forever</span>
+                                        Hapus Permanen
+                                    </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Empty state visual / Pagination Placeholder -->
+<div class="p-6 border-t border-outline-variant bg-surface-container-low flex justify-center">
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-lg bg-action-teal text-white font-bold flex items-center justify-center">1</button>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Decorative Element (Bento-style info card) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-6 relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-9xl" data-icon="auto_delete">auto_delete</span>
+</div>
+<h5 class="text-label-sm font-bold text-on-surface-variant uppercase mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="info">info</span>
+                        Statistik Sampah
+                    </h5>
+<div class="flex items-end justify-between">
+<div>
+<p class="text-display-lg font-display-lg text-primary">12</p>
+<p class="text-body-md text-on-surface-variant">Total entitas di tempat sampah</p>
+</div>
+<div class="h-12 w-12 bg-white rounded-full flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-action-teal" data-icon="bar_chart">bar_chart</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-6">
+<h5 class="text-label-sm font-bold text-on-surface-variant uppercase mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="history">history</span>
+                        Aktivitas Terakhir
+                    </h5>
+<div class="space-y-3">
+<div class="flex gap-3">
+<div class="w-1 h-8 bg-action-teal rounded-full"></div>
+<div class="text-body-md">
+<span class="font-bold">Admin Sarah</span> menghapus Departemen Riset &amp; Pengembangan
+                                <p class="text-label-sm text-on-surface-variant">12 Okt, 14:20</p>
+</div>
+</div>
+<div class="flex gap-3 opacity-60">
+<div class="w-1 h-8 bg-outline rounded-full"></div>
+<div class="text-body-md">
+<span class="font-bold">Sistem</span> menghapus otomatis akun 'John Doe'
+                                <p class="text-label-sm text-on-surface-variant">10 Okt, 00:00</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-action-teal rounded-xl p-6 text-white flex flex-col justify-between">
+<div>
+<h5 class="text-label-sm font-bold opacity-80 uppercase mb-2">Butuh Bantuan?</h5>
+<p class="text-body-md">Jika Anda tidak sengaja menghapus data yang krusial, hubungi Super Admin untuk penanganan khusus.</p>
+</div>
+<button class="mt-4 w-full bg-white text-action-teal py-2 rounded-lg font-bold hover:bg-primary-fixed transition-colors">
+                        Hubungi Support
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (this.innerText.includes('Hapus Permanen')) {
+                    if (!confirm('Peringatan: Tindakan ini akan menghapus data departemen secara permanen dan tidak dapat dipulihkan. Lanjutkan?')) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+
+        // Sticky header transparency effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 0) {
+                header.classList.add('shadow-sm');
+            } else {
+                header.classList.remove('shadow-sm');
+            }
+        });
+    </script>
+</body></html>

@@ -2,77 +2,58 @@
 
 @section('content')
 @php
-    // Warna untuk status pengerjaan
-    $warnaStatus = [
-     'Selesai'         => 'bg-emerald-600',
-     'Belum Mengerjakan' => 'bg-slate-500',
-     'Sedang Berjalan'   => 'bg-amber-500',
+    $badgeSesi = [
+        'Aktif'   => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'border' => 'border-green-200'],
+        'Selesai' => ['bg' => 'bg-slate-100',  'text' => 'text-slate-600', 'border' => 'border-slate-200'],
+        'Draft'   => ['bg' => 'bg-slate-100',  'text' => 'text-slate-500',  'border' => 'border-slate-200'],
     ];
 
-    // Warna untuk jenis peserta
-    $warnaJenis = [
-        'Karyawan' => 'bg-blue-600',
-        'Kandidat' => 'bg-indigo-600',
+    $badgeAlatTes = [
+        'DISC'  => ['bg' => 'bg-blue-50',   'text' => 'text-blue-600',  'border' => 'border-blue-100'],
+        'IST'   => ['bg' => 'bg-violet-50', 'text' => 'text-violet-600','border' => 'border-violet-100'],
+        'EPPS'  => ['bg' => 'bg-emerald-50','text' => 'text-emerald-600','border' => 'border-emerald-100'],
+        'MMPI-2'=> ['bg' => 'bg-orange-50', 'text' => 'text-orange-600','border' => 'border-orange-100'],
     ];
 
-    // Warna untuk status sesi
-    $warnaSesi = [
-        'Aktif'   => 'bg-emerald-600',
-        'Selesai' => 'bg-blue-600',
-        'Draft'   => 'bg-slate-500',
-    ];
-
-    // Warna untuk badge alat tes
-    $warnaAlatTes = [
-        'IST'      => 'bg-teal-600',
-        'DISC'     => 'bg-cyan-600',
-        'EPPS'     => 'bg-purple-600',
-        'MMPI-2'   => 'bg-pink-600',
-    ];
-
-    // Kelompokkan hasil_tes berdasarkan sesi_id
     $pesertaBySesi = [];
     foreach ($hasilTes as $row) {
-      $pesertaBySesi[$row['sesi_id']][] = $row;
+        $pesertaBySesi[$row['sesi_id']][] = $row;
     }
 
-    // Kelompokkan hasil_tes berdasarkan nama_peserta (untuk tab per peserta)
     $pesertaByNama = [];
     foreach ($hasilTes as $row) {
         $key = $row['nama_peserta'];
         if (!isset($pesertaByNama[$key])) {
             $pesertaByNama[$key] = [
-                'nama_peserta' => $row['nama_peserta'],
-                'departemen' => $row['departemen'],
-                'posisi' => $row['posisi'],
+                'nama_peserta'  => $row['nama_peserta'],
+                'departemen'    => $row['departemen'],
+                'posisi'        => $row['posisi'],
                 'jenis_peserta' => $row['jenis_peserta'],
-                'peserta_id' => $row['peserta_id'],
-                'sesi_diikuti' => [],
+                'peserta_id'    => $row['peserta_id'],
+                'sesi_diikuti'  => [],
             ];
         }
         $pesertaByNama[$key]['sesi_diikuti'][] = [
-            'sesi_id' => $row['sesi_id'],
+            'sesi_id'  => $row['sesi_id'],
             'peserta_id' => $row['peserta_id'],
-            'nama_sesi' => collect($penjadwalan)->where('id', $row['sesi_id'])->first()['nama_sesi'] ?? '—',
-            'status' => $row['status_pengerjaan'],
-            'tanggal' => $row['tanggal_pengerjaan'],
+            'nama_sesi'  => collect($penjadwalan)->where('id', $row['sesi_id'])->first()['nama_sesi'] ?? '—',
+            'status'     => $row['status_pengerjaan'],
+            'tanggal'    => $row['tanggal_pengerjaan'],
         ];
     }
     $pesertaByNama = collect($pesertaByNama)->sortBy('nama_peserta')->values()->all();
 
-    // Format tanggal menjadi DD Month YYYY
     $bulanId = [
-       1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-       5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-       9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
     ];
     $tglId = function ($iso) use ($bulanId) {
-      if (! $iso) return '-';
+        if (!$iso) return '-';
         [$y, $m, $d] = explode('-', substr($iso, 0, 10));
         return (int) $d . ' ' . $bulanId[(int) $m] . ' ' . $y;
     };
 
-    // Generate inisial foto avatar (2 huruf pertama nama)
     if (!function_exists('avatarInitialsHasilTes')) {
         function avatarInitialsHasilTes($nama) {
             $parts = explode(' ', $nama);
@@ -85,263 +66,418 @@
     }
 @endphp
 
-<div x-data="{ tab: 'sesi', sesiTerpilih: '', search: '' }"
-     x-init="
-        // Remove x-cloak from all descendants after Alpine initializes
-        this.$el.querySelectorAll('[x-cloak]').forEach(el => el.removeAttribute('x-cloak'));
-     "
-     class="w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
+<div x-data="{
+    tab: 'sesi',
+    sesiTerpilih: '',
+    search: '',
+    checkedIds: [],
+    allRowIds: @js(array_map(fn($r) => (string)$r['sesi_id'] . '-' . $r['peserta_id'], $hasilTes)),
+    toggleCheck(rowId) {
+        const idx = this.checkedIds.indexOf(rowId);
+        if (idx >= 0) this.checkedIds.splice(idx, 1);
+        else this.checkedIds.push(rowId);
+    },
+    toggleAll(checked) {
+        this.checkedIds = checked ? [...this.allRowIds] : [];
+    },
+    printPdf() {
+        if (!this.checkedIds.length) {
+            alert('Pilih minimal satu peserta untuk cetak PDF.');
+            return;
+        }
+        alert('Fitur cetak PDF terpilih akan aktif setelah backend selesai dibangun.');
+    }
+}" x-init=""
+class="w-full">
 
-    <div class="mb-4">
-        <h2 class="text-base font-semibold text-slate-900">Hasil Tes Psikotes</h2>
-        <p class="mt-0.5 text-xs text-slate-500">Lihat hasil tes berdasarkan sesi penjadwalan atau per peserta.</p>
-    </div>
-
-    {{-- TAB TOGGLE --}}
-    <div class="flex border-b border-slate-200 mb-4">
-        <button type="button"
-                @click="tab = 'sesi'"
-                :class="tab === 'sesi' ? 'border-[#2C5F6F] text-[#2C5F6F]' : 'border-transparent text-slate-500 hover:text-slate-700'"
-                class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors">
-            Per Sesi Penjadwalan
-        </button>
-        <button type="button"
-                @click="tab = 'peserta'"
-                :class="tab === 'peserta' ? 'border-[#2C5F6F] text-[#2C5F6F]' : 'border-transparent text-slate-500 hover:text-slate-700'"
-                class="px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors">
-            Per Peserta
-        </button>
-    </div>
-
-    {{-- ============ TAB A: PER SESI ======== --}}
-    <div x-show="tab === 'sesi'" x-cloak>
-        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div class="flex-1 max-w-md">
-                <label for="sesiSelect" class="block text-xs font-medium text-slate-600 mb-1">Pilih Sesi Penjadwalan</label>
-                <select id="sesiSelect"
-                        x-model="sesiTerpilih"
-                        class="block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-[#2C5F6F] focus:ring-[#2C5F6F]">
-                    <option value="">-- Pilih Sesi --</option>
-                    @foreach ($penjadwalan as $sesi)
-                    <option value="{{ $sesi['id'] }}">{{ $sesi['nama_sesi'] }}</option>
-                    @endforeach
-                </select>
-            </div>
+    {{-- PAGE HEADER --}}
+    <div class="mb-6">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
+                <h3 class="text-3xl font-bold text-[var(--color-primary)]">Hasil Tes Psikotes</h3>
+                <p class="text-[16px] leading-6 text-[var(--color-on-surface-variant)] mt-1">Pantau kemajuan dan kelola laporan hasil penilaian psikologi peserta.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="button" class="flex items-center px-4 py-2 bg-white border border-[var(--color-outline-variant)] rounded-xl text-[var(--color-secondary)] text-sm font-medium hover:bg-[var(--color-surface-container-low)] transition-colors">
+                    <span class="material-symbols-outlined mr-2 text-[18px]">filter_list</span>
+                    Filter Lanjutan
+                </button>
                 <button type="button"
-                        onclick="alert('Fitur cetak PDF terpilih akan aktif setelah backend selesai dibangun.')"
-                        class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="!sesiTerpilih">
+                        x-on:click="printPdf()"
+                        class="flex items-center px-4 py-2 bg-[var(--color-psikotes)] text-white rounded-xl text-sm font-semibold hover:bg-[#1e414c] transition-all shadow-sm">
+                    <span class="material-symbols-outlined mr-2 text-[18px]">download</span>
                     Cetak PDF Terpilih
                 </button>
             </div>
         </div>
-        @forelse ($penjadwalan as $sesi)
-            @php $listPeserta = $pesertaBySesi[$sesi['id']] ?? []; @endphp
-            <div x-show="sesiTerpilih == '{{ $sesi['id'] }}'"
-                 class="border border-slate-300 bg-white overflow-visible shadow-sm rounded-md">
+    </div>
 
-                <div class="px-4 py-3 border-b border-slate-200 bg-slate-50">
-                   <div class="flex items-center gap-2">
-                        <h3 class="text-sm font-semibold text-slate-90 truncate">{{ $sesi['nama_sesi'] }}</h3>
-                     <span class="inline-block rounded-md {{ $warnaSesi[$sesi['status']] ?? 'bg-slate-600' }} px-2 py-0.5 text-xs font-semibold text-white">
-                            {{ $sesi['status'] }}
-                       </span>
-                  </div>
-                 <p class="mt-1 text-xs text-slate-600">
-                        Departemen: <span class="font-medium text-slate-800">{{ $sesi['departemen_terkait'] }}</span>
-                     <span class="mx-2 text-slate-300">|</span>
-                        Periode: <span class="font-medium text-slate-800">{{ $tglId($sesi['tanggal_mulai']) }} – {{ $tglId($sesi['tanggal_selesai']) }}</span>
-                    </p>
+    {{-- TAB NAVIGATION --}}
+    <div class="flex border-b border-[var(--color-outline-variant)] mb-6">
+        <button type="button"
+                @click="tab = 'sesi'"
+                :class="tab === 'sesi' ? 'border-[var(--color-psikotes)] text-[var(--color-psikotes)] font-semibold' : 'border-transparent text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'"
+                class="px-6 py-3 text-sm font-medium border-b-2 -mb-px transition-all">
+            Per Sesi Penjadwalan
+        </button>
+        <button type="button"
+                @click="tab = 'peserta'"
+                :class="tab === 'peserta' ? 'border-[var(--color-psikotes)] text-[var(--color-psikotes)] font-semibold' : 'border-transparent text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'"
+                class="px-6 py-3 text-sm font-medium border-b-2 -mb-px transition-all">
+            Per Peserta
+        </button>
+    </div>
+
+    {{-- ============ TAB A: PER SESI ============ --}}
+    <div x-show="tab === 'sesi'" x-cloak>
+
+        {{-- Session selector + info card --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <div class="lg:col-span-1">
+                <label class="block text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)] mb-2">PILIH SESI PENJADWALAN</label>
+                <div class="relative">
+                    <select x-model="sesiTerpilih"
+                            class="w-full bg-white border border-[var(--color-outline-variant)] rounded-xl py-3 pl-4 pr-10 appearance-none text-sm font-medium focus:ring-2 focus:ring-[var(--color-psikotes)] focus:border-transparent outline-none cursor-pointer">
+                        <option value="">-- Pilih Sesi --</option>
+                        @foreach ($penjadwalan as $sesi)
+                            <option value="{{ $sesi['id'] }}">{{ $sesi['nama_sesi'] }}</option>
+                        @endforeach
+                    </select>
+                    <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[var(--color-on-surface-variant)]">
+                        <span class="material-symbols-outlined">expand_more</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                @foreach ($penjadwalan as $sesi)
+                <div x-show="sesiTerpilih == '{{ $sesi['id'] }}'" x-transition key="{{ $sesi['id'] }}">
+                    <div class="bg-white border border-[var(--color-outline-variant)] rounded-xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-[var(--color-primary-container)] rounded-lg flex items-center justify-center text-[var(--color-on-primary-container)]">
+                                <span class="material-symbols-outlined">event_available</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="text-lg font-semibold text-[var(--color-primary)]">{{ $sesi['nama_sesi'] }}</h4>
+                                    @php $bs = $badgeSesi[$sesi['status']] ?? $badgeSesi['Draft']; @endphp
+                                    <span class="px-2 py-0.5 text-[10px] font-bold rounded border {{ $bs['bg'] }} {{ $bs['text'] }} {{ $bs['border'] }}">
+                                        {{ $sesi['status'] }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-[var(--color-on-surface-variant)]">
+                                    <span class="flex items-center">
+                                        <span class="material-symbols-outlined text-[16px] mr-1">business</span>
+                                        {{ $sesi['departemen_terkait'] }}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <span class="material-symbols-outlined text-[16px] mr-1">calendar_today</span>
+                                        {{ $tglId($sesi['tanggal_mulai']) }} - {{ $tglId($sesi['tanggal_selesai']) }}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <span class="material-symbols-outlined text-[16px] mr-1">group</span>
+                                        {{ $sesi['jumlah_peserta'] }} Peserta
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" class="p-2 text-[var(--color-psikotes)] hover:bg-[var(--color-surface-container-low)] rounded-lg transition-colors">
+                                <span class="material-symbols-outlined">edit</span>
+                            </button>
+                            <button type="button" class="p-2 text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] rounded-lg transition-colors">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
         </div>
 
-                <table class="min-w-full bg-white">
+        @foreach ($penjadwalan as $sesi)
+        @php $listPeserta = $pesertaBySesi[$sesi['id']] ?? []; @endphp
+        <div x-show="sesiTerpilih == '{{ $sesi['id'] }}'" x-transition class="bg-white border border-[var(--color-outline-variant)] rounded-xl overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
                     <thead>
-           <tr class="bg-slate-100 text-left text-xs font-semibold uppercase tracking-wider text-slate-700 border-b border-slate-300">
-                        <th class="px-4 py-3 w-10 text-center">
-                               <input type="checkbox"
-                                       onclick="this.closest('tbody').querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = this.checked)"
-                                    class="rounded border-slate-300 text-[#2C5F6F] focus:ring-[#2C5F6F]">
-                         </th>
-                      <th class="px-4 py-3 w-10">No</th>
-                        <th class="px-4 py-3 w-14">Foto</th>
-                          <th class="px-4 py-3">Nama Peserta</th>
-                          <th class="px-4 py-3">Departemen - Posisi</th>
-                      <th class="px-4 py-3">Alat Tes</th>
-                        <th class="px-4 py-3">Status Pengerjaan</th>
-                          <th class="px-4 py-3">Tanggal</th>
-                        <th class="px-4 py-3 w-32">Aksi</th>
-                       </tr>
+                        <tr class="bg-[var(--color-surface-container)] border-b border-[var(--color-outline-variant)]/50">
+                            <th class="py-4 px-6 w-12">
+                                <input type="checkbox"
+                                       class="w-4 h-4 rounded border-[var(--color-outline-variant)] text-[var(--color-psikotes)] focus:ring-[var(--color-psikotes)] cursor-pointer"
+                                       @change="toggleAll($event.target.checked)">
+                            </th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">PESERTA</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">DEPARTEMEN / POSISI</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">ALAT TES</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">STATUS</th>
+                            <th class="py-4 px-6 text-right text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">AKSI</th>
+                        </tr>
                     </thead>
-                <tbody class="divide-y divide-slate-200">
-                    @forelse ($listPeserta as $idx => $row)
-                          <tr class="hover:bg-slate-50 transition-colors">
-                                <!-- Checkbox -->
-                            <td class="px-4 py-3 text-center">
-                                    <input type="checkbox" class="rounded border-slate-300 text-[#2C5F6F] focus:ring-[#2C5F6F]">
-                                </td>
-
-                                <!-- No -->
-                            <td class="px-4 py-3 text-center text-sm text-slate-600">
-                                   {{ $idx + 1 }}
-                                </td>
-
-                                <!-- Foto / avatar inisial -->
-                            <td class="px-4 py-3">
-                                 <div class="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center text-xs font-bold text-slate-700 border border-slate-400 mx-auto">
-                             {{ avatarInitialsHasilTes($row['nama_peserta']) }}
-                                   </div>
-                                </td>
-
-                                <!-- Nama Peserta -->
-                            <td class="px-4 py-3 text-sm font-medium text-slate-900 whitespace-nowrap">
-                            {{ $row['nama_peserta'] }}
-                                </td>
-
-                                <!-- Departemen - Posisi -->
-                            <td class="px-4 py-3 text-sm text-slate-700 whitespace-nowrap">
-                                    {{ $row['departemen'] }} - {{ $row['posisi'] }}
-                                </td>
-
-                            <!-- Alat Tes -->
-                            <td class="px-4 py-3">
-                                @if (!empty($row['hasil_alat_tes']))
-                                  <div class="flex flex-wrap gap-1">
-                                   @foreach ($row['hasil_alat_tes'] as $alat)
-                                        <span class="inline-block {{ $warnaAlatTes[$alat['nama_alat_tes']] ?? 'bg-slate-500' }} text-white px-2 py-0.5 rounded text-[11px] font-medium">
-                                              {{ $alat['nama_alat_tes'] }}
-                                               </span>
-                                            @endforeach
-                                       </div>
+                    <tbody class="divide-y divide-[var(--color-outline-variant)]/40">
+                        @forelse ($listPeserta as $row)
+                        @php $rowId = (string)$row['sesi_id'] . '-' . $row['peserta_id']; @endphp
+                        <tr class="hover:bg-[var(--color-surface-container-low)] transition-colors group">
+                            <td class="py-4 px-6">
+                                <input type="checkbox"
+                                       class="w-4 h-4 rounded border-[var(--color-outline-variant)] text-[var(--color-psikotes)] focus:ring-[var(--color-psikotes)] cursor-pointer"
+                                       :value="{{ $rowId }}"
+                                       :checked="checkedIds.includes('{{ $rowId }}')"
+                                       x-on:change="toggleCheck('{{ $rowId }}')">
+                            </td>
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-[var(--color-secondary-fixed)] flex items-center justify-center text-[var(--color-on-secondary-container)] font-bold text-[13px]">
+                                        {{ avatarInitialsHasilTes($row['nama_peserta']) }}
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-[var(--color-primary)]">{{ $row['nama_peserta'] }}</p>
+                                        <p class="text-[11px] text-[var(--color-on-surface-variant)]">ID: {{ $row['peserta_id'] }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4">
+                                <p class="text-sm text-[var(--color-on-surface)] font-medium">{{ $row['departemen'] }}</p>
+                                <p class="text-[11px] text-[var(--color-on-surface-variant)] mt-0.5">{{ $row['posisi'] }}</p>
+                            </td>
+                            <td class="py-4 px-4">
+                                <div class="flex flex-wrap gap-1">
+                                    @if (!empty($row['hasil_alat_tes']))
+                                        @foreach ($row['hasil_alat_tes'] as $alat)
+                                            @php $ba = $badgeAlatTes[$alat['nama_alat_tes']] ?? ['bg' => 'bg-slate-50', 'text' => 'text-slate-600', 'border' => 'border-slate-100']; @endphp
+                                            <span class="px-2 py-0.5 text-[10px] font-bold rounded border {{ $ba['bg'] }} {{ $ba['text'] }} {{ $ba['border'] }}">
+                                                {{ $alat['nama_alat_tes'] }}
+                                            </span>
+                                        @endforeach
                                     @else
-                                     <span class="text-slate-400 text-xs">—</span>
+                                        <span class="text-[11px] text-[var(--color-placeholder)]">—</span>
                                     @endif
-                                </td>
-
-                              <!-- Status Pengerjaan -->
-                            <td class="px-4 py-3 whitespace-nowrap">
-                           <span class="inline-block rounded-md {{ $warnaStatus[$row['status_pengerjaan']] ?? 'bg-slate-600' }} px-2 py-1 text-xs font-semibold text-white">
-                                    {{ $row['status_pengerjaan'] }}
-                                   </span>
-                                </td>
-
-                                <!-- Tanggal -->
-                            <td class="px-4 py-3 text-sm text-slate-700 whitespace-nowrap">
-                          {{ $row['tanggal_pengerjaan'] ? $tglId($row['tanggal_pengerjaan']) : '-' }}
-                                </td>
-
-                                <!-- Aksi -->
-                            <td class="px-4 py-3">
-                              @if ($row['status_pengerjaan'] === 'Selesai')
-                                        <div x-data="{ open: false }" class="relative inline-block text-left" @click.outside="open = false">
-                                           <button type="button"
-                                                 @click="open = !open"
-                                                   class="inline-flex items-center gap-1 text-sm font-medium text-slate-700 hover:text-slate-900 focus:outline-none">
-                                         <span>Lihat Hasil</span>
-                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                               </svg>
-                                           </button>
-                                           <div x-show="open"
-                                                 x-transition
-                                           class="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-md bg-white border border-slate-200 shadow-lg">
-                                             <div class="py-1">
-                                                    <a href="{{ route('admin.hasil-tes.detail', [$row['sesi_id'], $row['peserta_id']]) }}"
-                                                     class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
-                                                        Lihat Detail
-                                                   </a>
-                                                   <button type="button"
-                                                            onclick="alert('Cetak laporan individual akan aktif setelah backend selesai dibangun.')"
-                                                class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
-                                                        Cetak Laporan
-                                                   </button>
-                                               </div>
-                                           </div>
-                                       </div>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-slate-400 cursor-not-allowed select-none">
-                                      Lihat Hasil
-                                       </span>
-                                    @endif
-                               </td>
-                            </tr>
-                       @empty
-                            <tr>
-                           <td colspan="9" class="px-4 py-8 text-center text-sm text-slate-500">
-                                    Belum ada peserta dengan hasil tes pada sesi ini.
-                               </td>
-                            </tr>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4">
+                                @if ($row['status_pengerjaan'] === 'Selesai')
+                                    <span class="flex items-center text-green-600">
+                                        <span class="material-symbols-outlined text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                        <span class="text-sm font-medium">{{ $row['status_pengerjaan'] }}</span>
+                                    </span>
+                                @elseif ($row['status_pengerjaan'] === 'Sedang Berjalan')
+                                    <span class="flex items-center text-amber-600">
+                                        <span class="material-symbols-outlined text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">pending</span>
+                                        <span class="text-sm font-medium">{{ $row['status_pengerjaan'] }}</span>
+                                    </span>
+                                @else
+                                    <span class="flex items-center text-[var(--color-on-surface-variant)]">
+                                        <span class="material-symbols-outlined text-[16px] mr-1">history</span>
+                                        <span class="text-sm font-medium">{{ $row['status_pengerjaan'] }}</span>
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                @if ($row['status_pengerjaan'] === 'Selesai')
+                                    <a href="{{ route('admin.hasil-tes.detail', [$row['sesi_id'], $row['peserta_id']]) }}"
+                                       class="bg-[var(--color-psikotes)] text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:shadow-md transition-all inline-block">
+                                        Lihat Hasil
+                                    </a>
+                                @else
+                                    <button class="bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)]/40 px-4 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed" disabled>
+                                        Lihat Hasil
+                                    </button>
+                                @endif
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="py-8 text-center text-sm text-[var(--color-on-surface-variant)]">
+                                Belum ada peserta dengan hasil tes pada sesi ini.
+                            </td>
+                        </tr>
                         @endforelse
-                   </tbody>
-               </table>
+                    </tbody>
+                </table>
             </div>
-        @empty
-            <div class="rounded-lg border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
-               Belum ada sesi penjadwalan.
-            </div>
-        @endforelse
 
-        <div x-show="!sesiTerpilih"
-             class="mt-6 rounded-lg border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
+            {{-- Pagination Footer --}}
+            <div class="px-6 py-4 bg-[var(--color-surface-container-low)] border-t border-[var(--color-outline-variant)]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-sm font-medium text-[var(--color-on-surface-variant)]">
+                    Menampilkan {{ count($listPeserta) }} dari {{ $sesi['jumlah_peserta'] }} Peserta
+                </p>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 border border-[var(--color-outline-variant)] rounded-lg text-[var(--color-secondary)] hover:bg-[var(--color-surface-container-highest)] transition-colors" disabled>
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button class="w-8 h-8 rounded-lg bg-[var(--color-psikotes)] text-white text-sm font-medium">1</button>
+                    <button class="w-8 h-8 rounded-lg hover:bg-[var(--color-surface-variant)] text-[var(--color-secondary)] text-sm font-medium transition-colors">2</button>
+                    <button class="w-8 h-8 rounded-lg hover:bg-[var(--color-surface-variant)] text-[var(--color-secondary)] text-sm font-medium transition-colors">3</button>
+                    <span class="text-[var(--color-on-surface-variant)]">...</span>
+                    <button class="w-8 h-8 rounded-lg hover:bg-[var(--color-surface-variant)] text-[var(--color-secondary)] text-sm font-medium transition-colors">12</button>
+                    <button class="p-2 border border-[var(--color-outline-variant)] rounded-lg text-[var(--color-secondary)] hover:bg-[var(--color-surface-container-highest)] transition-colors">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        @endforeach
+
+        <div x-show="!sesiTerpilih" x-cloak class="mt-6 rounded-xl border border-dashed border-[var(--color-outline-variant)] bg-white px-6 py-10 text-center text-sm text-[var(--color-on-surface-variant)]">
             Silakan pilih sesi penjadwalan terlebih dahulu untuk melihat daftar peserta.
+        </div>
+
+        {{-- Stats Overview --}}
+        <div x-show="sesiTerpilih" x-transition class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="md:col-span-1 bg-blue-50 border border-blue-100 rounded-xl p-5">
+                <h5 class="text-blue-800 text-xs font-semibold tracking-widest uppercase mb-3">TINGKAT PENYELESAIAN</h5>
+                <div class="flex items-end justify-between">
+                    <span class="text-blue-900 text-3xl font-bold">82%</span>
+                    <div class="text-blue-700 text-xs font-medium mb-2">+5% vs Batch 2</div>
+                </div>
+            </div>
+            <div class="md:col-span-1 bg-emerald-50 border border-emerald-100 rounded-xl p-5">
+                <h5 class="text-emerald-800 text-xs font-semibold tracking-widest uppercase mb-3">STATUS SELESAI</h5>
+                <div class="flex items-end justify-between">
+                    <span class="text-emerald-900 text-3xl font-bold">39</span>
+                    <div class="text-emerald-700 text-xs font-medium mb-2">/ 48 Peserta</div>
+                </div>
+            </div>
+            <div class="md:col-span-2 bg-white border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between">
+                <div>
+                    <h5 class="text-[var(--color-on-surface-variant)] text-xs font-semibold tracking-widest uppercase mb-1">PROGRES KOLEKTIF</h5>
+                    <p class="text-[16px] font-semibold text-[var(--color-primary)] mb-3">Estimasi selesai: 2 Hari lagi</p>
+                    <div class="w-full bg-[var(--color-surface-container-high)] rounded-full h-2 min-w-[200px]">
+                        <div class="bg-[var(--color-psikotes)] h-2 rounded-full" style="width: 82%"></div>
+                    </div>
+                </div>
+                <div class="hidden lg:block text-right">
+                    <button class="text-[var(--color-psikotes)] text-sm font-medium flex items-center hover:underline">
+                        Lihat Detail Progres
+                        <span class="material-symbols-outlined text-[18px] ml-1">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    {{-- ============ TAB B: PER PESERTA ========== --}}
+    {{-- ============ TAB B: PER PESERTA ============ --}}
     <div x-show="tab === 'peserta'" x-cloak>
-        <div class="mb-4 max-w-md">
-            <label for="searchPeserta" class="block text-xs font-medium text-slate-600 mb-1">Cari Nama Peserta</label>
-            <input type="text"
-                   id="searchPeserta"
-                   x-model="search"
-                   placeholder="Ketik nama peserta..."
-                   class="block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-[#2C5F6F] focus:ring-[#2C5F6F]">
-       </div>
 
-       <div class="grid gap-3 md:grid-cols-2">
-           @forelse ($pesertaByNama as $peserta)
-                <div x-show="!search || '{{ strtolower($peserta['nama_peserta']) }}'.includes(search.toLowerCase())"
-                   class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                    <div class="flex items-start justify-between mb-2">
-                        <div>
-                            <h3 class="text-sm font-semibold text-slate-900">{{ $peserta['nama_peserta'] }}</h3>
-                       <p class="text-xs text-slate-500">{{ $peserta['departemen'] }} - {{ $peserta['posisi'] }}</p>
+        {{-- Controls --}}
+        <div class="flex flex-col md:flex-row gap-4 items-center mb-6">
+            <div class="relative flex-1 w-full">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-outline)]">search</span>
+                <input type="text"
+                       x-model="search"
+                       placeholder="Cari Nama Peserta..."
+                       class="w-full pl-12 pr-4 py-3 bg-white border border-[var(--color-outline-variant)] rounded-xl focus:ring-2 focus:ring-[var(--color-psikotes)] focus:border-transparent outline-none text-sm font-medium transition-all">
+            </div>
+            <button type="button" class="flex items-center gap-2 px-4 py-3 bg-white border border-[var(--color-outline-variant)] rounded-xl text-[var(--color-secondary)] hover:bg-[var(--color-surface-container-low)] transition-colors text-sm font-medium">
+                <span class="material-symbols-outlined">filter_list</span>
+                Filter Dept
+            </button>
+            <button type="button" class="flex items-center gap-2 px-4 py-3 bg-white border border-[var(--color-outline-variant)] rounded-xl text-[var(--color-secondary)] hover:bg-[var(--color-surface-container-low)] transition-colors text-sm font-medium">
+                <span class="material-symbols-outlined">download</span>
+                Export Semua
+            </button>
+        </div>
+
+        {{-- Participant Grid --}}
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            @foreach ($pesertaByNama as $peserta)
+            <div x-show="!search || '{{ strtolower($peserta['nama_peserta']) }}'.includes(search.toLowerCase())"
+                 class="bg-white border border-[var(--color-outline-variant)] rounded-xl overflow-hidden shadow-sm flex flex-col hover:border-[var(--color-psikotes)] transition-all duration-300">
+
+                {{-- Card Header --}}
+                <div class="p-4 pb-3 flex items-start gap-4">
+                    <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white flex-shrink-0 bg-[var(--color-secondary-fixed)] flex items-center justify-center text-[var(--color-on-secondary-container)] font-bold text-lg">
+                        {{ avatarInitialsHasilTes($peserta['nama_peserta']) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <h4 class="text-lg font-semibold text-[var(--color-primary)] truncate">{{ $peserta['nama_peserta'] }}</h4>
+                            @if ($peserta['jenis_peserta'] === 'Karyawan')
+                                <span class="px-2 py-0.5 rounded-full border border-[var(--color-primary)]/20 bg-[var(--color-primary-fixed)]/30 text-[var(--color-primary)] text-xs font-semibold">KARYAWAN</span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-full border border-[var(--color-tertiary)]/20 bg-[var(--color-tertiary-fixed)]/30 text-[var(--color-tertiary)] text-xs font-semibold">KANDIDAT</span>
+                            @endif
                         </div>
-                     <span class="inline-block rounded-md {{ $warnaJenis[$peserta['jenis_peserta']] ?? 'bg-slate-600' }} px-2 py-0.5 text-xs font-semibold text-white">
-                        {{ $peserta['jenis_peserta'] }}
-                        </span>
-                  </div>
+                        <p class="text-sm text-[var(--color-on-surface-variant)] mb-2">{{ $peserta['departemen'] }} - {{ $peserta['posisi'] }}</p>
+                        <div class="flex gap-4">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[18px] text-[var(--color-on-surface-variant)]">id_card</span>
+                                <span class="text-xs text-[var(--color-on-surface-variant)]">ID: {{ $peserta['peserta_id'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                    <p class="text-xs font-medium text-slate-600 mb-2">Sesi yang pernah diikuti:</p>
-                    <ul class="space-y-2">
+                {{-- Card Body: test history --}}
+                <div class="px-4 pb-4 pt-3 flex-1">
+                    <h5 class="text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)] mb-3">Riwayat Tes</h5>
+                    <div class="space-y-2">
                         @foreach ($peserta['sesi_diikuti'] as $sesiRow)
-                            <li class="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-                              <div class="flex-1 min-w-0">
-                                    <p class="text-xs font-medium text-slate-900 truncate">{{ $sesiRow['nama_sesi'] }}</p>
-                                <p class="text-[11px] text-slate-500">{{ $tglId($sesiRow['tanggal']) }}</p>
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--color-surface-container-low)] transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded bg-[var(--color-secondary-fixed)] flex items-center justify-center text-[var(--color-on-secondary-container)]">
+                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
                                 </div>
-                             <span class="ml-2 inline-block rounded-md {{ $warnaStatus[$sesiRow['status']] ?? 'bg-slate-600' }} px-2 py-0.5 text-xs font-semibold text-white">
-                                    {{ $sesiRow['status'] }}
-                                </span>
+                                <div>
+                                    <p class="text-sm font-semibold text-[var(--color-primary)]">{{ $sesiRow['nama_sesi'] }}</p>
+                                    <p class="text-xs text-[var(--color-on-surface-variant)]">
+                                        {{ $sesiRow['tanggal'] ? $tglId($sesiRow['tanggal']) : '-' }}
+                                        @if ($sesiRow['status'] === 'Selesai')
+                                            <span class="text-green-600"> • Selesai</span>
+                                        @elseif ($sesiRow['status'] === 'Sedang Berjalan')
+                                            <span class="text-amber-600"> • Sedang Berjalan</span>
+                                        @else
+                                            <span class="text-[var(--color-on-surface-variant)]"> • Belum Mengerjakan</span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                            @if ($sesiRow['status'] === 'Selesai')
                                 <a href="{{ route('admin.hasil-tes.detail', [$sesiRow['sesi_id'], $sesiRow['peserta_id']]) }}"
-                                   class="ml-2 rounded-md bg-[#2C5F6F] px-3 py-1 text-xs font-semibold text-white hover:bg-[#234853]">
+                                   class="px-3 py-1.5 text-[var(--color-psikotes)] border border-[var(--color-psikotes)]/30 rounded-lg text-xs font-medium hover:bg-[var(--color-psikotes)] hover:text-white transition-all">
                                     Lihat Detail
-                               </a>
-                            </li>
-                       @endforeach
-                   </ul>
+                                </a>
+                            @else
+                                <button class="px-3 py-1.5 bg-[var(--color-psikotes)] text-white rounded-lg text-xs font-medium hover:opacity-90 transition-all">
+                                    Monitor
+                                </button>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
-            @empty
-                <div class="col-span-2 rounded-lg border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
-                   Belum ada data peserta.
-                </div>
-            @endforelse
-       </div>
+            </div>
+            @endforeach
+
+            @if (empty($pesertaByNama))
+            <div class="col-span-2 rounded-xl border border-dashed border-[var(--color-outline-variant)] bg-white px-6 py-10 text-center text-sm text-[var(--color-on-surface-variant)]">
+                Belum ada data peserta.
+            </div>
+            @endif
+        </div>
+
+        {{-- Pagination --}}
+        <div class="mt-6 flex items-center justify-between">
+            <p class="text-sm font-medium text-[var(--color-on-surface-variant)]">Menampilkan {{ count($pesertaByNama) }} dari {{ count($pesertaByNama) }} peserta</p>
+            <div class="flex gap-2">
+                <button class="w-10 h-10 flex items-center justify-center border border-[var(--color-outline-variant)] rounded-lg text-[var(--color-secondary)] hover:bg-[var(--color-surface-container-low)] transition-colors" disabled>
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button class="w-10 h-10 flex items-center justify-center bg-[var(--color-psikotes)] text-white rounded-lg text-sm font-medium">1</button>
+                <button class="w-10 h-10 flex items-center justify-center border border-[var(--color-outline-variant)] rounded-lg text-[var(--color-secondary)] hover:bg-[var(--color-surface-container-low)] transition-colors text-sm font-medium">2</button>
+                <button class="w-10 h-10 flex items-center justify-center border border-[var(--color-outline-variant)] rounded-lg text-[var(--color-secondary)] hover:bg-[var(--color-surface-container-low)] transition-colors text-sm font-medium">3</button>
+                <button class="w-10 h-10 flex items-center justify-center border border-[var(--color-outline-variant)] rounded-lg text-[var(--color-secondary)] hover:bg-[var(--color-surface-container-low)] transition-colors">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+        </div>
     </div>
 
 </div>
 
 <style>
     [x-cloak] { display: none !important; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 </style>
+
 @endsection

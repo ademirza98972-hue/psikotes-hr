@@ -1,0 +1,25 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('standar_kompetensi_posisi', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('posisi_id')->constrained('posisi');
+            $table->foreignId('dimensi_id')->constrained('dimensi_alat_tes');
+            $table->foreignId('level_id_diharapkan')->constrained('level_dimensi');
+            $table->timestamps();
+            $table->unique(['posisi_id', 'dimensi_id'], 'standar_kompetensi_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('standar_kompetensi_posisi');
+    }
+};

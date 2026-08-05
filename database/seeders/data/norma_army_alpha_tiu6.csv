@@ -1,0 +1,11 @@
+instrumen,weighted_score,raw_score_min,raw_score_max,kategori
+Army Alpha,1,1,1,Kurang Sekali
+Army Alpha,2,2,2,Kurang
+Army Alpha,3,3,3,Rata-rata
+Army Alpha,4,4,4,Baik
+Army Alpha,5,5,5,Baik Sekali
+TIU6,1,1,8,Kurang Sekali
+TIU6,2,9,16,Kurang
+TIU6,3,17,24,Rata-rata
+TIU6,4,25,32,Baik
+TIU6,5,33,40,Baik Sekali

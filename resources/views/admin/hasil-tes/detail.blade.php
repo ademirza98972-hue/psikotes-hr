@@ -165,7 +165,7 @@
                             </tbody>
                         </table>
                     @else
-                        <div class="access-denied">Anda tidak memiliki akses untuk melihat aspek psikogram yang bersumber dari data tes sensitif (MMPI-2). Hubungi Super Admin atau Admin HR untuk informasi lebih lanjut.</div>
+                        <div class="access-denied">Anda tidak memiliki akses untuk melihat aspek psikogram yang bersumber dari data tes sensitif. Hubungi Super Admin atau Admin HR untuk informasi lebih lanjut.</div>
                     @endif
                 @endif
             @endif
@@ -207,71 +207,8 @@
         <div class="container-formal">
             <div class="sub-title">{{ $index + 1 }}. {{ $alatTes['nama_alat_tes'] }} &ndash; {{ $alatTes['format_dasar'] }}</div>
 
-            {{-- IST: Skor per subtes --}}
-            @if ($alatTes['nama_alat_tes'] === 'IST' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['nama_subtes']))
-                <p class="text-sm" style="margin:6px 0 10px 0; color:#666;">Format: Pilihan Ganda &ndash; Skor Mentah (RS) &amp; Skor Skala (SS)</p>
-                <table>
-                    <thead class="th-row"><tr><th style="width:45%;">Subtes</th><th style="width:25%;">Skor Mentah (RS)</th><th style="width:25%;">Skor Skala (SS)</th><th>Kategori</th></tr></thead>
-                    <tbody>
-                        @foreach ($alatTes['skor_ringkas'] as $subtes)
-                        <tr><td>{{ $subtes['nama_subtes'] }}</td><td class="mark">{{ $subtes['skor_mentah'] }}</td><td class="mark">{{ $subtes['skor_skala'] }}</td><td>{{ $subtes['kategori'] }}</td></tr>
-                        @endforeach
-                    </tbody>
-                </table>
-
-                <div style="margin-top:10px;">
-                    <div class="sub-title" style="margin:10px 0 6px 0;">Detail Jawaban</div>
-                    <table>
-                        <thead class="th-row"><tr><th style="width:5%;">No</th><th style="width:60%;">Pertanyaan</th><th>Jawaban Peserta</th><th>Jawaban Benar</th></tr></thead>
-                        <tbody>
-                            @foreach ([
-                                ['nomor'=>1,'pertanyaan'=>'Saya lebih suka bekerja dengan orang lain.','jawaban_peserta'=>'Saya lebih suka bekerja mandiri.','jawaban_benar'=>'Setuju'],
-                                ['nomor'=>2,'pertanyaan'=>'Saat menghadapi masalah, saya cenderung:','jawaban_peserta'=>'Menyusun rencana.','jawaban_benar'=>'Mengambil keputusan spontan'],
-                                ['nomor'=>3,'pertanyaan'=>'Saya suka:','jawaban_peserta'=>'Bekerja secara kreatif dan bebas.','jawaban_benar'=>'Bekerja dalam tim'],
-                                ['nomor'=>4,'pertanyaan'=>'Saya merasa lebih nyaman bekerja di:','jawaban_peserta'=>'Lingkungan tenang dan terstruktur.','jawaban_benar'=>'Tim kolaboratif'],
-                            ] as $soal)
-                            <tr><td class="mark">{{ $soal['nomor'] }}</td><td style="padding:3px 5px;">{{ $soal['pertanyaan'] }}</td><td>{{ $soal['jawaban_peserta'] }}</td><td>{{ $soal['jawaban_benar'] }}</td></tr>
-                            @endforeach
-                            <tr class="ellipsis-row"><td colspan="4">&hellip; seluruh soal ditampilkan berurutan &hellip;</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-            {{-- DISC: Skor per dimensi --}}
-            @elseif ($alatTes['nama_alat_tes'] === 'DISC' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['dimensi']))
-                <p class="text-sm" style="margin:6px 0 10px 0; color:#666;">Format: Skala Likert &ndash; Skor Mentah (1-100), Skor Skala (1-10)</p>
-                <table>
-                    <thead class="th-row"><tr><th style="width:40%;">Dimensi</th><th style="width:25%;">Skor Mentah</th><th style="width:25%;">Skor Skala</th><th>Kategori</th></tr></thead>
-                    <tbody>
-                        @foreach ($alatTes['skor_ringkas'] as $dimensi)
-                        <tr><td>{{ $dimensi['dimensi'] }}</td><td class="mark">{{ $dimensi['skor_mentah'] }}</td><td class="mark">{{ $dimensi['skor_skala'] }}</td><td>{{ $dimensi['kategori'] }}</td></tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div style="display:flex;gap:16px;align-items:flex-start;margin-top:8px;">
-                    <svg viewBox="0 0 160 160" width="130" height="130" style="border:1px solid #000;flex-shrink:0;">
-                        <polygon points="80,20 140,80 80,140 20,80" fill="none" stroke="#ccc" stroke-width="1"/>
-                        <polygon points="80,50 110,80 80,110 50,80" fill="none" stroke="#ccc" stroke-width="1"/>
-                        <line x1="80" y1="20" x2="80" y2="140" stroke="#ccc" stroke-width="1"/>
-                        <line x1="20" y1="80" x2="140" y2="80" stroke="#ccc" stroke-width="1"/>
-                        <!-- Label D (top) - centered, positioned slightly above the top point -->
-                        <text x="80" y="12" text-anchor="middle" font-size="9" fill="#111" dominant-baseline="middle">D</text>
-                        <!-- Label I (right) - aligned right, positioned slightly right of right point -->
-                        <text x="145" y="80" text-anchor="start" font-size="9" fill="#111" dominant-baseline="middle">I</text>
-                        <!-- Label S (bottom) - centered, positioned slightly below bottom point -->
-                        <text x="80" y="152" text-anchor="middle" font-size="9" fill="#111" dominant-baseline="hanging">S</text>
-                        <!-- Label C (left) - aligned left, positioned slightly left of left point -->
-                        <text x="15" y="80" text-anchor="end" font-size="9" fill="#111" dominant-baseline="middle">C</text>
-                        <polygon points="80,32 122,80 80,106 44,80" fill="#111" fill-opacity="0.12" stroke="#111" stroke-width="1.5"/>
-                        <circle cx="80" cy="32" r="2" fill="#111"/>
-                        <circle cx="122" cy="80" r="2" fill="#111"/>
-                        <circle cx="80" cy="106" r="2" fill="#111"/>
-                        <circle cx="44" cy="80" r="2" fill="#111"/>
-                    </svg>
-                </div>
-
             {{-- EPPS: Skor per dimensi --}}
-            @elseif ($alatTes['nama_alat_tes'] === 'EPPS' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['dimensi']))
+            @if ($alatTes['nama_alat_tes'] === 'EPPS' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['dimensi']))
                 <p class="text-sm" style="margin:6px 0 10px 0; color:#666;">Format: Forced Choice &ndash; Skor Mentah (1-100), Skor Skala (1-10)</p>
                 <table>
                     <thead class="th-row"><tr><th style="width:40%;">Dimensi</th><th style="width:25%;">Skor Mentah</th><th style="width:25%;">Skor Skala</th><th>Kategori</th></tr></thead>
@@ -282,33 +219,6 @@
                     </tbody>
                 </table>
 
-            {{-- MMPI-2: Skor skala klinis --}}
-            @elseif ($alatTes['nama_alat_tes'] === 'MMPI-2' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['skala_klinis']))
-                @if ($alatTes['is_sensitif'])
-                    @if ($bisaLihatSensitif)
-                        <p class="text-sm" style="margin:6px 0 10px 0; color:#666;">Format: Skala Likert &ndash; Skor T (40-90), Interpretasi</p>
-                        <table>
-                            <thead class="th-row"><tr><th style="width:50%;">Skala Klinis</th><th style="width:25%;">Skor T</th><th>Interpretasi</th></tr></thead>
-                            <tbody>
-                                @foreach ($alatTes['skor_ringkas'] as $skala)
-                                <tr><td>{{ $skala['skala_klinis'] }}</td><td class="mark">{{ $skala['skor_t'] }}</td><td>{{ $skala['interpretasi'] }}</td></tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <div class="access-denied">Anda tidak memiliki akses untuk melihat hasil tes sensitif ini. Hubungi Super Admin atau Admin HR untuk informasi lebih lanjut.</div>
-                    @endif
-                @else
-                    <p class="text-sm" style="margin:6px 0 10px 0; color:#666;">Format: Skala Likert &ndash; Skor T (40-90), Interpretasi</p>
-                    <table>
-                        <thead class="th-row"><tr><th style="width:50%;">Skala Klinis</th><th style="width:25%;">Skor T</th><th>Interpretasi</th></tr></thead>
-                        <tbody>
-                            @foreach ($alatTes['skor_ringkas'] as $skala)
-                            <tr><td>{{ $skala['skala_klinis'] }}</td><td class="mark">{{ $skala['skor_t'] }}</td><td>{{ $skala['interpretasi'] }}</td></tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @endif
             @endif
         </div>
     @endforeach

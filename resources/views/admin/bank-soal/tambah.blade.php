@@ -74,7 +74,7 @@
                 <input id="dimensi" name="dimensi" type="text" value="{{ old('dimensi') }}" required maxlength="100"
                        placeholder="mis. Influence, Dominance, D, Pa, ..."
                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                <p class="mt-1 text-xs text-slate-500">Contoh untuk DISC: Dominance, Influence, Steadiness, Compliance.</p>
+                <p class="mt-1 text-xs text-slate-500">&nbsp;</p>
             </div>
 
         @elseif ($format === 'Forced Choice')

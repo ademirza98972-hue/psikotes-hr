@@ -80,17 +80,7 @@ const fs = require('fs');
             path: path.join(screenshotDir, 'hasil-tes-detail.png'),
             fullPage: true,
         });
-        console.log('Screenshot 4 (Detail - Andi Pratama sesi 1): OK');
-
-        // Detail dengan MMPI-2 sensitif
-        await page.goto('http://127.0.0.1:8000/admin/hasil-tes/2/201', { waitUntil: 'networkidle2', timeout: 30000 });
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        await page.screenshot({
-            path: path.join(screenshotDir, 'hasil-tes-detail-mmpi.png'),
-            fullPage: true,
-        });
-        console.log('Screenshot 5 (Detail - Budi Santoso dengan MMPI-2): OK');
+        console.log('Screenshot 4 (Detail - Budi Santoso sesi 2): OK');
 
         console.log('\n✓ Semua screenshot berhasil dibuat di tests/screenshots/');
     } catch (err) {

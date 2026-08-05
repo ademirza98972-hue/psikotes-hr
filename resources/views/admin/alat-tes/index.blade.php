@@ -93,19 +93,10 @@
                         @php
                             // TODO: gunakan field `kode` dari database jika sudah ada.
                             // Saat ini ekstrak dari nama karena field kode belum tersedia.
-                            $kodeMap = [
-                                'DISC' => 'DISC',
-                                'IST' => 'IST',
-                                'EPPS' => 'EPPS',
-                                'MMPI-2' => 'MMPI-2',
-                            ];
-                            $kode = $kodeMap[$alat['nama']] ?? strtoupper(mb_substr($alat['nama'], 0, 4));
+                            $kode = strtoupper(mb_substr($alat['nama'], 0, 4));
 
                             $warnaKode = [
-                                'DISC' => 'bg-blue-100 text-blue-700',
-                                'IST'  => 'bg-violet-100 text-violet-700',
                                 'EPPS' => 'bg-emerald-100 text-emerald-700',
-                                'MMPI-2' => 'bg-orange-100 text-orange-700',
                             ];
                             $badgeKode = $warnaKode[$kode] ?? 'bg-slate-100 text-slate-700';
                         @endphp

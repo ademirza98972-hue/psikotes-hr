@@ -8,16 +8,10 @@
         'Selesai' => 'bg-slate-100 text-slate-600 border border-slate-200',
     ];
     $warnaAlatTes = [
-        'DISC'   => 'bg-blue-50 text-blue-700 border border-blue-200',
-        'IST'    => 'bg-violet-50 text-violet-700 border border-violet-200',
         'EPPS'   => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-        'MMPI-2' => 'bg-orange-50 text-orange-700 border border-orange-200',
     ];
     $formatLookup = collect([
-        ['nama' => 'DISC',  'format' => 'Skala Likert'],
-        ['nama' => 'IST',   'format' => 'Pilihan Ganda'],
         ['nama' => 'EPPS',  'format' => 'Forced Choice'],
-        ['nama' => 'MMPI-2','format' => 'Skala Likert'],
     ])->keyBy('nama');
     $bulanId = [
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',

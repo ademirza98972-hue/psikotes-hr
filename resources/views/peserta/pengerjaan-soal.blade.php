@@ -33,7 +33,7 @@
         @csrf
         <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
             <div class="p-8">
-                {{-- Likert Format (DISC) --}}
+                {{-- Likert Format --}}
                 @if($soal_data['type'] == 'likert')
                 <p class="text-base text-slate-800 mb-6 font-medium leading-relaxed">
                     {{ $soal_data['pernyataan'] }}
@@ -73,7 +73,7 @@
                     </label>
                 </div>
 
-            {{-- Multiple Choice (IST placeholder) --}}
+            {{-- Multiple Choice format --}}
             @elseif($soal_data['type'] == 'multiple_choice')
                 <p class="text-base text-slate-800 mb-6 font-medium leading-relaxed">
                     {{ $soal_data['pernyataan'] }}

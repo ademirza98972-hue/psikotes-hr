@@ -3,10 +3,7 @@
 @php
 // Mapping warna alat tes literal untuk Tailwind JIT detection
 $warnaAlatTes = [
-    'IST'    => 'bg-teal-600 text-[11px] font-medium px-2 py-0.5 rounded',
-    'DISC'   => 'bg-cyan-600 text-[11px] font-medium px-2 py-0.5 rounded',
     'EPPS'   => 'bg-purple-600 text-[11px] font-medium px-2 py-0.5 rounded',
-    'MMPI-2' => 'bg-pink-600 text-[11px] font-medium px-2 py-0.5 rounded',
 ];
 @endphp
 

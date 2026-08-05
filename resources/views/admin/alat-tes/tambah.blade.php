@@ -58,14 +58,12 @@
         {{--基本信息--}}
         <div class="bg-white border border-[#e0e3e5] rounded-xl p-6 space-y-5">
             <div class="grid gap-5 md:grid-cols-3">
-                {{-- TODO: field `kode` belum ada di database --}}
-                {{-- Disarankan menambahkan kolom `kode` UNIQUE di migration alat_tes untuk menyimpan kode alat tes (DISC, IST, EPPS, dll) --}}
                 <div class="md:col-span-1">
                     <label for="nama" class="block text-[12px] font-medium text-[#40484b] mb-2">Kode Alat Tes</label>
                     <input id="nama" name="nama" type="text" value="{{ old('nama') }}" required maxlength="255"
-                           placeholder="DISC"
+                           placeholder="Kode"
                            class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm font-semibold text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
-                    <p class="mt-1.5 text-[11px] text-[#919eab]">Kode singkat instrumen (misal: DISC, IST)</p>
+                    <p class="mt-1.5 text-[11px] text-[#919eab]">Kode singkat instrumen (misal: DISC)</p>
                 </div>
 
                 <div class="md:col-span-2">

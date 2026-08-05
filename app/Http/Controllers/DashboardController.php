@@ -35,8 +35,8 @@ class DashboardController extends Controller
         // Fallback data dummy jika belum ada auth sungguhan
         return (object) [
             'id' => 1,
-            'name' => 'Andi Pratama',
-            'email' => 'andi.pratama@company.com',
+            'name' => 'Budi Santoso',
+            'email' => 'budi.santoso@company.com',
             'tipe_akun' => 'peserta',
             'foto_profil' => null,
             'status' => 'aktif',
@@ -58,7 +58,7 @@ class DashboardController extends Controller
                 'departemen_terkait' => 'Marketing',
                 'tanggal_mulai' => '2025-08-15',
                 'tanggal_selesai' => '2025-08-25',
-                'daftar_alat_tes_ditugaskan' => ['DISC'],
+                'daftar_alat_tes_ditugaskan' => [],
                 'status_pengerjaan' => 'Belum Mengerjakan',
             ],
 
@@ -69,7 +69,7 @@ class DashboardController extends Controller
                 'departemen_terkait' => 'IT Development',
                 'tanggal_mulai' => '2025-08-01',
                 'tanggal_selesai' => '2025-08-10',
-                'daftar_alat_tes_ditugaskan' => ['IST', 'DISC', 'EPPS'],
+                'daftar_alat_tes_ditugaskan' => ['EPPS'],
                 'status_pengerjaan' => 'Sedang Berjalan',
             ],
 
@@ -80,7 +80,7 @@ class DashboardController extends Controller
                 'departemen_terkait' => 'HR Administration',
                 'tanggal_mulai' => '2025-07-01',
                 'tanggal_selesai' => '2025-07-05',
-                'daftar_alat_tes_ditugaskan' => ['MMPI-2', 'IST'],
+                'daftar_alat_tes_ditugaskan' => ['EPPS'],
                 'status_pengerjaan' => 'Selesai',
             ],
         ];
@@ -224,10 +224,7 @@ class DashboardController extends Controller
 
         // Buat detail tambahan dummy per alat tes (durasi_menit, jumlah_soal, format_dasar)
         $detailAlatTes = [
-            'IST'   => ['durasi_menit' => 45, 'jumlah_soal' => 30, 'format_dasar' => 'Pilihan Ganda'],
-            'DISC'  => ['durasi_menit' => 30, 'jumlah_soal' => 25, 'format_dasar' => 'Pilihan Ganda'],
             'EPPS'  => ['durasi_menit' => 40, 'jumlah_soal' => 28, 'format_dasar' => 'Pilihan Ganda'],
-            'MMPI-2' => ['durasi_menit' => 90, 'jumlah_soal' => 175, 'format_dasar' => 'Pernyataan True/False'],
         ];
 
         $daftarAlatTesDenganDetail = [];
@@ -256,10 +253,7 @@ class DashboardController extends Controller
     private function getNamaAlatTesFull($kode): string
     {
         $namaLengkap = [
-            'IST'    => 'Intelligenz Struktur Test',
-            'DISC'   => 'Dominance, Influence, Steadiness, Compliance',
             'EPPS'   => 'Edwards Personal Preference Schedule',
-            'MMPI-2' => 'Minnesota Multiphasic Personality Inventory-2',
         ];
 
         return $namaLengkap[$kode] ?? $kode;

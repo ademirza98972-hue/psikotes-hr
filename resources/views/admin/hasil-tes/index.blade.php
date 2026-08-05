@@ -9,10 +9,7 @@
     ];
 
     $badgeAlatTes = [
-        'DISC'  => ['bg' => 'bg-blue-50',   'text' => 'text-blue-600',  'border' => 'border-blue-100'],
-        'IST'   => ['bg' => 'bg-violet-50', 'text' => 'text-violet-600','border' => 'border-violet-100'],
         'EPPS'  => ['bg' => 'bg-emerald-50','text' => 'text-emerald-600','border' => 'border-emerald-100'],
-        'MMPI-2'=> ['bg' => 'bg-orange-50', 'text' => 'text-orange-600','border' => 'border-orange-100'],
     ];
 
     $pesertaBySesi = [];

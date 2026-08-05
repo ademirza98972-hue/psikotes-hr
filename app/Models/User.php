@@ -7,7 +7,9 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -65,5 +67,35 @@ class User extends Authenticatable
                 $query->where('kode_izin', $kodeIzin);
             })
             ->exists();
+    }
+
+    public function jawabanPeserta(): HasMany
+    {
+        return $this->hasMany(JawabanPeserta::class, 'user_id');
+    }
+
+    public function gridInputPeserta(): HasMany
+    {
+        return $this->hasMany(GridInputPeserta::class, 'user_id');
+    }
+
+    public function hasilKolomGrid(): HasMany
+    {
+        return $this->hasMany(HasilKolomGrid::class, 'user_id');
+    }
+
+    public function hasilSkorPeserta(): HasMany
+    {
+        return $this->hasMany(HasilSkorPeserta::class, 'user_id');
+    }
+
+    public function pesertaSesiTes(): HasMany
+    {
+        return $this->hasMany(PesertaSesiTes::class, 'user_id');
+    }
+
+    public function sesiTes(): BelongsToMany
+    {
+        return $this->belongsToMany(SesiTes::class, 'peserta_sesi_tes', 'user_id', 'sesi_tes_id');
     }
 }

@@ -19,6 +19,17 @@ class DatabaseSeeder extends Seeder
             PeranSeeder::class,
             SuperAdminSeeder::class,
             DummyDataSeeder::class,
+            CfitSeeder::class,
+            CfitSoalSeeder::class,
+            CfitNormaSeeder::class,
+            EppsSeeder::class,
+            EppsSoalSeeder::class,
+            EppsKonsistensiSoalSeeder::class,
+            EppsNormaSeeder::class,
+            EppsLevelSeeder::class,
+            PapikostikSeeder::class,
+            PapikostikSoalSeeder::class,
+            KraepelinSeeder::class,
         ]);
     }
 }

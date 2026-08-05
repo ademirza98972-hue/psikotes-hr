@@ -8,10 +8,7 @@ use Illuminate\View\View;
 class PenjadwalanTesController extends Controller
 {
     protected const DUMMY_ALAT_TES = [
-        ['id' => 1, 'nama' => 'DISC',  'format_dasar' => 'Skala Likert'],
-        ['id' => 2, 'nama' => 'IST',   'format_dasar' => 'Pilihan Ganda'],
         ['id' => 3, 'nama' => 'EPPS',  'format_dasar' => 'Forced Choice'],
-        ['id' => 4, 'nama' => 'MMPI-2','format_dasar' => 'Skala Likert'],
     ];
 
     protected const DUMMY_DEPARTEMEN = ['Finance', 'Produksi', 'HR', 'IT', 'Marketing', 'Operasional'];
@@ -25,7 +22,7 @@ class PenjadwalanTesController extends Controller
             'tanggal_mulai' => '2026-08-01',
             'tanggal_selesai' => '2026-08-07',
             'status' => 'Aktif',
-            'daftar_alat_tes' => ['IST', 'DISC'],
+            'daftar_alat_tes' => ['EPPS'],
             'jumlah_peserta' => 15,
             'jumlah_selesai' => 6,
         ],
@@ -36,7 +33,7 @@ class PenjadwalanTesController extends Controller
             'tanggal_mulai' => '2026-07-15',
             'tanggal_selesai' => '2026-07-30',
             'status' => 'Selesai',
-            'daftar_alat_tes' => ['DISC', 'EPPS', 'MMPI-2'],
+            'daftar_alat_tes' => ['EPPS'],
             'jumlah_peserta' => 42,
             'jumlah_selesai' => 42,
         ],
@@ -55,13 +52,11 @@ class PenjadwalanTesController extends Controller
 
     // Karyawan dengan properti departemen dan posisi
     protected const DUMMY_KARYAWAN = [
-        ['name' => 'Andi Pratama',   'departemen' => 'Finance', 'posisi' => 'Staff Akuntansi'],
         ['name' => 'Siti Aminah',    'departemen' => 'HR',      'posisi' => 'HR Specialist'],
         ['name' => 'Budi Santoso',   'departemen' => 'Produksi','posisi' => 'Supervisor Produksi'],
         ['name' => 'Dewi Lestari',   'departemen' => 'IT',      'posisi' => 'Analysist IT'],
         ['name' => 'Eko Wibowo',     'departemen' => 'Marketing','posisi' => 'Staff Marketing'],
         ['name' => 'Fitri Handayani','departemen' => 'Operasional','posisi' => 'Admin Operasional'],
-        ['name' => 'Galih Mahendra', 'departemen' => 'Finance', 'posisi' => 'Staff Keuangan'],
         ['name' => 'Hesti Rahmawati','departemen' => 'HR',      'posisi' => 'Rekruter'],
     ];
 
@@ -71,7 +66,6 @@ class PenjadwalanTesController extends Controller
         ['name' => 'Nurul Aini',        'departemen' => 'HR',       'posisi' => 'Calon HR Specialist'],
         ['name' => 'Bagas Maulana',     'departemen' => 'IT',       'posisi' => 'Calon IT Analyst'],
         ['name' => 'Citra Kirana',      'departemen' => 'Marketing','posisi' => 'Calon Staff Marketing'],
-        ['name' => 'Dimas Setiawan',    'departemen' => 'Finance',  'posisi' => 'Calon Akuntan'],
         ['name' => 'Erna Wulandari',    'departemen' => 'Produksi', 'posisi' => 'Calon Operator'],
         ['name' => 'Fajar Nugroho',     'departemen' => 'HR',       'posisi' => 'Calon Rekruter'],
         ['name' => 'Gita Permata',      'departemen' => 'IT',       'posisi' => 'Calon Analis'],

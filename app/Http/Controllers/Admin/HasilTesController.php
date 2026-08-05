@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\FormatHasilEppsService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -11,10 +12,7 @@ class HasilTesController extends Controller
 {
 
     protected const ALAT_TES = [
-        ['id' => 1, 'nama' => 'DISC', 'format_dasar' => 'Skala Likert'],
-        ['id' => 2, 'nama' => 'IST',   'format_dasar' => 'Pilihan Ganda'],
         ['id' => 3, 'nama' => 'EPPS',  'format_dasar' => 'Forced Choice'],
-        ['id' => 4, 'nama' => 'MMPI-2','format_dasar' => 'Skala Likert'],
     ];
 
     protected const PENJADWALAN = [
@@ -25,7 +23,7 @@ class HasilTesController extends Controller
             'tanggal_mulai' => '2026-08-01',
             'tanggal_selesai' => '2026-08-07',
             'status' => 'Aktif',
-            'daftar_alat_tes' => ['IST', 'DISC'],
+            'daftar_alat_tes' => ['EPPS'],
             'jumlah_peserta' => 15,
         ],
         [
@@ -35,7 +33,7 @@ class HasilTesController extends Controller
             'tanggal_mulai' => '2026-07-15',
             'tanggal_selesai' => '2026-07-30',
             'status' => 'Selesai',
-            'daftar_alat_tes' => ['DISC', 'EPPS', 'MMPI-2'],
+            'daftar_alat_tes' => ['EPPS'],
             'jumlah_peserta' => 42,
         ],
         [
@@ -51,11 +49,9 @@ class HasilTesController extends Controller
     ];
 
     protected const KARYAWAN = [
-        ['name' => 'Andi Pratama',   'departemen' => 'Finance', 'posisi' => 'Staff Akuntansi', 'foto_url' => null],
         ['name' => 'Budi Santoso',   'departemen' => 'Produksi','posisi' => 'Supervisor Produksi', 'foto_url' => null],
         ['name' => 'Dewi Lestari',   'departemen' => 'IT',      'posisi' => 'Analyst IT', 'foto_url' => null],
         ['name' => 'Eko Wibowo',     'departemen' => 'Marketing','posisi' => 'Staff Marketing', 'foto_url' => null],
-        ['name' => 'Galih Mahendra', 'departemen' => 'Finance', 'posisi' => 'Staff Keuangan', 'foto_url' => null],
         ['name' => 'Hesti Rahmawati','departemen' => 'HR',      'posisi' => 'HR Specialist', 'foto_url' => null],
         ['name' => 'Fitri Handayani','departemen' => 'Operasional','posisi' => 'Admin Operasional', 'foto_url' => null],
     ];
@@ -65,7 +61,6 @@ class HasilTesController extends Controller
         ['name' => 'Nurul Aini',        'departemen' => 'HR',       'posisi' => 'Calon HR Specialist', 'foto_url' => null],
         ['name' => 'Bagas Maulana',     'departemen' => 'IT',       'posisi' => 'Calon IT Analyst', 'foto_url' => null],
         ['name' => 'Citra Kirana',      'departemen' => 'Marketing','posisi' => 'Calon Staff Marketing', 'foto_url' => null],
-        ['name' => 'Dimas Setiawan',    'departemen' => 'Finance',  'posisi' => 'Calon Akuntan', 'foto_url' => null],
         ['name' => 'Erna Wulandari',    'departemen' => 'Produksi', 'posisi' => 'Calon Operator', 'foto_url' => null],
         ['name' => 'Fajar Nugroho',     'departemen' => 'HR',       'posisi' => 'Calon Rekruter', 'foto_url' => null],
         ['name' => 'Gita Permata',      'departemen' => 'IT',       'posisi' => 'Calon Analis', 'foto_url' => null],
@@ -74,110 +69,7 @@ class HasilTesController extends Controller
 
     // Data dummy hasil tes per peserta per sesi
     protected const HASIL_TES = [
-        // Sesi 1: Rekrutmen Staff Finance Batch 1 (IST, DISC)
-        [
-            'sesi_id' => 1,
-            'peserta_id' => 101,
-            'nama_peserta' => 'Andi Pratama',
-            'jenis_peserta' => 'Karyawan',
-            'departemen' => 'Finance',
-            'posisi' => 'Staff Akuntansi',
-            'status_pengerjaan' => 'Selesai',
-            'tanggal_pengerjaan' => '2026-08-05',
-            'hasil_alat_tes' => [
-                [
-                    'nama_alat_tes' => 'IST',
-                    'format_dasar' => 'Pilihan Ganda',
-                    'durasi_pengerjaan_aktual' => '45 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['nama_subtes' => 'SE - Pengertian Umum', 'skor_mentah' => 15, 'skor_skala' => 118, 'kategori' => 'Baik'],
-                        ['nama_subtes' => 'WA - Kosakata',          'skor_mentah' => 17, 'skor_skala' => 124, 'kategori' => 'Sangat Baik'],
-                        ['nama_subtes' => 'AN - Aritmatika',        'skor_mentah' => 12, 'skor_skala' => 105, 'kategori' => 'Baik'],
-                        ['nama_subtes' => 'GE - Persamaan Kata',    'skor_mentah' => 14, 'skor_skala' => 112, 'kategori' => 'Baik'],
-                    ]
-                ],
-                [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '32 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 65, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'I - Influence',   'skor_mentah' => 42, 'skor_skala' => 4, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 78, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 55, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                    ]
-                ]
-            ]
-        ],
-        [
-            'sesi_id' => 1,
-            'peserta_id' => 102,
-            'nama_peserta' => 'Dimas Setiawan',
-            'jenis_peserta' => 'Kandidat',
-            'departemen' => 'Finance',
-            'posisi' => 'Calon Akuntan',
-            'status_pengerjaan' => 'Sedang Berjalan',
-            'tanggal_pengerjaan' => '2026-08-06',
-            'hasil_alat_tes' => [
-                [
-                    'nama_alat_tes' => 'IST',
-                    'format_dasar' => 'Pilihan Ganda',
-                    'durasi_pengerjaan_aktual' => '28 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => null // belum selesai
-                ],
-                [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '25 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 52, 'skor_skala' => 5, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'I - Influence',   'skor_mentah' => 68, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 45, 'skor_skala' => 5, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 61, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                    ]
-                ]
-            ]
-        ],
-        [
-            'sesi_id' => 1,
-            'peserta_id' => 103,
-            'nama_peserta' => 'Galih Mahendra',
-            'jenis_peserta' => 'Karyawan',
-            'departemen' => 'Finance',
-            'posisi' => 'Staff Keuangan',
-            'status_pengerjaan' => 'Selesai',
-            'tanggal_pengerjaan' => '2026-08-04',
-            'hasil_alat_tes' => [
-                [
-                    'nama_alat_tes' => 'IST',
-                    'format_dasar' => 'Pilihan Ganda',
-                    'durasi_pengerjaan_aktual' => '52 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['nama_subtes' => 'SE - Pengertian Umum', 'skor_mentah' => 11, 'skor_skala' => 96,  'kategori' => 'Cukup'],
-                        ['nama_subtes' => 'WA - Kosakata',          'skor_mentah' => 13, 'skor_skala' => 102, 'kategori' => 'Baik'],
-                        ['nama_subtes' => 'AN - Aritmatika',        'skor_mentah' => 10, 'skor_skala' => 88,  'kategori' => 'Kurang'],
-                        ['nama_subtes' => 'GE - Persamaan Kata',    'skor_mentah' => 12, 'skor_skala' => 99,  'kategori' => 'Cukup'],
-                    ]
-                ],
-                [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '35 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 58, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'I - Influence',   'skor_mentah' => 38, 'skor_skala' => 4, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 72, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 49, 'skor_skala' => 5, 'kategori' => 'Sedang'],
-                    ]
-                ]
-            ]
-        ],
+        // Sesi 1: Rekrutmen Staff Finance Batch 1 (EPPS)
         [
             'sesi_id' => 1,
             'peserta_id' => 104,
@@ -190,7 +82,7 @@ class HasilTesController extends Controller
             'hasil_alat_tes' => []
         ],
 
-        // Sesi 2: Assessment Tahunan Produksi (DISC, EPPS, MMPI-2)
+        // Sesi 2: Assessment Tahunan Produksi (EPPS)
         [
             'sesi_id' => 2,
             'peserta_id' => 201,
@@ -201,18 +93,6 @@ class HasilTesController extends Controller
             'status_pengerjaan' => 'Selesai',
             'tanggal_pengerjaan' => '2026-07-28',
             'hasil_alat_tes' => [
-                [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '40 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 85, 'skor_skala' => 9, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'I - Influence',   'skor_mentah' => 55, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 38, 'skor_skala' => 4, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 62, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                    ]
-                ],
                 [
                     'nama_alat_tes' => 'EPPS',
                     'format_dasar' => 'Forced Choice',
@@ -225,22 +105,6 @@ class HasilTesController extends Controller
                         ['dimensi' => 'Exhibition',      'skor_mentah' => 58, 'skor_skala' => 6, 'kategori' => 'Sedang'],
                     ]
                 ],
-                [
-                    'nama_alat_tes' => 'MMPI-2',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '55 menit',
-                    'is_sensitif' => true, // sensitif
-                    'skor_ringkas' => [
-                        ['skala_klinis' => 'Depresi',                 'skor_t' => 68, 'interpretasi' => 'Perlu Perhatian'],
-                        ['skala_klinis' => 'Paranoia',                'skor_t' => 52, 'interpretasi' => 'Normal'],
-                        ['skala_klinis' => 'Psychasthenia',           'skor_t' => 74, 'interpretasi' => 'Perlu Perhatian'],
-                        ['skala_klinis' => 'Hipocondriasis',          'skor_t' => 61, 'interpretasi' => 'Normal'],
-                        ['skala_klinis' => 'Histeria',               'skor_t' => 82, 'interpretasi' => 'Signifikan'],
-                        ['skala_klinis' => 'Hiperpatenia',           'skor_t' => 55, 'interpretasi' => 'Normal'],
-                        ['skala_klinis' => 'Schizophrenia',          'skor_t' => 69, 'interpretasi' => 'Perlu Perhatian'],
-                        ['skala_klinis' => 'Mania',                  'skor_t' => 48, 'interpretasi' => 'Normal'],
-                    ]
-                ]
             ]
         ],
         [
@@ -253,18 +117,6 @@ class HasilTesController extends Controller
             'status_pengerjaan' => 'Selesai',
             'tanggal_pengerjaan' => '2026-07-29',
             'hasil_alat_tes' => [
-                [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '38 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 71, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'I - Influence',   'skor_mentah' => 48, 'skor_skala' => 5, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 61, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 53, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                    ]
-                ],
                 [
                     'nama_alat_tes' => 'EPPS',
                     'format_dasar' => 'Forced Choice',
@@ -289,18 +141,6 @@ class HasilTesController extends Controller
             'status_pengerjaan' => 'Selesai',
             'tanggal_pengerjaan' => '2026-07-27',
             'hasil_alat_tes' => [
-                [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '33 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 42, 'skor_skala' => 5, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'I - Influence',   'skor_mentah' => 35, 'skor_skala' => 4, 'kategori' => 'Rendah'],
-                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 78, 'skor_skala' => 9, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 65, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
-                    ]
-                ],
                 [
                     'nama_alat_tes' => 'EPPS',
                     'format_dasar' => 'Forced Choice',
@@ -327,18 +167,6 @@ class HasilTesController extends Controller
             'tanggal_pengerjaan' => '2026-07-26',
             'hasil_alat_tes' => [
                 [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '36 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 72, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'I - Influence',   'skor_mentah' => 45, 'skor_skala' => 5, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 68, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 59, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                    ]
-                ],
-                [
                     'nama_alat_tes' => 'EPPS',
                     'format_dasar' => 'Forced Choice',
                     'durasi_pengerjaan_aktual' => '52 menit',
@@ -363,18 +191,6 @@ class HasilTesController extends Controller
             'tanggal_pengerjaan' => '2026-07-25',
             'hasil_alat_tes' => [
                 [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '41 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => [
-                        ['dimensi' => 'D - Dominance',   'skor_mentah' => 68, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'I - Influence',   'skor_mentah' => 52, 'skor_skala' => 6, 'kategori' => 'Sedang'],
-                        ['dimensi' => 'S - Steadiness',  'skor_mentah' => 73, 'skor_skala' => 8, 'kategori' => 'Tinggi'],
-                        ['dimensi' => 'C - Compliance',  'skor_mentah' => 64, 'skor_skala' => 7, 'kategori' => 'Tinggi'],
-                    ]
-                ],
-                [
                     'nama_alat_tes' => 'EPPS',
                     'format_dasar' => 'Forced Choice',
                     'durasi_pengerjaan_aktual' => '58 menit',
@@ -398,13 +214,6 @@ class HasilTesController extends Controller
             'status_pengerjaan' => 'Sedang Berjalan',
             'tanggal_pengerjaan' => '2026-07-30',
             'hasil_alat_tes' => [
-                [
-                    'nama_alat_tes' => 'DISC',
-                    'format_dasar' => 'Skala Likert',
-                    'durasi_pengerjaan_aktual' => '39 menit',
-                    'is_sensitif' => false,
-                    'skor_ringkas' => null // belum selesai
-                ],
                 [
                     'nama_alat_tes' => 'EPPS',
                     'format_dasar' => 'Forced Choice',
@@ -493,7 +302,16 @@ class HasilTesController extends Controller
         ]);
     }
 
-    public function detail($sesiId, $pesertaId): View
+    /**
+     * Detail hasil tes untuk satu peserta pada satu sesi.
+     *
+     * Catatan routing: {pesertaId} di URL diperlakukan sebagai user_id
+     * (FK ke tabel users). Saat data masih dummy, nilai peserta_id di
+     * HASIL_TES belum tentu ada di tabel users, sehingga panggilan ke
+     * FormatHasilEppsService akan mengembalikan koleksi kosong dan
+     * halaman otomatis fallback ke skor dummy HASIL_TES.
+     */
+    public function detail(int $sesiId, int $pesertaId): View
     {
         $sesi = collect(self::PENJADWALAN)->where('id', $sesiId)->first();
         $hasilTes = collect(self::HASIL_TES)->where('sesi_id', $sesiId)->where('peserta_id', $pesertaId)->first();
@@ -502,17 +320,49 @@ class HasilTesController extends Controller
             abort(404);
         }
 
-        // Cek apakah ada alat tes sensitif MMPI-2 dan user punya izin lihat sensitif
-        $bisaLihatSensitif = false;
+        // Simpan skor_ringkas dummy EPPS sebelum disuntik (dipakai untuk psikogram
+        // sementara — konversi skor_skala dari DB belum tersedia).
+        $dummyEppsSkorRingkas = null;
         foreach ($hasilTes['hasil_alat_tes'] as $alat) {
-            if ($alat['nama_alat_tes'] === 'MMPI-2' && $alat['is_sensitif'] && !empty($alat['skor_ringkas'])) {
-                $bisaLihatSensitif = auth()->user()->hasIzin('hasil_tes.lihat_sensitif');
+            if (($alat['nama_alat_tes'] ?? null) === 'EPPS' && !empty($alat['skor_ringkas'])) {
+                $dummyEppsSkorRingkas = $alat['skor_ringkas'];
                 break;
             }
         }
 
-        // Hit psikogram otomatis dari konfigurasi dimensi
-        $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
+        // Suntik data EPPS nyata dari database bila tersedia.
+        // PesertaId dari URL = user_id untuk pencarian skor di DB.
+        if (!empty($hasilTes['hasil_alat_tes'])) {
+            $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps(
+                $hasilTes['hasil_alat_tes'],
+                $pesertaId,
+                $sesiId
+            );
+        }
+
+        // Cek apakah ada alat tes sensitif dan user punya izin lihat sensitif
+        $bisaLihatSensitif = false;
+        foreach ($hasilTes['hasil_alat_tes'] as $alat) {
+            if (!empty($alat['is_sensitif']) && !empty($alat['skor_ringkas'])) {
+                /** @var \App\Models\User $user */
+$user = auth()->user();
+$bisaLihatSensitif = $user->hasIzin('hasil_tes.lihat_sensitif');
+                break;
+            }
+        }
+
+        // Psikogram sementara tidak pakai skor EPPS nyata: skor_skala (1-10) yang
+        // dibutuhkan hitungPsikogram belum tersedia dari FormatHasilEppsService.
+        // Pemakaian skor dummy menjamin bidang psikogram tetap kosong atau
+        // sesuai konfigurasi, bukan menampilkan nilai yang salah.
+        $psikogramAlatTes = $hasilTes['hasil_alat_tes'];
+        foreach ($psikogramAlatTes as &$alat) {
+            if (($alat['nama_alat_tes'] ?? null) === 'EPPS') {
+                $alat['skor_ringkas'] = $dummyEppsSkorRingkas ?? [];
+            }
+        }
+        unset($alat);
+        $psikogram = $this->hitungPsikogram($psikogramAlatTes);
 
         return view('admin.hasil-tes.detail', [
             'sesi' => $sesi,
@@ -520,6 +370,64 @@ class HasilTesController extends Controller
             'bisaLihatSensitif' => $bisaLihatSensitif,
             'psikogram' => $psikogram,
         ]);
+    }
+
+    /**
+     * Suntik hasil EPPS nyata dari FormatHasilEppsService ke dalam array
+     * hasil_alat_tes. Untuk entri dengan nama_alat_tes === 'EPPS', bila
+     * service mengembalikan data, ganti bentuk 'skor_ringkas' dengan
+     * data tersebut. Bila kosong (belum ada skor di DB), biarkan
+     * skor_ringkas dummy tetap dipakai agar halaman tidak error.
+     *
+     * @param array $hasilAlatPeserta Array hasil_alat_tes milik satu peserta
+     * @param int   $userId          ID user (FK ke tabel users)
+     * @param int   $sesiId          ID sesi tes (FK ke sesi_tes)
+     * @return array Array baru (tidak memodifikasi input)
+     */
+    protected function injectHasilEpps(array $hasilAlatPeserta, int $userId, int $sesiId): array
+    {
+        $adaEpps = false;
+        foreach ($hasilAlatPeserta as $alat) {
+            if (($alat['nama_alat_tes'] ?? null) === 'EPPS') {
+                $adaEpps = true;
+                break;
+            }
+        }
+
+        if (!$adaEpps) {
+            return $hasilAlatPeserta; // bukan EPPS, jangan sentuh
+        }
+
+        $eppsRows = (new FormatHasilEppsService())
+            ->formatHasilEppsUntukTampilan($userId, $sesiId);
+
+        if ($eppsRows->isEmpty()) {
+            return $hasilAlatPeserta; // belum ada skor di DB, fallback ke dummy
+        }
+
+        // Bentuk skor_ringkas versi service: setiap row punya
+        // dimensi (format 'Kode - Nama'), skor_mentah, skor_persentil, kategori.
+        // Tambah 'skor_skala' agar view & hitungPsikogram tetap kompatibel:
+        // skor_skala = skor_persentil (bila dikonversi ke skala 1-10 di
+        // kemudian hari, cukup ubah di sini).
+        $skorRingkasBaru = $eppsRows->map(function (array $row) {
+            return [
+                'dimensi'     => $row['dimensi'],
+                'skor_mentah' => $row['skor_mentah'],
+                'skor_skala'  => $row['skor_persentil'],
+                'kategori'    => $row['kategori'],
+            ];
+        })->all();
+
+        $hasilBaru = [];
+        foreach ($hasilAlatPeserta as $alat) {
+            if (($alat['nama_alat_tes'] ?? null) === 'EPPS') {
+                $alat['skor_ringkas'] = $skorRingkasBaru;
+            }
+            $hasilBaru[] = $alat;
+        }
+
+        return $hasilBaru;
     }
 
     /**
@@ -577,40 +485,26 @@ class HasilTesController extends Controller
                 foreach ($skorRingkas as $score) {
                     $match = false;
 
-                    if ($namaAlat === 'IST') {
-                        // Format: nama_subtes seperti 'SE - Pengertian Umum'
-                        if (isset($score['nama_subtes'])) {
-                            $subtes = $score['nama_subtes'];
-                            // Ekstrak kode dari awalan (misal 'SE' dari 'SE - ...')
-                            $parts = explode(' - ', trim($subtes), 2);
-                            $kodeSubtes = trim($parts[0] ?? '');
-                            if ($kodeSubtes === $kodeDim) {
-                                $match = true;
-                            }
-                        }
-                    } elseif ($namaAlat === 'DISC' || $namaAlat === 'EPPS') {
-                        // Format: dimensi seperti 'D - Dominance'
+                    if ($namaAlat === 'EPPS') {
+                        // Format: dimensi seperti 'Ach - Achievement'
                         if (isset($score['dimensi'])) {
                             $dimensi = $score['dimensi'];
                             $parts = explode(' - ', trim($dimensi), 2);
                             $kodeDimensi = trim($parts[0] ?? '');
-                            if ($kodeDimensi === $kodeDim) {
+                            $namaDimensi   = trim($parts[1] ?? '');
+
+                            // Primary: case-insensitive kode match
+                            // (DB menyimpan lowercase 'ach', dummy memakai capitalized 'Ach')
+                            if (strcasecmp($kodeDimensi, $kodeDim) === 0) {
                                 $match = true;
                             }
-                        }
-                    } elseif ($namaAlat === 'MMPI-2') {
-                        // Format: skala_klinis seperti 'Depresi', 'Paranoia', dst
-                        // Mencoba mencocokkan via substring pada nama_dimensi atau kode jika tersedia
-                        if (isset($score['skala_klinis'])) {
-                            $skala = $score['skala_klinis'];
-                            // Pertama, cek apakah kode dim muncul di string skala (bukan biasa)
-                            if (strpos($skala, $kodeDim) !== false) {
+                            // Fallback: case-insensitive nama match
+                            // (menangani selisih ejaan seperti DB 'exh' vs dummy 'Exp')
+                            if (! $match
+                                && isset($dim['nama_dimensi'])
+                                && strcasecmp($namaDimensi, $dim['nama_dimensi']) === 0
+                            ) {
                                 $match = true;
-                            } else {
-                                // Lalu cek apakah nama_dimensi mengandung string skala atau sebaliknya
-                                if (stripos($dim['nama_dimensi'], $skala) !== false || stripos($skala, $dim['nama_dimensi']) !== false) {
-                                    $match = true;
-                                }
                             }
                         }
                     }

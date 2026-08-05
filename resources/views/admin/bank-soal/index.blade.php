@@ -4,10 +4,7 @@
 @php
     // Mapping kode alat tes → warna badge (konsisten dengan halaman Alat Tes)
     $warnaKode = [
-        'DISC'   => 'bg-blue-100 text-blue-700',
-        'IST'    => 'bg-violet-100 text-violet-700',
         'EPPS'   => 'bg-emerald-100 text-emerald-700',
-        'MMPI-2' => 'bg-orange-100 text-orange-700',
     ];
 @endphp
 
@@ -81,7 +78,7 @@
     @if($alatTesTerpilih)
         @php
             $kodeAlat = '';
-            foreach (['DISC', 'IST', 'EPPS', 'MMPI-2'] as $k) {
+            foreach (['EPPS'] as $k) {
                 if (str_contains($alatTesTerpilih['nama'], $k)) {
                     $kodeAlat = $k;
                     break;
@@ -138,7 +135,7 @@
                 @if($kelompok['alat'] === null) @continue @endif
                 @php
                     $kodeAlat = '';
-                    foreach (['DISC', 'IST', 'EPPS', 'MMPI-2'] as $k) {
+                    foreach (['EPPS'] as $k) {
                         if (str_contains($kelompok['alat']['nama'], $k)) {
                             $kodeAlat = $k;
                             break;

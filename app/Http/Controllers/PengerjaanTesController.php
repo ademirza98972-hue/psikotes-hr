@@ -8,118 +8,11 @@ use Illuminate\Support\Facades\Session;
 class PengerjaanTesController extends Controller
 {
     /**
-     * Data dummy soal untuk alat tes - DISC (Likert), EPPS (Forced Choice), IST dan MMPI-2 (pilgan)
+     * Data dummy soal untuk alat tes - EPPS (Forced Choice)
      */
     private function getSoalDummy(): array
     {
         return [
-            'IST' => [
-                'nama_lengkap' => 'Intelligenz Struktur Test',
-                'format_dasar' => 'Pilihan Ganda',
-                'jumlah_soal'  => 3,
-                'soal'         => [
-                    [
-                        'nomor'      => 1,
-                        'pernyataan' => 'Apakah Anda terbiasa tepat waktu?',
-                        'type'       => 'multiple_choice',
-                        'choices'    => [
-                            ['key' => 'a', 'text' => 'Ya'],
-                            ['key' => 'b', 'text' => 'Terkadang'],
-                            ['key' => 'c', 'text' => 'Tidak'],
-                            ['key' => 'd', 'text' => 'Tidak pernah'],
-                        ],
-                    ],
-                    [
-                        'nomor'      => 2,
-                        'pernyataan' => 'Apakah Anda suka bekerja dalam tim?',
-                        'type'       => 'multiple_choice',
-                        'choices'    => [
-                            ['key' => 'a', 'text' => 'Ya'],
-                            ['key' => 'b', 'text' => 'Tergantung situasi'],
-                            ['key' => 'c', 'text' => 'Lebih suka sendiri'],
-                            ['key' => 'd', 'text' => 'Tidak'],
-                        ],
-                    ],
-                    [
-                        'nomor'      => 3,
-                        'pernyataan' => 'Apakah Anda memiliki kemampuan analisis data?',
-                        'type'       => 'multiple_choice',
-                        'choices'    => [
-                            ['key' => 'a', 'text' => 'Mahir sekali'],
-                            ['key' => 'b', 'text' => 'Mahir'],
-                            ['key' => 'c', 'text' => 'Kurang mahir'],
-                            ['key' => 'd', 'text' => 'Tidak mahir'],
-                        ],
-                    ],
-                ],
-            ],
-            'DISC' => [
-                'nama_lengkap' => 'Dominance, Influence, Steadiness, Compliance',
-                'format_dasar' => 'Skala Likert',
-                'jumlah_soal'  => 5,
-                'soal'         => [
-                    [
-                        'nomor'      => 1,
-                        'pernyataan' => 'Saya merasa lebih nyaman memimpin diskusi daripada mengikutinya.',
-                        'type'       => 'likert',
-                        'scale'      => [
-                            ['value' => 1, 'label' => 'Sangat Tidak Setuju'],
-                            ['value' => 2, 'label' => 'Tidak Setuju'],
-                            ['value' => 3, 'label' => 'Netral'],
-                            ['value' => 4, 'label' => 'Setuju'],
-                            ['value' => 5, 'label' => 'Sangat Setuju'],
-                        ],
-                    ],
-                    [
-                        'nomor'      => 2,
-                        'pernyataan' => 'Saya cenderung menghindari konflik dan mencari jalan tengah.',
-                        'type'       => 'likert',
-                        'scale'      => [
-                            ['value' => 1, 'label' => 'Sangat Tidak Setuju'],
-                            ['value' => 2, 'label' => 'Tidak Setuju'],
-                            ['value' => 3, 'label' => 'Netral'],
-                            ['value' => 4, 'label' => 'Setuju'],
-                            ['value' => 5, 'label' => 'Sangat Setuju'],
-                        ],
-                    ],
-                    [
-                        'nomor'      => 3,
-                        'pernyataan' => 'Saya memiliki tingkat energi yang tinggi dan cepat dalam bertindak.',
-                        'type'       => 'likert',
-                        'scale'      => [
-                            ['value' => 1, 'label' => 'Sangat Tidak Setuju'],
-                            ['value' => 2, 'label' => 'Tidak Setuju'],
-                            ['value' => 3, 'label' => 'Netral'],
-                            ['value' => 4, 'label' => 'Setuju'],
-                            ['value' => 5, 'label' => 'Sangat Setuju'],
-                        ],
-                    ],
-                    [
-                        'nomor'      => 4,
-                        'pernyataan' => 'Saya memperhatikan aturan dan prosedur dengan teliti.',
-                        'type'       => 'likert',
-                        'scale'      => [
-                            ['value' => 1, 'label' => 'Sangat Tidak Setuju'],
-                            ['value' => 2, 'label' => 'Tidak Setuju'],
-                            ['value' => 3, 'label' => 'Netral'],
-                            ['value' => 4, 'label' => 'Setuju'],
-                            ['value' => 5, 'label' => 'Sangat Setuju'],
-                        ],
-                    ],
-                    [
-                        'nomor'      => 5,
-                        'pernyataan' => 'Saya cenderung bersikap tenang dan sabar dalam situasi menegangkan.',
-                        'type'       => 'likert',
-                        'scale'      => [
-                            ['value' => 1, 'label' => 'Sangat Tidak Setuju'],
-                            ['value' => 2, 'label' => 'Tidak Setuju'],
-                            ['value' => 3, 'label' => 'Netral'],
-                            ['value' => 4, 'label' => 'Setuju'],
-                            ['value' => 5, 'label' => 'Sangat Setuju'],
-                        ],
-                    ],
-                ],
-            ],
             'EPPS' => [
                 'nama_lengkap' => 'Edwards Personal Preference Schedule',
                 'format_dasar' => 'Pilihan Ganda',
@@ -157,53 +50,19 @@ class PengerjaanTesController extends Controller
                     ],
                 ],
             ],
-            'MMPI-2' => [
-                'nama_lengkap' => 'Minnesota Multiphasic Personality Inventory-2',
-                'format_dasar' => 'Pernyataan True/False',
-                'jumlah_soal'  => 3,
-                'soal'         => [
-                    [
-                        'nomor'      => 1,
-                        'pernyataan' => 'Saya merasa cemas tentang banyak hal dalam hidup saya.',
-                        'type'       => 'multiple_choice',
-                        'choices'    => [
-                            ['key' => 'true',  'text' => 'Benar'],
-                            ['key' => 'false', 'text' => 'Salah'],
-                        ],
-                    ],
-                    [
-                        'nomor'      => 2,
-                        'pernyataan' => 'Saya biasanya merasa nyaman berinteraksi dengan orang asing.',
-                        'type'       => 'multiple_choice',
-                        'choices'    => [
-                            ['key' => 'true',  'text' => 'Benar'],
-                            ['key' => 'false', 'text' => 'Salah'],
-                        ],
-                    ],
-                    [
-                        'nomor'      => 3,
-                        'pernyataan' => 'Saya sering merasa kelelahan tanpa alasan yang jelas.',
-                        'type'       => 'multiple_choice',
-                        'choices'    => [
-                            ['key' => 'true',  'text' => 'Benar'],
-                            ['key' => 'false', 'text' => 'Salah'],
-                        ],
-                    ],
-                ],
-            ],
         ];
     }
 
     private function getSesiDummy(): array
     {
         return [
-            ['id' => 1, 'nama_sesi' => 'Tes Rekrutmen Q3 2025',         'daftar_alat_tes_ditugaskan' => ['DISC']],
-            ['id' => 2, 'nama_sesi' => 'Evaluasi Kompetensi Internal', 'daftar_alat_tes_ditugaskan' => ['IST', 'DISC', 'EPPS']],
-            ['id' => 3, 'nama_sesi' => 'Assessment Awal Karyawan',     'daftar_alat_tes_ditugaskan' => ['MMPI-2', 'IST']],
+            ['id' => 1, 'nama_sesi' => 'Tes Rekrutmen Q3 2025',         'daftar_alat_tes_ditugaskan' => []],
+            ['id' => 2, 'nama_sesi' => 'Evaluasi Kompetensi Internal', 'daftar_alat_tes_ditugaskan' => ['EPPS']],
+            ['id' => 3, 'nama_sesi' => 'Assessment Awal Karyawan',     'daftar_alat_tes_ditugaskan' => ['EPPS']],
         ];
     }
 
-    private function getSesiById($sesiId)
+    private function getSesiById(int $sesiId)
     {
         foreach ($this->getSesiDummy() as $s) {
             if ((int) $s['id'] === (int) $sesiId) {
@@ -213,12 +72,12 @@ class PengerjaanTesController extends Controller
         return null;
     }
 
-    private function sessionKey($sesiId, $name): string
+    private function sessionKey(int $sesiId, string $name): string
     {
         return "pengerjaan_tes.sesi_{$sesiId}.{$name}";
     }
 
-    public function kerjakan(Request $request, $sesiId)
+    public function kerjakan(Request $request, int $sesiId)
     {
         $sesi = $this->getSesiById($sesiId);
         if (!$sesi) {
@@ -333,7 +192,7 @@ class PengerjaanTesController extends Controller
         ]);
     }
 
-    public function jawab(Request $request, $sesiId)
+    public function jawab(Request $request, int $sesiId)
     {
         $sesi = $this->getSesiById($sesiId);
         if (!$sesi) {
@@ -386,7 +245,7 @@ class PengerjaanTesController extends Controller
         return redirect()->route('peserta.tes.kerjakan', $sesiId);
     }
 
-    public function selesai($sesiId)
+    public function selesai(int $sesiId)
     {
         $sesi = $this->getSesiById($sesiId);
         $namaSesi = $sesi['nama_sesi'] ?? null;

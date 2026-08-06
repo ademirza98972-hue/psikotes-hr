@@ -33,103 +33,103 @@
         @csrf
         <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
             <div class="p-8">
-                {{-- Likert Format --}}
-                @if($soal_data['type'] == 'likert')
-                <p class="text-base text-slate-800 mb-6 font-medium leading-relaxed">
-                    {{ $soal_data['pernyataan'] }}
-                </p>
+                {{-- Forced Choice Format (EPPS) --}}
+                @if($soal_data['tipe_format'] == 'forced_choice')
+                    <p class="text-base text-slate-800 mb-6 font-medium">
+                        Pilih salah satu pernyataan berikut:
+                    </p>
 
-                {{-- Pilihan Jawaban Horizontal --}}
-                <div class="flex flex-wrap gap-3 justify-center">
-                    @foreach($soal_data['scale'] as $scaleOption)
-                        <label class="flex items-center gap-2">
-                            <input type="radio"
-                                   name="choice"
-                                   value="{{ $scaleOption['value'] }}"
-                                   @if($saved_answer == $scaleOption['value']) checked @endif
-                                   class="h-4 w-4 text-[#2C5F6F] border-slate-300 focus:ring-[#2C5F6F]" />
-                            <span class="text-sm text-slate-700">{{ $scaleOption['label'] }}</span>
-                        </label>
-                    @endforeach
-                </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach($soal_data['opsi'] as $opsi)
+                            <label class="flex flex-col gap-3 border border-slate-200 rounded-lg p-5 hover:bg-slate-50 transition cursor-pointer">
+                                <input type="radio"
+                                       name="opsi_id"
+                                       value="{{ $opsi['id'] }}"
+                                       @if($saved_answer == $opsi['id']) checked @endif
+                                       class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F]" />
+                                <p class="text-sm text-slate-800 leading-relaxed ml-8">{{ $opsi['teks'] }}</p>
+                            </label>
+                        @endforeach
+                    </div>
 
-            {{-- Forced Choice Format (EPPS) --}}
-            @elseif($soal_data['type'] == 'forced_choice')
-                <p class="text-base text-slate-800 mb-6 font-medium">
-                    Pilih salah satu pernyataan berikut:
-                </p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {{-- Kartu A --}}
-                    <label class="flex flex-col gap-3 border border-slate-200 rounded-lg p-5 hover:bg-slate-50 transition cursor-pointer">
-                        <input type="radio" name="choice" value="A" @if($saved_answer == 'A') checked @endif class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F]" />
-                        <p class="text-sm text-slate-800 leading-relaxed ml-8">{{ $soal_data['statement_a'] }}</p>
-                    </label>
-
-                    {{-- Kartu B --}}
-                    <label class="flex flex-col gap-3 border border-slate-200 rounded-lg p-5 hover:bg-slate-50 transition cursor-pointer">
-                        <input type="radio" name="choice" value="B" @if($saved_answer == 'B') checked @endif class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F]" />
-                        <p class="text-sm text-slate-800 leading-relaxed ml-8">{{ $soal_data['statement_b'] }}</p>
-                    </label>
-                </div>
-
-            {{-- Multiple Choice format --}}
-            @elseif($soal_data['type'] == 'multiple_choice')
-                <p class="text-base text-slate-800 mb-6 font-medium leading-relaxed">
-                    {{ $soal_data['pernyataan'] }}
-                </p>
-
-                <div class="space-y-3">
-                    @foreach($soal_data['choices'] as $choice)
-                        <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer relative">
-                            <input type="radio"
-                                   name="choice"
-                                   value="{{ $choice['key'] }}"
-                                   @if($saved_answer == $choice['key']) checked @endif
-                                   class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F]" />
-                            <span class="text-sm text-slate-700 ml-2">{{ $choice['text'] }}</span>
-                        </label>
-                    @endforeach
-                </div>
-
-            {{-- Lainnya --}}
-            @else
-                <p class="text-slate-600">Format soal belum didukung.</p>
-            @endif
-        </div>
-
-        {{-- Footer Navigation --}}
-        <div class="px-6 py-4 bg-slate-50 rounded-b-lg flex justify-between items-center">
-            {{-- Tombol Sebelumnya --}}
-            @if(!$is_first_soal)
-                <a href="{{ route('peserta.tes.kerjakan', $sesiId) . '?prev=1' }}"
-                   class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-white hover:border-slate-400 transition">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                    Sebelumnya
-                </a>
-            @else
-                <div class="invisible"></div>
-            @endif
-
-            {{-- Tombol Selanjutya / Selesai --}}
-            <button type="submit"
-                    class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-                <span>
-                    @if($is_last_soal)
-                        Selesai
-                    @else
-                        Selanjutnya
+                {{-- Multiple Choice / Pilihan Ganda Format --}}
+                @elseif(in_array($soal_data['tipe_format'], ['pilihan_ganda', 'multiple_choice', 'true_false']))
+                    @if(!empty($soal_data['pernyataan']))
+                        <p class="text-base text-slate-800 mb-6 font-medium leading-relaxed">
+                            {{ $soal_data['pernyataan'] }}
+                        </p>
                     @endif
-                </span>
-            </button>
+
+                    <div class="space-y-3">
+                        @foreach($soal_data['opsi'] as $opsi)
+                            <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer relative">
+                                <input type="radio"
+                                       name="opsi_id"
+                                       value="{{ $opsi['id'] }}"
+                                       @if($saved_answer == $opsi['id']) checked @endif
+                                       class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F]" />
+                                <span class="text-sm text-slate-700 ml-2">{{ $opsi['teks'] }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                {{-- Likert Format --}}
+                @elseif($soal_data['tipe_format'] == 'likert')
+                    <p class="text-base text-slate-800 mb-6 font-medium leading-relaxed">
+                        {{ $soal_data['pernyataan'] ?? '' }}
+                    </p>
+
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        @foreach($soal_data['opsi'] as $opsi)
+                            <label class="flex items-center gap-2">
+                                <input type="radio"
+                                       name="opsi_id"
+                                       value="{{ $opsi['id'] }}"
+                                       @if($saved_answer == $opsi['id']) checked @endif
+                                       class="h-4 w-4 text-[#2C5F6F] border-slate-300 focus:ring-[#2C5F6F]" />
+                                <span class="text-sm text-slate-700">{{ $opsi['teks'] }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                {{-- Lainnya --}}
+                @else
+                    <p class="text-slate-600">Format soal belum didukung.</p>
+                @endif
+            </div>
+
+            {{-- Footer Navigation --}}
+            <div class="px-6 py-4 bg-slate-50 rounded-b-lg flex justify-between items-center">
+                {{-- Tombol Sebelumnya --}}
+                @if(!$is_first_soal)
+                    <a href="{{ route('peserta.tes.kerjakan', $sesiId) . '?prev=1' }}"
+                       class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-white hover:border-slate-400 transition">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Sebelumnya
+                    </a>
+                @else
+                    <div class="invisible"></div>
+                @endif
+
+                {{-- Tombol Selanjutya / Selesai --}}
+                <button type="submit"
+                        class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    <span>
+                        @if($is_last_soal)
+                            Selesai
+                        @else
+                            Selanjutnya
+                        @endif
+                    </span>
+                </button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
 
     {{-- JavaScript Alpine untuk interaktivitas kartu --}}
     @vite(['resources/js/app.js'])

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\DataKaryawan;
 use App\Models\Peran;
+use App\Models\SesiTes;
+use App\Models\AlatTes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +20,7 @@ class DashboardController extends Controller
      */
     private function getPesertaLoginSaatIni(): object
     {
+        /** @var \App\Models\User $userAsli */
         $userAsli = auth()->user(); // Ambil user asli yang sedang login
 
         if ($userAsli) {
@@ -50,40 +53,44 @@ class DashboardController extends Controller
      */
     private function getSesiTesDummy(): array
     {
-        return [
-            // Sesi Belum Mengerjakan - jadwal depan
-            [
-                'id' => 1,
-                'nama_sesi' => 'Tes Rekrutmen Q3 2025',
-                'departemen_terkait' => 'Marketing',
-                'tanggal_mulai' => '2025-08-15',
-                'tanggal_selesai' => '2025-08-25',
-                'daftar_alat_tes_ditugaskan' => [],
-                'status_pengerjaan' => 'Belum Mengerjakan',
-            ],
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        if (!$user) {
+            return [];
+        }
 
-            // Sesi Sedang Berjalan - jadwal tengah
-            [
-                'id' => 2,
-                'nama_sesi' => 'Evaluasi Kompetensi Internal',
-                'departemen_terkait' => 'IT Development',
-                'tanggal_mulai' => '2025-08-01',
-                'tanggal_selesai' => '2025-08-10',
-                'daftar_alat_tes_ditugaskan' => ['EPPS'],
-                'status_pengerjaan' => 'Sedang Berjalan',
-            ],
+        $sesiTes = SesiTes::whereHas('pesertaSesiTes', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+            ->with(['departemenTerkait', 'alatTes' => function ($q) {
+                $q->select('alat_tes.id', 'alat_tes.kode');
+            }])
+            ->orderBy('tanggal_mulai', 'desc')
+            ->get();
 
-            // Sesi Selesai - jadwal selesai
-            [
-                'id' => 3,
-                'nama_sesi' => 'Assessment Awal Karyawan',
-                'departemen_terkait' => 'HR Administration',
-                'tanggal_mulai' => '2025-07-01',
-                'tanggal_selesai' => '2025-07-05',
-                'daftar_alat_tes_ditugaskan' => ['EPPS'],
-                'status_pengerjaan' => 'Selesai',
-            ],
-        ];
+        return $sesiTes->map(function ($sesi) {
+            $startDate = Carbon::parse($sesi->tanggal_mulai);
+            $endDate = Carbon::parse($sesi->tanggal_selesai);
+            $today = Carbon::now()->startOfDay();
+
+            if ($today > $endDate) {
+                $statusPengerjaan = 'Selesai';
+            } elseif ($today >= $startDate) {
+                $statusPengerjaan = 'Sedang Berjalan';
+            } else {
+                $statusPengerjaan = 'Belum Mengerjakan';
+            }
+
+            return [
+                'id' => $sesi->id,
+                'nama_sesi' => $sesi->nama_sesi,
+                'departemen_terkait' => $sesi->departemenTerkait?->nama_departemen ?? '',
+                'tanggal_mulai' => $sesi->tanggal_mulai,
+                'tanggal_selesai' => $sesi->tanggal_selesai,
+                'daftar_alat_tes_ditugaskan' => $sesi->alatTes->pluck('kode')->toArray(),
+                'status_pengerjaan' => $statusPengerjaan,
+            ];
+        })->toArray();
     }
 
     public function admin(Request $request): View
@@ -204,59 +211,57 @@ class DashboardController extends Controller
      * Halaman instruksi pengerjaan tes
      * Menampilkan daftar alat tes yang ditugaskan dan peraturan umum
      */
-    public function instruksi($sesiId)
+    public function instruksi(int $sesiId)
     {
-        // Ambil data sesi berdasarkan $sesiId dari data dummy
-        $sesi = null;
-        $sesiDummy = $this->getSesiTesDummy();
+        $sesi = SesiTes::with(['departemenTerkait', 'alatTes'])
+            ->find($sesiId);
 
-        foreach ($sesiDummy as $s) {
-            if ((string)$s['id'] === (string)$sesiId || (int)$s['id'] === (int)$sesiId) {
-                $sesi = $s;
-                break;
-            }
-        }
-
-        // Jika tidak ditemukan, redirect ke dashboard
         if (!$sesi) {
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
         }
 
-        // Buat detail tambahan dummy per alat tes (durasi_menit, jumlah_soal, format_dasar)
-        $detailAlatTes = [
-            'EPPS'  => ['durasi_menit' => 40, 'jumlah_soal' => 28, 'format_dasar' => 'Pilihan Ganda'],
-        ];
+        $startDate = Carbon::parse($sesi->tanggal_mulai);
+        $endDate = Carbon::parse($sesi->tanggal_selesai);
+        $today = Carbon::now()->startOfDay();
+
+        if ($today > $endDate) {
+            $statusPengerjaan = 'Selesai';
+        } elseif ($today >= $startDate) {
+            $statusPengerjaan = 'Sedang Berjalan';
+        } else {
+            $statusPengerjaan = 'Belum Mengerjakan';
+        }
+
+        $kodeAlatTes = $sesi->alatTes->pluck('kode')->toArray();
 
         $daftarAlatTesDenganDetail = [];
-        foreach ($sesi['daftar_alat_tes_ditugaskan'] as $kodeAlat) {
+        foreach ($kodeAlatTes as $kodeAlat) {
+            $alat = AlatTes::where('kode', $kodeAlat)->first();
             $daftarAlatTesDenganDetail[] = [
-                'nama_alat_tes' => $this->getNamaAlatTesFull($kodeAlat),
+                'nama_alat_tes' => $alat ? $alat->nama : $this->getNamaAlatTesFull($kodeAlat),
                 'kode_alat_tes' => $kodeAlat,
-                'durasi_menit'  => $detailAlatTes[$kodeAlat]['durasi_menit'] ?? 60,
-                'jumlah_soal'   => $detailAlatTes[$kodeAlat]['jumlah_soal'] ?? 50,
-                'format_dasar'  => $detailAlatTes[$kodeAlat]['format_dasar'] ?? 'Pilihan Ganda',
+                'durasi_menit'  => $alat->durasi_total_menit ?? 60,
+                'jumlah_soal'   => $alat->jumlah_soal ?? 50,
+                'format_dasar'  => $alat->format_dasar ?? 'Pilihan Ganda',
             ];
         }
 
         return view('peserta.instruksi', [
-            'nama_sesi' => $sesi['nama_sesi'],
-            'daftar_alat_tes_ditugaskan' => $sesi['daftar_alat_tes_ditugaskan'],
+            'nama_sesi' => $sesi->nama_sesi,
+            'daftar_alat_tes_ditugaskan' => $kodeAlatTes,
             'daftarAlatTesDenganDetail' => $daftarAlatTesDenganDetail,
-            'departemen_terkait' => $sesi['departemen_terkait'],
-            'sesiId' => $sesi['id'],
+            'departemen_terkait' => $sesi->departemenTerkait?->nama_departemen ?? '',
+            'sesiId' => $sesi->id,
         ]);
     }
 
     /**
      * Dapatkan nama lengkap alat tes berdasarkan kode
      */
-    private function getNamaAlatTesFull($kode): string
+    private function getNamaAlatTesFull(string $kode): string
     {
-        $namaLengkap = [
-            'EPPS'   => 'Edwards Personal Preference Schedule',
-        ];
-
-        return $namaLengkap[$kode] ?? $kode;
+        $alat = AlatTes::where('kode', $kode)->first();
+        return $alat ? $alat->nama : $kode;
     }
 
     /**

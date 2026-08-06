@@ -2,74 +2,136 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PesertaSesiTes;
+use App\Models\SesiTes;
+use App\Models\Soal;
+use App\Models\JawabanPeserta;
+use App\Services\ScoringEngineService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class PengerjaanTesController extends Controller
 {
     /**
-     * Data dummy soal untuk alat tes - EPPS (Forced Choice)
+     * Ambil semua sesi_tes di mana user login terdaftar sebagai peserta,
+     * lengkap dengan daftar kode alat tes yang ditugaskan.
      */
-    private function getSoalDummy(): array
-    {
-        return [
-            'EPPS' => [
-                'nama_lengkap' => 'Edwards Personal Preference Schedule',
-                'format_dasar' => 'Pilihan Ganda',
-                'jumlah_soal'  => 5,
-                'soal'         => [
-                    [
-                        'nomor'       => 1,
-                        'statement_a' => 'Saya senang menjadi pusat perhatian dalam kelompok.',
-                        'statement_b' => 'Saya lebih nyaman mengamati dan mendengarkan orang lain.',
-                        'type'        => 'forced_choice',
-                    ],
-                    [
-                        'nomor'       => 2,
-                        'statement_a' => 'Saya berusaha agar orang lain merasa nyaman dengan cara saya.',
-                        'statement_b' => 'Saya lebih jujur dan langsung menyatakan pendapat saya.',
-                        'type'        => 'forced_choice',
-                    ],
-                    [
-                        'nomor'       => 3,
-                        'statement_a' => 'Saya enjoying tugas-tugas rutin yang jelas aturannya.',
-                        'statement_b' => 'Saya lebih suka hal-hal baru dan tidak pasti.',
-                        'type'        => 'forced_choice',
-                    ],
-                    [
-                        'nomor'       => 4,
-                        'statement_a' => 'Saya lebih memilih bekerja sendiri daripada dalam tim.',
-                        'statement_b' => 'Saya aktif berpartisipasi dalam kegiatan kelompok.',
-                        'type'        => 'forced_choice',
-                    ],
-                    [
-                        'nomor'       => 5,
-                        'statement_a' => 'Saya merasa perlu sering mengulang pekerjaan agar sempurna.',
-                        'statement_b' => 'Saya tidak terlalu peduli pada detail kecil asalkan hasilnya bagus.',
-                        'type'        => 'forced_choice',
-                    ],
-                ],
-            ],
-        ];
-    }
-
     private function getSesiDummy(): array
     {
-        return [
-            ['id' => 1, 'nama_sesi' => 'Tes Rekrutmen Q3 2025',         'daftar_alat_tes_ditugaskan' => []],
-            ['id' => 2, 'nama_sesi' => 'Evaluasi Kompetensi Internal', 'daftar_alat_tes_ditugaskan' => ['EPPS']],
-            ['id' => 3, 'nama_sesi' => 'Assessment Awal Karyawan',     'daftar_alat_tes_ditugaskan' => ['EPPS']],
-        ];
+        $userId = auth()->id();
+        if (!$userId) {
+            return [];
+        }
+
+        $sesi = SesiTes::query()
+            ->whereHas('pesertaSesiTes', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->with(['alatTes' => function ($q) {
+                $q->select('alat_tes.id', 'alat_tes.kode');
+            }])
+            ->orderBy('tanggal_mulai')
+            ->get();
+
+        return $sesi->map(function (SesiTes $s) {
+            return [
+                'id'                          => $s->id,
+                'nama_sesi'                   => $s->nama_sesi,
+                'daftar_alat_tes_ditugaskan' => $s->alatTes
+                    ->pluck('kode')
+                    ->all(),
+            ];
+        })->all();
     }
 
     private function getSesiById(int $sesiId)
     {
-        foreach ($this->getSesiDummy() as $s) {
-            if ((int) $s['id'] === (int) $sesiId) {
-                return $s;
+        $userId = auth()->id();
+        if (!$userId) {
+            return null;
+        }
+
+        $sesi = SesiTes::query()
+            ->where('id', $sesiId)
+            ->whereHas('pesertaSesiTes', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->with(['alatTes' => function ($q) {
+                $q->select('alat_tes.id', 'alat_tes.kode');
+            }])
+            ->first();
+
+        if (!$sesi) {
+            return null;
+        }
+
+        return [
+            'id'                          => $sesi->id,
+            'nama_sesi'                   => $sesi->nama_sesi,
+            'daftar_alat_tes_ditugaskan' => $sesi->alatTes
+                ->pluck('kode')
+                ->all(),
+        ];
+    }
+
+    /**
+     * Ambil semua soal + opsi_jawaban untuk alat tes yang ditugaskan
+     * ke sesi-sesi milik user login. Output keyed by kode_alat_tes.
+     */
+    private function getSoalDummy(): array
+    {
+        $userId = auth()->id();
+        if (!$userId) {
+            return [];
+        }
+
+        $sesi = SesiTes::query()
+            ->whereHas('pesertaSesiTes', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->with(['alatTes' => function ($q) {
+                $q->with(['soal.opsiJawaban']);
+            }])
+            ->get();
+
+        $result = [];
+        foreach ($sesi as $s) {
+            foreach ($s->alatTes as $alat) {
+                $kode = $alat->kode;
+                if (isset($result[$kode])) {
+                    continue;
+                }
+                $result[$kode] = [
+                    'nama_lengkap' => $alat->nama,
+                    'format_dasar' => $alat->format_dasar,
+                    'jumlah_soal'  => $alat->soal->count(),
+                    'soal'         => $alat->soal
+                        ->sortBy('nomor')
+                        ->values()
+                        ->map(function (Soal $soal) {
+                            return [
+                                'id'          => $soal->id,
+                                'nomor'       => $soal->nomor,
+                                'teks_soal'   => $soal->teks_soal,
+                                'tipe_format' => $soal->tipe_format,
+                                'opsi'        => $soal->opsiJawaban
+                                    ->sortBy('urutan')
+                                    ->values()
+                                    ->map(function ($opsi) {
+                                        return [
+                                            'id'     => $opsi->id,
+                                            'teks'   => $opsi->teks_opsi,
+                                            'urutan' => $opsi->urutan,
+                                        ];
+                                    })->all(),
+                            ];
+                        })->all(),
+                ];
             }
         }
-        return null;
+
+        return $result;
     }
 
     private function sessionKey(int $sesiId, string $name): string
@@ -143,52 +205,45 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Jawaban sebelumnya untuk soal ini
-        $answers = Session::get($this->sessionKey($sesiId, 'answers'), []);
-        $savedAnswer = $answers[$currentStep] ?? null;
-
-        // Untuk progress bar: hitung progres di dalam alat tes ini
-        $soalAlatTesIni = [];
-        foreach ($daftarSoalFlat as $idx => $item) {
-            if ($item['kode_alat_tes'] === $kodeAlatTes) {
-                $soalAlatTesIni[] = $idx;
-            }
-        }
-        $totalSoalAlatTes = count($soalAlatTesIni);
+        // Jawaban sebelumnya untuk soal ini — ambil dari DB (opsi_dipilih_id)
+        $savedAnswer = JawabanPeserta::where('user_id', auth()->id())
+            ->where('sesi_tes_id', $sesiId)
+            ->where('soal_id', $soal['id'])
+            ->value('opsi_dipilih_id');
 
         // Variable untuk view
-        $sesiIdView       = $sesiId;
-        $nama_sesi        = $sesi['nama_sesi'];
-        $kode_alat_tes    = $kodeAlatTes;
-        $nama_alat_tes    = $soalDummy[$kodeAlatTes]['nama_lengkap'];
-        $format_dasar     = $soalDummy[$kodeAlatTes]['format_dasar'];
-        $alat_tes_index   = $alatTesIndex;
-        $total_alat_tes   = count($alatTesDenganSoal);
-        $soal_nomor       = $soalNomorAlatIni;
-        $soal_total       = $totalSoalAlatTes;
-        $soal_posisi_global = $currentStep;
-        $soal_total_global = count($daftarSoalFlat);
-        $soal_data        = $soal;
-        $saved_answer     = $savedAnswer;
-        $is_first_soal    = $currentStep === 0;
-        $is_last_soal     = $currentStep === count($daftarSoalFlat) - 1;
+        $sesiIdView           = $sesiId;
+        $nama_sesi            = $sesi['nama_sesi'];
+        $kode_alat_tes        = $kodeAlatTes;
+        $nama_alat_tes        = $soalDummy[$kodeAlatTes]['nama_lengkap'];
+        $format_dasar         = $soalDummy[$kodeAlatTes]['format_dasar'];
+        $alat_tes_index       = $alatTesIndex;
+        $total_alat_tes       = count($alatTesDenganSoal);
+        $soal_nomor           = $soalNomorAlatIni;
+        $soal_total           = count($soalDummy[$kodeAlatTes]['soal']);
+        $soal_posisi_global   = $currentStep;
+        $soal_total_global    = count($daftarSoalFlat);
+        $soal_data            = $soal;
+        $saved_answer         = $savedAnswer;
+        $is_first_soal        = $currentStep === 0;
+        $is_last_soal         = $currentStep === count($daftarSoalFlat) - 1;
 
         return view('peserta.pengerjaan-soal', [
-            'sesiId'          => $sesiIdView,
-            'nama_sesi'       => $nama_sesi,
-            'kode_alat_tes'   => $kode_alat_tes,
-            'nama_alat_tes'   => $nama_alat_tes,
-            'format_dasar'    => $format_dasar,
-            'alat_tes_index'  => $alat_tes_index,
-            'total_alat_tes'  => $total_alat_tes,
-            'soal_nomor'      => $soal_nomor,
-            'soal_total'      => $soal_total,
+            'sesiId'            => $sesiIdView,
+            'nama_sesi'         => $nama_sesi,
+            'kode_alat_tes'     => $kode_alat_tes,
+            'nama_alat_tes'     => $nama_alat_tes,
+            'format_dasar'      => $format_dasar,
+            'alat_tes_index'    => $alat_tes_index,
+            'total_alat_tes'    => $total_alat_tes,
+            'soal_nomor'        => $soal_nomor,
+            'soal_total'        => $soal_total,
             'soal_posisi_global' => $soal_posisi_global,
             'soal_total_global' => $soal_total_global,
-            'soal_data'       => $soal_data,
-            'saved_answer'    => $saved_answer,
-            'is_first_soal'   => $is_first_soal,
-            'is_last_soal'    => $is_last_soal,
+            'soal_data'         => $soal_data,
+            'saved_answer'      => $saved_answer,
+            'is_first_soal'     => $is_first_soal,
+            'is_last_soal'      => $is_last_soal,
         ]);
     }
 
@@ -223,20 +278,30 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
 
-        $choice = $request->input('choice');
-        if ($choice === null || $choice === '') {
+        $opsiId = $request->input('opsi_id');
+        if ($opsiId === null || $opsiId === '') {
             return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', 'Silakan pilih jawaban terlebih dahulu.');
         }
 
-        // Simpan jawaban
-        $answers = Session::get($this->sessionKey($sesiId, 'answers'), []);
-        $answers[$currentStep] = $choice;
-        Session::put($this->sessionKey($sesiId, 'answers'), $answers);
+        $soal = $daftarSoalFlat[$currentStep]['soal'];
+        $soalId = $soal['id'];
 
-        // Pindah ke soal berikutnya
+        // Simpan ke database (idempoten — updateOrCreate)
+        JawabanPeserta::updateOrCreate(
+            [
+                'user_id'     => auth()->id(),
+                'sesi_tes_id' => $sesiId,
+                'soal_id'     => $soalId,
+            ],
+            [
+                'opsi_dipilih_id' => (int) $opsiId,
+                'waktu_jawab'     => now(),
+            ]
+        );
+
+        // Pindah ke soal berikutnya (session hanya untuk navigasi)
         $nextStep = $currentStep + 1;
         if ($nextStep >= count($daftarSoalFlat)) {
-            // Semua soal sudah dijawab, arahkan ke halaman selesai
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
 
@@ -248,11 +313,62 @@ class PengerjaanTesController extends Controller
     public function selesai(int $sesiId)
     {
         $sesi = $this->getSesiById($sesiId);
-        $namaSesi = $sesi['nama_sesi'] ?? null;
+        if (!$sesi) {
+            return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
+        }
+
+        $soalDummy     = $this->getSoalDummy();
+        $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
+        $userId        = auth()->id();
+
+        // Muat alat_tes_id untuk setiap kode alat tes yang ditugaskan
+        $alatTesByKode = SesiTes::where('id', $sesiId)
+            ->with('alatTes:id,kode')
+            ->first()
+            ->alatTes
+            ->keyBy('kode')
+            ->map(fn ($a) => $a->id);
+
+        // Panggil scoring untuk setiap alat tes yang pakai forced_choice
+        $scoringService = app(ScoringEngineService::class);
+        $skorHasil      = [];
+
+        foreach ($daftarAlatTes as $kodeAlat) {
+            if (!isset($soalDummy[$kodeAlat])) {
+                continue;
+            }
+
+            $alatTesId = $alatTesByKode[$kodeAlat] ?? null;
+            if (!$alatTesId) {
+                continue;
+            }
+
+            $formatDasar = strtolower(str_replace(' ', '_', $soalDummy[$kodeAlat]['format_dasar'] ?? ''));
+            if ($formatDasar === 'forced_choice') {
+                // TODO: kelompok_segmen EPPS (1-4) perlu dikonfirmasi ke psikolog
+                // (kemungkinan berdasarkan tingkat pendidikan peserta).
+                // Sementara pakai '2' yang punya data norma paling lengkap.
+                $kelompokSegmen = '2';
+                $skorHasil[$kodeAlat] = $scoringService->scoreForcedChoice(
+                    $userId,
+                    $sesiId,
+                    $alatTesId,
+                    $kelompokSegmen
+                );
+            }
+        }
+
+        PesertaSesiTes::where('user_id', auth()->id())
+            ->where('sesi_tes_id', $sesiId)
+            ->update([
+                'status_pengerjaan' => 'Selesai',
+                'tanggal_pengerjaan' => now(),
+            ]);
 
         return view('peserta.tes-selesai', [
-            'sesiId'   => $sesiId,
-            'namaSesi' => $namaSesi,
+            'sesiId'  => $sesiId,
+            'namaSesi' => $sesi['nama_sesi'],
+            'skorHasil' => $skorHasil,
         ]);
     }
 }

@@ -64,22 +64,13 @@ class DashboardController extends Controller
         })
             ->with(['departemenTerkait', 'alatTes' => function ($q) {
                 $q->select('alat_tes.id', 'alat_tes.kode');
-            }])
+            }, 'pesertaSesiTesRecords'])
             ->orderBy('tanggal_mulai', 'desc')
             ->get();
 
-        return $sesiTes->map(function ($sesi) {
-            $startDate = Carbon::parse($sesi->tanggal_mulai);
-            $endDate = Carbon::parse($sesi->tanggal_selesai);
-            $today = Carbon::now()->startOfDay();
-
-            if ($today > $endDate) {
-                $statusPengerjaan = 'Selesai';
-            } elseif ($today >= $startDate) {
-                $statusPengerjaan = 'Sedang Berjalan';
-            } else {
-                $statusPengerjaan = 'Belum Mengerjakan';
-            }
+        return $sesiTes->map(function ($sesi) use ($user) {
+            $peserta = $sesi->pesertaSesiTesRecords->firstWhere('user_id', $user->id);
+            $statusPengerjaan = $peserta ? $peserta->status_pengerjaan : 'Belum Mengerjakan';
 
             return [
                 'id' => $sesi->id,

@@ -44,6 +44,11 @@ class SesiTes extends Model
         return $this->belongsToMany(User::class, 'peserta_sesi_tes', 'sesi_tes_id', 'user_id');
     }
 
+    public function pesertaSesiTesRecords()
+    {
+        return $this->hasMany(PesertaSesiTes::class, 'sesi_tes_id');
+    }
+
     public function jawabanPeserta()
     {
         return $this->hasMany(JawabanPeserta::class, 'sesi_tes_id');

@@ -142,6 +142,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/edit', [AlatTesController::class, 'edit'])->name('edit');
         Route::put('/{id}', [AlatTesController::class, 'update'])->name('update');
         Route::delete('/{id}', [AlatTesController::class, 'hapus'])->name('hapus');
+        Route::get('/{id}/norma', [AlatTesController::class, 'norma'])
+            ->whereNumber('id')->name('norma');
+        Route::post('/{id}/norma', [AlatTesController::class, 'uploadNorma'])
+            ->whereNumber('id')->name('uploadNorma');
     });
 
     // =========================================

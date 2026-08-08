@@ -137,6 +137,11 @@
                                            title="Edit">
                                             <span class="material-symbols-outlined text-[18px]">edit</span>
                                         </a>
+                                        <a href="{{ route('admin.alat-tes.norma', $alat['id']) }}"
+                                           class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                           title="Kelola Norma">
+                                            <span class="material-symbols-outlined text-[18px]">bar_chart</span>
+                                        </a>
                                         <button type="button"
                                                 class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
                                                 title="Hapus"

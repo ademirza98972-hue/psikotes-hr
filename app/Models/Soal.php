@@ -19,6 +19,7 @@ class Soal extends Model
         'nomor',
         'teks_soal',
         'tipe_format',
+        'kunci_jawaban',
         'urutan',
         'duplikat_dari_soal_id',
     ];

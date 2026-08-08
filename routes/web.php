@@ -139,6 +139,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [AlatTesController::class, 'index'])->name('index');
         Route::get('/tambah', [AlatTesController::class, 'tambah'])->name('tambah');
         Route::post('/', [AlatTesController::class, 'simpan'])->name('simpan');
+        Route::get('/{id}/edit', [AlatTesController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AlatTesController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AlatTesController::class, 'hapus'])->name('hapus');
     });
 
     // =========================================
@@ -147,15 +150,25 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin/bank-soal')->name('admin.bank-soal.')->group(function () {
         Route::get('/', [BankSoalController::class, 'index'])->name('index');
         Route::get('/tambah/{alatTesId}', [BankSoalController::class, 'tambah'])->whereNumber('alatTesId')->name('tambah');
+        Route::post('/{alatTesId}', [BankSoalController::class, 'simpan'])->whereNumber('alatTesId')->name('simpan');
+        Route::get('/{id}/edit', [BankSoalController::class, 'edit'])->whereNumber('id')->name('edit');
+        Route::put('/{id}', [BankSoalController::class, 'update'])->whereNumber('id')->name('update');
+        Route::delete('/{id}', [BankSoalController::class, 'hapus'])->whereNumber('id')->name('hapus');
     });
 
     // =========================================
-    // PENJADWALAN TES (placeholder, data dummy hardcode)
+    // PENJADWALAN TES
     // =========================================
     Route::prefix('admin/penjadwalan-tes')->name('admin.penjadwalan-tes.')->group(function () {
         Route::get('/', [PenjadwalanTesController::class, 'index'])->name('index');
         Route::get('/tambah', [PenjadwalanTesController::class, 'tambah'])->name('tambah');
         Route::post('/', [PenjadwalanTesController::class, 'simpan'])->name('simpan');
+        Route::get('/{id}', [PenjadwalanTesController::class, 'detail'])->whereNumber('id')->name('detail');
+        Route::get('/{id}/edit', [PenjadwalanTesController::class, 'edit'])->whereNumber('id')->name('edit');
+        Route::put('/{id}', [PenjadwalanTesController::class, 'update'])->whereNumber('id')->name('update');
+        Route::post('/{id}/peserta', [PenjadwalanTesController::class, 'tambahPeserta'])->whereNumber('id')->name('tambahPeserta');
+        Route::delete('/{id}/peserta/{userId}', [PenjadwalanTesController::class, 'hapusPeserta'])->whereNumber(['id','userId'])->name('hapusPeserta');
+        Route::delete('/{id}', [PenjadwalanTesController::class, 'hapus'])->whereNumber('id')->name('hapus');
     });
 
     // =========================================

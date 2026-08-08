@@ -10,9 +10,6 @@
     $warnaAlatTes = [
         'EPPS'   => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
     ];
-    $formatLookup = collect([
-        ['nama' => 'EPPS',  'format' => 'Forced Choice'],
-    ])->keyBy('nama');
     $bulanId = [
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
         5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
@@ -42,37 +39,37 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         @forelse ($penjadwalan as $sesi)
             @php
-                $persen = $sesi['jumlah_peserta'] > 0
-                    ? round(($sesi['jumlah_selesai'] / $sesi['jumlah_peserta']) * 100)
+                $persen = $sesi->jumlah_peserta > 0
+                    ? round(($sesi->jumlah_selesai / $sesi->jumlah_peserta) * 100)
                     : 0;
             @endphp
             <div class="rounded-xl border border-[#c1c7cb] bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#2C5F6F] hover:shadow-md flex flex-col justify-between">
 
                 <div>
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="font-bold text-[#191c1e] text-base">{{ $sesi['nama_sesi'] }}</h3>
-                        <span class="px-3 py-1 rounded-full text-[11px] font-bold border {{ $warnaStatus[$sesi['status']] ?? 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                            {{ $sesi['status'] }}
+                        <h3 class="font-bold text-[#191c1e] text-base">{{ $sesi->nama_sesi }}</h3>
+                        <span class="px-3 py-1 rounded-full text-[11px] font-bold border {{ $warnaStatus[$sesi->status] ?? 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                            {{ $sesi->status }}
                         </span>
                     </div>
 
                     <div class="space-y-2 mb-6">
                         <div class="flex items-center gap-2 text-[#41484b] text-sm">
                             <span class="material-symbols-outlined text-[18px]">business</span>
-                            <span>Departemen: <strong class="text-[#191c1e]">{{ $sesi['departemen_terkait'] ?? '—' }}</strong></span>
+                            <span>Departemen: <strong class="text-[#191c1e]">{{ $sesi->departemenTerkait?->nama_departemen ?? '—' }}</strong></span>
                         </div>
                         <div class="flex items-center gap-2 text-[#41484b] text-sm">
                             <span class="material-symbols-outlined text-[18px]">calendar_today</span>
-                            <span>Periode: <strong class="text-[#191c1e]">{{ $tglId($sesi['tanggal_mulai']) }} – {{ $tglId($sesi['tanggal_selesai']) }}</strong></span>
+                            <span>Periode: <strong class="text-[#191c1e]">{{ $tglId($sesi->tanggal_mulai) }} – {{ $tglId($sesi->tanggal_selesai) }}</strong></span>
                         </div>
                     </div>
 
                     <div class="mb-6">
                         <p class="text-[11px] font-semibold uppercase tracking-wider text-[#41484b] mb-2">ALAT TES:</p>
                         <div class="flex flex-wrap gap-2">
-                            @forelse ($sesi['daftar_alat_tes'] as $namaAlat)
-                                <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $warnaAlatTes[$namaAlat] ?? 'bg-slate-50 text-slate-600 border border-slate-200' }}">
-                                    {{ $namaAlat }}
+                            @forelse ($sesi->alatTes as $alat)
+                                <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $warnaAlatTes[$alat->kode] ?? 'bg-slate-50 text-slate-600 border border-slate-200' }}">
+                                    {{ $alat->kode ?? $alat->nama }}
                                 </span>
                             @empty
                                 <span class="text-xs text-[#919eab]">— belum dipilih</span>
@@ -83,7 +80,7 @@
 
                 <div class="mt-auto">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-[#41484b]">Progres Peserta: <span class="font-bold text-[#191c1e]">{{ $sesi['jumlah_selesai'] }}/{{ $sesi['jumlah_peserta'] }}</span> selesai</span>
+                        <span class="text-sm text-[#41484b]">Progres Peserta: <span class="font-bold text-[#191c1e]">{{ $sesi->jumlah_selesai }}/{{ $sesi->jumlah_peserta }}</span> selesai</span>
                         <span class="text-sm font-bold text-[#2C5F6F]">{{ $persen }}%</span>
                     </div>
                     <div class="w-full h-2 bg-[#e6e8ea] rounded-full overflow-hidden mb-6">
@@ -91,12 +88,24 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-2 border-t border-[#c1c7cb] pt-4">
-                        <button type="button" disabled title="Detail belum diimplementasikan"
-                                class="cursor-not-allowed px-4 py-2 text-sm font-semibold text-slate-400 opacity-60">Detail</button>
-                        <button type="button" disabled title="Ubah belum diimplementasikan"
-                                class="cursor-not-allowed px-4 py-2 text-sm font-semibold text-slate-600 opacity-60">Ubah</button>
-                        <button type="button" disabled title="Hapus belum diimplementasikan"
-                                class="cursor-not-allowed px-4 py-2 text-sm font-semibold text-slate-600 opacity-60">Hapus</button>
+                        <a href="{{ route('admin.penjadwalan-tes.detail', $sesi->id) }}"
+                           class="px-4 py-2 text-sm font-semibold text-[#2C5F6F] hover:bg-[#2C5F6F]/5 rounded-lg transition-colors">
+                            Detail
+                        </a>
+                        <a href="{{ route('admin.penjadwalan-tes.edit', $sesi->id) }}"
+                           class="px-4 py-2 text-sm font-semibold text-[#41484b] hover:bg-[#f2f4f6] rounded-lg transition-colors">
+                            Ubah
+                        </a>
+                        <form method="POST"
+                              action="{{ route('admin.penjadwalan-tes.hapus', $sesi->id) }}"
+                              onsubmit="return confirm('Hapus sesi {{ addslashes($sesi->nama_sesi) }}?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="px-4 py-2 text-sm font-semibold text-rose-600 hover:text-rose-700 transition-colors">
+                                Hapus
+                            </button>
+                        </form>
                     </div>
                 </div>
 

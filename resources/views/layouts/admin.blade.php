@@ -347,5 +347,6 @@
             if (fallback) fallback.style.display = 'flex';
         }
     </script>
+    @stack('scripts')
 </body>
 </html>

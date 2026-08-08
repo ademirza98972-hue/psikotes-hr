@@ -19,7 +19,7 @@
         <div class="flex items-center gap-2">
             @if(auth()->user()->hasIzin('soal.tambah'))
             @if($alatTesTerpilih)
-                <a href="{{ route('admin.bank-soal.tambah', $alatTesTerpilih['id']) }}"
+                <a href="{{ route('admin.bank-soal.tambah', $alatTesTerpilih->id) }}"
                    class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
                     <span class="material-symbols-outlined text-[18px]">add</span>
                     Tambah Soal
@@ -28,7 +28,7 @@
                 {{-- Tampilkan tombol Tambah Soal tanpa filter (ambil dari alat tes pertama) --}}
                 @php $alatFirst = $alatTesSemua[0] ?? null; @endphp
                 @if($alatFirst)
-                <a href="{{ route('admin.bank-soal.tambah', $alatFirst['id']) }}"
+                <a href="{{ route('admin.bank-soal.tambah', $alatFirst->id) }}"
                    class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
                     <span class="material-symbols-outlined text-[18px]">add</span>
                     Tambah Soal
@@ -55,8 +55,8 @@
                             class="block w-64 rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
                         <option value="">Semua Instrumen</option>
                         @foreach ($alatTesSemua as $alat)
-                            <option value="{{ $alat['id'] }}" @selected((int) request('alat_tes_id') === $alat['id'])>
-                                {{ $alat['nama'] }} ({{ $alat['format_dasar'] }})
+                            <option value="{{ $alat->id }}" @selected((int) request('alat_tes_id') === $alat->id)>
+                                {{ $alat->nama }} ({{ $alat->format_dasar }})
                             </option>
                         @endforeach
                     </select>
@@ -79,7 +79,7 @@
         @php
             $kodeAlat = '';
             foreach (['EPPS'] as $k) {
-                if (str_contains($alatTesTerpilih['nama'], $k)) {
+                if (str_contains($alatTesTerpilih->nama, $k)) {
                     $kodeAlat = $k;
                     break;
                 }
@@ -90,16 +90,16 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
                 @php
-                    $namaTampil = ($alatTesTerpilih['nama'] === $kodeAlat)
+                    $namaTampil = ($alatTesTerpilih->nama === $kodeAlat)
                         ? 'Instrument ' . $kodeAlat
-                        : $alatTesTerpilih['nama'];
+                        : $alatTesTerpilih->nama;
                 @endphp
                 <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $warnaKode[$kodeAlat] ?? 'bg-slate-100 text-slate-700' }}">
                     {{ $kodeAlat }}
                 </span>
                 <h2 class="text-base font-semibold text-[#191c1e]">{{ $namaTampil }}</h2>
                 <span class="inline-block rounded-full border border-[#c0c8cb] px-2.5 py-0.5 text-[11px] font-medium text-[#40484b]">
-                    {{ $alatTesTerpilih['format_dasar'] }}
+                    {{ $alatTesTerpilih->format_dasar }}
                 </span>
             </div>
             <span class="text-[12px] text-[#40484b]">{{ count($daftarSoal) }} soal terdaftar</span>
@@ -115,7 +115,7 @@
                     @include('admin.bank-soal.partials.kartu-soal', [
                         'nomor'       => $idx + 1,
                         'soal'        => $soal,
-                        'format'      => $alatTesTerpilih['format_dasar'],
+                        'format'      => $alatTesTerpilih->format_dasar,
                         'kodeAlat'    => $kodeAlat,
                         'warnaKode'   => $warnaKode,
                     ])
@@ -132,11 +132,11 @@
             </div>
         @else
             @foreach($kelompokSoalSemua as $alatId => $kelompok)
-                @if($kelompok['alat'] === null) @continue @endif
+                @if(empty($kelompok['alat'])) @continue @endif
                 @php
                     $kodeAlat = '';
                     foreach (['EPPS'] as $k) {
-                        if (str_contains($kelompok['alat']['nama'], $k)) {
+                        if (str_contains($kelompok['alat']->nama, $k)) {
                             $kodeAlat = $k;
                             break;
                         }
@@ -150,13 +150,13 @@
                             {{ $kodeAlat }}
                         </span>
                         @php
-                            $namaTampilAll = ($kelompok['alat']['nama'] === $kodeAlat)
+                            $namaTampilAll = ($kelompok['alat']->nama === $kodeAlat)
                                 ? 'Instrument ' . $kodeAlat
-                                : $kelompok['alat']['nama'];
+                                : $kelompok['alat']->nama;
                         @endphp
                         <h3 class="text-sm font-semibold text-[#191c1e]">{{ $namaTampilAll }}</h3>
                         <span class="inline-block rounded-full border border-[#c0c8cb] px-2.5 py-0.5 text-[11px] font-medium text-[#40484b]">
-                            {{ $kelompok['alat']['format_dasar'] }}
+                            {{ $kelompok['alat']->format_dasar }}
                         </span>
                     </div>
                     <span class="text-[12px] text-[#40484b]">{{ $kelompok['jumlahSoal'] }} soal</span>
@@ -168,7 +168,7 @@
                         @include('admin.bank-soal.partials.kartu-soal', [
                             'nomor'       => $idx + 1,
                             'soal'        => $soal,
-                            'format'      => $kelompok['alat']['format_dasar'],
+                            'format'      => $kelompok['alat']->format_dasar,
                             'kodeAlat'    => $kodeAlat,
                             'warnaKode'   => $warnaKode,
                         ])

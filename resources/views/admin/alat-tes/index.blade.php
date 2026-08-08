@@ -91,9 +91,7 @@
                 <tbody class="divide-y divide-[#e0e3e5]/60">
                     @forelse ($alatTes as $alat)
                         @php
-                            // TODO: gunakan field `kode` dari database jika sudah ada.
-                            // Saat ini ekstrak dari nama karena field kode belum tersedia.
-                            $kode = strtoupper(mb_substr($alat['nama'], 0, 4));
+                            $kode = $alat['kode'];
 
                             $warnaKode = [
                                 'EPPS' => 'bg-emerald-100 text-emerald-700',
@@ -133,22 +131,20 @@
                             </td>
                             <td class="px-5 py-3.5 text-right">
                                 @if(auth()->user()->hasIzin('kategori_tes.kelola'))
-                                <div class="flex items-center justify-end gap-1">
-                                    <a href="{{ route('admin.alat-tes.tambah') }}"
-                                       class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
-                                       title="Edit">
-                                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                                    </a>
-                                    @endif
-                                    @if(auth()->user()->hasIzin('kategori_tes.kelola'))
-                                    <button type="button"
-                                            class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
-                                            title="Hapus"
-                                            onclick="confirm('Yakin hapus alat tes {{ $alat['nama'] }}?')">
-                                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                                    </button>
-                                    @endif
-                                </div>
+                                    <div class="flex items-center justify-end gap-1">
+                                        <a href="{{ route('admin.alat-tes.edit', $alat['id']) }}"
+                                           class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                           title="Edit">
+                                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                                        </a>
+                                        <button type="button"
+                                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                                                title="Hapus"
+                                                onclick="confirmHapusAlatTes({{ $alat['id'] }}, '{{ addslashes($alat['nama']) }}')">
+                                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                                        </button>
+                                    </div>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -190,7 +186,6 @@
 
 @push('scripts')
 <script>
-    // Search highlight simulation (optional enhancement)
     const searchInput = document.querySelector('#alat-tes-search');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -200,6 +195,17 @@
                 row.style.display = text.includes(val) ? '' : 'none';
             });
         });
+    }
+
+    function confirmHapusAlatTes(id, nama) {
+        if (confirm(`Apakah Anda yakin ingin menghapus alat tes "${nama}"?`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/alat-tes/${id}`;
+            form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">';
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 </script>
 @endpush

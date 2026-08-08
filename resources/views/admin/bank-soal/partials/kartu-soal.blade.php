@@ -9,30 +9,42 @@
             <span class="text-[12px] text-[#40484b]">No. {{ str_pad($nomor, 3, '0', STR_PAD_LEFT) }}</span>
         </div>
         <div class="flex gap-1">
-            {{-- TODO: implementasi edit soal --}}
-            <button type="button" disabled title="Edit belum diimplementasikan"
-                    class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#f2f4f6] hover:text-[#2C5F6F] transition-colors cursor-not-allowed opacity-50">
+            <a href="{{ route('admin.bank-soal.edit', $soal['id']) }}"
+               class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#f2f4f6] hover:text-[#2C5F6F] transition-colors"
+               title="Edit soal">
                 <span class="material-symbols-outlined text-[18px]">edit</span>
-            </button>
-            {{-- TODO: implementasi hapus soal --}}
-            <button type="button" disabled title="Hapus belum diimplementasikan"
-                    class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-not-allowed opacity-50">
+            </a>
+            <button type="button" onclick="confirmHapus({{ $soal['id'] }}, '{{ route('admin.bank-soal.hapus', $soal['id']) }}')"
+                    class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                    title="Hapus soal">
                 <span class="material-symbols-outlined text-[18px]">delete</span>
             </button>
+            <form id="hapus-soal-{{ $soal['id'] }}" method="POST" action="{{ route('admin.bank-soal.hapus', $soal['id']) }}" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
         </div>
     </div>
+
+    <script>
+    function confirmHapus(soalId, url) {
+        if (confirm('Yakin ingin menghapus soal ini?')) {
+            document.getElementById('hapus-soal-' + soalId).submit();
+        }
+    }
+    </script>
 
     @if ($format === 'Pilihan Ganda')
         <p class="text-[16px] leading-relaxed text-[#191c1e]">{{ $soal['teks_soal'] }}</p>
         <ul class="mt-4 space-y-2">
             @foreach (['A','B','C','D'] as $i => $huruf)
                 @php $opsi = $soal['opsi'][$i] ?? ''; @endphp
-                <li class="flex items-center gap-3 rounded-xl border {{ $soal['kunci'] === $huruf ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-[#e0e3e5] bg-white' }} px-4 py-3 text-sm transition-colors hover:border-[#2C5F6F]/50">
-                    <span class="flex items-center justify-center w-6 h-6 rounded-full border {{ $soal['kunci'] === $huruf ? 'border-[#2C5F6F] bg-[#2C5F6F] text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-bold shrink-0">
+                <li class="flex items-center gap-3 rounded-xl border {{ $soal['kunci_jawaban'] === $huruf ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-[#e0e3e5] bg-white' }} px-4 py-3 text-sm transition-colors hover:border-[#2C5F6F]/50">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full border {{ $soal['kunci_jawaban'] === $huruf ? 'border-[#2C5F6F] bg-[#2C5F6F] text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-bold shrink-0">
                         {{ $huruf }}
                     </span>
-                    <span class="{{ $soal['kunci'] === $huruf ? 'font-semibold text-[#191c1e]' : 'text-[#40484b]' }}">{{ $opsi }}</span>
-                    @if ($soal['kunci'] === $huruf)
+                    <span class="{{ $soal['kunci_jawaban'] === $huruf ? 'font-semibold text-[#191c1e]' : 'text-[#40484b]' }}">{{ $opsi }}</span>
+                    @if ($soal['kunci_jawaban'] === $huruf)
                         <span class="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#2C5F6F]">
                             <span class="material-symbols-outlined text-[14px]">check_circle</span>
                             Kunci

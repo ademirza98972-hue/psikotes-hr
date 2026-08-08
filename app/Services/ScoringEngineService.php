@@ -343,4 +343,33 @@ class ScoringEngineService
             );
         });
     }
+
+    public function dispatch(
+        int $userId,
+        int $sesiTesId,
+        int $alatTesId,
+        string $kelompokSegmen = 'default'
+    ): mixed {
+        $alatTes = \App\Models\AlatTes::findOrFail($alatTesId);
+
+        return match($alatTes->pola_skoring) {
+            'kognitif'             => $this->scoreKognitif($userId, $sesiTesId, $alatTesId),
+            'forced_choice'        => $this->scoreForcedChoice($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
+            'forced_choice_rollup' => $this->scoreForcedChoiceRollup($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
+            'grid'                 => $this->scoreGrid($userId, $sesiTesId, $alatTesId),
+            default                => throw new \InvalidArgumentException(
+                "pola_skoring '{$alatTes->pola_skoring}' tidak dikenal untuk alat tes '{$alatTes->kode}'."
+            ),
+        };
+    }
+
+    private function scoreForcedChoiceRollup(
+        int $userId,
+        int $sesiTesId,
+        int $alatTesId,
+        string $kelompokSegmen
+    ): mixed {
+        $this->scoreForcedChoice($userId, $sesiTesId, $alatTesId, $kelompokSegmen);
+        return $this->scoreRollup($userId, $sesiTesId, $alatTesId);
+    }
 }

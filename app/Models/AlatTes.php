@@ -19,6 +19,7 @@ class AlatTes extends Model
         'kategori',
         'deskripsi',
         'format_dasar',
+        'pola_skoring',
         'durasi_total_menit',
         'batas_waktu_per_soal_aktif',
         'batas_waktu_per_soal_detik',

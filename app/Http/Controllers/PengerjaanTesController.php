@@ -349,13 +349,16 @@ class PengerjaanTesController extends Controller
                 // (kemungkinan berdasarkan tingkat pendidikan peserta).
                 // Sementara pakai '2' yang punya data norma paling lengkap.
                 $kelompokSegmen = '2';
-                $skorHasil[$kodeAlat] = $scoringService->scoreForcedChoice(
-                    $userId,
-                    $sesiId,
-                    $alatTesId,
-                    $kelompokSegmen
-                );
+            } else {
+                $kelompokSegmen = 'default'; // akan diupdate saat norma lengkap
             }
+
+            $skorHasil[$kodeAlat] = $scoringService->dispatch(
+                $userId,
+                $sesiId,
+                $alatTesId,
+                $kelompokSegmen
+            );
         }
 
         PesertaSesiTes::where('user_id', auth()->id())

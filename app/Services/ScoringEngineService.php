@@ -58,6 +58,7 @@ class ScoringEngineService
             [
                 'skor_mentah' => $skorMentah,
                 'skor_akhir'  => $skorAkhir,
+                'level_id'    => $this->cariLevelId($dimensiIQ, (float) $skorAkhir),
             ]
         );
     }
@@ -112,6 +113,7 @@ class ScoringEngineService
                     [
                         'skor_mentah' => $skorMentah,
                         'skor_akhir'  => $skorAkhir,
+                        'level_id'    => $this->cariLevelId($dimensiId, (float) $skorAkhir),
                     ]
                 )
             );
@@ -181,6 +183,7 @@ class ScoringEngineService
             [
                 'skor_mentah' => $skorMentah,
                 'skor_akhir'  => $skorAkhir,
+                'level_id'    => $this->cariLevelId($dimensiCon->id, (float) $skorAkhir),
             ]
         );
     }
@@ -232,6 +235,7 @@ class ScoringEngineService
                     [
                         'skor_mentah' => $skorMentah,
                         'skor_akhir'  => $skorMentah,
+                        'level_id'    => $this->cariLevelId($turunan->id, (float) $skorMentah),
                     ]
                 )
             );
@@ -329,19 +333,30 @@ class ScoringEngineService
         ]);
 
         return $results->map(function ($item) use ($userId, $sesiTesId, $alatTesId, $dimensiByKode) {
+            $dimensiId = $dimensiByKode[$item['kode_dimensi']];
             return HasilSkorPeserta::updateOrCreate(
                 [
                     'user_id'     => $userId,
                     'sesi_tes_id' => $sesiTesId,
                     'alat_tes_id' => $alatTesId,
-                    'dimensi_id'  => $dimensiByKode[$item['kode_dimensi']],
+                    'dimensi_id'  => $dimensiId,
                 ],
                 [
                     'skor_mentah' => $item['skor_mentah'],
                     'skor_akhir'  => $item['skor_akhir'],
+                    'level_id'    => $this->cariLevelId($dimensiId, (float) $item['skor_akhir']),
                 ]
             );
         });
+    }
+
+    private function cariLevelId(int $dimensiId, float $skorAkhir): ?int
+    {
+        return \App\Models\LevelDimensi::where('dimensi_id', $dimensiId)
+            ->where('skor_min', '<=', $skorAkhir)
+            ->where('skor_max', '>=', $skorAkhir)
+            ->orderBy('urutan')
+            ->value('id');
     }
 
     public function dispatch(

@@ -219,6 +219,41 @@
                     </tbody>
                 </table>
 
+            {{-- CFIT: tampilkan skor IQ tunggal --}}
+            @elseif (str_contains($alatTes['nama_alat_tes'], 'CFIT') && !empty($alatTes['skor_ringkas']))
+                @php $skorCfit = $alatTes['skor_ringkas'][0] ?? null; @endphp
+                @if ($skorCfit)
+                    <div class="mt-3">
+                        <div style="display:flex; align-items:center; gap:20px; padding:10px; background:#f0f6ff; border:1px solid #b8d4f0; border-radius:4px;">
+                            <div style="text-align:center;">
+                                <p style="font-size:11px; font-weight:700; color:#1a5696; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Skor IQ</p>
+                                <p style="font-size:32px; font-weight:700; color:#0a2463; line-height:1;">{{ $skorCfit['skor_skala'] }}</p>
+                            </div>
+                            <div style="flex:1; font-size:12px; color:#333;">
+                                <p>Skor Mentah: <strong>{{ $skorCfit['skor_mentah'] }}</strong></p>
+                                @if ($skorCfit['kategori'] !== '—')
+                                <p style="margin-top:4px;">Kategori: <strong>{{ $skorCfit['kategori'] }}</strong></p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+            {{-- Papikostik & alat tes lain: tabel skor per dimensi --}}
+            @elseif (!empty($alatTes['skor_ringkas']))
+                <table>
+                    <thead class="th-row"><tr><th style="width:50%;">Dimensi</th><th style="width:20%; text-align:center;">Skor Mentah</th><th style="width:20%; text-align:center;">Skor Akhir</th><th style="width:10%; text-align:center;">Kategori</th></tr></thead>
+                    <tbody>
+                        @foreach ($alatTes['skor_ringkas'] as $skor)
+                        <tr style="border-bottom:1px solid #e0e3e5;">
+                            <td style="padding:3px 5px;">{{ $skor['dimensi'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['skor_mentah'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['skor_skala'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['kategori'] }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             @endif
         </div>
     @endforeach

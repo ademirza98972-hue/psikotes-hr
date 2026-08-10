@@ -78,6 +78,43 @@ class HasilTesController extends Controller
             'hasil_alat_tes'     => [],
         ];
 
+        $hasilSkor = HasilSkorPeserta::where('user_id', $pesertaId)
+            ->where('sesi_tes_id', $sesiId)
+            ->with(['dimensi.alatTes', 'alatTes'])
+            ->get();
+
+        $grouped = $hasilSkor->groupBy(fn($h) =>
+            $h->alatTes?->id ?? $h->dimensi?->alatTes?->id
+        );
+
+        $hasilAlatTes = [];
+        foreach ($grouped as $alatTesId => $skorList) {
+            $firstRow = $skorList->first();
+            $alatTes = $firstRow->alatTes
+                ?? $firstRow->dimensi?->alatTes;
+
+            if (!$alatTes) continue;
+
+            $skorRingkas = $skorList->map(fn($h) => [
+                'dimensi'          => ($h->dimensi?->kode_dimensi ?? '')
+                    . ' - '
+                    . ($h->dimensi?->nama_dimensi ?? '—'),
+                'skor_mentah'  => $h->skor_mentah,
+                'skor_skala'   => $h->skor_akhir,
+                'skor_persentil' => $h->skor_akhir,
+                'kategori'     => $h->level?->label ?? '—',
+            ])->values()->all();
+
+            $hasilAlatTes[] = [
+                'nama_alat_tes'            => $alatTes->nama,
+                'format_dasar'             => $alatTes->format_dasar,
+                'durasi_pengerjaan_aktual' => '—',
+                'skor_ringkas'             => $skorRingkas,
+            ];
+        }
+
+        $hasilTes['hasil_alat_tes'] = $hasilAlatTes;
+
         $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps(
             $hasilTes['hasil_alat_tes'],
             $pesertaId,

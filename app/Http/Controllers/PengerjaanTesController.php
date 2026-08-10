@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PesertaAlatTes;
 use App\Models\PesertaSesiTes;
 use App\Models\SesiTes;
 use App\Models\Soal;
@@ -20,58 +21,48 @@ class PengerjaanTesController extends Controller
     private function getSesiDummy(): array
     {
         $userId = auth()->id();
-        if (!$userId) {
-            return [];
-        }
+        if (!$userId) return [];
 
-        $sesi = SesiTes::query()
-            ->whereHas('pesertaSesiTes', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            })
-            ->with(['alatTes' => function ($q) {
-                $q->select('alat_tes.id', 'alat_tes.kode');
-            }])
-            ->orderBy('tanggal_mulai')
+        $pesertaSesiList = PesertaSesiTes::where('user_id', $userId)
+            ->with(['sesiTes', 'alatTes'])
             ->get();
 
-        return $sesi->map(function (SesiTes $s) {
+        return $pesertaSesiList->map(function (PesertaSesiTes $ps) {
             return [
-                'id'                          => $s->id,
-                'nama_sesi'                   => $s->nama_sesi,
-                'daftar_alat_tes_ditugaskan' => $s->alatTes
-                    ->pluck('kode')
-                    ->all(),
+                'id'                         => $ps->sesi_tes_id,
+                'nama_sesi'                  => $ps->sesiTes?->nama_sesi ?? '—',
+                'peserta_sesi_tes_id'        => $ps->id,
+                'daftar_alat_tes_ditugaskan' => $ps->alatTes->pluck('kode')->all(),
             ];
         })->all();
     }
 
-    private function getSesiById(int $sesiId)
+    private function getSesiById(int $sesiId): ?array
     {
         $userId = auth()->id();
-        if (!$userId) {
-            return null;
-        }
+        if (!$userId) return null;
 
-        $sesi = SesiTes::query()
-            ->where('id', $sesiId)
-            ->whereHas('pesertaSesiTes', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            })
-            ->with(['alatTes' => function ($q) {
-                $q->select('alat_tes.id', 'alat_tes.kode');
-            }])
+        $pesertaSesi = PesertaSesiTes::where('sesi_tes_id', $sesiId)
+            ->where('user_id', $userId)
             ->first();
 
-        if (!$sesi) {
-            return null;
-        }
+        if (!$pesertaSesi) return null;
+
+        $sesi = SesiTes::find($sesiId);
+        if (!$sesi) return null;
+
+        $alatTesPeserta = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesi->id)
+            ->with('alatTes:id,kode,nama,format_dasar')
+            ->get()
+            ->pluck('alatTes')
+            ->filter()
+            ->values();
 
         return [
-            'id'                          => $sesi->id,
-            'nama_sesi'                   => $sesi->nama_sesi,
-            'daftar_alat_tes_ditugaskan' => $sesi->alatTes
-                ->pluck('kode')
-                ->all(),
+            'id'                         => $sesi->id,
+            'nama_sesi'                  => $sesi->nama_sesi,
+            'peserta_sesi_tes_id'        => $pesertaSesi->id,
+            'daftar_alat_tes_ditugaskan' => $alatTesPeserta->pluck('kode')->all(),
         ];
     }
 
@@ -82,26 +73,18 @@ class PengerjaanTesController extends Controller
     private function getSoalDummy(): array
     {
         $userId = auth()->id();
-        if (!$userId) {
-            return [];
-        }
+        if (!$userId) return [];
 
-        $sesi = SesiTes::query()
-            ->whereHas('pesertaSesiTes', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            })
-            ->with(['alatTes' => function ($q) {
-                $q->with(['soal.opsiJawaban']);
-            }])
+        $pesertaSesiList = PesertaSesiTes::where('user_id', $userId)
+            ->with(['alatTes.soal.opsiJawaban'])
             ->get();
 
         $result = [];
-        foreach ($sesi as $s) {
-            foreach ($s->alatTes as $alat) {
+        foreach ($pesertaSesiList as $ps) {
+            foreach ($ps->alatTes as $alat) {
                 $kode = $alat->kode;
-                if (isset($result[$kode])) {
-                    continue;
-                }
+                if (isset($result[$kode])) continue;
+
                 $result[$kode] = [
                     'nama_lengkap' => $alat->nama,
                     'format_dasar' => $alat->format_dasar,
@@ -118,13 +101,11 @@ class PengerjaanTesController extends Controller
                                 'opsi'        => $soal->opsiJawaban
                                     ->sortBy('urutan')
                                     ->values()
-                                    ->map(function ($opsi) {
-                                        return [
-                                            'id'     => $opsi->id,
-                                            'teks'   => $opsi->teks_opsi,
-                                            'urutan' => $opsi->urutan,
-                                        ];
-                                    })->all(),
+                                    ->map(fn($opsi) => [
+                                        'id'     => $opsi->id,
+                                        'teks'   => $opsi->teks_opsi,
+                                        'urutan' => $opsi->urutan,
+                                    ])->all(),
                             ];
                         })->all(),
                 ];
@@ -322,10 +303,12 @@ class PengerjaanTesController extends Controller
         $userId        = auth()->id();
 
         // Muat alat_tes_id untuk setiap kode alat tes yang ditugaskan
-        $alatTesByKode = SesiTes::where('id', $sesiId)
+        $pesertaSesiTesId = $sesi['peserta_sesi_tes_id'];
+        $alatTesByKode = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
             ->with('alatTes:id,kode')
-            ->first()
-            ->alatTes
+            ->get()
+            ->pluck('alatTes')
+            ->filter()
             ->keyBy('kode')
             ->map(fn ($a) => $a->id);
 

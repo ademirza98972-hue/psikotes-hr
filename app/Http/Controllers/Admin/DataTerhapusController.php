@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AlatTes;
 use App\Models\DataKaryawan;
 use App\Models\Departemen;
 use App\Models\Peran;
@@ -25,6 +26,7 @@ class DataTerhapusController extends Controller
         'departemen' => ['label' => 'Departemen', 'badge' => 'green'],
         'posisi'     => ['label' => 'Posisi', 'badge' => 'cyan'],
         'peran'      => ['label' => 'Peran', 'badge' => 'rose'],
+        'alat_tes'   => ['label' => 'Alat Tes', 'badge' => 'teal'],
     ];
 
     /**
@@ -42,6 +44,7 @@ class DataTerhapusController extends Controller
             'departemen' => Departemen::onlyTrashed()->withCount('posisi'),
             'posisi' => Posisi::onlyTrashed()->with('departemen'),
             'peran' => Peran::onlyTrashed()->withCount('pengguna'),
+            'alat_tes' => AlatTes::onlyTrashed()->orderBy('nama'),
             default => abort(404),
         };
     }

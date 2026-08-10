@@ -92,5 +92,10 @@
         @include('admin.data-terhapus._table_peran')
     @endif
 
+    {{-- ====== ALAT TES ====== --}}
+    @if ($jenisAktif === 'alat_tes')
+        @include('admin.data-terhapus._table_alat_tes')
+    @endif
+
 </div>
 @endsection

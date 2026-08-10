@@ -85,30 +85,51 @@ class PengerjaanTesController extends Controller
                 $kode = $alat->kode;
                 if (isset($result[$kode])) continue;
 
-                $result[$kode] = [
-                    'nama_lengkap' => $alat->nama,
-                    'format_dasar' => $alat->format_dasar,
-                    'jumlah_soal'  => $alat->soal->count(),
-                    'soal'         => $alat->soal
-                        ->sortBy('nomor')
-                        ->values()
-                        ->map(function (Soal $soal) {
-                            return [
+                $isGrid = $alat->format_dasar === 'Grid' || ($alat->pola_skoring ?? '') === 'grid';
+
+                if ($isGrid) {
+                    $result[$kode] = [
+                        'nama_lengkap' => $alat->nama,
+                        'format_dasar' => $alat->format_dasar,
+                        'jumlah_soal'  => $alat->soal->count(),
+                        'pola_skoring' => $alat->pola_skoring ?? '',
+                        'soal'         => $alat->soal
+                            ->sortBy('nomor')
+                            ->values()
+                            ->map(fn($soal) => [
                                 'id'          => $soal->id,
                                 'nomor'       => $soal->nomor,
-                                'teks_soal'   => $soal->teks_soal,
-                                'tipe_format' => $soal->tipe_format,
-                                'opsi'        => $soal->opsiJawaban
-                                    ->sortBy('urutan')
-                                    ->values()
-                                    ->map(fn($opsi) => [
-                                        'id'     => $opsi->id,
-                                        'teks'   => $opsi->teks_opsi,
-                                        'urutan' => $opsi->urutan,
-                                    ])->all(),
-                            ];
-                        })->all(),
-                ];
+                                'angka'       => array_map('intval',
+                                                    explode(',', $soal->teks_soal)),
+                                'tipe_format' => 'grid',
+                            ])->all(),
+                    ];
+                } else {
+                    $result[$kode] = [
+                        'nama_lengkap' => $alat->nama,
+                        'format_dasar' => $alat->format_dasar,
+                        'jumlah_soal'  => $alat->soal->count(),
+                        'soal'         => $alat->soal
+                            ->sortBy('nomor')
+                            ->values()
+                            ->map(function (Soal $soal) {
+                                return [
+                                    'id'          => $soal->id,
+                                    'nomor'       => $soal->nomor,
+                                    'teks_soal'   => $soal->teks_soal,
+                                    'tipe_format' => $soal->tipe_format,
+                                    'opsi'        => $soal->opsiJawaban
+                                        ->sortBy('urutan')
+                                        ->values()
+                                        ->map(fn($opsi) => [
+                                            'id'     => $opsi->id,
+                                            'teks'   => $opsi->teks_opsi,
+                                            'urutan' => $opsi->urutan,
+                                        ])->all(),
+                                ];
+                            })->all(),
+                    ];
+                }
             }
         }
 
@@ -167,6 +188,10 @@ class PengerjaanTesController extends Controller
         $currentItem = $daftarSoalFlat[$currentStep];
         $kodeAlatTes = $currentItem['kode_alat_tes'];
         $soal        = $currentItem['soal'];
+
+        if (($soal['tipe_format'] ?? '') === 'grid') {
+            return redirect()->route('peserta.tes.kraepelin', $sesiId);
+        }
 
         // Hitung posisi soal dalam alat tes ini
         $soalNomorAlatIni   = $soal['nomor'];
@@ -356,5 +381,113 @@ class PengerjaanTesController extends Controller
             'namaSesi' => $sesi['nama_sesi'],
             'skorHasil' => $skorHasil,
         ]);
+    }
+
+    public function kerjakanGrid(Request $request, int $sesiId)
+    {
+        $sesi = $this->getSesiById($sesiId);
+        if (!$sesi) {
+            return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
+        }
+
+        $soalData = $this->getSoalDummy();
+
+        $alatTesGrid = null;
+        $kodeGrid = null;
+        foreach ($sesi['daftar_alat_tes_ditugaskan'] as $kode) {
+            if (isset($soalData[$kode]) &&
+                ($soalData[$kode]['format_dasar'] === 'Grid' ||
+                 ($soalData[$kode]['pola_skoring'] ?? '') === 'grid')) {
+                $alatTesGrid = $soalData[$kode];
+                $kodeGrid = $kode;
+                break;
+            }
+        }
+
+        if (!$alatTesGrid) {
+            return redirect()->route('peserta.tes.kerjakan', $sesiId)
+                ->with('error', 'Tidak ada soal Kraepelin di sesi ini.');
+        }
+
+        $alatTesId = \App\Models\AlatTes::where('kode', $kodeGrid)->value('id');
+
+        $sudahDikerjakan = \App\Models\GridInputPeserta::where('user_id', auth()->id())
+            ->where('sesi_tes_id', $sesiId)
+            ->where('alat_tes_id', $alatTesId)
+            ->select('kolom_ke')
+            ->distinct()
+            ->pluck('kolom_ke')
+            ->toArray();
+
+        $semuaKolom = collect($alatTesGrid['soal'])->sortBy('nomor')->values();
+        $kolomAktif = $semuaKolom->firstWhere(
+            fn($k) => !in_array($k['nomor'], $sudahDikerjakan)
+        );
+
+        if (!$kolomAktif) {
+            return redirect()->route('peserta.tes.selesai', $sesiId);
+        }
+
+        $alatTesModel = \App\Models\AlatTes::find($alatTesId);
+        $adaTimerPerKolom = $alatTesModel?->batas_waktu_per_soal_aktif ?? false;
+        $detikPerKolom = $alatTesModel?->batas_waktu_per_soal_detik ?? 60;
+
+        return view('peserta.kraepelin', [
+            'sesiId'          => $sesiId,
+            'nama_sesi'       => $sesi['nama_sesi'],
+            'kodeGrid'        => $kodeGrid,
+            'alatTesId'       => $alatTesId,
+            'kolomAktif'      => $kolomAktif,
+            'totalKolom'      => $semuaKolom->count(),
+            'kolomSelesai'    => count($sudahDikerjakan),
+            'adaTimerPerKolom'=> $adaTimerPerKolom,
+            'detikPerKolom'   => $detikPerKolom,
+            'angka'           => $kolomAktif['angka'],
+        ]);
+    }
+
+    public function simpanKolomGrid(Request $request, int $sesiId)
+    {
+        $request->validate([
+            'alat_tes_id' => 'required|integer|exists:alat_tes,id',
+            'kolom_ke'    => 'required|integer|min:1',
+            'jawaban'     => 'required|array',
+            'jawaban.*'   => 'nullable|integer|min:0|max:9',
+            'angka'       => 'required|array',
+        ]);
+
+        $userId = auth()->id();
+        $alatTesId = $request->input('alat_tes_id');
+        $kolomKe = $request->input('kolom_ke');
+        $jawaban = $request->input('jawaban');
+        $angka = $request->input('angka');
+
+        foreach ($jawaban as $barisKe => $jawabanPeserta) {
+            if ($jawabanPeserta === null || $jawabanPeserta === '') continue;
+
+            $i = (int) $barisKe;
+            $angkaBawah = (int) ($angka[$i] ?? 0);
+            $angkaAtas  = (int) ($angka[$i + 1] ?? 0);
+            $benar = ($angkaBawah + $angkaAtas) % 10;
+            $isBenar = ((int) $jawabanPeserta) === $benar;
+
+            \App\Models\GridInputPeserta::updateOrCreate(
+                [
+                    'user_id'     => $userId,
+                    'sesi_tes_id' => $sesiId,
+                    'alat_tes_id' => $alatTesId,
+                    'kolom_ke'    => $kolomKe,
+                    'baris_ke'    => $i + 1,
+                ],
+                [
+                    'jawaban_peserta' => (int) $jawabanPeserta,
+                    'jawaban_benar'   => $benar,
+                    'is_benar'        => $isBenar,
+                    'waktu_input'     => now(),
+                ]
+            );
+        }
+
+        return redirect()->route('peserta.tes.kraepelin', $sesiId);
     }
 }

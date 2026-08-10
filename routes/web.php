@@ -146,6 +146,16 @@ Route::middleware('auth')->group(function () {
             ->whereNumber('id')->name('norma');
         Route::post('/{id}/norma', [AlatTesController::class, 'uploadNorma'])
             ->whereNumber('id')->name('uploadNorma');
+        Route::get('/{id}/dimensi', [AlatTesController::class, 'dimensi'])
+            ->whereNumber('id')->name('dimensi');
+        Route::post('/{id}/dimensi', [AlatTesController::class, 'simpanDimensi'])
+            ->whereNumber('id')->name('simpanDimensi');
+        Route::put('/{id}/dimensi/{dimensiId}', [AlatTesController::class, 'updateDimensi'])
+            ->whereNumber(['id','dimensiId'])->name('updateDimensi');
+        Route::delete('/{id}/dimensi/{dimensiId}', [AlatTesController::class, 'hapusDimensi'])
+            ->whereNumber(['id','dimensiId'])->name('hapusDimensi');
+        Route::post('/{id}/dimensi/{dimensiId}/level', [AlatTesController::class, 'simpanLevel'])
+            ->whereNumber(['id','dimensiId'])->name('simpanLevel');
     });
 
     // =========================================

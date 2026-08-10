@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AlatTes;
+use App\Models\DimensiAlatTes;
+use App\Models\LevelDimensi;
 use App\Models\NormaKonversi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -206,5 +208,104 @@ class AlatTesController extends Controller
         return redirect()
             ->route('admin.alat-tes.norma', $id)
             ->with('sukses', "{$jumlah} baris norma berhasil diimport.");
+    }
+
+    public function dimensi(int $id): View
+    {
+        $alatTes = AlatTes::findOrFail($id);
+        $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
+            ->with('levelDimensi')
+            ->orderBy('urutan')
+            ->get();
+
+        return view('admin.alat-tes.dimensi', compact('alatTes', 'dimensi'));
+    }
+
+    public function simpanDimensi(Request $request, int $id)
+    {
+        AlatTes::findOrFail($id);
+
+        $data = $request->validate([
+            'kode_dimensi'   => 'required|string|max:50',
+            'nama_dimensi'   => 'required|string|max:150',
+            'deskripsi_aspek'=> 'nullable|string',
+            'tipe_kategori'  => 'required|in:psikogram,klinis',
+            'arah_skor'      => 'required|in:tinggi_baik,rendah_baik',
+            'urutan'         => 'nullable|integer|min:0',
+        ]);
+
+        DimensiAlatTes::create(array_merge($data, [
+            'alat_tes_id' => $id,
+            'urutan'      => $data['urutan']
+                ?? (DimensiAlatTes::where('alat_tes_id', $id)->max('urutan') + 1),
+        ]));
+
+        return redirect()
+            ->route('admin.alat-tes.dimensi', $id)
+            ->with('sukses', "Dimensi '{$data['nama_dimensi']}' berhasil ditambahkan.");
+    }
+
+    public function updateDimensi(Request $request, int $id, int $dimensiId)
+    {
+        $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
+            ->findOrFail($dimensiId);
+
+        $data = $request->validate([
+            'kode_dimensi'   => 'required|string|max:50',
+            'nama_dimensi'   => 'required|string|max:150',
+            'deskripsi_aspek'=> 'nullable|string',
+            'tipe_kategori'  => 'required|in:psikogram,klinis',
+            'arah_skor'      => 'required|in:tinggi_baik,rendah_baik',
+            'urutan'         => 'nullable|integer|min:0',
+        ]);
+
+        $dimensi->update($data);
+
+        return redirect()
+            ->route('admin.alat-tes.dimensi', $id)
+            ->with('sukses', "Dimensi '{$data['nama_dimensi']}' berhasil diupdate.");
+    }
+
+    public function hapusDimensi(int $id, int $dimensiId)
+    {
+        $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
+            ->findOrFail($dimensiId);
+        $nama = $dimensi->nama_dimensi;
+        $dimensi->delete();
+
+        return redirect()
+            ->route('admin.alat-tes.dimensi', $id)
+            ->with('sukses', "Dimensi '{$nama}' berhasil dihapus.");
+    }
+
+    public function simpanLevel(Request $request, int $id, int $dimensiId)
+    {
+        $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
+            ->findOrFail($dimensiId);
+
+        $data = $request->validate([
+            'levels'           => 'required|array|min:1',
+            'levels.*.label'   => 'required|string|max:50',
+            'levels.*.skor_min'=> 'required|numeric',
+            'levels.*.skor_max'=> 'required|numeric',
+            'levels.*.urutan'  => 'required|integer|min:0',
+        ]);
+
+        LevelDimensi::where('dimensi_id', $dimensiId)->delete();
+
+        foreach ($data['levels'] as $level) {
+            LevelDimensi::create([
+                'alat_tes_id' => $id,
+                'dimensi_id'  => $dimensiId,
+                'label'       => $level['label'],
+                'skor_min'    => $level['skor_min'],
+                'skor_max'    => $level['skor_max'],
+                'urutan'      => $level['urutan'],
+            ]);
+        }
+
+        return redirect()
+            ->route('admin.alat-tes.dimensi', $id)
+            ->with('sukses', "Level dimensi '{$dimensi->nama_dimensi}' berhasil disimpan.");
     }
 }

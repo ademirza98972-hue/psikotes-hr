@@ -142,6 +142,11 @@
                                            title="Kelola Norma">
                                             <span class="material-symbols-outlined text-[18px]">bar_chart</span>
                                         </a>
+                                        <a href="{{ route('admin.alat-tes.dimensi', $alat['id']) }}"
+                                           class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                           title="Kelola Dimensi">
+                                            <span class="material-symbols-outlined text-[18px]">psychology</span>
+                                        </a>
                                         <button type="button"
                                                 class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
                                                 title="Hapus"

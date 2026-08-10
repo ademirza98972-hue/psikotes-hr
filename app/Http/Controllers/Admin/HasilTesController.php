@@ -10,6 +10,7 @@ use App\Models\HasilSkorPeserta;
 use App\Models\PesertaSesiTes;
 use App\Models\SesiTes;
 use App\Services\FormatHasilEppsService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -130,6 +131,83 @@ class HasilTesController extends Controller
         return view('admin.hasil-tes.detail', compact(
             'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
         ));
+    }
+
+    public function exportPdf(int $sesiId, int $pesertaId)
+    {
+        $sesi = SesiTes::with('departemenTerkait')->findOrFail($sesiId);
+        $user = \App\Models\User::findOrFail($pesertaId);
+
+        $pesertaSesi = PesertaSesiTes::where('user_id', $pesertaId)
+            ->where('sesi_tes_id', $sesiId)
+            ->first();
+
+        /** @var \App\Models\User $currentUser */
+        $currentUser = auth()->user();
+        $bisaLihatSensitif = $currentUser->hasIzin('hasil_tes.lihat_sensitif');
+
+        $hasilTes = [
+            'nama_peserta'       => $user->name,
+            'no_peserta'         => 'HT-' . $sesiId . '-' . str_pad((string) $pesertaId, 3, '0', STR_PAD_LEFT),
+            'jenis_peserta'      => ucfirst($user->tipe_akun ?? '—'),
+            'departemen'         => '—',
+            'posisi'             => '—',
+            'peserta_id'         => $pesertaId,
+            'tanggal_pengerjaan' => $pesertaSesi?->tanggal_pengerjaan,
+            'catatan_hr'         => $pesertaSesi?->catatan_hr,
+            'hasil_alat_tes'     => [],
+        ];
+
+        $hasilSkor = HasilSkorPeserta::where('user_id', $pesertaId)
+            ->where('sesi_tes_id', $sesiId)
+            ->with(['dimensi.alatTes', 'alatTes', 'level'])
+            ->get();
+
+        $grouped = $hasilSkor->groupBy(fn($h) =>
+            $h->alatTes?->id ?? $h->dimensi?->alatTes?->id
+        );
+
+        $hasilAlatTes = [];
+        foreach ($grouped as $alatTesId => $skorList) {
+            $firstRow = $skorList->first();
+            $alatTes = $firstRow->alatTes ?? $firstRow->dimensi?->alatTes;
+            if (!$alatTes) continue;
+
+            $skorRingkas = $skorList->map(fn($h) => [
+                'dimensi'        => ($h->dimensi?->kode_dimensi ?? '') . ' - ' . ($h->dimensi?->nama_dimensi ?? '—'),
+                'skor_mentah'    => $h->skor_mentah,
+                'skor_skala'     => $h->skor_akhir,
+                'skor_persentil' => $h->skor_akhir,
+                'kategori'       => $h->level?->label ?? '—',
+            ])->values()->all();
+
+            $hasilAlatTes[] = [
+                'nama_alat_tes'            => $alatTes->nama,
+                'format_dasar'             => $alatTes->format_dasar,
+                'durasi_pengerjaan_aktual' => '—',
+                'skor_ringkas'             => $skorRingkas,
+            ];
+        }
+
+        $hasilTes['hasil_alat_tes'] = $hasilAlatTes;
+        $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps(
+            $hasilTes['hasil_alat_tes'], $pesertaId, $sesiId
+        );
+        $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
+
+        $pdf = Pdf::loadView('admin.hasil-tes.pdf', compact(
+            'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
+        ));
+        $pdf->setPaper('A4', 'portrait');
+        $dompdf = $pdf->getDomPDF();
+        $dompdf->set_option('defaultFont', 'DejaVu Sans');
+        $dompdf->set_option('isRemoteEnabled', true);
+        $dompdf->set_option('chroot', public_path());
+
+        $namaFile = 'psikogram-' . str_replace(' ', '-', strtolower($user->name))
+            . '-' . $sesiId . '.pdf';
+
+        return $pdf->download($namaFile);
     }
 
     public function simpanCatatan(Request $request, int $sesiId, int $pesertaId): RedirectResponse

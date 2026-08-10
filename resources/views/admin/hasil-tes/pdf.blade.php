@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id" style="width:170mm; margin:0 auto;">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Psikogram - {{ $hasilTes['nama_peserta'] }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #000; margin: 0; padding: 0; }
+        .dokumen { width: 170mm; margin: 0 auto; padding: 0; box-sizing: border-box; }
+        .company-name { font-weight: 700; font-size: 15px; margin: 0; }
+        .company-sub { font-size: 10px; color: #444; margin: 2px 0 0 0; }
+        .rahasia-badge { border: 1px solid #b91c1c; color: #b91c1c; font-size: 8px; font-weight: bold; padding: 2px 6px; white-space: nowrap; }
+        .doc-title { text-align: center; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; margin: 8px 0 4px 0; }
+        .doc-sub { text-align: center; font-size: 10px; color: #666; margin-bottom: 14px; }
+        .section-title { font-weight: 700; font-size: 11.5px; margin: 16px 0 8px 0; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sub-title { font-weight: 700; font-size: 10.5px; margin: 10px 0 4px 0; color: #333; }
+        table { border-collapse: collapse; font-size: 10px; margin-bottom: 6px; }
+        td, th { border: 1px solid #000; padding: 3px 5px; vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word; }
+        .th-row td, .th-row th { background: #000; color: #fff; font-weight: 700; }
+        .th-row th { text-align: left; }
+        .label-cell { background: #f2f2f2; font-weight: 700; width: 110px; }
+        .mark { text-align: center; font-weight: 700; }
+        .narasi-box { padding: 8px; font-size: 10px; line-height: 1.7; text-align: justify; word-wrap: break-word; overflow-wrap: break-word; }
+        .footnote { font-size: 8.5px; color: #888; border-top: 1px solid #ccc; padding-top: 6px; margin: 6px 0 4px 0; line-height: 1.6; }
+        .access-denied { border: 1px dashed #999; padding: 24px; text-align: center; color: #666; font-size: 11px; margin-bottom: 14px; }
+        .ttd-space { margin-bottom: 36px; }
+        .ttd-line { border-top: 1px solid #000; width: 150px; padding-top: 2px; }
+        .container-formal { border: 1px solid #000; padding: 12px; margin-bottom: 12px; }
+        .page2-header { border-bottom: 1px solid #000; padding-bottom: 6px; margin-bottom: 10px; }
+        .page2-header .company-name { font-size: 12px; }
+        .page2-header .company-sub { font-size: 9px; }
+        .page2-header .rahasia-badge { font-size: 8px; padding: 2px 6px; }
+        .page2-title { font-weight: 700; font-size: 11px; letter-spacing: 0.5px; margin-bottom: 10px; text-align: center; }
+        .page-break { page-break-after: always; break-after: page; }
+        @page {
+            size: A4 portrait;
+        }
+        p, div, td { orphans: 3; widows: 3; }
+    </style>
+</head>
+<body>
+@php
+    $bulanId = [
+        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+    ];
+    $tglId = function ($iso) use ($bulanId) {
+        if (! $iso) return '-';
+        [$y, $m, $d] = explode('-', substr($iso, 0, 10));
+        return (int) $d . ' ' . $bulanId[(int) $m] . ' ' . $y;
+    };
+@endphp
+<div class="dokumen">
+
+    {{-- HEADER --}}
+    <table style="border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:14px; border-collapse:collapse;">
+        <tr>
+            <td style="border:none; padding:0; width:65%;">
+                <table style="border-collapse:collapse;">
+                    <tr>
+                        <td style="border:none; padding:0; width:40px; vertical-align:middle;">
+                            <img src="{{ public_path('images/logo.png') }}" width="36" height="36">
+                        </td>
+                        <td style="border:none; padding:0 0 0 10px; vertical-align:middle;">
+                            <div class="company-name">PT Jhonlin Group</div>
+                            <div class="company-sub">Departemen Human Capital</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="border:none; padding:0 0 0 10px; width:35%; text-align:right; vertical-align:top;">
+                <span class="rahasia-badge">DATA BERSIFAT RAHASIA</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="doc-title">PSIKOGRAM &mdash; HASIL PEMERIKSAAN PSIKOLOGI</div>
+    <div class="doc-sub">Rekrutmen Staff Finance Batch 1 &middot; PT Jhonlin Group</div>
+
+    {{-- IDENTITAS PESERTA --}}
+    <div class="container-formal">
+        <div class="section-title">IDENTITAS PESERTA</div>
+        <table>
+            <tr>
+                <td class="label-cell">Nama</td>
+                <td>{{ $hasilTes['nama_peserta'] }}</td>
+                <td class="label-cell">No. Peserta</td>
+                <td>{{ $hasilTes['no_peserta'] ?? 'HT-2026-XXX' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Jenis Peserta</td>
+                <td>{{ $hasilTes['jenis_peserta'] }}</td>
+                <td class="label-cell">Departemen</td>
+                <td>{{ $hasilTes['departemen'] }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Posisi</td>
+                <td>{{ $hasilTes['posisi'] }}</td>
+                <td class="label-cell">Nama Sesi</td>
+                <td>{{ $sesi['nama_sesi'] }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Tanggal Pengerjaan</td>
+                <td>{{ $tglId($hasilTes['tanggal_pengerjaan']) }}</td>
+                <td class="label-cell">Tujuan Tes</td>
+                <td>Seleksi Karyawan Baru</td>
+            </tr>
+        </table>
+    </div>
+
+    {{-- RINGKASAN ALAT TES --}}
+    <div class="container-formal">
+        <div class="section-title">RINGKASAN ALAT TES</div>
+        <table>
+            <thead class="th-row"><tr class="text-left"><th>Alat Tes</th><th>Format Dasar</th><th>Durasi Aktual</th></tr></thead>
+            <tbody>
+                @forelse ($hasilTes['hasil_alat_tes'] as $alat)
+                <tr><td>{{ $alat['nama_alat_tes'] }}</td><td>{{ $alat['format_dasar'] }}</td><td>{{ $alat['durasi_pengerjaan_aktual'] }}</td></tr>
+                @empty
+                <tr><td colspan="3" style="color:#999; font-style:italic;">Belum ada hasil tes</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    {{-- PSIKOGRAM --}}
+    @if (!empty($psikogram))
+    <div class="container-formal">
+        <div class="section-title">PSIKOGRAM</div>
+
+        @foreach (['Intelektual', 'Sikap Kerja', 'Kepribadian', 'Potensi Kerja', 'Sensitif'] as $bidang)
+            @if (!empty($psikogram[$bidang]))
+                @php
+                    switch ($bidang) {
+                        case 'Intelektual': $huruf = 'A'; $namaDisplay = 'BIDANG INTELEKTUAL'; break;
+                        case 'Sikap Kerja': $huruf = 'B'; $namaDisplay = 'BIDANG SIKAP KERJA'; break;
+                        case 'Kepribadian': $huruf = 'C'; $namaDisplay = 'BIDANG KEPRIBADIAN'; break;
+                        case 'Potensi Kerja': $huruf = 'D'; $namaDisplay = 'BIDANG POTENSI KERJA'; break;
+                        case 'Sensitif': $huruf = 'E'; $namaDisplay = 'BIDANG SENSITIF'; break;
+                    }
+                @endphp
+                <div class="sub-title">{{ $huruf }}. {{ $namaDisplay }}</div>
+
+                @if ($bidang !== 'Sensitif')
+                    <table>
+                        <thead class="th-row"><tr><th style="width:50%;">Aspek</th><th style="width:10%;">R</th><th style="width:10%;">K</th><th style="width:10%;">C</th><th style="width:10%;">B</th><th style="width:10%;">BS</th></tr></thead>
+                        <tbody>
+                            @foreach ($psikogram[$bidang] as $aspek)
+                            <tr>
+                                <td style="padding:3px 5px;"><strong>{{ $aspek['nama_dimensi'] }}</strong><br><span style="font-size:9px;color:#666">{{ $aspek['deskripsi_aspek'] }}</span></td>
+                                <td class="mark">@if ($aspek['kategori_hasil'] === 'R') X @else &bull; @endif</td>
+                                <td class="mark">@if ($aspek['kategori_hasil'] === 'K') X @else &bull; @endif</td>
+                                <td class="mark">@if ($aspek['kategori_hasil'] === 'C') X @else &bull; @endif</td>
+                                <td class="mark">@if ($aspek['kategori_hasil'] === 'B') X @else &bull; @endif</td>
+                                <td class="mark">@if ($aspek['kategori_hasil'] === 'BS') X @else &bull; @endif</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    @if ($bisaLihatSensitif)
+                        <table>
+                            <thead class="th-row"><tr><th style="width:50%;">Aspek</th><th style="width:25%;">Skor T</th><th>Interpretasi</th></tr></thead>
+                            <tbody>
+                                @foreach ($psikogram[$bidang] as $aspek)
+                                <tr>
+                                    <td style="padding:3px 5px;"><strong>{{ $aspek['nama_dimensi'] }}</strong><br><span style="font-size:9px;color:#666">{{ $aspek['deskripsi_aspek'] }}</span></td>
+                                    <td class="mark">{{ $aspek['skor_t'] ?? '-' }}</td>
+                                    <td>{{ $aspek['kategori_hasil'] }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <div class="access-denied">Anda tidak memiliki akses untuk melihat aspek psikogram yang bersumber dari data tes sensitif. Hubungi Super Admin atau Admin HR untuk informasi lebih lanjut.</div>
+                    @endif
+                @endif
+            @endif
+        @endforeach
+
+        <div class="footnote"><strong>Keterangan Skala:</strong> R = Rendah &middot; K = Kurang &middot; C = Cukup &middot; B = Baik &middot; BS = Baik Sekali. Skor mentah dan rincian per alat tes tersedia di Lampiran.</div>
+
+        <div class="section-title" style="margin-top:16px;">RINGKASAN EVALUASI PSIKOLOGIS</div>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="narasi-box" style="min-height:60px;">
+                        @if (!empty($psikogram['Narasi_Evaluasi']))
+                            {{ $psikogram['Narasi_Evaluasi'] }}
+                        @else
+                            Berdasarkan hasil pemeriksaan psikologi, terdapat taraf kecerdasan umum baik dengan kemampuan menonjol pada salah satu aspek. Sikap kerja menunjukkan sistematika dan daya tahan kerja yang baik. Dari segi kepribadian, mampu bekerja sama dan berkomunikasi dalam kelompok, dengan kepercayaan diri yang memadai. Motivasi berprestasi menunjukkan dorongan kuat untuk mencapai hasil kerja optimal.
+                        @endif
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title" style="margin-top:16px;">KESIMPULAN DAN REKOMENDASI HR</div>
+        <table>
+            <tbody>
+                <tr><td class="narasi-box" style="color:#888;min-height:50px;">Diisi manual oleh HR / Psikolog setelah peninjauan hasil di atas.</td></tr>
+            </tbody>
+        </table>
+
+        {{-- TANDA TANGAN --}}
+        <table style="border-collapse:collapse; margin-top:24px; font-size:11px;">
+            <tr>
+                <td style="border:none; padding:0; width:50%;">
+                    <div class="ttd-space">Diperiksa oleh,</div>
+                    <div class="ttd-line">Admin HR</div>
+                </td>
+                <td style="border:none; padding:0; width:50%; text-align:right;">
+                    <div class="ttd-space">Banjarbaru, 28 Juli 2026</div>
+                    <div style="border-top:1px solid #000; width:130px; padding-top:2px;">Super Admin</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    @endif
+    <div class="page-break"></div>
+
+    {{-- HALAMAN 2: LAMPIRAN --}}
+    <table style="border-bottom:1px solid #000; padding-bottom:6px; margin-bottom:10px; border-collapse:collapse;" class="page2-header">
+        <tr>
+            <td style="border:none; padding:0; vertical-align:middle;">
+                <table style="border-collapse:collapse;">
+                    <tr>
+                        <td style="border:none; padding:0; width:32px; vertical-align:middle;">
+                            <img src="{{ public_path('images/logo.png') }}" width="28" height="28">
+                        </td>
+                        <td style="border:none; padding:0 0 0 8px; vertical-align:middle;">
+                            <div class="company-name">PT Jhonlin Group</div>
+                            <div class="company-sub">Departemen Human Capital</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="border:none; padding:0; text-align:right; vertical-align:middle;">
+                <span class="rahasia-badge">DATA BERSIFAT RAHASIA</span>
+            </td>
+        </tr>
+    </table>
+    <div class="page2-title">LAMPIRAN &mdash; HASIL PER INSTRUMEN</div>
+
+    {{-- HASIL PER INSTRUMEN --}}
+    @foreach ($hasilTes['hasil_alat_tes'] as $index => $alatTes)
+        <div class="container-formal">
+            <div class="sub-title">{{ $index + 1 }}. {{ $alatTes['nama_alat_tes'] }} &ndash; {{ $alatTes['format_dasar'] }}</div>
+
+            {{-- EPPS: Skor per dimensi --}}
+            @if ($alatTes['nama_alat_tes'] === 'EPPS' && is_array($alatTes['skor_ringkas']) && isset($alatTes['skor_ringkas'][0]['dimensi']))
+                <p style="margin:6px 0 10px 0; color:#666;font-size:10px;">Format: Forced Choice &ndash; Skor Mentah (1-100), Skor Skala (1-10)</p>
+                <table>
+                    <thead class="th-row"><tr><th style="width:40%;">Dimensi</th><th style="width:25%;">Skor Mentah</th><th style="width:25%;">Skor Skala</th><th>Kategori</th></tr></thead>
+                    <tbody>
+                        @foreach ($alatTes['skor_ringkas'] as $dimensi)
+                        <tr><td>{{ $dimensi['dimensi'] }}</td><td class="mark">{{ $dimensi['skor_mentah'] }}</td><td class="mark">{{ $dimensi['skor_skala'] }}</td><td>{{ $dimensi['kategori'] }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+            {{-- CFIT: tampilkan skor IQ tunggal --}}
+            @elseif (str_contains($alatTes['nama_alat_tes'], 'CFIT') && !empty($alatTes['skor_ringkas']))
+                @php $skorCfit = $alatTes['skor_ringkas'][0] ?? null; @endphp
+                @if ($skorCfit)
+                    <table style="border:none; margin-bottom:0;">
+                        <tr>
+                            <td style="width:80px; text-align:center; background:#eff6ff; border:1px solid #bfdbfe; padding:8px; border:none;">
+                                <div style="font-size:9px; font-weight:bold; color:#1d4ed8;">SKOR IQ</div>
+                                <div style="font-size:24px; font-weight:bold; color:#1e3a5f;">{{ $skorCfit['skor_skala'] }}</div>
+                            </td>
+                            <td style="padding-left:10px; font-size:9px; color:#333; border:none;">
+                                <p>Skor Mentah: <strong>{{ $skorCfit['skor_mentah'] }}</strong></p>
+                                @if ($skorCfit['kategori'] !== '—')
+                                <p style="margin-top:3px;">Kategori: <strong>{{ $skorCfit['kategori'] }}</strong></p>
+                                @endif
+                            </td>
+                        </tr>
+                    </table>
+                @endif
+
+            {{-- Papikostik & alat tes lain: tabel skor per dimensi --}}
+            @elseif (!empty($alatTes['skor_ringkas']))
+                <table>
+                    <thead class="th-row"><tr><th style="width:50%;">Dimensi</th><th style="width:20%; text-align:center;">Skor Mentah</th><th style="width:20%; text-align:center;">Skor Akhir</th><th style="width:10%; text-align:center;">Kategori</th></tr></thead>
+                    <tbody>
+                        @foreach ($alatTes['skor_ringkas'] as $skor)
+                        <tr style="border-bottom:1px solid #e0e3e5;">
+                            <td style="padding:3px 5px;">{{ $skor['dimensi'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['skor_mentah'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['skor_skala'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['kategori'] }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    @endforeach
+
+</div>
+</body>
+</html>

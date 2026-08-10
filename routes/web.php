@@ -195,11 +195,15 @@ Route::middleware('auth')->group(function () {
     });
 
     // =========================================
+    // =========================================
     // HASIL TES (baru)
     // =========================================
     Route::prefix('admin/hasil-tes')->name('admin.hasil-tes.')->group(function () {
         Route::get('/', [HasilTesController::class, 'index'])->name('index');
         Route::get('/{sesiId}/{pesertaId}', [HasilTesController::class, 'detail'])->name('detail');
+        Route::get('/{sesiId}/{pesertaId}/pdf', [HasilTesController::class, 'exportPdf'])
+            ->whereNumber(['sesiId', 'pesertaId'])
+            ->name('exportPdf');
         Route::post('/{sesiId}/{pesertaId}/catatan', [HasilTesController::class, 'simpanCatatan'])
             ->whereNumber(['sesiId', 'pesertaId'])
             ->name('simpanCatatan');

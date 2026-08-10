@@ -34,7 +34,14 @@
     }
     </script>
 
-    @if ($format === 'Pilihan Ganda')
+    @if (($soal['tipe_format'] ?? '') === 'grid')
+        <div style="font-family: monospace; font-size: 13px; color: #374151; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; letter-spacing: 2px;">
+            {{ $soal['teks_soal'] }}
+        </div>
+        <p class="text-[11px] text-[#919eab] mt-1.5">
+            {{ count(explode(',', $soal['teks_soal'])) }} angka per kolom
+        </p>
+    @elseif ($format === 'Pilihan Ganda')
         <p class="text-[16px] leading-relaxed text-[#191c1e]">{{ $soal['teks_soal'] }}</p>
         <ul class="mt-4 space-y-2">
             @foreach (['A','B','C','D'] as $i => $huruf)

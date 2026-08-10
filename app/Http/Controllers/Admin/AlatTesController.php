@@ -29,7 +29,7 @@ class AlatTesController extends Controller
     public function tambah(): View
     {
         return view('admin.alat-tes.tambah', [
-            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice'],
+            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid'],
         ]);
     }
 
@@ -67,7 +67,7 @@ class AlatTesController extends Controller
 
         return view('admin.alat-tes.edit', [
             'alatTes' => $alatTes,
-            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice'],
+            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid'],
         ]);
     }
 

@@ -6,6 +6,7 @@
         'Pilihan Ganda' => 'bg-blue-600',
         'Skala Likert'  => 'bg-indigo-600',
         'Forced Choice' => 'bg-amber-600',
+        'Grid'          => 'bg-emerald-600',
     ];
     $format = $alatTes->format_dasar;
 @endphp
@@ -40,7 +41,32 @@
     <form method="POST" action="{{ route('admin.bank-soal.simpan', $alatTes->id) }}" class="space-y-4">
         @csrf
 
-        @if ($format === 'Pilihan Ganda')
+        @if ($format === 'Grid')
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[12px] font-semibold
+                           text-[#40484b] uppercase tracking-wider mb-2">
+                        Deretan Angka Kolom <span class="text-rose-500">*</span>
+                    </label>
+                    <p class="text-[12px] text-[#919eab] mb-3">
+                        Masukkan 27 angka (0-9) dipisah koma.
+                        Contoh: 1,6,2,8,8,2,2,1,6,9,6,4,6,6,2,1,7,6,1,6,2,4,1,6,4,9,1
+                    </p>
+                    <textarea name="teks_soal" rows="3" required
+                        class="w-full bg-[#f2f4f6] border border-[#e0e3e5]
+                               rounded-xl px-4 py-3 text-sm font-mono
+                               text-[#191c1e] focus:ring-2
+                               focus:ring-[#2C5F6F]/40
+                               focus:border-[#2C5F6F] outline-none
+                               transition-all resize-none"
+                        placeholder="1,6,2,8,8,2,2,1,6,9,6,4,6,6,2,1,7,6,1,6,2,4,1,6,4,9,1"
+                    >{{ old('teks_soal') }}</textarea>
+                    <p class="text-[11px] text-[#919eab] mt-1.5">
+                        Angka akan dipisah otomatis saat pengerjaan tes.
+                    </p>
+                </div>
+            </div>
+        @elseif ($format === 'Pilihan Ganda')
             <div>
                 <label for="teks_soal" class="block text-sm font-medium text-slate-700">Teks Soal <span class="text-rose-500">*</span></label>
                 <textarea id="teks_soal" name="teks_soal" rows="3" required

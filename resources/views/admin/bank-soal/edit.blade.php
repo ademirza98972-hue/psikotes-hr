@@ -7,7 +7,7 @@
         'Skala Likert'  => 'bg-indigo-600',
         'Forced Choice' => 'bg-amber-600',
     ];
-    $format = $soal->alatTes->format_dasar;
+    $format = $soal->alatTes->format_dasar ?? 'Pilihan Ganda';
 @endphp
 
 <div class="w-full rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -41,7 +41,28 @@
         @csrf
         @method('PUT')
 
-        @if ($format === 'Pilihan Ganda')
+        @if ($format === 'Grid')
+            <div class="mb-6">
+                <label class="block text-sm font-semibold
+                       text-[#191c1e] mb-2">
+                    Deretan Angka Kolom
+                    <span class="text-rose-500">*</span>
+                </label>
+                <p class="text-[12px] text-[#919eab] mb-2">
+                    Masukkan 27 angka (0-9) dipisah koma.
+                    Contoh: 1,6,2,8,8,2,2,1,6,9,...
+                </p>
+                <textarea name="teks_soal" rows="3" required
+                    class="w-full bg-[#f2f4f6] border border-[#e0e3e5]
+                           rounded-xl px-4 py-3 text-sm font-mono
+                           text-[#191c1e] focus:ring-2
+                           focus:ring-[#2C5F6F]/40
+                           focus:border-[#2C5F6F] outline-none
+                           transition-all resize-none"
+                    placeholder="1,6,2,8,8,2,2,1,6,9,6,4,6,6,2,1,7,6,1,6,2,4,1,6,4,9,1"
+                >{{ old('teks_soal', $soal->teks_soal) }}</textarea>
+            </div>
+        @elseif ($format === 'Pilihan Ganda')
             <div>
                 <label for="teks_soal" class="block text-sm font-medium text-slate-700">Teks Soal <span class="text-rose-500">*</span></label>
                 <textarea id="teks_soal" name="teks_soal" rows="3" required

@@ -81,15 +81,28 @@ class BankSoalController extends Controller
         $alatTes = AlatTes::findOrFail($alatTesId);
         $format = $alatTes->format_dasar;
 
-        $rules = $format === 'Forced Choice'
-            ? $this->forcedChoiceRules()
-            : $this->pilihanAtauLikertRules();
+        $rules = match ($format) {
+            'Forced Choice' => $this->forcedChoiceRules(),
+            'Grid'          => $this->gridRules(),
+            default         => $this->pilihanAtauLikertRules(),
+        };
 
         $validated = $request->validate($rules);
 
         DB::transaction(function () use ($alatTes, $format, $validated, $request) {
             $nomorBerikutnya = (int) (Soal::where('alat_tes_id', $alatTes->id)->max('nomor') ?? 0) + 1;
             $urutanBerikutnya = (int) (Soal::where('alat_tes_id', $alatTes->id)->max('urutan') ?? 0) + 1;
+
+            if ($format === 'Grid') {
+                Soal::create([
+                    'alat_tes_id' => $alatTes->id,
+                    'nomor'       => $nomorBerikutnya,
+                    'teks_soal'   => $validated['teks_soal'],
+                    'tipe_format' => 'grid',
+                    'urutan'      => $urutanBerikutnya,
+                ]);
+                return;
+            }
 
             if ($format === 'Forced Choice') {
                 $soal = Soal::create([
@@ -177,8 +190,9 @@ class BankSoalController extends Controller
     {
         $soal = Soal::with(['alatTes', 'opsiJawaban.bobotOpsiDimensi.dimensi'])
             ->findOrFail($id);
+        $format = $soal->alatTes->format_dasar ?? 'Pilihan Ganda';
 
-        return view('admin.bank-soal.edit', compact('soal'));
+        return view('admin.bank-soal.edit', compact('soal', 'format'));
     }
 
     public function update(Request $request, int $id)
@@ -187,13 +201,20 @@ class BankSoalController extends Controller
         $alatTes = $soal->alatTes;
         $format = $alatTes->format_dasar;
 
-        $rules = $format === 'Forced Choice'
-            ? $this->forcedChoiceRules()
-            : $this->pilihanAtauLikertRules();
+        $rules = match ($format) {
+            'Forced Choice' => $this->forcedChoiceRules(),
+            'Grid'          => $this->gridRules(),
+            default         => $this->pilihanAtauLikertRules(),
+        };
 
         $validated = $request->validate($rules);
 
         DB::transaction(function () use ($soal, $format, $validated, $request, $alatTes) {
+            if ($format === 'Grid') {
+                $soal->update(['teks_soal' => $validated['teks_soal']]);
+                return;
+            }
+
             if ($format === 'Forced Choice') {
                 $soal->update([
                     'teks_soal' => $validated['pernyataan_a'],
@@ -315,12 +336,22 @@ class BankSoalController extends Controller
     {
         $format = $format ?? $soal->alatTes?->format_dasar;
 
+        if ($soal->tipe_format === 'grid') {
+            return [
+                'id'            => $soal->id,
+                'tipe_format'   => 'grid',
+                'format_dasar'  => 'Grid',
+                'teks_soal'     => $soal->teks_soal,
+            ];
+        }
+
         if ($format === 'Pilihan Ganda') {
             $opsi = $soal->opsiJawaban->sortBy('urutan')->values();
             return [
-                'id'        => $soal->id,
-                'teks_soal' => $soal->teks_soal,
-                'opsi'      => [
+                'id'            => $soal->id,
+                'tipe_format'   => $soal->tipe_format ?? 'pilihan_ganda',
+                'teks_soal'     => $soal->teks_soal,
+                'opsi'          => [
                     'A' => $opsi[0]->teks_opsi ?? '',
                     'B' => $opsi[1]->teks_opsi ?? '',
                     'C' => $opsi[2]->teks_opsi ?? '',
@@ -333,9 +364,10 @@ class BankSoalController extends Controller
         if ($format === 'Skala Likert') {
             $dimensi = $soal->alatTes?->dimensiAlatTes->first();
             return [
-                'id'          => $soal->id,
-                'pernyataan'  => $soal->teks_soal,
-                'dimensi'     => $dimensi?->nama_dimensi ?? '-',
+                'id'            => $soal->id,
+                'tipe_format'   => $soal->tipe_format ?? 'skala_likert',
+                'pernyataan'    => $soal->teks_soal,
+                'dimensi'       => $dimensi?->nama_dimensi ?? '-',
             ];
         }
 
@@ -346,6 +378,7 @@ class BankSoalController extends Controller
 
             return [
                 'id'            => $soal->id,
+                'tipe_format'   => $soal->tipe_format ?? 'forced_choice',
                 'pernyataan_a'  => $opsi[0]->teks_opsi ?? '',
                 'dimensi_a'     => $dimensiA,
                 'pernyataan_b'  => $opsi[1]->teks_opsi ?? '',
@@ -353,7 +386,7 @@ class BankSoalController extends Controller
             ];
         }
 
-        return ['id' => $soal->id, 'teks_soal' => $soal->teks_soal];
+        return ['id' => $soal->id, 'teks_soal' => $soal->teks_soal, 'tipe_format' => $soal->tipe_format ?? 'pilihan_ganda'];
     }
 
     protected function forcedChoiceRules(): array
@@ -363,6 +396,13 @@ class BankSoalController extends Controller
             'dimensi_a'    => ['required', 'string', 'max:100'],
             'pernyataan_b' => ['required', 'string'],
             'dimensi_b'    => ['required', 'string', 'max:100'],
+        ];
+    }
+
+    protected function gridRules(): array
+    {
+        return [
+            'teks_soal' => ['required', 'string'],
         ];
     }
 

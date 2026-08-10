@@ -200,5 +200,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin/hasil-tes')->name('admin.hasil-tes.')->group(function () {
         Route::get('/', [HasilTesController::class, 'index'])->name('index');
         Route::get('/{sesiId}/{pesertaId}', [HasilTesController::class, 'detail'])->name('detail');
+        Route::post('/{sesiId}/{pesertaId}/catatan', [HasilTesController::class, 'simpanCatatan'])
+            ->whereNumber(['sesiId', 'pesertaId'])
+            ->name('simpanCatatan');
     });
 });

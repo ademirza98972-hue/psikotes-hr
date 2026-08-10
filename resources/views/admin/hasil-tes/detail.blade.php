@@ -261,10 +261,26 @@
     {{-- CATATAN & REKOMENDASI HR --}}
     <div class="container-formal">
         <div class="section-title">CATATAN & REKOMENDASI HR</div>
-        <textarea id="catatanHR" rows="4" placeholder="Masukkan catatan atau rekomendasi HR di sini..." class="block w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-[#2C5F6F] focus:ring-[#2C5F6F] resize-none"></textarea>
-        <div style="margin-top:10px;">
-            <button type="button" onclick="alert('Catatan telah disimpan. (Placeholder)');" class="bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white border border-[#2C5F6F] hover:bg-[#234853]">Simpan Catatan</button>
-        </div>
+
+        @if(session('sukses'))
+            <div style="background:#f0fdf4; border:1px solid #86efac; padding:8px 12px; border-radius:6px; color:#166534; font-size:11px; margin-bottom:10px;">
+                {{ session('sukses') }}
+            </div>
+        @endif
+
+        <form method="POST"
+              action="{{ route('admin.hasil-tes.simpanCatatan', [$sesi->id, $hasilTes['peserta_id']]) }}">
+            @csrf
+            <textarea name="catatan_hr" rows="4"
+                      placeholder="Masukkan catatan atau rekomendasi HR di sini..."
+                      style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:8px 10px; font-size:11px; resize:none; font-family:inherit; box-sizing:border-box;">{{ old('catatan_hr', $hasilTes['catatan_hr'] ?? '') }}</textarea>
+            <div style="margin-top:8px;">
+                <button type="submit"
+                        style="background:#2C5F6F; color:white; border:none; padding:8px 16px; font-size:11px; font-weight:600; border-radius:4px; cursor:pointer;">
+                    Simpan Catatan
+                </button>
+            </div>
+        </form>
     </div>
 
 </div>

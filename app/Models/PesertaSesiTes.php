@@ -20,6 +20,7 @@ class PesertaSesiTes extends Model
         'sesi_tes_id',
         'status_pengerjaan',
         'tanggal_pengerjaan',
+        'catatan_hr',
     ];
 
     protected $casts = [

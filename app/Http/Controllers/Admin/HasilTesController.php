@@ -10,6 +10,8 @@ use App\Models\HasilSkorPeserta;
 use App\Models\PesertaSesiTes;
 use App\Models\SesiTes;
 use App\Services\FormatHasilEppsService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HasilTesController extends Controller
@@ -75,6 +77,8 @@ class HasilTesController extends Controller
             'departemen'         => '—',
             'posisi'             => '—',
             'tanggal_pengerjaan' => $pesertaSesi?->tanggal_pengerjaan,
+            'catatan_hr'         => $pesertaSesi?->catatan_hr,
+            'peserta_id'         => $pesertaId,
             'hasil_alat_tes'     => [],
         ];
 
@@ -126,6 +130,21 @@ class HasilTesController extends Controller
         return view('admin.hasil-tes.detail', compact(
             'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
         ));
+    }
+
+    public function simpanCatatan(Request $request, int $sesiId, int $pesertaId): RedirectResponse
+    {
+        $request->validate([
+            'catatan_hr' => 'nullable|string|max:5000',
+        ]);
+
+        PesertaSesiTes::where('sesi_tes_id', $sesiId)
+            ->where('user_id', $pesertaId)
+            ->update(['catatan_hr' => $request->input('catatan_hr')]);
+
+        return redirect()
+            ->route('admin.hasil-tes.detail', [$sesiId, $pesertaId])
+            ->with('sukses', 'Catatan HR berhasil disimpan.');
     }
 
     protected function injectHasilEpps(array $hasilAlatPeserta, int $userId, int $sesiId): array

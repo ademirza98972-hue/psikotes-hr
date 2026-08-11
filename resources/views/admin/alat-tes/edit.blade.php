@@ -66,6 +66,20 @@
                 </div>
 
                 <div>
+                    <label for="pola_skoring" class="block text-[12px] font-medium text-[#40484b] mb-2">Pola Skoring</label>
+                    <div class="relative">
+                        <select id="pola_skoring" name="pola_skoring" required
+                                class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none cursor-pointer">
+                            <option value="kognitif" @selected(old('pola_skoring', $alatTes->pola_skoring) === 'kognitif')>Kognitif — untuk CFIT</option>
+                            <option value="forced_choice" @selected(old('pola_skoring', $alatTes->pola_skoring) === 'forced_choice')>Forced Choice — untuk EPPS</option>
+                            <option value="forced_choice_rollup" @selected(old('pola_skoring', $alatTes->pola_skoring) === 'forced_choice_rollup')>Forced Choice Rollup — untuk Papikostik</option>
+                            <option value="grid" @selected(old('pola_skoring', $alatTes->pola_skoring) === 'grid')>Grid — untuk Kraepelin</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#40484b] text-[18px]">expand_more</span>
+                    </div>
+                </div>
+
+                <div>
                     <label for="durasi_total_menit" class="block text-[12px] font-medium text-[#40484b] mb-2">Durasi Total (menit)</label>
                     <input id="durasi_total_menit" name="durasi_total_menit" type="number" min="0" value="{{ old('durasi_total_menit', $alatTes->durasi_total_menit) }}"
                            class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">

@@ -22,6 +22,7 @@ class CfitSeeder extends Seeder
                 'batas_waktu_per_soal_detik' => null,
                 'is_sensitif' => false,
                 'jumlah_soal' => 50,
+                'pola_skoring' => 'kognitif',
                 'is_aktif' => true,
             ]
         );

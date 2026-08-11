@@ -20,11 +20,13 @@ class PesertaSesiTes extends Model
         'sesi_tes_id',
         'status_pengerjaan',
         'tanggal_pengerjaan',
+        'waktu_mulai',
         'catatan_hr',
     ];
 
     protected $casts = [
         'tanggal_pengerjaan' => 'date',
+        'waktu_mulai'        => 'datetime',
     ];
 
     public function user(): BelongsTo

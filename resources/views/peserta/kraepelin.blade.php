@@ -133,6 +133,7 @@
         .numpad-btn.del { background: #fee2e2; border-color: #fca5a5; color: #ef4444; }
         .numpad-btn.del:active { background: #fca5a5; }
     </style>
+    <meta name="debug-sisa" content="{{ $sisaDetikPerKolom ?? 'null' }} / detikPerKolom={{ $detikPerKolom ?? 'null' }}">
 </head>
 <body>
 
@@ -147,10 +148,14 @@
     </div>
     <div class="header-right">
         <div class="header-timer" id="timer-display">
+            @php
+                $menitSisa = floor($sisaDetikKeseluruhan ?? 0 / 60);
+                $detikSisaDisplay = ($sisaDetikKeseluruhan ?? 0) % 60;
+            @endphp
             @if ($adaTimerPerKolom)
                 {{ gmdate('i:s', $detikPerKolom) }}
             @else
-                00:00
+                {{ str_pad($menitSisa, 2, '0', STR_PAD_LEFT) }}:{{ str_pad($detikSisaDisplay, 2, '0', STR_PAD_LEFT) }}
             @endif
         </div>
         <div class="header-timer-label">
@@ -224,6 +229,8 @@ const angka = @json($angka);
 const totalRows = angka.length - 1;
 const adaTimerPerKolom = @json($adaTimerPerKolom);
 const detikPerKolom = @json($detikPerKolom ?? 60);
+const sisaDetikPerKolom = @json($sisaDetikPerKolom ?? $detikPerKolom);
+const sisaDetikKeseluruhan = @json($sisaDetikKeseluruhan ?? 0);
 
 let currentIndex = 0;
 
@@ -297,8 +304,8 @@ function startTimer() {
     if (!display) return;
 
     if (adaTimerPerKolom) {
-        // Countdown
-        let sisa = detikPerKolom;
+        // Countdown per kolom dari sisaDetikPerKolom (persisten dari server)
+        let sisa = sisaDetikPerKolom;
         timerInterval = setInterval(() => {
             sisa--;
             const m = Math.floor(sisa / 60).toString().padStart(2, '0');
@@ -310,13 +317,17 @@ function startTimer() {
             }
         }, 1000);
     } else {
-        // Stopwatch naik
-        let berjalan = 0;
+        // Countdown keseluruhan dari sisaDetikKeseluruhan
+        let sisa = sisaDetikKeseluruhan;
         timerInterval = setInterval(() => {
-            berjalan++;
-            const m = Math.floor(berjalan / 60).toString().padStart(2, '0');
-            const s = (berjalan % 60).toString().padStart(2, '0');
+            sisa--;
+            const m = Math.floor(sisa / 60).toString().padStart(2, '0');
+            const s = (sisa % 60).toString().padStart(2, '0');
             display.textContent = m + ':' + s;
+            if (sisa <= 0) {
+                clearInterval(timerInterval);
+                submitForm();
+            }
         }, 1000);
     }
 }

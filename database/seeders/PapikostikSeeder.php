@@ -23,6 +23,7 @@ class PapikostikSeeder extends Seeder
                 'batas_waktu_per_soal_detik' => null,
                 'is_sensitif' => false,
                 'jumlah_soal' => 90,
+                'pola_skoring' => 'forced_choice_rollup',
                 'is_aktif' => true,
             ]
         );

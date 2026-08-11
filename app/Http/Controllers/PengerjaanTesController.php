@@ -411,6 +411,30 @@ class PengerjaanTesController extends Controller
 
         $alatTesId = \App\Models\AlatTes::where('kode', $kodeGrid)->value('id');
 
+        // Persistent countdown: set waktu_mulai saat pertama kali masuk
+        $pesertaSesi = PesertaSesiTes::where('user_id', auth()->id())
+            ->where('sesi_tes_id', $sesiId)
+            ->first();
+
+        if ($pesertaSesi && !$pesertaSesi->waktu_mulai) {
+            $pesertaSesi->update([
+                'waktu_mulai'         => now(),
+                'tanggal_pengerjaan'  => now()->toDateString(),
+            ]);
+            $pesertaSesi->refresh();
+        }
+
+        // Hitung sisa waktu dari durasi alat tes
+        $alatTesModel = \App\Models\AlatTes::find($alatTesId);
+        $durasiDetik  = ($alatTesModel?->durasi_total_menit ?? 60) * 60;
+        $detikBerjalan = (int) $pesertaSesi?->waktu_mulai->diffInSeconds(now());
+        $sisaDetik = (int) max(0, $durasiDetik - $detikBerjalan);
+
+        // Kalau waktu habis, langsung selesai
+        if ($sisaDetik <= 0) {
+            return redirect()->route('peserta.tes.selesai', $sesiId);
+        }
+
         $sudahDikerjakan = \App\Models\GridInputPeserta::where('user_id', auth()->id())
             ->where('sesi_tes_id', $sesiId)
             ->where('alat_tes_id', $alatTesId)
@@ -428,21 +452,59 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
 
-        $alatTesModel = \App\Models\AlatTes::find($alatTesId);
         $adaTimerPerKolom = $alatTesModel?->batas_waktu_per_soal_aktif ?? false;
-        $detikPerKolom = $alatTesModel?->batas_waktu_per_soal_detik ?? 60;
+        $detikPerKolom    = $alatTesModel?->batas_waktu_per_soal_detik ?? 60;
+
+        // Persistensi timer per-kolom
+        $sisaDetikPerKolom = $detikPerKolom;
+        if ($adaTimerPerKolom) {
+            $pesertaAlatTes = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesi->id)
+                ->where('alat_tes_id', $alatTesId)
+                ->first();
+
+            if ($pesertaAlatTes) {
+                $waktuMulaiKolom = $pesertaAlatTes->waktu_mulai_kolom;
+                $kolomAktifNomor = (int) $kolomAktif['nomor'];
+                $tersimpanNomor  = (int) ($pesertaAlatTes->kolom_ke ?? 0);
+
+                if ($tersimpanNomor === $kolomAktifNomor) {
+                    if ($waktuMulaiKolom) {
+                        $sisaDetikPerKolom = (int) max(0, $detikPerKolom - $waktuMulaiKolom->diffInSeconds(now()));
+                    } else {
+                        $pesertaAlatTes->update(['waktu_mulai_kolom' => now()]);
+                        $sisaDetikPerKolom = $detikPerKolom;
+                    }
+                } else {
+                    $pesertaAlatTes->update([
+                        'waktu_mulai_kolom' => now(),
+                        'kolom_ke'          => $kolomAktifNomor,
+                    ]);
+                    $sisaDetikPerKolom = $detikPerKolom;
+                }
+            } else {
+                $pesertaAlatTes = PesertaAlatTes::create([
+                    'peserta_sesi_tes_id' => $pesertaSesi->id,
+                    'alat_tes_id'         => $alatTesId,
+                    'waktu_mulai_kolom'   => now(),
+                    'kolom_ke'            => $kolomAktif['nomor'],
+                ]);
+                $sisaDetikPerKolom = $detikPerKolom;
+            }
+        }
 
         return view('peserta.kraepelin', [
-            'sesiId'          => $sesiId,
-            'nama_sesi'       => $sesi['nama_sesi'],
-            'kodeGrid'        => $kodeGrid,
-            'alatTesId'       => $alatTesId,
-            'kolomAktif'      => $kolomAktif,
-            'totalKolom'      => $semuaKolom->count(),
-            'kolomSelesai'    => count($sudahDikerjakan),
-            'adaTimerPerKolom'=> $adaTimerPerKolom,
-            'detikPerKolom'   => $detikPerKolom,
-            'angka'           => $kolomAktif['angka'],
+            'sesiId'                 => $sesiId,
+            'nama_sesi'              => $sesi['nama_sesi'],
+            'kodeGrid'               => $kodeGrid,
+            'alatTesId'              => $alatTesId,
+            'kolomAktif'             => $kolomAktif,
+            'totalKolom'             => $semuaKolom->count(),
+            'kolomSelesai'           => count($sudahDikerjakan),
+            'adaTimerPerKolom'       => $adaTimerPerKolom,
+            'detikPerKolom'          => $detikPerKolom,
+            'sisaDetikPerKolom'      => $sisaDetikPerKolom,
+            'sisaDetikKeseluruhan'  => $sisaDetik,
+            'angka'                  => $kolomAktif['angka'],
         ]);
     }
 

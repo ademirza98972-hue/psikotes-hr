@@ -22,6 +22,7 @@ class EppsSeeder extends Seeder
                 'batas_waktu_per_soal_detik' => null,
                 'is_sensitif' => false,
                 'jumlah_soal' => 225,
+                'pola_skoring' => 'forced_choice',
                 'is_aktif' => true,
             ]
         );

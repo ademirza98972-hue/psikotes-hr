@@ -22,6 +22,7 @@ class KraepelinSeeder extends Seeder
                 'batas_waktu_per_soal_detik' => null,
                 'is_sensitif' => false,
                 'jumlah_soal' => null,
+                'pola_skoring' => 'grid',
                 'is_aktif' => true,
             ]
         );

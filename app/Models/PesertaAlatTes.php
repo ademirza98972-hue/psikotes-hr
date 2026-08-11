@@ -15,6 +15,12 @@ class PesertaAlatTes extends Model
     protected $fillable = [
         'peserta_sesi_tes_id',
         'alat_tes_id',
+        'waktu_mulai_kolom',
+        'kolom_ke',
+    ];
+
+    protected $casts = [
+        'waktu_mulai_kolom' => 'datetime',
     ];
 
     public function pesertaSesiTes(): BelongsTo

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GridInputPeserta;
+use App\Models\HasilKolomGrid;
 use App\Models\PesertaAlatTes;
 use App\Models\PesertaSesiTes;
 use App\Models\SesiTes;
@@ -585,6 +587,47 @@ class PengerjaanTesController extends Controller
                 ]
             );
         }
+
+        HasilKolomGrid::updateOrCreate(
+            [
+                'user_id'     => $userId,
+                'sesi_tes_id' => $sesiId,
+                'alat_tes_id' => $alatTesId,
+                'kolom_ke'    => $kolomKe,
+            ],
+            [
+                'jumlah_benar'    => GridInputPeserta::where('user_id', $userId)
+                    ->where('sesi_tes_id', $sesiId)
+                    ->where('alat_tes_id', $alatTesId)
+                    ->where('kolom_ke', $kolomKe)
+                    ->where('is_benar', true)
+                    ->count(),
+                'jumlah_salah'    => GridInputPeserta::where('user_id', $userId)
+                    ->where('sesi_tes_id', $sesiId)
+                    ->where('alat_tes_id', $alatTesId)
+                    ->where('kolom_ke', $kolomKe)
+                    ->where('is_benar', false)
+                    ->where('jawaban_peserta', '!=', 0)
+                    ->count(),
+                'jumlah_kelewat'  => GridInputPeserta::where('user_id', $userId)
+                    ->where('sesi_tes_id', $sesiId)
+                    ->where('alat_tes_id', $alatTesId)
+                    ->where('kolom_ke', $kolomKe)
+                    ->where(function ($q) {
+                        $q->whereNull('jawaban_peserta')
+                          ->orWhere('jawaban_peserta', 0);
+                    })
+                    ->count(),
+                'waktu_pakai_detik' => (int) max(0, now()->diffInSeconds(
+                    GridInputPeserta::where('user_id', $userId)
+                        ->where('sesi_tes_id', $sesiId)
+                        ->where('alat_tes_id', $alatTesId)
+                        ->where('kolom_ke', $kolomKe)
+                        ->min('waktu_input')
+                        ?? now()
+                )),
+            ]
+        );
 
         return redirect()->route('peserta.tes.kraepelin', $sesiId);
     }

@@ -462,31 +462,67 @@ class PengerjaanTesController extends Controller
                 ->where('alat_tes_id', $alatTesId)
                 ->first();
 
-            if ($pesertaAlatTes) {
-                $waktuMulaiKolom = $pesertaAlatTes->waktu_mulai_kolom;
-                $kolomAktifNomor = (int) $kolomAktif['nomor'];
-                $tersimpanNomor  = (int) ($pesertaAlatTes->kolom_ke ?? 0);
+            $kolomAktifNomor = (int) $kolomAktif['nomor'];
 
-                if ($tersimpanNomor === $kolomAktifNomor) {
-                    if ($waktuMulaiKolom) {
-                        $sisaDetikPerKolom = (int) max(0, $detikPerKolom - $waktuMulaiKolom->diffInSeconds(now()));
-                    } else {
-                        $pesertaAlatTes->update(['waktu_mulai_kolom' => now()]);
-                        $sisaDetikPerKolom = $detikPerKolom;
-                    }
-                } else {
-                    $pesertaAlatTes->update([
-                        'waktu_mulai_kolom' => now(),
-                        'kolom_ke'          => $kolomAktifNomor,
-                    ]);
-                    $sisaDetikPerKolom = $detikPerKolom;
-                }
-            } else {
+            if (!$pesertaAlatTes) {
+                // Kasus 1: record tidak ada → create baru
                 $pesertaAlatTes = PesertaAlatTes::create([
                     'peserta_sesi_tes_id' => $pesertaSesi->id,
                     'alat_tes_id'         => $alatTesId,
                     'waktu_mulai_kolom'   => now(),
-                    'kolom_ke'            => $kolomAktif['nomor'],
+                    'kolom_ke'            => $kolomAktifNomor,
+                ]);
+                $sisaDetikPerKolom = $detikPerKolom;
+            } elseif (!$pesertaAlatTes->kolom_ke) {
+                // Kasus 2: kolom_ke null → inisialisasi
+                $pesertaAlatTes->update([
+                    'waktu_mulai_kolom' => now(),
+                    'kolom_ke'          => $kolomAktifNomor,
+                ]);
+                $sisaDetikPerKolom = $detikPerKolom;
+            } elseif ($pesertaAlatTes->kolom_ke == $kolomAktifNomor) {
+                if (!$pesertaAlatTes->waktu_mulai_kolom) {
+                    $pesertaAlatTes->update(['waktu_mulai_kolom' => now()]);
+                    $sisaDetikPerKolom = $detikPerKolom;
+                } else {
+                    $sisaDetikPerKolom = (int) max(0, $detikPerKolom - $pesertaAlatTes->waktu_mulai_kolom->diffInSeconds(now()));
+                    if ($sisaDetikPerKolom <= 0) {
+                        // Kasus 4: waktu habis → simpan jawaban kosong, redirect ke kolom berikutnya
+                        $sudahAda = \App\Models\GridInputPeserta::where('user_id', auth()->id())
+                            ->where('sesi_tes_id', $sesiId)
+                            ->where('alat_tes_id', $alatTesId)
+                            ->where('kolom_ke', $kolomAktifNomor)
+                            ->exists();
+
+                        if (!$sudahAda) {
+                            $barisPertama = $kolomAktif['angka'][0] ?? null;
+                            if ($barisPertama !== null) {
+                                \App\Models\GridInputPeserta::create([
+                                    'user_id'          => auth()->id(),
+                                    'sesi_tes_id'      => $sesiId,
+                                    'alat_tes_id'      => $alatTesId,
+                                    'kolom_ke'         => $kolomAktifNomor,
+                                    'baris_ke'         => 1,
+                                    'jawaban_peserta'  => 0,
+                                    'jawaban_benar'    => 0,
+                                    'is_benar'         => false,
+                                    'waktu_input'      => now(),
+                                ]);
+                            }
+                        }
+
+                        $pesertaAlatTes->update([
+                            'waktu_mulai_kolom' => now(),
+                        ]);
+
+                        return redirect()->route('peserta.tes.kraepelin', $sesiId);
+                    }
+                }
+            } else {
+                // Kasus 5: kolom_ke != nomor aktif → reset ke kolom baru
+                $pesertaAlatTes->update([
+                    'waktu_mulai_kolom' => now(),
+                    'kolom_ke'          => $kolomAktifNomor,
                 ]);
                 $sisaDetikPerKolom = $detikPerKolom;
             }

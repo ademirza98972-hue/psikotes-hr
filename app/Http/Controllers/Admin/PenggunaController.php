@@ -100,6 +100,7 @@ class PenggunaController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'no_hp' => $data['no_hp'],
+                'jenis_kelamin' => $data['jenis_kelamin'],
                 'tipe_akun' => 'karyawan',
                 'peran_id' => $peran->id,
                 'status' => 'aktif',
@@ -132,7 +133,7 @@ class PenggunaController extends Controller
                 'jabatan' => $jabatanNama,
             ]);
 
-            $dataMaster->update(['status' => 'sudah_terpakai']);
+            $dataMaster->update(['status' => 'sudah_terpakai', 'jenis_kelamin' => $data['jenis_kelamin']]);
         });
 
         return redirect()
@@ -175,9 +176,10 @@ class PenggunaController extends Controller
 
         DB::transaction(function () use ($pengguna, $data) {
             $payload = [
-                'name' => $data['nama_karyawan'],
+                'name' => $data['nama_karyawan'] ?? $pengguna->name,
                 'email' => $data['email'],
                 'no_hp' => $data['no_hp'],
+                'jenis_kelamin' => $data['jenis_kelamin'],
             ];
 
             if (! empty($data['password'])) {
@@ -188,18 +190,27 @@ class PenggunaController extends Controller
 
             $profil = $pengguna->profilKaryawan;
             if ($profil) {
-                $departemen = Departemen::findOrFail($data['departemen']);
+                $departemenId = $data['departemen']
+                    ?? Departemen::where('nama_departemen', $profil->departemen)->value('id');
+                $departemen = Departemen::findOrFail($departemenId);
                 $jabatanNama = null;
                 if (!empty($data['jabatan'])) {
                     $jabatan = Posisi::find($data['jabatan']);
                     $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
+                } elseif ($profil->jabatan) {
+                    $jabatanNama = $profil->jabatan;
                 }
 
                 $profil->update([
-                    'nama_karyawan' => $data['nama_karyawan'],
+                    'nama_karyawan' => $data['nama_karyawan'] ?? $pengguna->name,
                     'departemen' => $departemen->nama_departemen,
                     'jabatan' => $jabatanNama,
                 ]);
+
+                $dataMaster = DataKaryawan::where('nik_karyawan', $profil->nik_karyawan)->first();
+                if ($dataMaster) {
+                    $dataMaster->update(['jenis_kelamin' => $data['jenis_kelamin']]);
+                }
             }
         });
 

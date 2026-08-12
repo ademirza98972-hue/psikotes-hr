@@ -41,6 +41,16 @@
                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
         </div>
 
+        <div>
+            <label for="jenis_kelamin" class="block text-sm font-medium text-slate-700">Jenis Kelamin</label>
+            <select id="jenis_kelamin" name="jenis_kelamin" required
+                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                <option value="">-- Pilih --</option>
+                <option value="L" @if(old('jenis_kelamin', $data->jenis_kelamin) == 'L') selected @endif>Laki-laki</option>
+                <option value="P" @if(old('jenis_kelamin', $data->jenis_kelamin) == 'P') selected @endif>Perempuan</option>
+            </select>
+        </div>
+
         <div class="grid gap-4 sm:grid-cols-2">
             <div>
                 <label for="departemen" class="block text-sm font-medium text-slate-700">Departemen</label>

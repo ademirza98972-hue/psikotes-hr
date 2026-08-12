@@ -28,7 +28,8 @@ class PerbaruiPenggunaRequest extends FormRequest
             ],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
-            'tipe_akun' => ['required', Rule::in(['kandidat', 'karyawan'])],
+            'tipe_akun' => ['nullable', Rule::in(['kandidat', 'karyawan'])],
+            'jenis_kelamin' => ['required', 'in:L,P'],
         ];
 
         $tipe = $this->input('tipe_akun');
@@ -37,7 +38,6 @@ class PerbaruiPenggunaRequest extends FormRequest
             $aturan['nama_kandidat'] = ['required', 'string', 'max:255'];
             $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
             $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
-            $nikKandidat = $this->input('nik_kandidat');
             $aturan['nik_kandidat'] = [
                 'required', 'string', 'digits:16',
                 Rule::unique('profil_kandidat', 'nik_kandidat')->ignore($idPengguna, 'user_id'),
@@ -72,6 +72,7 @@ class PerbaruiPenggunaRequest extends FormRequest
             'password' => 'password',
             'no_hp' => 'no HP',
             'tipe_akun' => 'tipe akun',
+            'jenis_kelamin' => 'jenis kelamin',
             'nama_kandidat' => 'nama kandidat',
             'posisi_dilamar' => 'posisi yang dilamar',
             'pendidikan_terakhir' => 'pendidikan terakhir',

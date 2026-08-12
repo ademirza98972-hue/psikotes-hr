@@ -27,6 +27,7 @@ class PerbaruiDataKaryawanRequest extends FormRequest
                     ->whereNull('deleted_at'),
             ],
             'nama_karyawan' => ['required', 'string', 'max:255'],
+            'jenis_kelamin' => ['required', 'in:L,P'],
             'departemen_id' => [
                 'required',
                 'integer',
@@ -72,6 +73,7 @@ class PerbaruiDataKaryawanRequest extends FormRequest
         return [
             'nik_karyawan' => 'NIK',
             'nama_karyawan' => 'nama karyawan',
+            'jenis_kelamin' => 'jenis kelamin',
             'departemen_id' => 'departemen',
             'posisi_id' => 'jabatan',
             'departemen' => 'departemen',

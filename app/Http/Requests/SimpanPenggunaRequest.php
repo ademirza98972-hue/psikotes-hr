@@ -27,6 +27,7 @@ class SimpanPenggunaRequest extends FormRequest
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
+            'jenis_kelamin' => ['required', 'in:L,P'],
             'nik_karyawan' => [
                 'required',
                 'string',

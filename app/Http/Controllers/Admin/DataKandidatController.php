@@ -99,13 +99,17 @@ class DataKandidatController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'no_hp' => $data['no_hp'],
+                'jenis_kelamin' => $data['jenis_kelamin'],
                 'tipe_akun' => 'kandidat',
                 'peran_id' => $peran->id,
                 'status' => 'aktif',
             ]);
 
+            $departemen = Departemen::findOrFail($data['departemen']);
+
             ProfilKandidat::create([
                 'user_id' => $user->id,
+                'departemen' => $departemen->nama_departemen,
                 'nama_kandidat' => $data['nama_kandidat'],
                 'posisi_dilamar' => $namaPosisi,
                 'pendidikan_terakhir' => $data['pendidikan_terakhir'],
@@ -126,10 +130,13 @@ class DataKandidatController extends Controller
 
         $departemen = Departemen::orderBy('nama_departemen')->get();
 
+        $currentDepartemenId = Departemen::where('nama_departemen', optional($kandidat->profilKandidat)->departemen)->value('id');
+
         return view('admin.data-kandidat.ubah', [
             'kandidat' => $kandidat,
             'profilKandidat' => $kandidat->profilKandidat,
             'departemen' => $departemen,
+            'currentDepartemenId' => $currentDepartemenId,
         ]);
     }
 
@@ -148,6 +155,7 @@ class DataKandidatController extends Controller
                 'name' => $data['nama_kandidat'],
                 'email' => $data['email'],
                 'no_hp' => $data['no_hp'],
+                'jenis_kelamin' => $data['jenis_kelamin'],
             ];
 
             if (! empty($data['password'])) {
@@ -156,9 +164,12 @@ class DataKandidatController extends Controller
 
             $kandidat->update($payload);
 
+            $departemen = Departemen::findOrFail($data['departemen']);
+
             $profil = $kandidat->profilKandidat;
             if ($profil) {
                 $profil->update([
+                    'departemen' => $departemen->nama_departemen,
                     'nama_kandidat' => $data['nama_kandidat'],
                     'posisi_dilamar' => $namaPosisi,
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],

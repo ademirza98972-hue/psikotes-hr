@@ -355,10 +355,12 @@ class PengerjaanTesController extends Controller
 
             $formatDasar = strtolower(str_replace(' ', '_', $soalDummy[$kodeAlat]['format_dasar'] ?? ''));
             if ($formatDasar === 'forced_choice') {
-                // TODO: kelompok_segmen EPPS (1-4) perlu dikonfirmasi ke psikolog
-                // (kemungkinan berdasarkan tingkat pendidikan peserta).
-                // Sementara pakai '2' yang punya data norma paling lengkap.
-                $kelompokSegmen = '2';
+                $jenisKelamin = Auth::user()->jenis_kelamin ?? null;
+                $kelompokSegmen = match ($jenisKelamin) {
+                    'L' => '3',
+                    'P' => '4',
+                    default => '3',
+                };
             } else {
                 $kelompokSegmen = 'default'; // akan diupdate saat norma lengkap
             }

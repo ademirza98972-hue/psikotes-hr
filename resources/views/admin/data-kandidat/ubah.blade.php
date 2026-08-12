@@ -39,6 +39,15 @@
                     <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp', $kandidat->no_hp) }}" required
                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
                 </div>
+                <div>
+                    <label for="jenis_kelamin" class="block text-sm font-medium text-slate-700">Jenis Kelamin</label>
+                    <select id="jenis_kelamin" name="jenis_kelamin" required
+                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        <option value="">-- Pilih --</option>
+                        <option value="L" @if(old('jenis_kelamin', $kandidat->jenis_kelamin) == 'L') selected @endif>Laki-laki</option>
+                        <option value="P" @if(old('jenis_kelamin', $kandidat->jenis_kelamin) == 'P') selected @endif>Perempuan</option>
+                    </select>
+                </div>
             </div>
 
             <div class="space-y-4 border-t border-slate-100 pt-4">
@@ -50,7 +59,7 @@
                                 class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
                             <option value="">-- Pilih Departemen --</option>
                             @foreach($departemen as $item)
-                                <option value="{{ $item->id }}" @if(old('departemen') == $item->id) selected @endif>{{ $item->nama_departemen }}</option>
+                                <option value="{{ $item->id }}" @if(old('departemen', $currentDepartemenId) == $item->id) selected @endif>{{ $item->nama_departemen }}</option>
                             @endforeach
                         </select>
                     </div>

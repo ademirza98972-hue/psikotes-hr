@@ -17,6 +17,7 @@ class DataKaryawan extends Model
     protected $fillable = [
         'nik_karyawan',
         'nama_karyawan',
+        'jenis_kelamin',
         'departemen',
         'jabatan',
         'status',

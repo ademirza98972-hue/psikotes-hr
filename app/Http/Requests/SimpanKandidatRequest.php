@@ -51,6 +51,7 @@ class SimpanKandidatRequest extends FormRequest
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
+            'jenis_kelamin' => ['required', 'in:L,P'],
             'pendidikan_terakhir' => ['required', 'string', 'max:255'],
             'nik_kandidat' => ['required', 'string', 'digits:16'],
         ];
@@ -77,6 +78,7 @@ class SimpanKandidatRequest extends FormRequest
             'email' => 'email',
             'password' => 'password',
             'no_hp' => 'no HP',
+            'jenis_kelamin' => 'jenis kelamin',
             'pendidikan_terakhir' => 'pendidikan terakhir',
             'nik_kandidat' => 'NIK KTP',
         ];

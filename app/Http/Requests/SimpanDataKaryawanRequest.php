@@ -21,6 +21,7 @@ class SimpanDataKaryawanRequest extends FormRequest
                 \Illuminate\Validation\Rule::unique('data_karyawan', 'nik_karyawan')->whereNull('deleted_at'),
             ],
             'nama_karyawan' => ['required', 'string', 'max:255'],
+            'jenis_kelamin' => ['required', 'in:L,P'],
             'departemen_id' => [
                 'required',
                 'integer',
@@ -66,6 +67,7 @@ class SimpanDataKaryawanRequest extends FormRequest
         return [
             'nik_karyawan' => 'NIK',
             'nama_karyawan' => 'nama karyawan',
+            'jenis_kelamin' => 'jenis kelamin',
             'departemen_id' => 'departemen',
             'posisi_id' => 'jabatan',
             'departemen' => 'departemen',

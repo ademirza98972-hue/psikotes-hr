@@ -281,6 +281,27 @@
                     </table>
                 @endif
 
+            {{-- Kraepelin — Grid: ringkasan jumlah kolom --}}
+            @elseif ($alatTes['format_dasar'] === 'Grid' && ($gridRingkasan = $alatTes['grid_ringkasan'] ?? null))
+                <table style="margin-top:8px;">
+                    <thead class="th-row"><tr><th style="width:50%;">Dimensi</th><th style="width:20%; text-align:center;">Skor Mentah</th><th style="width:20%; text-align:center;">Skor Akhir</th><th style="width:10%; text-align:center;">Kategori</th></tr></thead>
+                    <tbody>
+                        @foreach ($alatTes['skor_ringkas'] as $skor)
+                        <tr style="border-bottom:1px solid #e0e3e5;">
+                            <td style="padding:3px 5px;">{{ $skor['dimensi'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['skor_mentah'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['skor_skala'] }}</td>
+                            <td style="padding:3px 5px; text-align:center;">{{ $skor['kategori'] }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <div style="margin-top:8px; padding:8px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; font-size:9px; color:#334155; display:grid; grid-template-columns:1fr 1fr; gap:3px 16px;">
+                    <div><strong>Total Jawaban Benar:</strong> {{ $gridRingkasan->total_benar }}</div>
+                    <div><strong>Total Jawaban Salah:</strong> {{ $gridRingkasan->total_salah }}</div>
+                    <div><strong>Total Kelewat:</strong> {{ $gridRingkasan->total_kelewat }}</div>
+                    <div><strong>Total Kolom Dikerjakan:</strong> {{ $gridRingkasan->total_kolom }}</div>
+                </div>
             {{-- Papikostik & alat tes lain: tabel skor per dimensi --}}
             @elseif (!empty($alatTes['skor_ringkas']))
                 <table>

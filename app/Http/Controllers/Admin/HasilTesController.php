@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BidangLaporan;
 use App\Models\DimensiAlatTes;
 use App\Models\DimensiBidangLaporan;
+use App\Models\HasilKolomGrid;
 use App\Models\HasilSkorPeserta;
 use App\Models\PesertaSesiTes;
 use App\Models\SesiTes;
@@ -116,6 +117,19 @@ class HasilTesController extends Controller
                 'durasi_pengerjaan_aktual' => '—',
                 'skor_ringkas'             => $skorRingkas,
             ];
+
+            if ($alatTes->format_dasar === 'Grid') {
+                $gridRows = HasilKolomGrid::where('user_id', $pesertaId)
+                    ->where('sesi_tes_id', $sesiId)
+                    ->where('alat_tes_id', $alatTesId)
+                    ->selectRaw('
+                        COALESCE(SUM(jumlah_benar),0) as total_benar,
+                        COALESCE(SUM(jumlah_salah),0) as total_salah,
+                        COALESCE(SUM(jumlah_kelewat),0) as total_kelewat,
+                        COUNT(kolom_ke) as total_kolom
+                    ')->first();
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
+            }
         }
 
         $hasilTes['hasil_alat_tes'] = $hasilAlatTes;
@@ -187,6 +201,19 @@ class HasilTesController extends Controller
                 'durasi_pengerjaan_aktual' => '—',
                 'skor_ringkas'             => $skorRingkas,
             ];
+
+            if ($alatTes->format_dasar === 'Grid') {
+                $gridRows = HasilKolomGrid::where('user_id', $pesertaId)
+                    ->where('sesi_tes_id', $sesiId)
+                    ->where('alat_tes_id', $alatTesId)
+                    ->selectRaw('
+                        COALESCE(SUM(jumlah_benar),0) as total_benar,
+                        COALESCE(SUM(jumlah_salah),0) as total_salah,
+                        COALESCE(SUM(jumlah_kelewat),0) as total_kelewat,
+                        COUNT(kolom_ke) as total_kolom
+                    ')->first();
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
+            }
         }
 
         $hasilTes['hasil_alat_tes'] = $hasilAlatTes;

@@ -124,10 +124,13 @@ class PengerjaanTesController extends Controller
                                         ->sortBy('urutan')
                                         ->values()
                                         ->map(fn($opsi) => [
-                                            'id'     => $opsi->id,
-                                            'teks'   => $opsi->teks_opsi,
-                                            'urutan' => $opsi->urutan,
+                                            'id'        => $opsi->id,
+                                            'teks'      => $opsi->teks_opsi,
+                                            'urutan'    => $opsi->urutan,
+                                            'gambar'    => $opsi->gambar_opsi ?? null,
                                         ])->all(),
+                                    'gambar_soal'   => $soal->gambar_soal ?? null,
+                                    'kunci_jawaban' => $soal->kunci_jawaban ?? null,
                                 ];
                             })->all(),
                     ];
@@ -182,6 +185,20 @@ class PengerjaanTesController extends Controller
             Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
         }
 
+        // Tangani query ?step=N (lompat ke nomor soal tertentu)
+        if ($request->query('step') !== null) {
+            $targetStep = (int) $request->query('step');
+            if ($targetStep >= 0 && $targetStep < count($daftarSoalFlat)) {
+                $kodeTarget = $daftarSoalFlat[$targetStep]['kode_alat_tes'] ?? '';
+                $alatTesTarget = \App\Models\AlatTes::where('kode', $kodeTarget)->first();
+                $adaTimerPerSoal = $alatTesTarget?->batas_waktu_per_soal_aktif ?? false;
+                if (!$adaTimerPerSoal) {
+                    $currentStep = $targetStep;
+                    Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
+                }
+            }
+        }
+
         // Jika step melebihi total soal, berarti sudah selesai
         if ($currentStep >= count($daftarSoalFlat)) {
             return redirect()->route('peserta.tes.selesai', $sesiId);
@@ -213,11 +230,37 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Jawaban sebelumnya untuk soal ini — ambil dari DB (opsi_dipilih_id)
-        $savedAnswer = JawabanPeserta::where('user_id', auth()->id())
+        $jawabanRecord = JawabanPeserta::where('user_id', auth()->id())
             ->where('sesi_tes_id', $sesiId)
             ->where('soal_id', $soal['id'])
-            ->value('opsi_dipilih_id');
+            ->first();
+        $savedAnswer = $jawabanRecord?->opsi_dipilih_id;
+        $savedAnswerTeks = $jawabanRecord?->jawaban_teks;
+
+        // Bangun daftar nomor soal untuk navigasi sidebar
+        $soalIds = collect($daftarSoalFlat)->pluck('soal.id')->filter()->values();
+        $sudahDijawabIds = JawabanPeserta::where('user_id', auth()->id())
+            ->where('sesi_tes_id', $sesiId)
+            ->whereIn('soal_id', $soalIds)
+            ->where(function($q) {
+                $q->whereNotNull('opsi_dipilih_id')
+                  ->orWhere(function($q2) {
+                      $q2->whereNotNull('jawaban_teks')->where('jawaban_teks', '!=', '');
+                  });
+            })
+            ->pluck('soal_id')
+            ->toArray();
+
+        $daftar_nomor_soal = collect($daftarSoalFlat)->map(function($item, $step) use ($currentStep, $sudahDijawabIds) {
+            return [
+                'step'          => $step,
+                'nomor_soal'    => $item['soal']['nomor'],
+                'kode_alat_tes' => $item['kode_alat_tes'],
+                'sudah_dijawab' => in_array($item['soal']['id'], $sudahDijawabIds),
+                'is_current'    => $step === $currentStep,
+                'tipe_format'   => $item['soal']['tipe_format'] ?? 'pilihan_ganda',
+            ];
+        })->all();
 
         // Variable untuk view
         $sesiIdView           = $sesiId;
@@ -250,8 +293,10 @@ class PengerjaanTesController extends Controller
             'soal_total_global' => $soal_total_global,
             'soal_data'         => $soal_data,
             'saved_answer'      => $saved_answer,
+            'saved_answer_teks' => $savedAnswerTeks,
             'is_first_soal'     => $is_first_soal,
             'is_last_soal'      => $is_last_soal,
+            'daftar_nomor_soal' => $daftar_nomor_soal,
         ]);
     }
 
@@ -286,26 +331,29 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
 
-        $opsiId = $request->input('opsi_id');
-        if ($opsiId === null || $opsiId === '') {
-            return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', 'Silakan pilih jawaban terlebih dahulu.');
-        }
-
         $soal = $daftarSoalFlat[$currentStep]['soal'];
         $soalId = $soal['id'];
+        $tipeFormat = $soal['tipe_format'] ?? 'pilihan_ganda';
 
-        // Simpan ke database (idempoten — updateOrCreate)
-        JawabanPeserta::updateOrCreate(
-            [
-                'user_id'     => auth()->id(),
-                'sesi_tes_id' => $sesiId,
-                'soal_id'     => $soalId,
-            ],
-            [
-                'opsi_dipilih_id' => (int) $opsiId,
-                'waktu_jawab'     => now(),
-            ]
-        );
+        if (in_array($tipeFormat, ['isian_teks', 'isian_angka'])) {
+            $jawabanTeks = $request->input('jawaban_teks');
+            if ($jawabanTeks === null || $jawabanTeks === '') {
+                return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', 'Silakan isi jawaban terlebih dahulu.');
+            }
+            JawabanPeserta::updateOrCreate(
+                ['user_id' => auth()->id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
+                ['jawaban_teks' => $jawabanTeks, 'opsi_dipilih_id' => null, 'waktu_jawab' => now()]
+            );
+        } else {
+            $opsiId = $request->input('opsi_id');
+            if ($opsiId === null || $opsiId === '') {
+                return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', 'Silakan pilih jawaban terlebih dahulu.');
+            }
+            JawabanPeserta::updateOrCreate(
+                ['user_id' => auth()->id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
+                ['opsi_dipilih_id' => (int) $opsiId, 'jawaban_teks' => null, 'waktu_jawab' => now()]
+            );
+        }
 
         // Pindah ke soal berikutnya (session hanya untuk navigasi)
         $nextStep = $currentStep + 1;

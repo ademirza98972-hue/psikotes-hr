@@ -11,6 +11,17 @@ Pelajaran · Laravel helper method selalu butuh IDE Helper untuk tipe yang diken
 Log Keyword · `ide-helper`, `Parameter has no type information`, `Undefined method 'user'`
 Deploy · local
 
+### Fix #3 — Mixed Format: kunci_jawaban Tidak Terekstrak dari Validated Input
+Tanggal · 2026-08-14
+File · `app/Http/Controllers/Admin/BankSoalController.php`
+Masalah · Pada format Mixed, rule `mixedRules()` meminta field `'kunci'` (uppercase A-D), tetapi update() membaca `$validated['kunci']` padahal form mengirim `'kunci_jawaban'` (lowercase a-e). Akibatnya kunci jawaban tidak tersimpan dan opsi E tidak pernah valid.
+Akar · Nama field validasi tidak konsisten antara rule, input form (kartu-soal.blade), dan penugasan ke model.
+Fix · 1) `mixedRules()`: ganti `'kunci'` → `'kunci_jawaban'` dengan rule `'in:a,b,c,d,e'`. 2) `update()`: ganti `$validated['kunci'] ?? null` → `$validated['kunci_jawaban'] ?? $request->input('kunci_jawaban')`. 3) `update()`: `$hurufMap` jadi `['a'=>1,'b'=>2,'c'=>3,'d'=>4,'e'=>5]` agar cocok dengan format lowercase.
+Verifikasi · `grep -n` pada controller menampilkan ketiga perubahan; kartu-soal.blade sudah menggunakan `strtolower($soal['kunci_jawaban'])` sehingga cocok dengan format lowercase.
+Pelajaran · Nama field di rule validasi harus selalu sinkron dengan nama field yang dikirim form.
+Log Keyword · `mixedRules`, `kunci_jawaban`, `hurufMap`, `Mixed format`
+Deploy · local
+
 ### Fix #2 — sessionKey() $name: Tipe Salah Menyebabkan TypeError Saat Runtime
 Tanggal · 2026-08-05
 File · `app/Http/Controllers/PengerjaanTesController.php` (baris 75)

@@ -141,7 +141,7 @@
 
         @if ($tipeFormat === 'pilihan_gambar')
             @if (!empty($soal['gambar_soal']))
-                <img src="{{ asset('storage/' . $soal['gambar_soal']) }}" class="h-28 rounded-lg border border-slate-200 object-contain mb-3">
+                <img src="{{ asset('storage/' . $soal['gambar_soal']) }}" class="h-20 max-w-xs rounded-lg border border-slate-200 object-contain mb-3">
             @else
                 <div class="mb-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-[12px] text-slate-400 text-center">Gambar soal belum diupload</div>
             @endif
@@ -153,7 +153,10 @@
                     @php $huruf = chr(65 + $idx); $hurufLower = strtolower($huruf); @endphp
                     <li class="flex items-center gap-2 rounded-lg border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-[#e0e3e5]' }} px-3 py-2 text-sm">
                         <span class="flex items-center justify-center w-5 h-5 rounded-full border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-[#2C5F6F] bg-[#2C5F6F] text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-semibold">{{ $huruf }}</span>
-                        <span>{{ $opsiTeks }}</span>
+                        @if (!empty($opsiTeks['gambar']))
+                            <img src="{{ asset('storage/' . $opsiTeks['gambar']) }}" class="h-16 max-w-[120px] rounded border border-slate-200 object-contain">
+                        @endif
+                        <span>{{ $opsiTeks['teks'] ?? $opsiTeks }}</span>
                         @if (strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower)
                             <span class="ml-auto text-[11px] font-semibold text-[#2C5F6F]">Kunci</span>
                         @endif

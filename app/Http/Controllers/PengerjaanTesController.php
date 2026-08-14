@@ -409,6 +409,16 @@ class PengerjaanTesController extends Controller
                     'P' => '4',
                     default => '3',
                 };
+            } elseif ($kodeAlat === 'IST') {
+                $user = Auth::user();
+                $pendidikan = $user->profilKaryawan?->pendidikan_terakhir
+                    ?? $user->profilKandidat?->pendidikan_terakhir
+                    ?? 'SLTA';
+                $kelompokSegmen = match (strtoupper($pendidikan)) {
+                    'SD', 'SMP', 'SLTP' => 'SLTP',
+                    'S1', 'S2', 'S3', 'D3', 'D4', 'SARJANA', 'SARJ' => 'SARJ',
+                    default => 'SLTA',
+                };
             } else {
                 $kelompokSegmen = 'default'; // akan diupdate saat norma lengkap
             }

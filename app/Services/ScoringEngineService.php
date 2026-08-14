@@ -9,6 +9,7 @@ use App\Models\HasilKolomGrid;
 use App\Models\HasilSkorPeserta;
 use App\Models\JawabanPeserta;
 use App\Models\NormaKonversi;
+use App\Models\OpsiJawaban;
 use App\Models\Soal;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +62,128 @@ class ScoringEngineService
                 'level_id'    => $this->cariLevelId($dimensiIQ, (float) $skorAkhir),
             ]
         );
+    }
+
+    /**
+     * Hitung skor IST per subtes (SE, WA, AN, GE, RA, ZR, FA, WU, ME) dan IQ Total.
+     */
+    public function scoreIST(int $userId, int $sesiTesId, int $alatTesId, string $kelompokSegmen = 'SLTA'): void
+    {
+        // 1. Ambil semua dimensi subtes IST (SE, WA, AN, GE, RA, ZR, FA, WU, ME, IQ)
+        $dimensiMap = DB::table('dimensi_alat_tes')
+            ->where('alat_tes_id', $alatTesId)
+            ->pluck('id', 'kode_dimensi');
+
+        // 2. Ambil semua soal IST beserta kunci jawaban dan range nomor per subtes
+        $subtesRange = [
+            'SE' => [1, 20],
+            'WA' => [21, 40],
+            'AN' => [41, 60],
+            'GE' => [61, 76],
+            'RA' => [77, 96],
+            'ZR' => [97, 116],
+            'FA' => [117, 136],
+            'WU' => [137, 156],
+            'ME' => [157, 176],
+        ];
+
+        // 3. Ambil semua jawaban peserta untuk IST
+        $jawaban = JawabanPeserta::where('user_id', $userId)
+            ->where('sesi_tes_id', $sesiTesId)
+            ->whereHas('soal', fn($q) => $q->where('alat_tes_id', $alatTesId))
+            ->with('soal')
+            ->get()
+            ->keyBy('soal_id');
+
+        // 4. Ambil semua soal IST dengan kunci jawaban
+        $soalList = Soal::where('alat_tes_id', $alatTesId)
+            ->get()
+            ->keyBy('id');
+
+        // 5. Hitung skor per subtes
+        $skorMentahTotal = 0;
+        foreach ($subtesRange as $kode => [$nomorMin, $nomorMax]) {
+            if (!isset($dimensiMap[$kode])) {
+                continue;
+            }
+
+            $soalSubtes = $soalList->filter(fn($s) => $s->nomor >= $nomorMin && $s->nomor <= $nomorMax);
+            $benar = 0;
+
+            foreach ($soalSubtes as $soal) {
+                $jaw = $jawaban->get($soal->id);
+                if (!$jaw) {
+                    continue;
+                }
+
+                $kunciJawaban = strtolower(trim($soal->kunci_jawaban ?? ''));
+                if ($kunciJawaban === '') {
+                    continue;
+                }
+
+                if ($soal->tipe_format === 'pilihan_ganda' || $soal->tipe_format === 'pilihan_gambar') {
+                    if ($jaw->opsi_dipilih_id) {
+                        $opsiDipilih = OpsiJawaban::find($jaw->opsi_dipilih_id);
+                        $hurufDipilih = chr(96 + ($opsiDipilih?->urutan ?? 0));
+                        if ($hurufDipilih === $kunciJawaban) {
+                            $benar++;
+                        }
+                    }
+                } elseif (in_array($soal->tipe_format, ['isian_teks', 'isian_angka'])) {
+                    $jawabanPeserta = strtolower(trim($jaw->jawaban_teks ?? ''));
+                    if ($jawabanPeserta === $kunciJawaban) {
+                        $benar++;
+                    }
+                }
+            }
+
+            // Simpan skor per subtes
+            HasilSkorPeserta::updateOrCreate(
+                [
+                    'user_id'     => $userId,
+                    'sesi_tes_id' => $sesiTesId,
+                    'alat_tes_id' => $alatTesId,
+                    'dimensi_id'  => $dimensiMap[$kode],
+                ],
+                [
+                    'skor_mentah' => $benar,
+                    'skor_akhir'  => NormaKonversi::where('alat_tes_id', $alatTesId)
+                        ->where('dimensi_id', $dimensiMap[$kode])
+                        ->where('kelompok_segmen', $kelompokSegmen)
+                        ->where('skor_mentah_min', '<=', $benar)
+                        ->where('skor_mentah_max', '>=', $benar)
+                        ->value('skor_hasil') ?? 0,
+                    'level_id'    => null,
+                ]
+            );
+
+            $skorMentahTotal += $benar;
+        }
+
+        // 6. Hitung IQ Total dari skor mentah total
+        if (isset($dimensiMap['IQ'])) {
+            $kelompokIQ = $kelompokSegmen === 'SLTP' ? 'SLTP' : 'GTSLTP';
+            $iqTotal = NormaKonversi::where('alat_tes_id', $alatTesId)
+                ->where('dimensi_id', $dimensiMap['IQ'])
+                ->where('kelompok_segmen', $kelompokIQ)
+                ->where('skor_mentah_min', '<=', $skorMentahTotal)
+                ->where('skor_mentah_max', '>=', $skorMentahTotal)
+                ->value('skor_hasil') ?? 0;
+
+            HasilSkorPeserta::updateOrCreate(
+                [
+                    'user_id'     => $userId,
+                    'sesi_tes_id' => $sesiTesId,
+                    'alat_tes_id' => $alatTesId,
+                    'dimensi_id'  => $dimensiMap['IQ'],
+                ],
+                [
+                    'skor_mentah' => $skorMentahTotal,
+                    'skor_akhir'  => $iqTotal,
+                    'level_id'    => null,
+                ]
+            );
+        }
     }
 
     public function scoreForcedChoice(int $userId, int $sesiTesId, int $alatTesId, string $kelompokSegmen, bool $pakaiNorma = true): Collection
@@ -369,7 +492,10 @@ class ScoringEngineService
         $alatTes = \App\Models\AlatTes::findOrFail($alatTesId);
 
         return match($alatTes->pola_skoring) {
-            'kognitif'             => $this->scoreKognitif($userId, $sesiTesId, $alatTesId),
+            'kognitif'             => $alatTes->kode === 'IST'
+                ? $this->scoreIST($userId, $sesiTesId, $alatTesId, $kelompokSegmen)
+                : $this->scoreKognitif($userId, $sesiTesId, $alatTesId),
+            'ist'                  => $this->scoreIST($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
             'forced_choice'        => $this->scoreForcedChoice($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
             'forced_choice_rollup' => $this->scoreForcedChoiceRollup($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
             'grid'                 => $this->scoreGrid($userId, $sesiTesId, $alatTesId),

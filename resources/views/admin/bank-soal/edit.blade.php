@@ -6,6 +6,7 @@
         'Pilihan Ganda' => 'bg-blue-600',
         'Skala Likert'  => 'bg-indigo-600',
         'Forced Choice' => 'bg-amber-600',
+        'Mixed'         => 'bg-purple-600',
     ];
     $format = $soal->alatTes->format_dasar ?? 'Pilihan Ganda';
 @endphp
@@ -37,7 +38,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.bank-soal.update', $soal->id) }}" class="space-y-4">
+    <form method="POST" action="{{ route('admin.bank-soal.update', $soal->id) }}" enctype="multipart/form-data" class="space-y-4">
         @csrf
         @method('PUT')
 
@@ -143,6 +144,75 @@
                     </div>
                 </div>
             </div>
+        @elseif ($format === 'Mixed')
+            @php
+                $tipeFormat = $soal->tipe_format ?? 'pilihan_ganda';
+                $opsiList = $soal->opsiJawaban->sortBy('urutan')->values();
+            @endphp
+
+            {{-- Info subtes --}}
+            <div class="rounded-md bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">
+                <strong>Subtes:</strong> {{ $soal->nomor <= 20 ? 'SE' : ($soal->nomor <= 40 ? 'WA' : ($soal->nomor <= 60 ? 'AN' : ($soal->nomor <= 76 ? 'GE' : ($soal->nomor <= 96 ? 'RA' : ($soal->nomor <= 116 ? 'ZR' : ($soal->nomor <= 136 ? 'FA' : ($soal->nomor <= 156 ? 'WU' : 'ME'))))))) }}
+                &nbsp;|&nbsp; <strong>Tipe Format:</strong> {{ $tipeFormat }}
+                &nbsp;|&nbsp; <strong>Nomor:</strong> {{ $soal->nomor }}
+            </div>
+
+            {{-- Teks Soal --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Teks Soal <span class="text-rose-500">*</span></label>
+                <textarea name="teks_soal" rows="3" required
+                          class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">{{ old('teks_soal', $soal->teks_soal) }}</textarea>
+            </div>
+
+            {{-- Upload Gambar Soal (FA/WU) --}}
+            @if (in_array($tipeFormat, ['pilihan_gambar']))
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Gambar Soal</label>
+                    @if ($soal->gambar_soal)
+                        <img src="{{ asset('storage/' . $soal->gambar_soal) }}" class="mt-2 h-32 rounded border border-slate-200 object-contain">
+                    @endif
+                    <input type="file" name="gambar_soal" accept="image/*"
+                           class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-[#234853]">
+                </div>
+            @endif
+
+            {{-- Kunci Jawaban --}}
+            @if (in_array($tipeFormat, ['isian_teks', 'isian_angka']))
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
+                    <input type="text" name="kunci_jawaban" value="{{ old('kunci_jawaban', $soal->kunci_jawaban) }}"
+                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                           placeholder="{{ $tipeFormat === 'isian_angka' ? 'Jawaban angka, contoh: 35' : 'Jawaban teks, contoh: bunga' }}">
+                </div>
+            @endif
+
+            {{-- Opsi Jawaban (pilihan_ganda dan pilihan_gambar) --}}
+            @if (in_array($tipeFormat, ['pilihan_ganda', 'pilihan_gambar']))
+                <div class="space-y-3">
+                    <p class="text-sm font-medium text-slate-700">Opsi Jawaban (a–e)</p>
+                    @foreach (['a','b','c','d','e'] as $huruf)
+                        @php $idx = $loop->index; $opsi = $opsiList[$idx] ?? null; @endphp
+                        <div class="rounded-md border border-slate-200 bg-slate-50 p-3 space-y-2">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="kunci_jawaban" value="{{ $huruf }}" id="kunci_{{ $huruf }}"
+                                       @checked(old('kunci_jawaban', $soal->kunci_jawaban) === $huruf)
+                                       class="h-4 w-4 border-slate-300 text-[#2C5F6F]">
+                                <label for="kunci_{{ $huruf }}" class="w-6 text-sm font-semibold text-slate-700">{{ strtoupper($huruf) }}.</label>
+                                <input type="text" name="opsi[{{ $huruf }}]" value="{{ old('opsi.' . $huruf, $opsi?->teks_opsi ?? '') }}"
+                                       placeholder="Teks opsi {{ strtoupper($huruf) }}"
+                                       class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none">
+                                @if ($tipeFormat === 'pilihan_gambar')
+                                    @if ($opsi?->gambar_opsi)
+                                        <img src="{{ asset('storage/' . $opsi->gambar_opsi) }}" class="h-20 rounded border border-slate-200 object-contain">
+                                    @endif
+                                    <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
+                                           class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         @endif
 
         <div class="sticky bottom-0 -mx-6 mt-4 flex justify-end gap-2 border-t border-slate-200 bg-white px-6 py-3 shadow-[0_-2px_4px_rgba(0,0,0,0.04)]">

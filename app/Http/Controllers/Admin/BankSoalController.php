@@ -386,7 +386,15 @@ class BankSoalController extends Controller
             ];
         }
 
-        return ['id' => $soal->id, 'teks_soal' => $soal->teks_soal, 'tipe_format' => $soal->tipe_format ?? 'pilihan_ganda'];
+        return [
+            'id'            => $soal->id,
+            'nomor'         => $soal->nomor,
+            'tipe_format'   => $soal->tipe_format ?? 'pilihan_ganda',
+            'teks_soal'     => $soal->teks_soal,
+            'gambar_soal'   => $soal->gambar_soal ?? null,
+            'opsi'          => $soal->opsiJawaban->sortBy('urutan')->values()->map(fn ($o) => $o->teks_opsi)->toArray(),
+            'kunci_jawaban' => $soal->kunci_jawaban,
+        ];
     }
 
     protected function forcedChoiceRules(): array

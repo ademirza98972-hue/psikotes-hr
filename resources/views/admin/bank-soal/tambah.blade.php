@@ -6,6 +6,7 @@
         'Pilihan Ganda' => 'bg-blue-600',
         'Skala Likert'  => 'bg-indigo-600',
         'Forced Choice' => 'bg-amber-600',
+        'Mixed'         => 'bg-purple-600',
         'Grid'          => 'bg-emerald-600',
     ];
     $format = $alatTes->format_dasar;
@@ -132,6 +133,64 @@
                                class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
                     </div>
                 </div>
+            </div>
+        @elseif ($format === 'Mixed')
+            @php
+                $tipeFormat = old('tipe_format', 'pilihan_ganda');
+            @endphp
+
+            {{-- Tipe Format selector --}}
+            <div>
+                <label for="tipe_format" class="block text-sm font-medium text-slate-700">Tipe Format <span class="text-rose-500">*</span></label>
+                <select id="tipe_format" name="tipe_format"
+                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                    <option value="pilihan_ganda" {{ old('tipe_format') === 'pilihan_ganda' ? 'selected' : '' }}>Pilihan Ganda</option>
+                    <option value="pilihan_gambar" {{ old('tipe_format') === 'pilihan_gambar' ? 'selected' : '' }}>Pilihan Gambar</option>
+                    <option value="isian_teks" {{ old('tipe_format') === 'isian_teks' ? 'selected' : '' }}>Isian Teks</option>
+                    <option value="isian_angka" {{ old('tipe_format') === 'isian_angka' ? 'selected' : '' }}>Isian Angka</option>
+                </select>
+            </div>
+
+            {{-- Teks Soal --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Teks Soal <span class="text-rose-500">*</span></label>
+                <textarea name="teks_soal" rows="3" required
+                          class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">{{ old('teks_soal') }}</textarea>
+            </div>
+
+            {{-- Upload Gambar Soal (FA/WU) --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Gambar Soal</label>
+                <input type="file" name="gambar_soal" accept="image/*"
+                       class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-[#234853]">
+            </div>
+
+            {{-- Kunci Jawaban --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
+                <input type="text" name="kunci_jawaban" value="{{ old('kunci_jawaban') }}"
+                       class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                       placeholder="Jawaban">
+            </div>
+
+            {{-- Opsi Jawaban (a–e) --}}
+            <div class="space-y-3">
+                <p class="text-sm font-medium text-slate-700">Opsi Jawaban (a–e)</p>
+                @foreach (['a','b','c','d','e'] as $huruf)
+                    <div class="rounded-md border border-slate-200 bg-slate-50 p-3 space-y-2">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="kunci_jawaban" value="{{ $huruf }}" id="kunci_{{ $huruf }}"
+                                   @checked(old('kunci_jawaban') === $huruf)
+                                   class="h-4 w-4 border-slate-300 text-[#2C5F6F]">
+                            <label for="kunci_{{ $huruf }}" class="w-6 text-sm font-semibold text-slate-700">{{ strtoupper($huruf) }}.</label>
+                            <input type="text" name="opsi[{{ $huruf }}]" value="{{ old('opsi.' . $huruf) }}"
+                                   placeholder="Teks opsi {{ strtoupper($huruf) }}"
+                                   class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none">
+                            <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
+                                   class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
+                        </div>
+                    </div>
+                @endforeach
             </div>
         @endif
 

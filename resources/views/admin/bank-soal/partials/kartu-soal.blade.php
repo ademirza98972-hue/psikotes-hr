@@ -109,6 +109,62 @@
                 </div>
             </div>
         </div>
+    @elseif ($format === 'Mixed')
+        @php
+            $tipeFormat = $soal['tipe_format'] ?? 'pilihan_ganda';
+            $subtesLabel = match(true) {
+                $soal['nomor'] <= 20  => 'SE',
+                $soal['nomor'] <= 40  => 'WA',
+                $soal['nomor'] <= 60  => 'AN',
+                $soal['nomor'] <= 76  => 'GE',
+                $soal['nomor'] <= 96  => 'RA',
+                $soal['nomor'] <= 116 => 'ZR',
+                $soal['nomor'] <= 136 => 'FA',
+                $soal['nomor'] <= 156 => 'WU',
+                default               => 'ME',
+            };
+            $warnaTipe = [
+                'pilihan_ganda'  => 'bg-blue-50 text-blue-700',
+                'isian_teks'     => 'bg-violet-50 text-violet-700',
+                'isian_angka'    => 'bg-orange-50 text-orange-700',
+                'pilihan_gambar' => 'bg-rose-50 text-rose-700',
+                'memori'         => 'bg-teal-50 text-teal-700',
+            ];
+        @endphp
+
+        <div class="flex items-center gap-2 mb-3">
+            <span class="rounded-lg bg-purple-50 px-2.5 py-1 text-[11px] font-bold text-purple-700">{{ $subtesLabel }}</span>
+            <span class="rounded-lg {{ $warnaTipe[$tipeFormat] ?? 'bg-slate-50 text-slate-700' }} px-2.5 py-1 text-[11px] font-semibold">{{ $tipeFormat }}</span>
+        </div>
+
+        <p class="text-[15px] leading-relaxed text-[#191c1e] mb-3">{{ $soal['teks_soal'] }}</p>
+
+        @if ($tipeFormat === 'pilihan_gambar')
+            @if (!empty($soal['gambar_soal']))
+                <img src="{{ asset('storage/' . $soal['gambar_soal']) }}" class="h-28 rounded-lg border border-slate-200 object-contain mb-3">
+            @else
+                <div class="mb-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-[12px] text-slate-400 text-center">Gambar soal belum diupload</div>
+            @endif
+        @endif
+
+        @if (in_array($tipeFormat, ['pilihan_ganda', 'pilihan_gambar']) && !empty($soal['opsi']))
+            <ul class="space-y-1.5">
+                @foreach ($soal['opsi'] as $idx => $opsiTeks)
+                    @php $huruf = chr(65 + $idx); $hurufLower = strtolower($huruf); @endphp
+                    <li class="flex items-center gap-2 rounded-lg border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-[#e0e3e5]' }} px-3 py-2 text-sm">
+                        <span class="flex items-center justify-center w-5 h-5 rounded-full border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-[#2C5F6F] bg-[#2C5F6F] text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-semibold">{{ $huruf }}</span>
+                        <span>{{ $opsiTeks }}</span>
+                        @if (strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower)
+                            <span class="ml-auto text-[11px] font-semibold text-[#2C5F6F]">Kunci</span>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+        @elseif (in_array($tipeFormat, ['isian_teks', 'isian_angka']))
+            <div class="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-sm text-slate-600">
+                Jawaban: <strong>{{ $soal['kunci_jawaban'] ?? '-' }}</strong>
+            </div>
+        @endif
     @endif
 
 </div>

@@ -575,6 +575,182 @@
 })();
 </script>
 
+                @elseif (str_contains(strtoupper($alatTes['nama_alat_tes']), 'IST') && !empty($alatTes['skor_ringkas']))
+                    @php
+                        $skorByKode = collect($alatTes['skor_ringkas'])->keyBy(fn($s) => explode(' - ', $s['dimensi'])[0]);
+                        $iqData = $skorByKode->get('IQ');
+                        $iqSkor = (float) ($iqData['skor_skala'] ?? $iqData['skor_mentah'] ?? 0);
+
+                        $klasifikasiIQ = match(true) {
+                            $iqSkor >= 141 => 'Genius',
+                            $iqSkor >= 128 => 'Very Superior',
+                            $iqSkor >= 120 => 'Superior',
+                            $iqSkor >= 111 => 'High Average (Di Atas Rata-rata)',
+                            $iqSkor >= 91  => 'Average (Rata-rata)',
+                            $iqSkor >= 80  => 'Low Average (Di Bawah Rata-rata)',
+                            $iqSkor > 0    => 'Borderline',
+                            default        => '-',
+                        };
+
+                        $aspekPsikologis = [
+                            ['no'=>1, 'nama'=>'Kecerdasan Umum',            'deskripsi'=>'Kemampuan dasar untuk menghadapi, mengolah, mempelajari dan memecahkan masalah di sekitarnya.',                                  'kode'=>'WU'],
+                            ['no'=>2, 'nama'=>'Kemampuan Analisis - Sintesa','deskripsi'=>'Kemampuan analisa terhadap sebuah masalah.',                                                                                     'kode'=>'WA'],
+                            ['no'=>3, 'nama'=>'Kemampuan Berfikir Fleksibel','deskripsi'=>'Kemampuan untuk berpikir secara fleksibel dan adanya kejelasan dalam proses pikir.',                                            'kode'=>'AN'],
+                            ['no'=>4, 'nama'=>'Kemampuan Verbal',            'deskripsi'=>'Potensi untuk mencerna konsep dalam kata dan memahami polanya sehingga menarik kesimpulan secara umum.',                        'kode'=>'SE'],
+                            ['no'=>5, 'nama'=>'Kemampuan Berpikir Praktis',  'deskripsi'=>'Kemampuan untuk memahami realita dan membuat keputusan yang didasarkan atas fakta.',                                            'kode'=>'ZR'],
+                            ['no'=>6, 'nama'=>'Kemampuan Numerikal',         'deskripsi'=>'Potensi untuk mencerna konsep angka dan menggunakannya dalam memecahkan persoalan hitungan, baik yang praktis maupun yang menuntut logika berpikir.','kode'=>'RA'],
+                            ['no'=>7, 'nama'=>'Daya Kreatifitas',            'deskripsi'=>'Kemampuan untuk melepaskan diri dari pemikiran yang bersifat konvensional.',                                                    'kode'=>'FA'],
+                            ['no'=>8, 'nama'=>'Kemampuan Abstraksi',         'deskripsi'=>'Potensi untuk membayangkan (berimajinasi) secara konstruktif yang bersifat menyeluruh dan analitis.',                           'kode'=>'GE'],
+                            ['no'=>9, 'nama'=>'Kemampuan Daya Ingat / Memori','deskripsi'=>'Kemampuan untuk mengingat informasi yang diterima secara akurat.',                                                             'kode'=>'ME'],
+                        ];
+
+                        function kategoriIST(float $skor): string {
+                            return match(true) {
+                                $skor >= 120 => 'ST',
+                                $skor >= 110 => 'T',
+                                $skor >= 90  => 'C',
+                                $skor >= 80  => 'R',
+                                $skor > 0    => 'SR',
+                                default      => '',
+                            };
+                        }
+
+                        // Generate kesimpulan otomatis
+                        $aspekLemah = [];
+                        $aspekKuat = [];
+                        foreach ($aspekPsikologis as $aspek) {
+                            $s = $skorByKode->get($aspek['kode']);
+                            $skor = (float)($s['skor_skala'] ?? 0);
+                            if ($skor > 0 && $skor < 90) $aspekLemah[] = $aspek['nama'];
+                            if ($skor >= 110) $aspekKuat[] = $aspek['nama'];
+                        }
+                    @endphp
+
+                    {{-- PSIKOGRAM --}}
+                    <div style="margin-bottom:16px;">
+                        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                            <thead>
+                                <tr>
+                                    <th colspan="2" style="background:#2d7a2d;color:#fff;padding:8px 10px;text-align:left;border:1px solid #ccc;" rowspan="2">ASPEK-ASPEK PSIKOLOGIS</th>
+                                    <th colspan="5" style="background:#2d7a2d;color:#fff;padding:6px;text-align:center;border:1px solid #ccc;">KATEGORI</th>
+                                </tr>
+                                <tr>
+                                    <th style="background:#c0392b;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">SR<br><span style="font-weight:400;font-size:9px;">Sangat Rendah</span></th>
+                                    <th style="background:#e67e22;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">R<br><span style="font-weight:400;font-size:9px;">Rendah</span></th>
+                                    <th style="background:#27ae60;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">C<br><span style="font-weight:400;font-size:9px;">Cukup</span></th>
+                                    <th style="background:#2980b9;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">T<br><span style="font-weight:400;font-size:9px;">Tinggi</span></th>
+                                    <th style="background:#8e44ad;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">ST<br><span style="font-weight:400;font-size:9px;">Sangat Tinggi</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($aspekPsikologis as $aspek)
+                                    @php
+                                        $s = $skorByKode->get($aspek['kode']);
+                                        $skor = (float)($s['skor_skala'] ?? 0);
+                                        $kat = kategoriIST($skor);
+                                        $bg = $aspek['no'] % 2 === 0 ? '#f8fafc' : '#ffffff';
+                                    @endphp
+                                    <tr style="background:{{ $bg }};border-bottom:1px solid #e0e3e5;">
+                                        <td style="padding:6px 8px;border:1px solid #ddd;color:#64748b;text-align:center;width:4%;">{{ $aspek['no'] }}</td>
+                                        <td style="padding:6px 10px;border:1px solid #ddd;">
+                                            <strong style="color:#1a1a1a;font-size:11px;">{{ $aspek['nama'] }}</strong><br>
+                                            <span style="color:#64748b;font-size:10px;">{{ $aspek['deskripsi'] }}</span>
+                                        </td>
+                                        <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'SR' ? '✓' : '' }}</td>
+                                        <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'R'  ? '✓' : '' }}</td>
+                                        <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'C'  ? '✓' : '' }}</td>
+                                        <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'T'  ? '✓' : '' }}</td>
+                                        <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'ST' ? '✓' : '' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- KLASIFIKASI IQ --}}
+                    <div style="display:flex;gap:16px;margin-bottom:16px;">
+                        <table style="border-collapse:collapse;font-size:11px;flex:1;">
+                            <thead>
+                                <tr>
+                                    <th style="background:#2d7a2d;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">IQ</th>
+                                    <th style="background:#2d7a2d;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">KLASIFIKASI KECERDASAN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach([['141 ke atas','Genius'],['128 - 140','Very Superior'],['120 - 127','Superior'],['111 - 119','High Average (Di Atas Rata-rata)'],['91 - 110','Average (Rata-rata)'],['80 - 90','Low Average (Di Bawah Rata-rata)'],['79 ke bawah','Borderline']] as [$range, $label])
+                                    <tr style="border-bottom:1px solid #ddd;">
+                                        <td style="padding:5px 10px;border:1px solid #ddd;text-align:center;">{{ $range }}</td>
+                                        <td style="padding:5px 10px;border:1px solid #ddd;text-align:center;">{{ $label }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <div style="flex:1;border:2px solid #2d7a2d;border-radius:6px;padding:16px;display:flex;align-items:center;justify-content:center;">
+                            <p style="font-size:13px;font-weight:700;color:#1a1a1a;text-align:center;line-height:1.6;">
+                                Kecerdasan Umum peserta diperkirakan berada pada taraf<br>
+                                <span style="color:#c0392b;">{{ $klasifikasiIQ }}</span><br>
+                                dengan IQ = <span style="font-size:20px;color:#2C5F6F;">{{ $iqSkor > 0 ? number_format($iqSkor, 0) : '-' }}</span><br>
+                                berdasarkan pada skala IST.
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- KESIMPULAN OTOMATIS --}}
+                    <div style="border:1px solid #2d7a2d;border-radius:4px;padding:14px 16px;margin-bottom:16px;">
+                        <div style="font-size:13px;font-weight:800;color:#2d7a2d;text-decoration:underline;margin-bottom:8px;">KESIMPULAN</div>
+                        <p style="font-size:11px;line-height:1.8;color:#1a1a1a;text-align:justify;">
+                            @if($iqSkor > 0)
+                                Hasil pemeriksaan psikologis menunjukkan bahwa peserta memiliki tingkat kecerdasan umum yang tergolong <strong>{{ $klasifikasiIQ }}</strong> dengan skor IQ {{ number_format($iqSkor, 0) }}.
+                                @if(count($aspekKuat) > 0)
+                                    Kemampuan yang menonjol meliputi: <strong>{{ implode(', ', $aspekKuat) }}</strong>.
+                                @endif
+                                @if(count($aspekLemah) > 0)
+                                    Aspek yang masih perlu dikembangkan: <strong>{{ implode(', ', $aspekLemah) }}</strong>.
+                                @endif
+                            @else
+                                Kesimpulan akan tersedia setelah scoring selesai diproses.
+                            @endif
+                        </p>
+                    </div>
+
+                    {{-- SKOR DETAIL --}}
+                    <details style="margin-top:8px;">
+                        <summary style="font-size:11px;color:#64748b;cursor:pointer;padding:4px 0;">Lihat skor detail per subtes</summary>
+                        <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;">
+                            <thead>
+                                <tr style="background:#404040;color:#fff;">
+                                    <th style="padding:6px 10px;text-align:left;">Subtes</th>
+                                    <th style="padding:6px 10px;text-align:center;">Skor Mentah</th>
+                                    <th style="padding:6px 10px;text-align:center;">Skor Standar</th>
+                                    <th style="padding:6px 10px;text-align:center;">Kategori</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($aspekPsikologis as $aspek)
+                                    @php
+                                        $s = $skorByKode->get($aspek['kode']);
+                                        $skor = (float)($s['skor_skala'] ?? 0);
+                                        $kat = kategoriIST($skor);
+                                    @endphp
+                                    <tr style="border-bottom:1px solid #e0e3e5;">
+                                        <td style="padding:5px 10px;font-weight:600;color:#2C5F6F;">{{ $aspek['kode'] }} - {{ $aspek['nama'] }}</td>
+                                        <td style="padding:5px 10px;text-align:center;">{{ $s ? number_format($s['skor_mentah'], 0) : '-' }}</td>
+                                        <td style="padding:5px 10px;text-align:center;font-weight:700;">{{ $skor > 0 ? number_format($skor, 0) : '-' }}</td>
+                                        <td style="padding:5px 10px;text-align:center;">{{ $kat ?: '-' }}</td>
+                                    </tr>
+                                @endforeach
+                                @if($iqData)
+                                    <tr style="background:#f0f7f9;font-weight:700;">
+                                        <td style="padding:6px 10px;color:#2C5F6F;">IQ TOTAL</td>
+                                        <td style="padding:6px 10px;text-align:center;">{{ number_format($iqData['skor_mentah'], 0) }}</td>
+                                        <td style="padding:6px 10px;text-align:center;color:#2C5F6F;font-size:14px;">{{ $iqSkor > 0 ? number_format($iqSkor, 0) : '-' }}</td>
+                                        <td style="padding:6px 10px;text-align:center;">{{ $klasifikasiIQ }}</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </details>
+
                 {{-- Papikostik & alat tes lain: tabel skor per dimensi --}}
                 @elseif (!empty($alatTes['skor_ringkas']))
                     <table>

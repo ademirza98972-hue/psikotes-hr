@@ -474,6 +474,107 @@
                     @endforeach
                     <div class="footnote"><strong>Keterangan:</strong> R = Rendah &middot; K = Kurang &middot; C = Cukup &middot; B = Baik &middot; T = Tinggi</div>
 
+                    <div style="margin-top: 24px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <div style="font-weight: 700; font-size: 12px; letter-spacing: 0.5px; margin-bottom: 16px; text-transform: uppercase;">PAPIKOSTICK STYLE</div>
+                        <div style="position: relative; width: 100%; height: 520px;">
+                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                            <canvas id="papRadarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <script>
+(function() {
+    const labels = [
+        'Arah Kerja - Penyelesaian Tugas - N',
+        'Arah Kerja - Pekerja Keras - G',
+        'Arah Kerja - Motivasi Berprestasi - A',
+        'Kepemimpinan - Peran Pemimpin - L',
+        'Kepemimpinan - Mengendalikan Orang - P',
+        'Kepemimpinan - Pengambilan Keputusan - I',
+        'Aktivitas - Kecepatan - T',
+        'Aktivitas - Semangat - V',
+        'Sosial - Keb. Perhatian - X',
+        'Sosial - Pergaulan Luas - S',
+        'Sosial - Keb. Berkelompok - B',
+        'Sosial - Keb. Kedekatan - O',
+        'Gaya Kerja - Tipe Teoritis - R',
+        'Gaya Kerja - Detail - D',
+        'Gaya Kerja - Teratur - C',
+        'Temperamen - Keb. Perubahan - Z',
+        'Temperamen - Pengendalian Emosi - E',
+        'Temperamen - Agresif - K',
+        'Kepatuhan - Mendukung Pemimpin - F',
+        'Kepatuhan - Taat Aturan - W',
+    ];
+    const data = [
+        {{ $papScores['TGS_PRIBADI']['skor_mentah'] ?? 0 }},
+        {{ $papScores['KERJA_KERAS']['skor_mentah'] ?? 0 }},
+        {{ $papScores['BERPRESTASI']['skor_mentah'] ?? 0 }},
+        {{ $papScores['PIMPINAN']['skor_mentah'] ?? 0 }},
+        {{ $papScores['KENDALI_ORG']['skor_mentah'] ?? 0 }},
+        {{ $papScores['PUTUSAN']['skor_mentah'] ?? 0 }},
+        {{ $papScores['SIBUK']['skor_mentah'] ?? 0 }},
+        {{ $papScores['SEMANGAT']['skor_mentah'] ?? 0 }},
+        {{ $papScores['PERHATIAN']['skor_mentah'] ?? 0 }},
+        {{ $papScores['PERGAULAN_LUAS']['skor_mentah'] ?? 0 }},
+        {{ $papScores['BETAH_KELOMPOK']['skor_mentah'] ?? 0 }},
+        {{ $papScores['DEKAT_SAYANG']['skor_mentah'] ?? 0 }},
+        {{ $papScores['TEORITIS']['skor_mentah'] ?? 0 }},
+        {{ $papScores['DETAIL_KERJA']['skor_mentah'] ?? 0 }},
+        {{ $papScores['TYPE_PENGATUR']['skor_mentah'] ?? 0 }},
+        {{ $papScores['HASRAT_BERUBAH']['skor_mentah'] ?? 0 }},
+        {{ $papScores['KENDALI_EMOSI']['skor_mentah'] ?? 0 }},
+        {{ $papScores['AGRESI']['skor_mentah'] ?? 0 }},
+        {{ $papScores['DUKUNGAN_ATASAN']['skor_mentah'] ?? 0 }},
+        {{ $papScores['TAAT_ATURAN']['skor_mentah'] ?? 0 }},
+    ];
+    const ctx = document.getElementById('papRadarChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Skor',
+                data: data,
+                backgroundColor: 'rgba(44, 95, 111, 0.15)',
+                borderColor: 'rgba(44, 95, 111, 0.8)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(44, 95, 111, 1)',
+                pointRadius: 3,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    min: 0,
+                    max: 9,
+                    ticks: {
+                        stepSize: 1,
+                        font: { size: 8 },
+                        backdropColor: 'transparent'
+                    },
+                    pointLabels: {
+                        font: { size: 8.5 },
+                        padding: 8
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.08)'
+                    },
+                    angleLines: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+})();
+</script>
+
                 {{-- Papikostik & alat tes lain: tabel skor per dimensi --}}
                 @elseif (!empty($alatTes['skor_ringkas']))
                     <table>

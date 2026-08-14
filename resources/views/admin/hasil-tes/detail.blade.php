@@ -65,28 +65,6 @@
     ];
 @endphp
 <style>
-    @page { size: A4; margin: 0; }
-    @media print {
-        body { background: #fff; }
-        .halaman-wrapper { padding: 0; margin: 0; }
-        .dokumen-page { border: none; margin: 0; box-shadow: none; page-break-after: always; }
-    }
-    .halaman-wrapper {
-        background: #e9ecef;
-        padding: 24px 0;
-        margin: -24px;
-    }
-    .dokumen-page {
-        width: 210mm;
-        height: 297mm;
-        margin: 0 auto 20px auto;
-        padding: 20mm;
-        background: white;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
     .header-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 14px; }
     .company-logo { width: 36px; height: 36px; background: #0f6e56; border-radius: 0; }
     .company-name { font-weight: 700; font-size: 15px; margin: 0; }
@@ -119,16 +97,16 @@
     .page2-title { font-weight: 700; font-size: 11px; letter-spacing: 0.5px; margin-bottom: 10px; text-align: center; }
 </style>
 
-<div class="halaman-wrapper">
+<div style="max-width: 900px; margin: 0 auto; padding: 0 8px;">
 
-    <div style="max-width: 210mm; margin: 0 auto 12px auto; display: flex; justify-content: flex-end;">
+    <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
         <a href="{{ route('admin.hasil-tes.exportPdf', [$sesi->id, $hasilTes['peserta_id']]) }}"
            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white
                   shadow-sm hover:bg-[#234853] inline-block">Cetak PDF</a>
     </div>
 
     {{-- ========== HALAMAN 1 ========== --}}
-    <div class="dokumen-page">
+    <div style="background: white; padding: 32px; margin-bottom: 24px; border: 1px solid #e2e8f0; border-radius: 8px;">
         {{-- Header --}}
         <div class="header-row">
             <div class="header-content">
@@ -281,7 +259,7 @@
     {{-- END HALAMAN 1 --}}
 
     {{-- ========== HALAMAN 2 ========== --}}
-    <div class="dokumen-page">
+    <div style="background: white; padding: 32px; margin-bottom: 24px; border: 1px solid #e2e8f0; border-radius: 8px;">
         {{-- Repeat Header (small) --}}
         <div class="page2-header">
             <div style="display:flex; align-items:center; gap:8px;">
@@ -413,6 +391,89 @@
                         <div><strong>Total Kelewat:</strong> {{ $gridRingkasan->total_kelewat }}</div>
                         <div><strong>Total Kolom Dikerjakan:</strong> {{ $gridRingkasan->total_kolom }}</div>
                     </div>
+                @elseif (str_contains(strtoupper($alatTes['nama_alat_tes']), 'PAPIKOSTIK') && !empty($alatTes['skor_ringkas']))
+                    @php
+                        $papKelompok = [
+                            'Arah Kerja'   => ['N', 'G', 'A'],
+                            'Kepemimpinan' => ['L', 'P', 'I'],
+                            'Aktivitas'    => ['T', 'V'],
+                            'Pergaulan'    => ['X', 'S', 'B', 'O'],
+                            'Gaya Kerja'   => ['R', 'D', 'C'],
+                            'Sifat'        => ['Z', 'E', 'K'],
+                            'Ketaatan'     => ['F', 'W'],
+                        ];
+                        $papDesc = [
+                            'N' => ['db'=>'TGS_PRIBADI',    'nama'=>'Penyelesaian secara prestasi', 'R'=>'Cenderung ragu-ragu dalam situasi pengambilan keputusan, menunda atau menghindari penyelesaian tugas.','K'=>'Kurang konsisten dalam menyelesaikan tugas hingga tuntas, perlu dorongan dari luar.','C'=>'Cukup mampu menyelesaikan tugas dengan standar yang memadai.','B'=>'Berorientasi pada penyelesaian tugas secara tuntas dan bertanggung jawab.','T'=>'Sangat berorientasi pada penyelesaian tugas, tidak mudah berhenti sebelum pekerjaan selesai.'],
+                            'G' => ['db'=>'KERJA_KERAS',    'nama'=>'Peranan sebagai pekerja keras','R'=>'Bekerja hanya untuk mengejar kesenangan saja, bukan untuk memberikan suatu hasil yang baik.','K'=>'Usaha kerja masih perlu ditingkatkan, kurang konsisten dalam menunjukkan etos kerja yang baik.','C'=>'Cukup bersungguh-sungguh dalam bekerja dan mampu menunjukkan etos kerja yang memadai.','B'=>'Memiliki etos kerja yang baik, bersungguh-sungguh dan tekun dalam menyelesaikan pekerjaan.','T'=>'Sangat berdedikasi dan pekerja keras, selalu memberikan usaha terbaik dalam setiap pekerjaan.'],
+                            'A' => ['db'=>'BERPRESTASI',    'nama'=>'Hasrat untuk berprestasi','R'=>'Mencerminkan ketidakpastian tujuan, tidak perlu melanjutkan usaha untuk sukses.','K'=>'Motivasi berprestasi masih rendah, kurang terdorong untuk mencapai hasil yang lebih baik.','C'=>'Memiliki motivasi berprestasi yang cukup, berusaha mencapai target yang ditetapkan.','B'=>'Memiliki dorongan berprestasi yang baik, berorientasi pada pencapaian hasil yang optimal.','T'=>'Memiliki dorongan berprestasi yang sangat kuat, selalu berusaha melampaui standar yang ada.'],
+                            'L' => ['db'=>'PIMPINAN',       'nama'=>'Peran sebagai pimpinan','R'=>'Cenderung tidak suka aktif menggunakan orang lain dalam bekerja, kurang berminat memimpin.','K'=>'Potensi kepemimpinan masih perlu dikembangkan, kurang aktif mengambil peran sebagai pemimpin.','C'=>'Cukup mampu menjalankan peran kepemimpinan dalam situasi yang terstruktur.','B'=>'Memiliki jiwa kepemimpinan yang baik, mampu mengarahkan dan memotivasi orang lain.','T'=>'Sangat berjiwa pemimpin, selalu berinisiatif mengambil kendali dan memimpin kelompok.'],
+                            'P' => ['db'=>'KENDALI_ORG',    'nama'=>'Pengendalian orang lain','R'=>'Menurunnya keinginan untuk bertanggung jawab terhadap pekerjaan dan tindakan orang lain.','K'=>'Kurang aktif dalam mengendalikan atau mengarahkan orang lain untuk mencapai tujuan.','C'=>'Cukup mampu mengendalikan dan mengarahkan orang lain dalam situasi yang diperlukan.','B'=>'Memiliki kemampuan yang baik dalam mengendalikan dan mempengaruhi perilaku orang lain.','T'=>'Sangat dominan dalam mengendalikan orang lain, selalu berusaha mengarahkan tindakan kelompok.'],
+                            'I' => ['db'=>'PUTUSAN',        'nama'=>'Mudah dalam mengambil keputusan','R'=>'Ragu-ragu sampai penundaan atau menolak situasi pengambilan keputusan.','K'=>'Lambat dan kurang percaya diri dalam mengambil keputusan, perlu pertimbangan berlebihan.','C'=>'Cukup mampu mengambil keputusan dengan pertimbangan yang memadai.','B'=>'Mampu mengambil keputusan secara cepat dan tepat dalam berbagai situasi.','T'=>'Sangat cepat dan tegas dalam mengambil keputusan, tidak mudah ragu dalam bertindak.'],
+                            'T' => ['db'=>'SIBUK',          'nama'=>'Tipe selalu sibuk','R'=>'Melakukan segala sesuatu menurut kemauannya sendiri, kurang terstruktur dalam bekerja.','K'=>'Tingkat aktivitas masih rendah, kurang inisiatif dalam mencari pekerjaan atau tantangan baru.','C'=>'Cukup aktif dan produktif, mampu mengisi waktu kerja dengan kegiatan yang bermakna.','B'=>'Memiliki energi kerja yang tinggi, aktif dan produktif dalam menyelesaikan berbagai tugas.','T'=>'Sangat aktif dan selalu ingin bergerak, tidak nyaman bila tidak ada pekerjaan yang dikerjakan.'],
+                            'V' => ['db'=>'SEMANGAT',       'nama'=>'Tipe yang bersemangat','R'=>'Keaktifannya tergolong rendah, cenderung pasif dan kurang bergairah dalam bekerja.','K'=>'Semangat kerja masih perlu ditingkatkan, kadang terlihat kurang antusias dalam aktivitas.','C'=>'Memiliki semangat kerja yang cukup, mampu menunjukkan antusiasme dalam situasi yang tepat.','B'=>'Memiliki semangat dan gairah kerja yang tinggi, antusias dalam menjalani aktivitas sehari-hari.','T'=>'Sangat bersemangat dan bergairah, selalu menunjukkan energi positif yang tinggi dalam bekerja.'],
+                            'X' => ['db'=>'PERHATIAN',      'nama'=>'Kebutuhan untuk mendapat perhatian','R'=>'Cenderung pemalu dan suka menyendiri, tidak terlalu membutuhkan pengakuan dari orang lain.','K'=>'Kebutuhan perhatian rendah, kurang aktif mengekspresikan diri di hadapan orang lain.','C'=>'Cukup memiliki kebutuhan untuk diperhatikan dan diakui oleh lingkungan sekitar.','B'=>'Memiliki kebutuhan yang cukup besar untuk mendapat perhatian dan pengakuan dari orang lain.','T'=>'Sangat membutuhkan perhatian dan pengakuan, aktif menonjolkan diri agar diperhatikan.'],
+                            'S' => ['db'=>'PERGAULAN_LUAS', 'nama'=>'Pergaulan luas','R'=>'Memiliki penilaian rendah terhadap hubungan sosial, cenderung kurang percaya pada orang lain.','K'=>'Pergaulan masih terbatas, kurang aktif dalam membangun relasi dan jaringan sosial yang luas.','C'=>'Memiliki pergaulan yang cukup luas, mampu berinteraksi dengan berbagai kalangan.','B'=>'Memiliki kemampuan bergaul yang baik, aktif membangun relasi dengan banyak orang.','T'=>'Sangat mudah bergaul dan memiliki jaringan sosial yang sangat luas di berbagai lingkungan.'],
+                            'B' => ['db'=>'BETAH_KELOMPOK', 'nama'=>'Kebutuhan berkelompok','R'=>'Selektif dalam bergabung dengan kelompok, secara umum melepaskan diri dari kelompok.','K'=>'Kurang antusias dalam kegiatan kelompok, lebih menyukai bekerja secara individual.','C'=>'Cukup nyaman bekerja dalam kelompok, mampu berkontribusi dalam situasi tim.','B'=>'Menikmati bekerja dalam kelompok, aktif berkontribusi dan membangun kekompakan tim.','T'=>'Sangat menyukai kegiatan kelompok, merasa nyaman dan produktif saat bekerja dalam tim.'],
+                            'O' => ['db'=>'DEKAT_SAYANG',   'nama'=>'Kebutuhan untuk dekat dan menyayangi','R'=>'Tidak menyukai hubungan antar pribadi yang intim, tidak menyukai interaksi perseorangan.','K'=>'Kurang memiliki kebutuhan untuk membangun kedekatan emosional dengan orang lain.','C'=>'Memiliki kebutuhan yang cukup untuk menjalin hubungan yang dekat dan hangat dengan orang lain.','B'=>'Memiliki kebutuhan yang besar untuk menjalin hubungan yang dekat dan penuh kasih sayang.','T'=>'Sangat membutuhkan kedekatan emosional, selalu berusaha membangun hubungan yang intim dan hangat.'],
+                            'R' => ['db'=>'TEORITIS',       'nama'=>'Tipe teoritikal','R'=>'Kurang perhatian-praktis, lebih menyukai pendekatan yang konkret dan langsung.','K'=>'Kurang tertarik pada pemikiran teoritis, lebih menyukai hal-hal yang bersifat praktis.','C'=>'Mampu menyeimbangkan pendekatan teoritis dan praktis dalam menyelesaikan pekerjaan.','B'=>'Memiliki kecenderungan berpikir teoritis yang baik, mampu mengembangkan konsep dan ide.','T'=>'Sangat berorientasi teoritis, menyukai pemikiran konseptual dan analisis mendalam.'],
+                            'D' => ['db'=>'DETAIL_KERJA',   'nama'=>'Suka pekerjaan yang terperinci','R'=>'Menyadari kebutuhan akan kecermatan tetapi secara pribadi tidak berminat menangani hal-hal detail.','K'=>'Kurang menyukai pekerjaan yang membutuhkan ketelitian dan perhatian pada detail.','C'=>'Cukup mampu mengerjakan tugas yang memerlukan ketelitian dan perhatian pada hal-hal detail.','B'=>'Memiliki perhatian yang baik pada detail, teliti dan cermat dalam menyelesaikan pekerjaan.','T'=>'Sangat menyukai pekerjaan yang terperinci, teliti hingga ke hal terkecil dalam setiap tugas.'],
+                            'C' => ['db'=>'TYPE_PENGATUR',  'nama'=>'Tipe teratur','R'=>'Fleksibilitas sampai ketidak-teraturan, kurang memperhatikan kerapian dan sistematika kerja.','K'=>'Sistematika dan keteraturan kerja masih perlu ditingkatkan.','C'=>'Cukup teratur dan sistematis dalam bekerja, mampu menjaga kerapian pekerjaan.','B'=>'Memiliki keteraturan kerja yang baik, selalu mengorganisir pekerjaan secara rapi dan sistematis.','T'=>'Sangat teratur dan sistematis, selalu memastikan setiap pekerjaan tersusun dengan rapi dan terstruktur.'],
+                            'Z' => ['db'=>'HASRAT_BERUBAH', 'nama'=>'Hasrat untuk berubah','R'=>'Tidak menyukai dan menolak perubahan, cenderung menggunakan pendekatan-pendekatan tradisional.','K'=>'Kurang terbuka terhadap perubahan, membutuhkan waktu lama untuk beradaptasi dengan hal baru.','C'=>'Cukup terbuka terhadap perubahan, mampu beradaptasi dengan situasi yang berubah.','B'=>'Menyukai perubahan dan hal-hal baru, aktif mencari cara-cara inovatif dalam bekerja.','T'=>'Sangat menyukai perubahan dan inovasi, tidak nyaman dengan rutinitas dan selalu mencari hal baru.'],
+                            'E' => ['db'=>'KENDALI_EMOSI',  'nama'=>'Pengendalian emosi','R'=>'Terbuka, cepat bereaksi, tidak memikirkan nilai dalam pengendalian diri.','K'=>'Pengendalian emosi masih perlu ditingkatkan, kadang bereaksi berlebihan terhadap situasi.','C'=>'Cukup mampu mengendalikan emosi, umumnya tenang dalam menghadapi berbagai situasi.','B'=>'Memiliki pengendalian emosi yang baik, mampu tetap tenang dan rasional dalam situasi sulit.','T'=>'Sangat mampu mengendalikan emosi, selalu tampil tenang dan stabil dalam berbagai kondisi.'],
+                            'K' => ['db'=>'AGRESI',         'nama'=>'Agresi','R'=>'Selalu menghindari masalah, cenderung mengabaikan situasi atau menolak untuk mengenali sesuatu sebagai masalah.','K'=>'Cenderung menghindari konflik, kurang berani mengungkapkan ketidaksetujuan secara tegas.','C'=>'Cukup mampu bersikap tegas dan mengungkapkan ketidaksetujuan bila diperlukan.','B'=>'Berani mengungkapkan pendapat dan bersikap tegas dalam mempertahankan posisinya.','T'=>'Sangat agresif dan tegas, tidak segan mengkritik atau menentang pendapat orang lain.'],
+                            'F' => ['db'=>'DUKUNGAN_ATASAN','nama'=>'Dukungan terhadap atasan','R'=>'Cenderung egois, kemungkinan bisa bersikap memberontak terhadap atasan atau aturan.','K'=>'Kurang mendukung dan mengikuti arahan atasan, kadang bersikap tidak kooperatif.','C'=>'Cukup mendukung dan menghormati atasan, mampu mengikuti arahan dengan baik.','B'=>'Memiliki loyalitas dan dukungan yang baik terhadap atasan dan kebijakan organisasi.','T'=>'Sangat loyal dan mendukung atasan, selalu berusaha memenuhi harapan dan arahan pimpinan.'],
+                            'W' => ['db'=>'TAAT_ATURAN',    'nama'=>'Kebutuhan taat pada aturan & pengarahan','R'=>'Berorientasi pada tujuan, mandiri, tidak terlalu membutuhkan aturan yang ketat.','K'=>'Kurang menyukai aturan yang mengikat, lebih suka bekerja dengan kebebasan yang besar.','C'=>'Cukup patuh terhadap aturan dan pengarahan yang berlaku di lingkungan kerja.','B'=>'Memiliki kepatuhan yang baik terhadap aturan, prosedur, dan pengarahan yang diberikan.','T'=>'Sangat membutuhkan aturan yang jelas, disiplin tinggi dalam mengikuti prosedur dan pengarahan.'],
+                        ];
+                        $papScores = [];
+                        foreach ($alatTes['skor_ringkas'] as $_s) {
+                            $_kode = explode(' - ', $_s['dimensi'] ?? '')[0] ?? '';
+                            $papScores[trim($_kode)] = $_s;
+                        }
+                    @endphp
+                    <p style="margin:6px 0 10px 0; color:#666;font-size:10px;">Format: Self-Report &ndash; Skor Mentah (0-9), Kategori: R = Rendah, K = Kurang, C = Cukup, B = Baik, T = Tinggi</p>
+                    @foreach ($papKelompok as $_kelompokNama => $_dimensiKode)
+                        <div style="background:#000; color:#fff; font-weight:700; font-size:10.5px; padding:4px 8px; margin-top:8px; letter-spacing:0.5px;">{{ $_kelompokNama }}</div>
+                        <table>
+                            <thead class="th-row">
+                                <tr>
+                                    <th style="width:38%;">ASPEK PSIKOLOGIS</th>
+                                    <th style="width:5%;text-align:center;">R</th>
+                                    <th style="width:5%;text-align:center;">K</th>
+                                    <th style="width:5%;text-align:center;">C</th>
+                                    <th style="width:5%;text-align:center;">B</th>
+                                    <th style="width:5%;text-align:center;">T</th>
+                                    <th>DESKRIPSI KEPRIBADIAN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($_dimensiKode as $_skala)
+                                    @php $_dbKode = $papDesc[$_skala]['db'] ?? ''; $_skor = $papScores[$_dbKode] ?? null; @endphp
+                                    @php
+                                        $_katHuruf = '-';
+                                        if ($_skor) {
+                                            $_sm = (float) $_skor['skor_mentah'];
+                                            if ($_sm <= 2) $_katHuruf = 'R';
+                                            elseif ($_sm <= 4) $_katHuruf = 'K';
+                                            elseif ($_sm <= 6) $_katHuruf = 'C';
+                                            elseif ($_sm <= 8) $_katHuruf = 'B';
+                                            else $_katHuruf = 'T';
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <td style="padding:3px 6px;"><strong>{{ $papDesc[$_skala]['nama'] }}</strong></td>
+                                        <td class="mark" style="font-size:12px;">{!! $_katHuruf === 'R' ? '&#10003;' : '&bull;' !!}</td>
+                                        <td class="mark" style="font-size:12px;">{!! $_katHuruf === 'K' ? '&#10003;' : '&bull;' !!}</td>
+                                        <td class="mark" style="font-size:12px;">{!! $_katHuruf === 'C' ? '&#10003;' : '&bull;' !!}</td>
+                                        <td class="mark" style="font-size:12px;">{!! $_katHuruf === 'B' ? '&#10003;' : '&bull;' !!}</td>
+                                        <td class="mark" style="font-size:12px;">{!! $_katHuruf === 'T' ? '&#10003;' : '&bull;' !!}</td>
+                                        <td style="font-size:9px;color:#333;line-height:1.4;">{{ $_skor && $_katHuruf !== '-' ? ($papDesc[$_skala][$_katHuruf] ?? '-') : '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endforeach
+                    <div class="footnote"><strong>Keterangan:</strong> R = Rendah &middot; K = Kurang &middot; C = Cukup &middot; B = Baik &middot; T = Tinggi</div>
+
                 {{-- Papikostik & alat tes lain: tabel skor per dimensi --}}
                 @elseif (!empty($alatTes['skor_ringkas']))
                     <table>
@@ -458,7 +519,5 @@
         </div>
     </div>
     {{-- END HALAMAN 2 --}}
-
-</div>
 
 @endsection

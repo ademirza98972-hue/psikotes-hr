@@ -385,7 +385,7 @@ class ScoringEngineService
         int $alatTesId,
         string $kelompokSegmen
     ): mixed {
-        $this->scoreForcedChoice($userId, $sesiTesId, $alatTesId, $kelompokSegmen);
+        $this->scoreForcedChoice($userId, $sesiTesId, $alatTesId, $kelompokSegmen, pakaiNorma: false);
         return $this->scoreRollup($userId, $sesiTesId, $alatTesId);
     }
 }

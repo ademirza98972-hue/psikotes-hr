@@ -57,7 +57,7 @@
 
         {{-- Header Progress Bar --}}
         <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm mb-4">
-            <div class="flex items-start justify-between mb-2">
+            <div class="flex items-center justify-between mb-2">
                 <div>
                     <h2 class="text-base font-semibold text-slate-900">
                         {{ $nama_alat_tes }} ({{ $kode_alat_tes }})
@@ -66,8 +66,33 @@
                         {{ $alat_tes_index + 1 }} dari {{ $total_alat_tes }} alat tes
                     </p>
                 </div>
-                <div class="text-sm text-slate-600">
-                    Soal {{ $soal_nomor }} dari {{ $soal_total }}
+                <div class="flex items-center gap-4">
+                    @if($sisa_waktu_sesi_detik !== null)
+                    <div x-data="{
+                        sisa: {{ $sisa_waktu_sesi_detik }},
+                        get jam() { return String(Math.floor(this.sisa / 3600)).padStart(2, '0') },
+                        get menit() { return String(Math.floor((this.sisa % 3600) / 60)).padStart(2, '0') },
+                        get detik() { return String(this.sisa % 60).padStart(2, '0') },
+                        init() {
+                            const interval = setInterval(() => {
+                                if (this.sisa > 0) {
+                                    this.sisa--;
+                                } else {
+                                    clearInterval(interval);
+                                    window.location.href = '{{ route('peserta.tes.selesai', $sesiId) }}';
+                                }
+                            }, 1000);
+                        }
+                    }" class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base" :class="sisa <= 300 ? 'text-red-500' : 'text-slate-400'">timer</span>
+                        <span class="font-mono font-semibold text-sm tabular-nums" :class="sisa <= 300 ? 'text-red-600' : 'text-slate-700'">
+                            <span x-text="jam"></span>:<span x-text="menit"></span>:<span x-text="detik"></span>
+                        </span>
+                    </div>
+                    @endif
+                    <div class="text-sm text-slate-600">
+                        Soal {{ $soal_nomor }} dari {{ $soal_total }}
+                    </div>
                 </div>
             </div>
             <div class="w-full bg-slate-200 rounded-full h-1.5">

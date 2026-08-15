@@ -46,7 +46,6 @@
                     <span class="material-symbols-outlined text-[18px]">expand_more</span>
                 </span>
             </div>
-
             {{-- Filter Status --}}
             <div class="relative min-w-[140px]">
                 <select name="status" onchange="this.form.submit()"

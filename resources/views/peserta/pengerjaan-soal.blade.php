@@ -79,7 +79,12 @@
                                     this.sisa--;
                                 } else {
                                     clearInterval(interval);
-                                    window.location.href = '{{ route('peserta.tes.selesai', $sesiId) }}';
+                                    fetch('{{ route('peserta.tes.timeout-sesi', $sesiId) }}', {
+                                        method: 'POST',
+                                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                    }).then(() => {
+                                        window.location.href = '{{ route('peserta.tes.kerjakan', $sesiId) }}';
+                                    });
                                 }
                             }, 1000);
                         }

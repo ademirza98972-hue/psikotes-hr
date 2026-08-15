@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     // Route untuk halaman pengerjaan tes (sekarang mengarah ke PengerjaanTesController)
     Route::get('/peserta/tes/{sesiId}', [PengerjaanTesController::class, 'kerjakan'])->name('peserta.tes.kerjakan');
     Route::post('/peserta/tes/{sesiId}/jawab', [PengerjaanTesController::class, 'jawab'])->name('peserta.tes.jawab');
+    Route::post('/peserta/tes/{sesiId}/timeout-sesi', [PengerjaanTesController::class, 'timeoutSesi'])->name('peserta.tes.timeout-sesi');
     Route::get('/peserta/tes/{sesiId}/kraepelin', [PengerjaanTesController::class, 'kerjakanGrid'])->name('peserta.tes.kraepelin');
     Route::post('/peserta/tes/{sesiId}/kraepelin', [PengerjaanTesController::class, 'simpanKolomGrid'])->name('peserta.tes.simpanKolomGrid');
     Route::get('/peserta/tes/{sesiId}/selesai', [PengerjaanTesController::class, 'selesai'])->name('peserta.tes.selesai');

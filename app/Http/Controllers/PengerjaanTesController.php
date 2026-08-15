@@ -344,7 +344,8 @@ class PengerjaanTesController extends Controller
                 $sisaWaktuSesiDetik = max(0, $durasiSesiDetik - (now()->timestamp - $waktuMulaiSesi));
 
                 if ($sisaWaktuSesiDetik <= 0) {
-                    return redirect()->route('peserta.tes.selesai', $sesiId);
+                    Session::put($this->sessionKey($sesiId, 'current_step'), 0);
+                    return redirect()->route('peserta.tes.kerjakan', $sesiId);
                 }
             }
         }
@@ -441,6 +442,45 @@ class PengerjaanTesController extends Controller
             'kode_subtes_timer'     => $kodeSubtesTimer ?? null,
             'is_ist'                => $isIST ?? false,
         ]);
+    }
+
+    public function timeoutSesi(Request $request, int $sesiId)
+    {
+        $sesi = $this->getSesiById($sesiId);
+        if (!$sesi) {
+            return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', 'Sesi tes tidak ditemukan.');
+        }
+
+        $soalDummy     = $this->getSoalDummy();
+        $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
+        $userId        = auth()->id();
+
+        $pesertaSesiTesId = $sesi['peserta_sesi_tes_id'];
+        $alatTesByKode = \App\Models\PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
+            ->with('alatTes:id,kode')
+            ->get()
+            ->pluck('alatTes')
+            ->filter()
+            ->keyBy('kode')
+            ->map(fn ($a) => $a->id);
+
+        // Tandai alat tes aktif yang belum selesai dengan menyimpan jawaban kosong
+        $aktif = Session::get($this->sessionKey($sesiId, 'kode_alat_tes_aktif'));
+        if ($aktif && isset($soalDummy[$aktif])) {
+            $alatTesId = $alatTesByKode[$aktif] ?? null;
+            foreach ($soalDummy[$aktif]['soal'] as $soal) {
+                JawabanPeserta::updateOrCreate(
+                    ['user_id' => $userId, 'sesi_tes_id' => $sesiId, 'soal_id' => $soal['id']],
+                    ['opsi_dipilih_id' => null, 'jawaban_teks' => null, 'waktu_jawab' => now()]
+                );
+            }
+        }
+
+        // Reset step dan timer agar alat tes berikutnya dimulai fresh
+        Session::put($this->sessionKey($sesiId, 'current_step'), 0);
+        Session::forget($this->sessionKey($sesiId, 'kode_alat_tes_aktif'));
+
+        return redirect()->route('peserta.tes.kerjakan', $sesiId);
     }
 
     public function jawab(Request $request, int $sesiId)

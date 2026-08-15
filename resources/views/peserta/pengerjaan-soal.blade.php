@@ -6,7 +6,7 @@
     const m = document.querySelector('main');
     if (m) { m.style.maxWidth = '100%'; m.style.paddingLeft = '24px'; m.style.paddingRight = '24px'; }
 </script>
-<div class="grid items-start" style="grid-template-columns: 200px 1fr; gap: 16px;">
+<div class="grid items-start gap-4" style="grid-template-columns: 220px 1fr;">
 
     {{-- SIDEBAR KIRI: Grid Nomor Soal --}}
     @php
@@ -19,7 +19,7 @@
                 @foreach($grupAlat as $kode => $soalGrup)
                     <div>
                         <p class="text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">{{ $kode }}</p>
-                        <div class="grid gap-1" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="grid gap-1" style="grid-template-columns: repeat(5, 1fr);">
                             @foreach($soalGrup as $item)
                                 @php
                                     $bg = $item['is_current']
@@ -29,7 +29,7 @@
                                             : 'bg-white text-slate-500 border-slate-200 hover:border-[#2C5F6F] hover:text-[#2C5F6F]');
                                 @endphp
                                 <a href="{{ route('peserta.tes.kerjakan', $sesiId) }}?step={{ $item['step'] }}"
-                                   class="flex items-center justify-center rounded border text-[11px] font-semibold transition aspect-square {{ $bg }}">
+                                   class="flex items-center justify-center rounded border text-[10px] font-semibold transition aspect-square {{ $bg }}">
                                     {{ $loop->iteration }}
                                 </a>
                             @endforeach
@@ -157,8 +157,8 @@
         {{-- Question Card --}}
         <form id="form-jawaban" action="{{ route('peserta.tes.jawab', $sesiId) }}" method="POST">
             @csrf
-            <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
-                <div class="p-6">
+            <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+                <div class="p-8">
                     {{-- Forced Choice Format --}}
                     @if($soal_data['tipe_format'] == 'forced_choice')
                         <p class="text-sm text-slate-800 mb-5 font-medium">
@@ -166,11 +166,11 @@
                         </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach($soal_data['opsi'] as $opsi)
-                                <label class="flex flex-col gap-3 border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition cursor-pointer">
+                                <label class="flex items-start gap-3 border border-slate-200 rounded-lg p-4 hover:border-[#2C5F6F]/50 hover:bg-[#2C5F6F]/5 transition cursor-pointer">
                                     <input type="radio" name="opsi_id" value="{{ $opsi['id'] }}"
                                            @checked($saved_answer == $opsi['id'])
-                                           class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F]" />
-                                    <p class="text-sm text-slate-800 leading-relaxed ml-8">{{ $opsi['teks'] }}</p>
+                                           class="mt-0.5 h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F] shrink-0" />
+                                    <p class="text-sm text-slate-700 leading-relaxed">{{ $opsi['teks'] }}</p>
                                 </label>
                             @endforeach
                         </div>
@@ -181,12 +181,12 @@
                         @if(!empty($teks_tampil))
                             <p class="text-base text-slate-800 mb-5 font-medium leading-relaxed">{{ $teks_tampil }}</p>
                         @endif
-                        <div class="space-y-2">
+                        <div class="space-y-3">
                             @foreach($soal_data['opsi'] as $opsi)
-                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer">
+                                <label class="flex items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg hover:border-[#2C5F6F]/50 hover:bg-[#2C5F6F]/5 transition cursor-pointer">
                                     <input type="radio" name="opsi_id" value="{{ $opsi['id'] }}"
                                            @checked($saved_answer == $opsi['id'])
-                                           class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F]" />
+                                           class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F] shrink-0" />
                                     <span class="text-sm text-slate-700">{{ $opsi['teks'] }}</span>
                                 </label>
                             @endforeach
@@ -265,7 +265,7 @@
                 </div>
 
                 {{-- Footer Navigation --}}
-                <div class="px-5 py-4 bg-slate-50 rounded-b-lg flex justify-between items-center border-t border-slate-100">
+                <div class="px-6 py-4 bg-slate-50 rounded-b-xl flex justify-between items-center border-t border-slate-100">
                     @if(!$is_first_soal)
                         <a href="{{ route('peserta.tes.kerjakan', $sesiId) }}?prev=1"
                            class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-white transition">

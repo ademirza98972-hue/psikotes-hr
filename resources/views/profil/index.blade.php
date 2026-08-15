@@ -1,4 +1,4 @@
-@extends('layouts.' . (auth()->user()->tipe_akun === 'kandidat' ? 'peserta' : 'admin'), ['judulHalaman' => 'Profil Saya'])
+@extends('layouts.' . (in_array(auth()->user()->tipe_akun, ['kandidat', 'karyawan']) ? 'peserta' : 'admin'), ['judulHalaman' => 'Profil Saya'])
 
 @section('content')
     @php

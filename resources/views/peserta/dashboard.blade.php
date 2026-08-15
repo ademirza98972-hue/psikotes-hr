@@ -1,93 +1,172 @@
 @extends('layouts.peserta', ['judulHalaman' => 'Dashboard'])
 
 @php
-// Mapping warna alat tes literal untuk Tailwind JIT detection
-$warnaAlatTes = [
-    'EPPS'   => 'bg-purple-600 text-[11px] font-medium px-2 py-0.5 rounded',
-];
+    $totalSesi = count($sesiTes);
+    $sedangBerjalan = collect($sesiTes)->where('status_pengerjaan', 'Sedang Berjalan')->count();
+    $selesai = collect($sesiTes)->where('status_pengerjaan', 'Selesai')->count();
 @endphp
 
 @section('content')
-    <div class="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-        <h2 class="text-xl font-semibold text-slate-900">Selamat datang, {{ $pengguna->name }}!</h2>
-        <p class="mt-2 text-sm text-slate-600">
-            Anda terdaftar sebagai
-            <span class="font-medium text-[#2C5F6F]">{{ ucfirst($pengguna->tipe_akun ?? '') }}</span>.
-            @if ($pengguna->status === 'menunggu_verifikasi')
-                <span class="mt-2 inline-block rounded-md bg-amber-500 px-2 py-0.5 text-xs font-medium text-white">Akun menunggu verifikasi HR</span>
-            @endif
-        </p>
+    <div class="space-y-6">
 
-        <!-- Daftar Sesi Tes -->
+        {{-- Header Sapaan --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm">
+            <h2 class="text-xl font-semibold text-slate-900">Selamat datang, {{ $pengguna->name }}!</h2>
+            <p class="mt-2 text-sm text-slate-600">
+                Anda terdaftar sebagai
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ml-1">
+                    {{ ucfirst($pengguna->tipe_akun ?? '-') }}
+                </span>
+                @if ($pengguna->status === 'menunggu_verifikasi')
+                    <span class="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                        <span class="material-symbols-outlined text-base">warning</span>
+                        Akun menunggu verifikasi HR
+                    </span>
+                @endif
+            </p>
+        </div>
+
+        {{-- Stat Cards --}}
+        <div class="grid grid-cols-3 gap-4">
+            <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[#2C5F6F]/10">
+                        <span class="material-symbols-outlined text-[24px] text-[#2C5F6F]">assignment</span>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-slate-900">{{ $totalSesi }}</p>
+                        <p class="text-xs text-slate-500">Total Sesi Ditugaskan</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
+                        <span class="material-symbols-outlined text-[24px] text-blue-600">hourglass_top</span>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-slate-900">{{ $sedangBerjalan }}</p>
+                        <p class="text-xs text-slate-500">Sedang Berjalan</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50">
+                        <span class="material-symbols-outlined text-[24px] text-emerald-600">check_circle</span>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-slate-900">{{ $selesai }}</p>
+                        <p class="text-xs text-slate-500">Sesi Selesai</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Daftar Sesi Tes --}}
         @if (count($sesiTes) > 0)
-            <div class="mt-8 space-y-4">
-                <h3 class="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">Sesi Tes yang Ditugaskan</h3>
+            <div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">assignment</span>
+                    Sesi Tes yang Ditugaskan
+                </h3>
 
-                @foreach ($sesiTes as $sesi)
-                    <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-                        <!-- Header Sesi -->
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <h4 class="text-lg font-semibold text-slate-900">{{ $sesi['nama_sesi'] }}</h4>
-                                <p class="text-sm text-slate-600 mt-1">Departemen: {{ $sesi['departemen_terkait'] }}</p>
+                <div class="space-y-4">
+                    @foreach ($sesiTes as $sesi)
+                        <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm">
+                            <!-- Header Sesi -->
+                            <div class="flex items-start justify-between mb-5">
+                                <div>
+                                    <h4 class="text-base font-semibold text-slate-900">{{ $sesi['nama_sesi'] }}</h4>
+                                    <div class="flex items-center gap-1 mt-1 text-sm text-slate-500">
+                                        <span class="material-symbols-outlined text-base">business</span>
+                                        {{ $sesi['departemen_terkait'] }}
+                                    </div>
+                                </div>
+
+                                <!-- Badge Status -->
+                                @if ($sesi['status_pengerjaan'] == 'Belum Mengerjakan')
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 border border-amber-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Belum Mengerjakan
+                                    </span>
+                                @elseif ($sesi['status_pengerjaan'] == 'Sedang Berjalan')
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 border border-blue-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                        Sedang Berjalan
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 border border-emerald-200">
+                                        <span class="material-symbols-outlined text-base">check_circle</span>
+                                        Selesai
+                                    </span>
+                                @endif
                             </div>
 
-                            <!-- Badge Status -->
+                            <!-- Info Grid -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                                <!-- Tanggal -->
+                                <div class="flex items-center gap-2 text-sm text-slate-600">
+                                    <span class="material-symbols-outlined text-base text-slate-400">calendar_today</span>
+                                    <span>
+                                        <span class="text-slate-400">Mulai:</span>
+                                        {{ Carbon\Carbon::parse($sesi['tanggal_mulai'])->translatedFormat('d M Y') }}
+                                        &ndash;
+                                        <span class="text-slate-400">Selesai:</span>
+                                        {{ Carbon\Carbon::parse($sesi['tanggal_selesai'])->translatedFormat('d M Y') }}
+                                    </span>
+                                </div>
+
+                                <!-- Jumlah Alat Tes -->
+                                <div class="flex items-center gap-2 text-sm text-slate-600">
+                                    <span class="material-symbols-outlined text-base text-slate-400">app_registration</span>
+                                    <span>{{ count($sesi['daftar_alat_tes_ditugaskan'] ?? []) }} alat tes</span>
+                                </div>
+                            </div>
+
+                            <!-- Alat Tes Chips -->
+                            <div class="mb-5">
+                                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Alat Tes</p>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach ($sesi['daftar_alat_tes_ditugaskan'] as $alat)
+                                        <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 border border-slate-200">
+                                            {{ $alat }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Tombol Aksi -->
                             @if ($sesi['status_pengerjaan'] == 'Belum Mengerjakan')
-                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-sm font-medium text-amber-800">
-                                    Belum Mengerjakan
-                                </span>
+                                <a href="{{ route('peserta.tes.instruksi', $sesi['id'] ?? $loop->iteration) }}"
+                                   class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
+                                    <span class="material-symbols-outlined text-base">play_arrow</span>
+                                    Mulai Tes
+                                </a>
                             @elseif ($sesi['status_pengerjaan'] == 'Sedang Berjalan')
-                                <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-sm font-medium text-blue-800">
-                                    Sedang Berjalan
-                                </span>
+                                <a href="{{ route('peserta.tes.kerjakan', $sesi['id'] ?? $loop->iteration) }}"
+                                   class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
+                                    <span class="material-symbols-outlined text-base">play_arrow</span>
+                                    Lanjutkan Tes
+                                </a>
                             @else
-                                <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-sm font-medium text-emerald-800">
-                                    Selesai
-                                </span>
+                                <button disabled
+                                        class="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed">
+                                    <span class="material-symbols-outlined text-base">check_circle</span>
+                                    Selesai Dikerjakan
+                                </button>
                             @endif
                         </div>
-
-                        <!-- Alat Tes Ditugaskan -->
-                        <div class="mb-4">
-                            <p class="text-sm text-slate-600 mb-2">Alat Tes yang Ditugaskan:</p>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach ($sesi['daftar_alat_tes_ditugaskan'] as $alat)
-                                    <span class="{{ $warnaAlatTes[$alat] ?? 'bg-slate-500' }}">
-                                        {{ $alat }}
-                                    </span>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <!-- Periode / Deadline -->
-                        <div class="mb-4 text-sm text-slate-600">
-                            <p>Tanggal: {{ Carbon\Carbon::parse($sesi['tanggal_mulai'])->translatedFormat('d F Y') }}
-                               &ndash; {{ Carbon\Carbon::parse($sesi['tanggal_selesai'])->translatedFormat('d F Y') }}</p>
-                        </div>
-
-                        <!-- Tombol Aksi -->
-                        @if ($sesi['status_pengerjaan'] == 'Belum Mengerjakan')
-                            <a href="{{ route('peserta.tes.instruksi', $sesi['id'] ?? $loop->iteration) }}"
-                               class="inline-flex items-center rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-medium text-white hover:bg-[#1e4450] transition">
-                                Mulai Tes
-                            </a>
-                        @elseif ($sesi['status_pengerjaan'] == 'Sedang Berjalan')
-                            <a href="{{ route('peserta.tes.kerjakan', $sesi['id'] ?? $loop->iteration) }}"
-                               class="inline-flex items-center rounded-md bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 transition">
-                                Lanjutkan Tes
-                            </a>
-                        @else
-                            <button disabled
-                                    class="inline-flex items-center rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-500 cursor-not-allowed">
-                                Selesai Dikerjakan
-                            </button>
-                        @endif
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         @else
-            <p class="mt-6 text-sm text-slate-600">Belum ada sesi tes yang ditugaskan untuk Anda.</p>
+            <div class="rounded-xl border border-[#e0e3e5] bg-white p-8 text-center shadow-sm">
+                <span class="material-symbols-outlined text-4xl text-slate-300 mb-3 block">inbox</span>
+                <p class="text-sm text-slate-500">Belum ada sesi tes yang ditugaskan untuk Anda.</p>
+            </div>
         @endif
     </div>
 @endsection

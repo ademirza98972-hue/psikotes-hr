@@ -60,7 +60,7 @@
             </li>
             <li class="flex items-start">
                 <span class="mr-2 mt-0.5 text-teal-600 font-semibold">•</span>
-                <span>Sistem akan mendeteksi if Anda berpindah tab/window selama tes berlangsung</span>
+                <span>Halaman ini akan tertutup otomatis setelah Anda klik "Mulai Mengerjakan"</span>
             </li>
             <li class="flex items-start">
                 <span class="mr-2 mt-0.5 text-teal-600 font-semibold">•</span>

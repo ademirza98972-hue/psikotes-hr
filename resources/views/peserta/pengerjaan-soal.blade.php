@@ -265,10 +265,68 @@
                     @else
                         <div></div>
                     @endif
-                    <button type="submit"
-                            class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
-                        @if($is_last_soal) Selesai @else Selanjutnya @endif &rarr;
-                    </button>
+                    @if($is_last_soal)
+                        <div x-data="{ showModal: false, unanswered: 0,
+                            checkUnanswered() {
+                                const radios = document.querySelectorAll('input[type=radio]:checked');
+                                const texts  = document.querySelectorAll('input[name=jawaban_teks]');
+                                let answered = radios.length;
+                                texts.forEach(t => { if (t.value.trim()) answered++; });
+                                this.unanswered = {{ $soal_total }} - answered;
+                            }
+                        }">
+                            <button type="button"
+                                    @click="showModal = true; checkUnanswered()"
+                                    class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                                Selesai &rarr;
+                            </button>
+
+                            {{-- Modal Konfirmasi Selesai --}}
+                            <div x-show="showModal"
+                                 x-transition:enter="ease-out duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 x-transition:leave="ease-in duration-150"
+                                 x-transition:leave-start="opacity-100"
+                                 x-transition:leave-end="opacity-0"
+                                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                                 @click.self="showModal = false"
+                                 style="display: none;">
+                                <div x-transition:enter="ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave="ease-in duration-150"
+                                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                                     class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
+                                    <h3 class="text-base font-semibold text-slate-900 mb-2">Selesaikan Tes?</h3>
+                                    <p class="text-sm text-slate-600 mb-1">
+                                        Anda akan menyelesaikan <strong>{{ $nama_alat_tes }}</strong>. Jawaban yang sudah dikirim tidak dapat diubah.
+                                    </p>
+                                    <template x-if="unanswered > 0">
+                                        <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+                                            Masih ada <strong x-text="unanswered"></strong> soal yang belum dijawab.
+                                        </p>
+                                    </template>
+                                    <div class="flex gap-3 mt-6 justify-end">
+                                        <button @click="showModal = false"
+                                                class="px-4 py-2 rounded-lg text-sm font-medium border border-[#2C5F6F] text-[#2C5F6F] hover:bg-slate-50 transition">
+                                            Batal
+                                        </button>
+                                        <button @click="document.getElementById('form-jawaban').submit();"
+                                                class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                                            Ya, Selesaikan
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                            Selanjutnya &rarr;
+                        </button>
+                    @endif
                 </div>
             </div>
         </form>

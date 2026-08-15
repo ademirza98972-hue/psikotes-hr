@@ -79,8 +79,49 @@
             </div>
         </div>
 
+        {{-- Timer Subtes IST --}}
+        @if($is_ist && $sisa_waktu_detik !== null)
+        <div x-data="{
+            sisa: {{ $sisa_waktu_detik }},
+            durasi: {{ $durasi_subtes }},
+            get menit() { return String(Math.floor(this.sisa / 60)).padStart(2, '0') },
+            get detik() { return String(this.sisa % 60).padStart(2, '0') },
+            get persen() { return this.durasi > 0 ? (this.sisa / this.durasi) * 100 : 0 },
+            get warnaTimer() {
+                if (this.sisa <= 30) return 'text-red-600';
+                if (this.sisa <= 60) return 'text-orange-500';
+                return 'text-[#2C5F6F]';
+            },
+            init() {
+                const interval = setInterval(() => {
+                    if (this.sisa > 0) {
+                        this.sisa--;
+                    } else {
+                        clearInterval(interval);
+                        document.getElementById('form-jawaban').submit();
+                    }
+                }, 1000);
+            }
+        }" class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm mb-4 flex items-center justify-between">
+            <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Waktu Subtes {{ $kode_subtes_timer }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Sisa waktu mengerjakan subtes ini</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="w-32 bg-slate-200 rounded-full h-2">
+                    <div class="h-full rounded-full transition-all duration-1000"
+                         :class="sisa <= 30 ? 'bg-red-500' : sisa <= 60 ? 'bg-orange-400' : 'bg-[#2C5F6F]'"
+                         :style="'width:' + persen + '%'"></div>
+                </div>
+                <div class="text-2xl font-bold font-mono tabular-nums" :class="warnaTimer">
+                    <span x-text="menit"></span>:<span x-text="detik"></span>
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Question Card --}}
-        <form action="{{ route('peserta.tes.jawab', $sesiId) }}" method="POST">
+        <form id="form-jawaban" action="{{ route('peserta.tes.jawab', $sesiId) }}" method="POST">
             @csrf
             <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
                 <div class="p-6">

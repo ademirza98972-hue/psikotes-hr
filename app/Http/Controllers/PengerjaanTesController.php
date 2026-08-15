@@ -212,6 +212,74 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.kraepelin', $sesiId);
         }
 
+        // IST per-subtes timer
+        $kodeSubtesSaat = $kodeAlatTes;
+        $alatTesSaat = \App\Models\AlatTes::where('kode', $kodeSubtesSaat)->first()
+            ?? \App\Models\AlatTes::find($alatTesByKode[$kodeSubtesSaat] ?? 0);
+        $isIST = ($alatTesSaat?->kode === 'IST' || str_contains($alatTesSaat?->nama ?? '', 'IST'));
+
+        $sisaWaktuDetik = null;
+        $durasiSubtes = null;
+        $kodeSubtesTimer = null;
+
+        if ($isIST) {
+            $nomorSoal = $soal['nomor'];
+            $kodeSubtesTimer = match(true) {
+                $nomorSoal <= 20  => 'SE',
+                $nomorSoal <= 40  => 'WA',
+                $nomorSoal <= 60  => 'AN',
+                $nomorSoal <= 76  => 'GE',
+                $nomorSoal <= 96  => 'RA',
+                $nomorSoal <= 116 => 'ZR',
+                $nomorSoal <= 136 => 'FA',
+                $nomorSoal <= 156 => 'WU',
+                default           => 'ME',
+            };
+
+            $dimensiSubtes = \App\Models\DimensiAlatTes::where('alat_tes_id', $alatTesSaat->id)
+                ->where('kode_dimensi', $kodeSubtesTimer)
+                ->first();
+            $durasiSubtes = $dimensiSubtes?->durasi_detik ?? 420;
+
+            $timerKey = $this->sessionKey($sesiId, "timer_subtes_{$kodeSubtesTimer}");
+            $waktuMulaiSubtes = Session::get($timerKey);
+
+            if (!$waktuMulaiSubtes) {
+                Session::put($timerKey, now()->timestamp);
+                $waktuMulaiSubtes = now()->timestamp;
+            }
+
+            $sisaWaktuDetik = max(0, $durasiSubtes - (now()->timestamp - $waktuMulaiSubtes));
+
+            if ($sisaWaktuDetik <= 0) {
+                $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
+                $idxSubtesSaat = array_search($kodeSubtesTimer, $subtesUrutan);
+                $kodeSubtesBerikutnya = $subtesUrutan[$idxSubtesSaat + 1] ?? null;
+
+                if ($kodeSubtesBerikutnya) {
+                    foreach ($daftarSoalFlat as $stepIdx => $item) {
+                        $nomorItem = $item['soal']['nomor'];
+                        $kodeItem = match(true) {
+                            $nomorItem <= 20  => 'SE',
+                            $nomorItem <= 40  => 'WA',
+                            $nomorItem <= 60  => 'AN',
+                            $nomorItem <= 76  => 'GE',
+                            $nomorItem <= 96  => 'RA',
+                            $nomorItem <= 116 => 'ZR',
+                            $nomorItem <= 136 => 'FA',
+                            $nomorItem <= 156 => 'WU',
+                            default           => 'ME',
+                        };
+                        if ($kodeItem === $kodeSubtesBerikutnya) {
+                            Session::put($this->sessionKey($sesiId, 'current_step'), $stepIdx);
+                            return redirect()->route('peserta.tes.kerjakan', $sesiId);
+                        }
+                    }
+                }
+                return redirect()->route('peserta.tes.jawab', $sesiId)->withInput(['_method' => 'POST', 'auto_submit' => true]);
+            }
+        }
+
         // Hitung posisi soal dalam alat tes ini
         $soalNomorAlatIni   = $soal['nomor'];
         $alatTesIndex       = 0;
@@ -297,6 +365,10 @@ class PengerjaanTesController extends Controller
             'is_first_soal'     => $is_first_soal,
             'is_last_soal'      => $is_last_soal,
             'daftar_nomor_soal' => $daftar_nomor_soal,
+            'sisa_waktu_detik'  => $sisaWaktuDetik,
+            'durasi_subtes'     => $durasiSubtes,
+            'kode_subtes_timer' => $kodeSubtesTimer,
+            'is_ist'            => $isIST ?? false,
         ]);
     }
 

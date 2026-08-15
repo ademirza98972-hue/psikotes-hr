@@ -1,14 +1,14 @@
 # CHANGELOG_FIXES.md
 
-### Fix #1 — IDE Warning Bersih: Laravel IDE Helper + Tipe Eksplisit
-Tanggal · 2026-08-05
-File · `app/Http/Controllers/PengerjaanTesController.php`, `composer.json`
-Masalah · VS Code Problems panel menampilkan "Undefined method 'user'" dari `auth()->user()` dan "Parameter has no type information available" di beberapa parameter metode di `PengerjaanTesController`.
-Akar · Laravel helper method seperti `auth()`, `redirect()`, `view()` tidak dikenal oleh IDE tanpa IDE Helper. Parameter `$sesiId` dan `$name` di `PengerjaanTesController` belum bertipe eksplisit.
-Fix · 1) Install `barryvdh/laravel-ide-helper` (dev dependency), jalankan `php artisan ide-helper:generate` dan `ide-helper:meta`. 2) Tambah type hint `int` pada parameter `$sesiId` (baris 65, 80, 195, 248) dan `int` pada `$name` (baris 75) di `PengerjaanTesController.php`.
-Verifikasi · `php -l` pada semua controller yang disentuh menghasilkan no syntax errors.
-Pelajaran · Laravel helper method selalu butuh IDE Helper untuk tipe yang dikenali IDE.
-Log Keyword · `ide-helper`, `Parameter has no type information`, `Undefined method 'user'`
+### Fix #5 — Timer Subtes IST Double-Submit Guard
+Tanggal · 2026-08-15
+File · `resources/views/peserta/pengerjaan-soal.blade.php`
+Masalah · Timer subtes IST memicu double-submit: saat timer habis, JS memanggil `form.submit()`, tetapi server juga bisa redirect ke `jawab()` dengan `auto_submit=true` jika kondisi `$sisaWaktuDetik <= 0` terdeteksi pada request berikutnya (race condition).
+Akar · Tidak ada guard di sisi klien yang mencegah form di-submit lebih dari satu kali.
+Fix · Tambah `submitted: false` di dalam blok `x-data` timer IST. Pada blok `else` (timer habis), ganti `document.getElementById('form-jawaban').submit()` langsung menjadi conditional: hanya submit jika `!this.submitted`, lalu set `this.submitted = true` sebelum submit.
+Verifikasi · Code review manual — penambahan guard hanya di satu baris, tidak mengubah flow form submission lain (nav prev/next, tombol selesai).
+Pelajaran · Race condition antara client-initiated submit dan server-side auto-redirect perlu guard idempotency di sisi klien.
+Log Keyword · `double-submit`, `timer subtes IST`, `submitted guard`, `x-data`
 Deploy · local
 
 ### Fix #4 — Proteksi Copy-Paste pada Halaman Pengerjaan Soal
@@ -20,6 +20,17 @@ Fix · Menambahkan script vanilla JS setelah `@vite` di akhir view: (1) `prevent
 Verifikasi · Test manual: klik kanan dicegah, Ctrl+C/X/V/A/U dicegah, teks soal tidak bisa diseleksi.
 Pelajaran · Proteksi front-end bersifat soft guard — tetap perlu verifikasi di sisi server bahwa jawaban unik dan tidak ada kebocoran API.
 Log Keyword · `contextmenu`, `copy`, `paste`, `selectstart`, `user-select`
+Deploy · local
+
+### Fix #1 — IDE Warning Bersih: Laravel IDE Helper + Tipe Eksplisit
+Tanggal · 2026-08-05
+File · `app/Http/Controllers/PengerjaanTesController.php`, `composer.json`
+Masalah · VS Code Problems panel menampilkan "Undefined method 'user'" dari `auth()->user()` dan "Parameter has no type information available" di beberapa parameter metode di `PengerjaanTesController`.
+Akar · Laravel helper method seperti `auth()`, `redirect()`, `view()` tidak dikenal oleh IDE tanpa IDE Helper. Parameter `$sesiId` dan `$name` di `PengerjaanTesController` belum bertipe eksplisit.
+Fix · 1) Install `barryvdh/laravel-ide-helper` (dev dependency), jalankan `php artisan ide-helper:generate` dan `ide-helper:meta`. 2) Tambah type hint `int` pada parameter `$sesiId` (baris 65, 80, 195, 248) dan `int` pada `$name` (baris 75) di `PengerjaanTesController.php`.
+Verifikasi · `php -l` pada semua controller yang disentuh menghasilkan no syntax errors.
+Pelajaran · Laravel helper method selalu butuh IDE Helper untuk tipe yang dikenali IDE.
+Log Keyword · `ide-helper`, `Parameter has no type information`, `Undefined method 'user'`
 Deploy · local
 
 ### Fix #3 — Mixed Format: kunci_jawaban Tidak Terekstrak dari Validated Input

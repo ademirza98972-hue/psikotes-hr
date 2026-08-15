@@ -114,6 +114,7 @@
         <div x-data="{
             sisa: {{ $sisa_waktu_detik }},
             durasi: {{ $durasi_subtes }},
+            submitted: false,
             get menit() { return String(Math.floor(this.sisa / 60)).padStart(2, '0') },
             get detik() { return String(this.sisa % 60).padStart(2, '0') },
             get persen() { return this.durasi > 0 ? (this.sisa / this.durasi) * 100 : 0 },
@@ -128,7 +129,10 @@
                         this.sisa--;
                     } else {
                         clearInterval(interval);
-                        document.getElementById('form-jawaban').submit();
+                        if (!this.submitted) {
+                            this.submitted = true;
+                            document.getElementById('form-jawaban').submit();
+                        }
                     }
                 }, 1000);
             }

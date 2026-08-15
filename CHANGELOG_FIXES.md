@@ -11,6 +11,17 @@ Pelajaran · Laravel helper method selalu butuh IDE Helper untuk tipe yang diken
 Log Keyword · `ide-helper`, `Parameter has no type information`, `Undefined method 'user'`
 Deploy · local
 
+### Fix #4 — Proteksi Copy-Paste pada Halaman Pengerjaan Soal
+Tanggal · 2026-08-15
+File · `resources/views/peserta/pengerjaan-soal.blade.php`
+Masalah · Peserta dapat melakukan copy-paste isi soal menggunakan klik kanan, Ctrl+C, atau menu browser, berpotensi membocorkan konten tes.
+Akar · Tidak ada handler yang memblokir event DOM terkait copy, cut, paste, dan text selection.
+Fix · Menambahkan script vanilla JS setelah `@vite` di akhir view: (1) `preventDefault` pada event contextmenu, copy, cut, paste, selectstart; (2) blokir keyboard shortcut Ctrl+C, Ctrl+X, Ctrl+V, Ctrl+A, Ctrl+U; (3) CSS `user-select: none` pada elemen teks soal dan jawaban.
+Verifikasi · Test manual: klik kanan dicegah, Ctrl+C/X/V/A/U dicegah, teks soal tidak bisa diseleksi.
+Pelajaran · Proteksi front-end bersifat soft guard — tetap perlu verifikasi di sisi server bahwa jawaban unik dan tidak ada kebocoran API.
+Log Keyword · `contextmenu`, `copy`, `paste`, `selectstart`, `user-select`
+Deploy · local
+
 ### Fix #3 — Mixed Format: kunci_jawaban Tidak Terekstrak dari Validated Input
 Tanggal · 2026-08-14
 File · `app/Http/Controllers/Admin/BankSoalController.php`

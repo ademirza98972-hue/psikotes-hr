@@ -334,4 +334,33 @@
 </div>
 
 @vite(['resources/js/app.js'])
+<script>
+    // Proteksi anti-copy-paste
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+    document.addEventListener('paste', e => e.preventDefault());
+    document.addEventListener('selectstart', e => e.preventDefault());
+
+    document.addEventListener('keydown', e => {
+        const isCtrl = e.ctrlKey || e.metaKey;
+        if (isCtrl && ['c','x','v','a','u'].includes(e.key.toLowerCase())) {
+            e.preventDefault();
+        }
+    });
+
+    const selector = `
+        .text-base.text-slate-800.mb-5,
+        .text-sm.text-slate-800.mb-5,
+        .text-sm.text-slate-700,
+        .text-sm.font-medium.text-slate-700,
+        .text-base.font-medium.text-slate-800,
+        .font-mono.text-lg.tracking-widest,
+        .text-sm.text-slate-800.leading-relaxed.ml-8
+    `;
+    document.querySelectorAll(selector).forEach(el => {
+        el.style.userSelect = 'none';
+        el.style.webkitUserSelect = 'none';
+    });
+</script>
 @endsection

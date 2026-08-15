@@ -146,6 +146,38 @@ class PengerjaanTesController extends Controller
         return "pengerjaan_tes.sesi_{$sesiId}.{$name}";
     }
 
+    private function getOrCreateSoalOrder(int $sesiId, string $kodeAlatTes, array $soalIds, ?string $kodeSubtes = null): array
+    {
+        $key = $kodeSubtes
+            ? $this->sessionKey($sesiId, "soal_order_{$kodeAlatTes}_{$kodeSubtes}")
+            : $this->sessionKey($sesiId, "soal_order_{$kodeAlatTes}");
+
+        $stored = Session::get($key);
+        if ($stored !== null) {
+            return $stored;
+        }
+
+        $shuffled = $soalIds;
+        shuffle($shuffled);
+        Session::put($key, $shuffled);
+        return $shuffled;
+    }
+
+    private function getOrCreateOpsiOrder(int $sesiId, int $soalId, array $opsiIds): array
+    {
+        $key = $this->sessionKey($sesiId, "opsi_order_{$soalId}");
+
+        $stored = Session::get($key);
+        if ($stored !== null) {
+            return $stored;
+        }
+
+        $shuffled = $opsiIds;
+        shuffle($shuffled);
+        Session::put($key, $shuffled);
+        return $shuffled;
+    }
+
     public function kerjakan(Request $request, int $sesiId)
     {
         $sesi = $this->getSesiById($sesiId);
@@ -217,6 +249,55 @@ class PengerjaanTesController extends Controller
             $daftarSoalFlat[] = ['kode_alat_tes' => $kodeAlatTesAktif, 'soal' => $soal];
         }
 
+        // Randomisasi urutan soal berdasarkan alat tes
+        if ($kodeAlatTesAktif === 'IST') {
+            $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
+            $soalPerSubtes = [];
+            foreach ($daftarSoalFlat as $item) {
+                $nomor = $item['soal']['nomor'];
+                $subtes = match(true) {
+                    $nomor <= 20  => 'SE',
+                    $nomor <= 40  => 'WA',
+                    $nomor <= 60  => 'AN',
+                    $nomor <= 76  => 'GE',
+                    $nomor <= 96  => 'RA',
+                    $nomor <= 116 => 'ZR',
+                    $nomor <= 136 => 'FA',
+                    $nomor <= 156 => 'WU',
+                    default        => 'ME',
+                };
+                $soalPerSubtes[$subtes][] = $item;
+            }
+            $daftarSoalFlat = [];
+            foreach ($subtesUrutan as $subtes) {
+                if (empty($soalPerSubtes[$subtes])) continue;
+                $ids = array_map(fn($i) => $i['soal']['id'], $soalPerSubtes[$subtes]);
+                $orderedIds = $this->getOrCreateSoalOrder($sesiId, $kodeAlatTesAktif, $ids, $subtes);
+                $idToItem = [];
+                foreach ($soalPerSubtes[$subtes] as $item) {
+                    $idToItem[$item['soal']['id']] = $item;
+                }
+                foreach ($orderedIds as $id) {
+                    if (isset($idToItem[$id])) {
+                        $daftarSoalFlat[] = $idToItem[$id];
+                    }
+                }
+            }
+        } elseif (in_array($kodeAlatTesAktif, ['EPPS', 'PAP'])) {
+            $ids = array_map(fn($item) => $item['soal']['id'], $daftarSoalFlat);
+            $orderedIds = $this->getOrCreateSoalOrder($sesiId, $kodeAlatTesAktif, $ids);
+            $idToItem = [];
+            foreach ($daftarSoalFlat as $item) {
+                $idToItem[$item['soal']['id']] = $item;
+            }
+            $daftarSoalFlat = [];
+            foreach ($orderedIds as $id) {
+                if (isset($idToItem[$id])) {
+                    $daftarSoalFlat[] = $idToItem[$id];
+                }
+            }
+        }
+
         // Tangani query ?prev=1 (kembali ke soal sebelumnya)
         if ($request->query('prev') === '1' && $currentStep > 0) {
             $currentStep = $currentStep - 1;
@@ -251,6 +332,22 @@ class PengerjaanTesController extends Controller
         $currentItem = $daftarSoalFlat[$currentStep];
         $kodeAlatTes = $currentItem['kode_alat_tes'];
         $soal        = $currentItem['soal'];
+
+        // Randomisasi posisi opsi jawaban
+        if (isset($soal['opsi']) && is_array($soal['opsi']) && count($soal['opsi']) > 1) {
+            $opsiIds = array_map(fn($o) => $o['id'], $soal['opsi']);
+            $orderedOpsiIds = $this->getOrCreateOpsiOrder($sesiId, $soal['id'], $opsiIds);
+            $idToOpsi = [];
+            foreach ($soal['opsi'] as $o) {
+                $idToOpsi[$o['id']] = $o;
+            }
+            $soal['opsi'] = [];
+            foreach ($orderedOpsiIds as $oid) {
+                if (isset($idToOpsi[$oid])) {
+                    $soal['opsi'][] = $idToOpsi[$oid];
+                }
+            }
+        }
 
         if (($soal['tipe_format'] ?? '') === 'grid') {
             return redirect()->route('peserta.tes.kraepelin', $sesiId);
@@ -408,7 +505,7 @@ class PengerjaanTesController extends Controller
         $format_dasar         = $soalDummy[$kodeAlatTes]['format_dasar'];
         $alat_tes_index       = $alatTesIndex;
         $total_alat_tes       = count($alatTesDenganSoal);
-        $soal_nomor           = $soalNomorAlatIni;
+        $soal_nomor           = $currentStep + 1;
         $soal_total           = count($soalDummy[$kodeAlatTes]['soal']);
         $soal_posisi_global   = $currentStep;
         $soal_total_global    = count($daftarSoalFlat);
@@ -502,6 +599,55 @@ class PengerjaanTesController extends Controller
                     'kode_alat_tes' => $kodeAlatTesAktif,
                     'soal'          => $soal,
                 ];
+            }
+        }
+
+        // Randomisasi urutan soal berdasarkan alat tes (sama seperti kerjakan())
+        if ($kodeAlatTesAktif === 'IST') {
+            $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
+            $soalPerSubtes = [];
+            foreach ($daftarSoalFlat as $item) {
+                $nomor = $item['soal']['nomor'];
+                $subtes = match(true) {
+                    $nomor <= 20  => 'SE',
+                    $nomor <= 40  => 'WA',
+                    $nomor <= 60  => 'AN',
+                    $nomor <= 76  => 'GE',
+                    $nomor <= 96  => 'RA',
+                    $nomor <= 116 => 'ZR',
+                    $nomor <= 136 => 'FA',
+                    $nomor <= 156 => 'WU',
+                    default        => 'ME',
+                };
+                $soalPerSubtes[$subtes][] = $item;
+            }
+            $daftarSoalFlat = [];
+            foreach ($subtesUrutan as $subtes) {
+                if (empty($soalPerSubtes[$subtes])) continue;
+                $ids = array_map(fn($i) => $i['soal']['id'], $soalPerSubtes[$subtes]);
+                $orderedIds = $this->getOrCreateSoalOrder($sesiId, $kodeAlatTesAktif, $ids, $subtes);
+                $idToItem = [];
+                foreach ($soalPerSubtes[$subtes] as $item) {
+                    $idToItem[$item['soal']['id']] = $item;
+                }
+                foreach ($orderedIds as $id) {
+                    if (isset($idToItem[$id])) {
+                        $daftarSoalFlat[] = $idToItem[$id];
+                    }
+                }
+            }
+        } elseif (in_array($kodeAlatTesAktif, ['EPPS', 'PAP'])) {
+            $ids = array_map(fn($item) => $item['soal']['id'], $daftarSoalFlat);
+            $orderedIds = $this->getOrCreateSoalOrder($sesiId, $kodeAlatTesAktif, $ids);
+            $idToItem = [];
+            foreach ($daftarSoalFlat as $item) {
+                $idToItem[$item['soal']['id']] = $item;
+            }
+            $daftarSoalFlat = [];
+            foreach ($orderedIds as $id) {
+                if (isset($idToItem[$id])) {
+                    $daftarSoalFlat[] = $idToItem[$id];
+                }
             }
         }
 

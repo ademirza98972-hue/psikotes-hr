@@ -30,7 +30,7 @@
                                 @endphp
                                 <a href="{{ route('peserta.tes.kerjakan', $sesiId) }}?step={{ $item['step'] }}"
                                    class="flex items-center justify-center rounded border text-[11px] font-semibold transition aspect-square {{ $bg }}">
-                                    {{ $item['nomor_soal'] }}
+                                    {{ $loop->iteration }}
                                 </a>
                             @endforeach
                         </div>

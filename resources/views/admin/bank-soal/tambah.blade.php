@@ -105,6 +105,10 @@
             </div>
 
         @elseif ($format === 'Forced Choice')
+            @php
+                $defaultDimensiA = old('dimensi_a');
+                $defaultDimensiB = old('dimensi_b');
+            @endphp
             <div class="grid gap-4 md:grid-cols-2">
                 <div class="rounded-md border border-slate-200 bg-slate-50 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Pernyataan A</p>
@@ -115,8 +119,18 @@
                     </div>
                     <div class="mt-3">
                         <label for="dimensi_a" class="block text-sm font-medium text-slate-700">Dimensi A <span class="text-rose-500">*</span></label>
-                        <input id="dimensi_a" name="dimensi_a" type="text" value="{{ old('dimensi_a') }}" required maxlength="100"
-                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        @if ($dimensiList->isNotEmpty())
+                            <select id="dimensi_a" name="dimensi_a" required
+                                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                <option value="">-- Pilih Dimensi A --</option>
+                                @foreach ($dimensiList as $d)
+                                    <option value="{{ $d->kode_dimensi }}" {{ $defaultDimensiA === $d->kode_dimensi ? 'selected' : '' }}>{{ $d->kode_dimensi }} — {{ $d->nama_dimensi }}</option>
+                                @endforeach
+                            </select>
+                        @else
+                            <input id="dimensi_a" name="dimensi_a" type="text" value="{{ $defaultDimensiA }}" required maxlength="100"
+                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        @endif
                     </div>
                 </div>
 
@@ -129,8 +143,18 @@
                     </div>
                     <div class="mt-3">
                         <label for="dimensi_b" class="block text-sm font-medium text-slate-700">Dimensi B <span class="text-rose-500">*</span></label>
-                        <input id="dimensi_b" name="dimensi_b" type="text" value="{{ old('dimensi_b') }}" required maxlength="100"
-                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        @if ($dimensiList->isNotEmpty())
+                            <select id="dimensi_b" name="dimensi_b" required
+                                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                <option value="">-- Pilih Dimensi B --</option>
+                                @foreach ($dimensiList as $d)
+                                    <option value="{{ $d->kode_dimensi }}" {{ $defaultDimensiB === $d->kode_dimensi ? 'selected' : '' }}>{{ $d->kode_dimensi }} — {{ $d->nama_dimensi }}</option>
+                                @endforeach
+                            </select>
+                        @else
+                            <input id="dimensi_b" name="dimensi_b" type="text" value="{{ $defaultDimensiB }}" required maxlength="100"
+                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        @endif
                     </div>
                 </div>
             </div>

@@ -70,10 +70,11 @@ class BankSoalController extends Controller
     public function tambah(int $alatTesId): View
     {
         $alatTes = AlatTes::findOrFail($alatTesId);
+        $dimensiList = DimensiAlatTes::where('alat_tes_id', $alatTes->id)
+            ->orderBy('urutan')
+            ->get(['id', 'kode_dimensi', 'nama_dimensi']);
 
-        return view('admin.bank-soal.tambah', [
-            'alatTes' => $alatTes,
-        ]);
+        return view('admin.bank-soal.tambah', compact('alatTes', 'dimensiList'));
     }
 
     public function simpan(Request $request, int $alatTesId)
@@ -126,10 +127,10 @@ class BankSoalController extends Controller
                 ]);
 
                 $dimensiA = DimensiAlatTes::where('alat_tes_id', $alatTes->id)
-                    ->where('nama_dimensi', $validated['dimensi_a'])
+                    ->where('kode_dimensi', $validated['dimensi_a'])
                     ->first();
                 $dimensiB = DimensiAlatTes::where('alat_tes_id', $alatTes->id)
-                    ->where('nama_dimensi', $validated['dimensi_b'])
+                    ->where('kode_dimensi', $validated['dimensi_b'])
                     ->first();
 
                 if (!$dimensiA || !$dimensiB) {
@@ -204,7 +205,11 @@ class BankSoalController extends Controller
             ->findOrFail($id);
         $format = $soal->alatTes->format_dasar ?? 'Pilihan Ganda';
 
-        return view('admin.bank-soal.edit', compact('soal', 'format'));
+        $dimensiList = DimensiAlatTes::where('alat_tes_id', $soal->alat_tes_id)
+            ->orderBy('urutan')
+            ->get(['id', 'kode_dimensi', 'nama_dimensi']);
+
+        return view('admin.bank-soal.edit', compact('soal', 'format', 'dimensiList'));
     }
 
     public function update(Request $request, int $id)
@@ -257,10 +262,10 @@ class BankSoalController extends Controller
                 }
 
                 $dimensiA = DimensiAlatTes::where('alat_tes_id', $alatTes->id)
-                    ->where('nama_dimensi', $validated['dimensi_a'])
+                    ->where('kode_dimensi', $validated['dimensi_a'])
                     ->first();
                 $dimensiB = DimensiAlatTes::where('alat_tes_id', $alatTes->id)
-                    ->where('nama_dimensi', $validated['dimensi_b'])
+                    ->where('kode_dimensi', $validated['dimensi_b'])
                     ->first();
 
                 if (!$dimensiA || !$dimensiB) {

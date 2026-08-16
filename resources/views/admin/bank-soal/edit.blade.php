@@ -114,6 +114,8 @@
                 $opsiB = $opsiList->count() > 1 ? $opsiList->skip(1)->first() : null;
                 $dimensiA = $opsiA?->bobotOpsiDimensi->first()?->dimensi;
                 $dimensiB = $opsiB?->bobotOpsiDimensi->first()?->dimensi;
+                $defaultDimensiA = old('dimensi_a', $dimensiA?->kode_dimensi ?? '');
+                $defaultDimensiB = old('dimensi_b', $dimensiB?->kode_dimensi ?? '');
             @endphp
             <div class="grid gap-4 md:grid-cols-2">
                 <div class="rounded-md border border-slate-200 bg-slate-50 p-4">
@@ -125,8 +127,18 @@
                     </div>
                     <div class="mt-3">
                         <label for="dimensi_a" class="block text-sm font-medium text-slate-700">Dimensi A <span class="text-rose-500">*</span></label>
-                        <input id="dimensi_a" name="dimensi_a" type="text" value="{{ old('dimensi_a', $dimensiA?->nama_dimensi ?? '') }}" required maxlength="100"
-                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        @if ($dimensiList->isNotEmpty())
+                            <select id="dimensi_a" name="dimensi_a" required
+                                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                <option value="">-- Pilih Dimensi A --</option>
+                                @foreach ($dimensiList as $d)
+                                    <option value="{{ $d->kode_dimensi }}" {{ $defaultDimensiA === $d->kode_dimensi ? 'selected' : '' }}>{{ $d->kode_dimensi }} — {{ $d->nama_dimensi }}</option>
+                                @endforeach
+                            </select>
+                        @else
+                            <input id="dimensi_a" name="dimensi_a" type="text" value="{{ old('dimensi_a', $dimensiA?->nama_dimensi ?? '') }}" required maxlength="100"
+                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        @endif
                     </div>
                 </div>
 
@@ -139,8 +151,18 @@
                     </div>
                     <div class="mt-3">
                         <label for="dimensi_b" class="block text-sm font-medium text-slate-700">Dimensi B <span class="text-rose-500">*</span></label>
-                        <input id="dimensi_b" name="dimensi_b" type="text" value="{{ old('dimensi_b', $dimensiB?->nama_dimensi ?? '') }}" required maxlength="100"
-                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        @if ($dimensiList->isNotEmpty())
+                            <select id="dimensi_b" name="dimensi_b" required
+                                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                <option value="">-- Pilih Dimensi B --</option>
+                                @foreach ($dimensiList as $d)
+                                    <option value="{{ $d->kode_dimensi }}" {{ $defaultDimensiB === $d->kode_dimensi ? 'selected' : '' }}>{{ $d->kode_dimensi }} — {{ $d->nama_dimensi }}</option>
+                                @endforeach
+                            </select>
+                        @else
+                            <input id="dimensi_b" name="dimensi_b" type="text" value="{{ old('dimensi_b', $dimensiB?->nama_dimensi ?? '') }}" required maxlength="100"
+                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        @endif
                     </div>
                 </div>
             </div>

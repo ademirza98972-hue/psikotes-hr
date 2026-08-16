@@ -33,7 +33,9 @@ class PenjadwalanTesController extends Controller
                 $endDate = Carbon::parse($sesi->tanggal_selesai);
                 $startDate = Carbon::parse($sesi->tanggal_mulai);
 
-                if ($today > $endDate) {
+                if ($sesi->status === 'Draft') {
+                    $sesi->status_display = 'Draft';
+                } elseif ($today > $endDate) {
                     $sesi->status_display = 'Kedaluwarsa';
                 } elseif ($today >= $startDate) {
                     $sesi->status_display = 'Aktif';

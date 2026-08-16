@@ -62,6 +62,7 @@ class DashboardController extends Controller
         $sesiTes = SesiTes::whereHas('pesertaSesiTes', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })
+            ->where('status', '!=', 'Draft')
             ->with(['departemenTerkait', 'alatTes' => function ($q) {
                 $q->select('alat_tes.id', 'alat_tes.kode');
             }, 'pesertaSesiTesRecords'])
@@ -75,6 +76,10 @@ class DashboardController extends Controller
             $today = Carbon::today();
             $startDate = Carbon::parse($sesi->tanggal_mulai);
             $endDate = Carbon::parse($sesi->tanggal_selesai);
+
+            if ($sesi->status === 'Draft') {
+                return null;
+            }
 
             if ($today > $endDate) {
                 $statusSesi = 'Kedaluwarsa';
@@ -94,7 +99,7 @@ class DashboardController extends Controller
                 'status_pengerjaan' => $statusPengerjaan,
                 'status_sesi' => $statusSesi,
             ];
-        })->toArray();
+        })->filter()->values()->toArray();
     }
 
     public function admin(Request $request): View
@@ -222,6 +227,10 @@ class DashboardController extends Controller
 
         if (!$sesi) {
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
+        }
+
+        if ($sesi->status === 'Draft') {
+            abort(403, 'Sesi tes belum aktif.');
         }
 
         $startDate = Carbon::parse($sesi->tanggal_mulai);

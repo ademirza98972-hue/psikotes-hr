@@ -39,11 +39,10 @@ class DepartemenController extends Controller
                 'max:100',
                 function ($attribute, $value, $fail) {
                     $exists = DB::table('departemen')
-                        ->whereNull('deleted_at')
                         ->where('nama_departemen', $value)
                         ->exists();
                     if ($exists) {
-                        $fail('Nama departemen sudah terdaftar.');
+                        $fail('Nama departemen sudah terdaftar atau pernah digunakan sebelumnya. Gunakan nama lain atau pulihkan dari Data Terhapus.');
                     }
                 },
             ],

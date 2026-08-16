@@ -18,21 +18,55 @@ use Illuminate\View\View;
 
 class HasilTesController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $sesiList = SesiTes::with(['departemenTerkait', 'pesertaSesiTesRecords.user'])
+        $selectedSesiId = $request->integer('sesi');
+
+        $sesiList = SesiTes::with([
+            'departemenTerkait',
+            'alatTes',
+            'pesertaSesiTesRecords.user.profilKaryawan.dataKaryawan',
+            'pesertaSesiTesRecords.user.profilKandidat',
+            'pesertaSesiTesRecords.alatTes',
+        ])
             ->orderByDesc('tanggal_mulai')
             ->get();
+
+        $today = now()->toDateString();
+        foreach ($sesiList as $sesi) {
+            if ($sesi->status === 'Draft') {
+                $sesi->status_display = 'Draft';
+            } elseif ($sesi->status === 'Selesai') {
+                $sesi->status_display = 'Selesai';
+            } elseif ($today > $sesi->tanggal_selesai?->toDateString()) {
+                $sesi->status_display = 'Kedaluwarsa';
+            } elseif ($today >= $sesi->tanggal_mulai?->toDateString()) {
+                $sesi->status_display = 'Aktif';
+            } else {
+                $sesi->status_display = 'Belum Dimulai';
+            }
+        }
 
         $penjadwalan = $sesiList->map(fn($sesi) => [
             'id'                 => $sesi->id,
             'nama_sesi'          => $sesi->nama_sesi,
             'status'             => $sesi->status,
+            'status_display'     => $sesi->status_display,
             'departemen_terkait' => $sesi->departemenTerkait?->nama_departemen ?? '—',
             'tanggal_mulai'      => $sesi->tanggal_mulai,
             'tanggal_selesai'    => $sesi->tanggal_selesai,
             'jumlah_peserta'     => $sesi->jumlah_peserta,
         ])->all();
+
+        $hasilPeserta = [];
+        foreach ($sesiList as $sesi) {
+            if ($sesi->pesertaSesiTesRecords->isNotEmpty()) {
+                $hasilPeserta[$sesi->id] = true;
+            }
+        }
+        if (!$selectedSesiId && $sesiList->isNotEmpty()) {
+            $selectedSesiId = $sesiList->first(fn($s) => ($hasilPeserta[$s->id] ?? false))?->id ?? $sesiList->first()->id;
+        }
 
         $hasilTes = [];
         foreach ($sesiList as $sesi) {
@@ -42,21 +76,38 @@ class HasilTesController extends Controller
                     continue;
                 }
 
+                $departemen = '—';
+                $posisi = '—';
+                $karyawan = $user->profilKaryawan;
+                if ($karyawan && $karyawan->dataKaryawan) {
+                    $departemen = $karyawan->dataKaryawan->departemen?->nama_departemen ?? ($karyawan->departemen ?? '—');
+                    $posisi = $karyawan->dataKaryawan->posisi?->nama_posisi ?? '—';
+                } else {
+                    $kandidat = $user->profilKandidat;
+                    if ($kandidat) {
+                        $departemen = $kandidat->departemen ?? '—';
+                        $posisi = $kandidat->posisi_dilamar?->nama_posisi ?? '—';
+                    }
+                }
+
+                $alatTesKode = $peserta->alatTes?->pluck('kode')->join(', ') ?: '—';
+
                 $hasilTes[] = [
                     'sesi_id'            => $sesi->id,
                     'peserta_id'         => $user->id,
                     'nama_peserta'       => $user->name,
-                    'departemen'         => '—',
-                    'posisi'             => '—',
+                    'departemen'         => $departemen,
+                    'posisi'             => $posisi,
                     'jenis_peserta'      => ucfirst($user->tipe_akun ?? '—'),
                     'status_pengerjaan'  => $peserta->status_pengerjaan,
                     'tanggal_pengerjaan' => $peserta->tanggal_pengerjaan,
                     'hasil_alat_tes'     => [],
+                    'alat_tes_kode'      => $alatTesKode,
                 ];
             }
         }
 
-        return view('admin.hasil-tes.index', compact('hasilTes', 'penjadwalan'));
+        return view('admin.hasil-tes.index', compact('hasilTes', 'penjadwalan', 'selectedSesiId'));
     }
 
     public function detail(int $sesiId, int $pesertaId): View

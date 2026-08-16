@@ -1,5 +1,16 @@
 # CHANGELOG_FIXES.md
 
+### Fix #6 — Stat Cards Selalu 0: $selectedSesiId Memilih Sesi Tanpa Peserta
+Tanggal · 2026-08-16
+File · `app/Http/Controllers/Admin/HasilTesController.php` (method `index()`)
+Masalah · Stat cards (TINGKAT PENYELESAIAN, STATUS SELESAI, PROGRES KOLEKTIF) selalu menampilkan 0% dan 0/0 peserta, padahal tabel peserta di tab "Per Sesi" menampilkan data dengan benar.
+Akar · Baris `$selectedSesiId = $sesiList->first()->id;` memilih sesi pertama secara absolut (diurutkan DESC by `tanggal_mulai`), bukan sesi pertama yang memiliki peserta. Sesi terbaru (id=7, nama "tes") memiliki `jumlah_peserta = 0`, sehingga `$pesertaBySesi[$selectedSesiId]` selalu kosong.
+Fix · Tambah blok pra-pemilihan: loop `$sesiList` sekali untuk menyimpan ID sesi yang memiliki `pesertaSesiTesRecords` tidak kosong ke `$hasilPeserta[]`. Gunakan `$sesiList->first(fn($s) => $hasilPeserta[$s->id])` untuk mengambil sesi pertama yang benar-benar punya peserta, dengan fallback ke `$sesiList->first()->id` jika semua sesi kosong.
+Verifikasi · Simulasi tinker: sebelum fix `selectedSesiId=7` (kosong), setelah fix `selectedSesiId=6` (5 peserta). Stats count untuk sesi 6 = 5 (bukan 0).
+Pelajaran · Logic "pilih default" harus mempertimbangkan konten, bukan hanya urutan — asumsi "first record = valid default" bisa salah jika record tersebut empty.
+Log Keyword · `selectedSesiId`, `pesertaBySesi`, `stat cards`, `kosong`, `default selection`
+Deploy · local
+
 ### Fix #5 — Timer Subtes IST Double-Submit Guard
 Tanggal · 2026-08-15
 File · `resources/views/peserta/pengerjaan-soal.blade.php`

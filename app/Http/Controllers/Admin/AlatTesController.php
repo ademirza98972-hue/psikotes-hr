@@ -15,14 +15,16 @@ class AlatTesController extends Controller
 {
     public function index(): View
     {
-        // toArray() supaya view bisa memakai array_column() (tidak bekerja pada Collection Eloquent)
-        $alatTes = AlatTes::withTrashed(false)
+        // withCount('soal') mengambil jumlah soal real dari tabel soal
+        $alatTes = AlatTes::withCount('soal')
             ->orderBy('nama')
-            ->get()
-            ->toArray();
+            ->get();
+
+        $totalSoal = $alatTes->sum('soal_count');
 
         return view('admin.alat-tes.index', [
             'alatTes' => $alatTes,
+            'totalSoal' => $totalSoal,
         ]);
     }
 

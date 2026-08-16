@@ -10,8 +10,8 @@
 
     // TODO: tambahkan field `status` (enum: aktif/nonaktif) ke tabel alat_tes saat backend siap
     // Saat ini semua alat tes dianggap Aktif
-    $totalAlat = count($alatTes);
-    $totalSoal = array_sum(array_column($alatTes, 'jumlah_soal'));
+    $totalAlat = $alatTes->count();
+    // totalSoal dikirim dari controller (sum of soal_count)
 @endphp
 
 <div class="space-y-6">
@@ -57,7 +57,7 @@
             </div>
             <div>
                 <p class="text-[11px] text-[#40484b] uppercase tracking-wider font-semibold">Total Soal</p>
-                <p class="text-[18px] leading-6 font-bold text-[#191c1e]">{{ number_format($totalSoal) }}</p>
+                <p class="text-[18px] leading-6 font-bold text-[#191c1e]">{{ number_format($totalSoal ?? 0) }}</p>
             </div>
         </div>
         <div class="bg-white border border-[#e0e3e5] rounded-xl p-4 flex items-center gap-4">
@@ -67,8 +67,8 @@
             <div>
                 <p class="text-[11px] text-[#40484b] uppercase tracking-wider font-semibold">Terpopuler</p>
                 <p class="text-[14px] leading-5 font-bold text-[#191c1e]">
-                    @php $maxSoal = max(array_column($alatTes, 'jumlah_soal')); $populer = collect($alatTes)->first(fn($a) => $a['jumlah_soal'] === $maxSoal); @endphp
-                    {{ $populer['nama'] ?? '-' }}
+                    @php $alatPopuler = $alatTes->sortByDesc('soal_count')->first(); @endphp
+                    {{ $alatPopuler->nama ?? '-' }}
                 </p>
             </div>
         </div>
@@ -109,7 +109,7 @@
                                 <p class="text-[11px] text-[#40484b] mt-0.5">{{ $alat['format_dasar'] }}</p>
                             </td>
                             <td class="px-5 py-3.5 text-center font-medium text-[#40484b]">
-                                {{ $alat['jumlah_soal'] }}
+                                {{ number_format($alat->soal_count) }}
                             </td>
                             <td class="px-5 py-3.5">
                                 <span class="inline-block border border-[#c0c8cb] px-3 py-1 rounded-full text-[12px] font-medium text-[#40484b]">

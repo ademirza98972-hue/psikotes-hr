@@ -58,6 +58,41 @@
 </head>
 <body class="min-h-screen bg-[#f7f9fb] font-body antialiased">
 
+<div x-data="{
+    show: false,
+    type: 'sukses',
+    message: '',
+    init() {
+        @if(session('sukses'))
+            this.type = 'sukses';
+            this.message = '{{ session('sukses') }}';
+            this.show = true;
+            setTimeout(() => this.show = false, 4000);
+        @elseif(session('error'))
+            this.type = 'error';
+            this.message = '{{ session('error') }}';
+            this.show = true;
+            setTimeout(() => this.show = false, 4000);
+        @endif
+    }
+}">
+    <div x-show="show"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-x-8"
+         x-transition:enter-end="opacity-100 translate-x-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-x-0"
+         x-transition:leave-end="opacity-0 translate-x-8"
+         class="fixed top-4 right-4 z-[9999] flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium max-w-sm"
+         :class="type === 'sukses' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'">
+        <span class="material-symbols-outlined text-[20px] shrink-0" x-text="type === 'sukses' ? 'check_circle' : 'error'"></span>
+        <span x-text="message" class="flex-1"></span>
+        <button @click="show = false" class="shrink-0 opacity-70 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+    </div>
+</div>
+
 <div class="flex h-screen overflow-hidden">
 
     {{-- SIDEBAR --}}
@@ -322,17 +357,6 @@
 
         {{-- CONTENT --}}
         <main class="flex-1 overflow-y-auto px-6 py-6">
-            @if (session('sukses'))
-                <div class="mb-4 rounded-md border border-emerald-600 bg-emerald-600 px-4 py-3 text-sm text-white">
-                    {{ session('sukses') }}
-                </div>
-            @endif
-            @if (session('error'))
-                <div class="mb-4 rounded-md border border-rose-600 bg-rose-600 px-4 py-3 text-sm text-white">
-                    {{ session('error') }}
-                </div>
-            @endif
-
             @yield('content')
         </main>
 

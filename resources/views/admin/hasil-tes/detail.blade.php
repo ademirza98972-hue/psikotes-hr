@@ -100,7 +100,7 @@
 <div style="max-width: 900px; margin: 0 auto; padding: 0 8px;">
 
     <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
-        <a href="{{ route('admin.hasil-tes.exportPdf', [$sesi->id, $hasilTes['peserta_id']]) }}"
+        <a href="{{ route('admin.hasil-tes.print', [$sesi->id, $hasilTes['peserta_id']]) }}" target="_blank"
            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white
                   shadow-sm hover:bg-[#234853] inline-block">Cetak PDF</a>
     </div>

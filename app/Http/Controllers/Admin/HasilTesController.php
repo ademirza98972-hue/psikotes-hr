@@ -237,6 +237,86 @@ class HasilTesController extends Controller
         return $pdf->download($namaFile);
     }
 
+    public function printView(int $sesiId, int $pesertaId)
+    {
+        $sesi = SesiTes::with('departemenTerkait')->findOrFail($sesiId);
+        $user = \App\Models\User::findOrFail($pesertaId);
+
+        $pesertaSesi = PesertaSesiTes::where('user_id', $pesertaId)
+            ->where('sesi_tes_id', $sesiId)
+            ->first();
+
+        $currentUser = auth()->user();
+        $bisaLihatSensitif = $currentUser->hasIzin('hasil_tes.lihat_sensitif');
+
+        $hasilTes = [
+            'nama_peserta'       => $user->name,
+            'no_peserta'         => 'HT-' . $sesiId . '-' . str_pad((string) $pesertaId, 3, '0', STR_PAD_LEFT),
+            'jenis_peserta'      => ucfirst($user->tipe_akun ?? '—'),
+            'departemen'         => '—',
+            'posisi'             => '—',
+            'peserta_id'         => $pesertaId,
+            'tanggal_pengerjaan' => $pesertaSesi?->tanggal_pengerjaan,
+            'catatan_hr'         => $pesertaSesi?->catatan_hr,
+            'hasil_alat_tes'     => [],
+        ];
+
+        $hasilSkor = HasilSkorPeserta::where('user_id', $pesertaId)
+            ->where('sesi_tes_id', $sesiId)
+            ->with(['dimensi.alatTes', 'alatTes', 'level'])
+            ->get();
+
+        $grouped = $hasilSkor->groupBy(fn($h) =>
+            $h->alatTes?->id ?? $h->dimensi?->alatTes?->id
+        );
+
+        $hasilAlatTes = [];
+        foreach ($grouped as $alatTesId => $skorList) {
+            $firstRow = $skorList->first();
+            $alatTes = $firstRow->alatTes ?? $firstRow->dimensi?->alatTes;
+            if (!$alatTes) continue;
+
+            $skorRingkas = $skorList->map(fn($h) => [
+                'dimensi'        => ($h->dimensi?->kode_dimensi ?? '') . ' - ' . ($h->dimensi?->nama_dimensi ?? '—'),
+                'skor_mentah'    => $h->skor_mentah,
+                'skor_skala'     => $h->skor_akhir,
+                'skor_persentil' => $h->skor_akhir,
+                'kategori'       => $h->level?->label ?? '—',
+            ])->values()->all();
+
+            $hasilAlatTes[] = [
+                'nama_alat_tes'            => $alatTes->nama,
+                'format_dasar'             => $alatTes->format_dasar,
+                'durasi_pengerjaan_aktual' => '—',
+                'skor_ringkas'             => $skorRingkas,
+            ];
+
+            if ($alatTes->format_dasar === 'Grid') {
+                $gridRows = HasilKolomGrid::where('user_id', $pesertaId)
+                    ->where('sesi_tes_id', $sesiId)
+                    ->where('alat_tes_id', $alatTesId)
+                    ->selectRaw('
+                        COALESCE(SUM(jumlah_benar),0) as total_benar,
+                        COALESCE(SUM(jumlah_salah),0) as total_salah,
+                        COALESCE(SUM(jumlah_kelewat),0) as total_kelewat,
+                        COUNT(kolom_ke) as total_kolom
+                    ')->first();
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
+            }
+        }
+
+        $hasilTes['hasil_alat_tes'] = $hasilAlatTes;
+        $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps(
+            $hasilTes['hasil_alat_tes'], $pesertaId, $sesiId
+        );
+        $papScores = $this->buildPapScores($hasilTes['hasil_alat_tes']);
+        $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
+
+        return view('admin.hasil-tes.print', compact(
+            'hasilTes', 'sesi', 'papScores', 'psikogram', 'bisaLihatSensitif'
+        ));
+    }
+
     public function simpanCatatan(Request $request, int $sesiId, int $pesertaId): RedirectResponse
     {
         $request->validate([
@@ -291,6 +371,19 @@ class HasilTesController extends Controller
         }
 
         return $hasilBaru;
+    }
+
+    protected function buildPapScores(array $hasilAlatPeserta): array
+    {
+        $scores = [];
+        foreach ($hasilAlatPeserta as $alat) {
+            if (!str_contains(strtoupper($alat['nama_alat_tes'] ?? ''), 'PAPIKOSTIK')) continue;
+            foreach ($alat['skor_ringkas'] ?? [] as $row) {
+                $kode = trim(explode(' - ', $row['dimensi'] ?? '')[0] ?? '');
+                if ($kode) $scores[$kode] = $row;
+            }
+        }
+        return $scores;
     }
 
     protected function hitungPsikogram(array $hasilAlatPeserta): array

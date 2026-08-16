@@ -207,6 +207,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/{sesiId}/{pesertaId}/pdf', [HasilTesController::class, 'exportPdf'])
             ->whereNumber(['sesiId', 'pesertaId'])
             ->name('exportPdf');
+        Route::get('/{sesiId}/{pesertaId}/print', [HasilTesController::class, 'printView'])
+            ->whereNumber(['sesiId', 'pesertaId'])
+            ->name('print');
         Route::post('/{sesiId}/{pesertaId}/catatan', [HasilTesController::class, 'simpanCatatan'])
             ->whereNumber(['sesiId', 'pesertaId'])
             ->name('simpanCatatan');

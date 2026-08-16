@@ -25,8 +25,10 @@
         [$y, $m, $d] = explode('-', substr($iso, 0, 10));
         return (int) $d . ' ' . $bulanId[(int) $m] . ' ' . $y;
     };
-    $persen = $sesi->jumlah_peserta > 0
-        ? round(($sesi->jumlah_selesai / $sesi->jumlah_peserta) * 100)
+    $pesertaSelesai = $sesi->pesertaSesiTesRecords->where('status_pengerjaan', 'Selesai')->count();
+    $pesertaTotal = $sesi->pesertaSesiTesRecords->count();
+    $persen = $pesertaTotal > 0
+        ? round(($pesertaSelesai / $pesertaTotal) * 100)
         : 0;
 @endphp
 
@@ -98,7 +100,7 @@
 
                 <div class="mb-5">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-[#41484b]">Progres Peserta: <span class="font-bold text-[#191c1e]">{{ $sesi->jumlah_selesai }}/{{ $sesi->jumlah_peserta }}</span> selesai</span>
+                        <span class="text-sm text-[#41484b]">Progres Peserta: <span class="font-bold text-[#191c1e]">{{ $pesertaSelesai }}/{{ $pesertaTotal }}</span> selesai</span>
                         <span class="text-sm font-bold text-[#2C5F6F]">{{ $persen }}%</span>
                     </div>
                     <div class="w-full h-2 bg-[#e6e8ea] rounded-full overflow-hidden">

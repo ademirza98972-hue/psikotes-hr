@@ -72,6 +72,18 @@ class DashboardController extends Controller
             $peserta = $sesi->pesertaSesiTesRecords->firstWhere('user_id', $user->id);
             $statusPengerjaan = $peserta ? $peserta->status_pengerjaan : 'Belum Mengerjakan';
 
+            $today = Carbon::today();
+            $startDate = Carbon::parse($sesi->tanggal_mulai);
+            $endDate = Carbon::parse($sesi->tanggal_selesai);
+
+            if ($today > $endDate) {
+                $statusSesi = 'Kedaluwarsa';
+            } elseif ($today >= $startDate) {
+                $statusSesi = 'Aktif';
+            } else {
+                $statusSesi = 'Belum Dimulai';
+            }
+
             return [
                 'id' => $sesi->id,
                 'nama_sesi' => $sesi->nama_sesi,
@@ -80,6 +92,7 @@ class DashboardController extends Controller
                 'tanggal_selesai' => $sesi->tanggal_selesai,
                 'daftar_alat_tes_ditugaskan' => $sesi->alatTes->pluck('kode')->toArray(),
                 'status_pengerjaan' => $statusPengerjaan,
+                'status_sesi' => $statusSesi,
             ];
         })->toArray();
     }

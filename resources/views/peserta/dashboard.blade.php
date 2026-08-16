@@ -87,10 +87,28 @@
                                 </div>
 
                                 <!-- Badge Status -->
-                                @if ($sesi['status_pengerjaan'] == 'Belum Mengerjakan')
+                                @php
+                                    $today = \Illuminate\Support\Carbon::today();
+                                    $startDate = \Illuminate\Support\Carbon::parse($sesi['tanggal_mulai']);
+                                    $endDate = \Illuminate\Support\Carbon::parse($sesi['tanggal_selesai']);
+                                    if ($today > $endDate) { $statusSesi = 'Kedaluwarsa'; }
+                                    elseif ($today >= $startDate) { $statusSesi = 'Aktif'; }
+                                    else { $statusSesi = 'Belum Dimulai'; }
+                                @endphp
+                                @if ($sesi['status_pengerjaan'] == 'Selesai')
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 border border-emerald-200">
+                                        <span class="material-symbols-outlined text-base">check_circle</span>
+                                        Selesai
+                                    </span>
+                                @elseif ($statusSesi == 'Kedaluwarsa')
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 border border-rose-200">
+                                        <span class="material-symbols-outlined text-base">hourglass_disabled</span>
+                                        Kedaluwarsa
+                                    </span>
+                                @elseif ($statusSesi == 'Belum Dimulai')
                                     <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 border border-amber-200">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                        Belum Mengerjakan
+                                        Belum Dimulai
                                     </span>
                                 @elseif ($sesi['status_pengerjaan'] == 'Sedang Berjalan')
                                     <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 border border-blue-200">
@@ -98,9 +116,9 @@
                                         Sedang Berjalan
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 border border-emerald-200">
-                                        <span class="material-symbols-outlined text-base">check_circle</span>
-                                        Selesai
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 border border-amber-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Belum Mengerjakan
                                     </span>
                                 @endif
                             </div>
@@ -139,12 +157,24 @@
                             </div>
 
                             <!-- Tombol Aksi -->
-                            @if ($sesi['status_pengerjaan'] == 'Belum Mengerjakan')
-                                <a href="{{ route('peserta.tes.instruksi', $sesi['id'] ?? $loop->iteration) }}"
-                                   class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
-                                    <span class="material-symbols-outlined text-base">play_arrow</span>
-                                    Mulai Tes
-                                </a>
+                            @if ($sesi['status_pengerjaan'] == 'Selesai')
+                                <button disabled
+                                        class="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed">
+                                    <span class="material-symbols-outlined text-base">check_circle</span>
+                                    Selesai Dikerjakan
+                                </button>
+                            @elseif ($statusSesi == 'Kedaluwarsa')
+                                <button disabled
+                                        class="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed">
+                                    <span class="material-symbols-outlined text-base">hourglass_disabled</span>
+                                    Periode tes telah berakhir
+                                </button>
+                            @elseif ($statusSesi == 'Belum Dimulai')
+                                <button disabled
+                                        class="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed">
+                                    <span class="material-symbols-outlined text-base">schedule</span>
+                                    Belum Dimulai
+                                </button>
                             @elseif ($sesi['status_pengerjaan'] == 'Sedang Berjalan')
                                 <a href="{{ route('peserta.tes.kerjakan', $sesi['id'] ?? $loop->iteration) }}"
                                    class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
@@ -152,11 +182,11 @@
                                     Lanjutkan Tes
                                 </a>
                             @else
-                                <button disabled
-                                        class="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed">
-                                    <span class="material-symbols-outlined text-base">check_circle</span>
-                                    Selesai Dikerjakan
-                                </button>
+                                <a href="{{ route('peserta.tes.instruksi', $sesi['id'] ?? $loop->iteration) }}"
+                                   class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
+                                    <span class="material-symbols-outlined text-base">play_arrow</span>
+                                    Mulai Tes
+                                </a>
                             @endif
                         </div>
                     @endforeach

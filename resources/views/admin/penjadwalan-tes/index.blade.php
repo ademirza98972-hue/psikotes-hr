@@ -3,9 +3,11 @@
 @section('content')
 @php
     $warnaStatus = [
-        'Draft'   => 'bg-slate-100 text-slate-600 border border-slate-200',
-        'Aktif'   => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-        'Selesai' => 'bg-slate-100 text-slate-600 border border-slate-200',
+        'Draft'         => 'bg-slate-100 text-slate-600 border border-slate-200',
+        'Aktif'         => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+        'Selesai'       => 'bg-slate-100 text-slate-600 border border-slate-200',
+        'Kedaluwarsa'   => 'bg-rose-50 text-rose-700 border border-rose-200',
+        'Belum Dimulai' => 'bg-amber-50 text-amber-700 border border-amber-200',
     ];
     $warnaAlatTes = [
         'EPPS'   => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
@@ -39,8 +41,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         @forelse ($penjadwalan as $sesi)
             @php
-                $persen = $sesi->jumlah_peserta > 0
-                    ? round(($sesi->jumlah_selesai / $sesi->jumlah_peserta) * 100)
+                $persen = $sesi->jumlah_peserta_count > 0
+                    ? round(($sesi->jumlah_selesai_count / $sesi->jumlah_peserta_count) * 100)
                     : 0;
             @endphp
             <div class="rounded-xl border border-[#c1c7cb] bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#2C5F6F] hover:shadow-md flex flex-col justify-between">
@@ -48,8 +50,8 @@
                 <div>
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="font-bold text-[#191c1e] text-base">{{ $sesi->nama_sesi }}</h3>
-                        <span class="px-3 py-1 rounded-full text-[11px] font-bold border {{ $warnaStatus[$sesi->status] ?? 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                            {{ $sesi->status }}
+                        <span class="px-3 py-1 rounded-full text-[11px] font-bold border {{ $warnaStatus[$sesi->status_display] ?? $warnaStatus[$sesi->status] ?? 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                            {{ $sesi->status_display ?? $sesi->status }}
                         </span>
                     </div>
 
@@ -80,7 +82,7 @@
 
                 <div class="mt-auto">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-[#41484b]">Progres Peserta: <span class="font-bold text-[#191c1e]">{{ $sesi->jumlah_selesai }}/{{ $sesi->jumlah_peserta }}</span> selesai</span>
+                        <span class="text-sm text-[#41484b]">Progres Peserta: <span class="font-bold text-[#191c1e]">{{ $sesi->jumlah_selesai_count }}/{{ $sesi->jumlah_peserta_count }}</span> selesai</span>
                         <span class="text-sm font-bold text-[#2C5F6F]">{{ $persen }}%</span>
                     </div>
                     <div class="w-full h-2 bg-[#e6e8ea] rounded-full overflow-hidden mb-6">

@@ -37,8 +37,9 @@
             box-shadow: 0 0 0 2px var(--color-psikotes-glow);
         }
         /* hide visual panel on register page */
+        .no-visual-panel { justify-content: center; }
         .no-visual-panel .visual-panel { display: none; }
-        .no-visual-panel .login-panel { border-right: none; max-width: 100%; }
+        .no-visual-panel .login-panel { border-right: none; }
     </style>
 </head>
 <body class="min-h-screen bg-background text-on-surface font-body antialiased">

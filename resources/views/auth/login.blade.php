@@ -87,6 +87,11 @@
         </button>
     </form>
 
+    <div class="text-center mt-4 text-sm text-slate-500">
+        Belum punya akun?
+        <a href="{{ route('register') }}" class="text-[#2C5F6F] font-semibold hover:underline">Daftar di sini</a>
+    </div>
+
     <div class="pt-6 border-t border-surface-variant">
         <p class="font-body text-sm text-on-surface-variant text-center">
             Membutuhkan bantuan akses? <a href="#" class="text-psikotes font-medium hover:underline">Hubungi IT Support</a>

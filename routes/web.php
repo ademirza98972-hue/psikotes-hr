@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->middleware('izin:dashboard.lihat')->name('admin.dashboard');
     Route::get('/admin/aktivitas', [DashboardController::class, 'aktivitas'])->name('admin.aktivitas.index');
     Route::get('/peserta/dashboard', [DashboardController::class, 'peserta'])->name('peserta.dashboard');
+    Route::get('/peserta/panduan', [DashboardController::class, 'panduan'])->name('peserta.panduan');
 
     // Route untuk instruksi tes (baru)
     Route::get('/peserta/tes/{sesiId}/instruksi', [DashboardController::class, 'instruksi'])->name('peserta.tes.instruksi');

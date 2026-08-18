@@ -84,12 +84,18 @@
                 <span>Dashboard</span>
             </a>
 
+            <a href="{{ route('peserta.panduan') }}"
+               class="sidebar-link {{ request()->routeIs('peserta.panduan') ? 'active' : '' }}">
+                <span class="material-symbols-outlined text-[20px]">menu_book</span>
+                <span>Panduan Tes</span>
+            </a>
+
             <div class="section-label">Akun</div>
 
             <a href="{{ route('profil.index') }}"
                class="sidebar-link {{ request()->routeIs('profil.*') ? 'active' : '' }}">
-                <span class="material-symbols-outlined text-[20px]">person</span>
-                <span>Edit Profil</span>
+                <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+                <span>Profil Saya</span>
             </a>
 
             <div class="nav-divider"></div>

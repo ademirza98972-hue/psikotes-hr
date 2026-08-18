@@ -281,6 +281,15 @@ class DashboardController extends Controller
      * Placeholder untuk halaman pengerjaan tes (sedang dikerjakan)
      * Akan diisi nanti ketika module tes sudah lengkap
      */
+    public function panduan(): View
+    {
+        $alatTes = AlatTes::where('is_aktif', true)
+            ->orderBy('nama')
+            ->get(['kode', 'nama', 'deskripsi', 'format_dasar', 'durasi_total_menit', 'jumlah_soal']);
+
+        return view('peserta.panduan', ['alatTes' => $alatTes]);
+    }
+
     public function mulaiTes($sesiId)
     {
         return view('peserta.tes-placeholder');

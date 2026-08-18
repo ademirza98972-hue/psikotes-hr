@@ -44,6 +44,7 @@
         <div class="space-y-1.5">
             <div class="flex justify-between items-center">
                 <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="password">Kata Sandi</label>
+                <a href="{{ route('password.request') }}" class="text-xs text-psikotes font-medium hover:underline">Lupa password?</a>
             </div>
             <div class="relative focused-input group">
                 <input

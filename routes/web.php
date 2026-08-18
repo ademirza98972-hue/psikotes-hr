@@ -29,6 +29,12 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/daftar', [AutentikasiController::class, 'tampilkanRegister'])->name('register');
     Route::post('/daftar', [AutentikasiController::class, 'register']);
+
+    Route::get('/lupa-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'tampilkan'])->name('password.request');
+    Route::post('/lupa-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'kirim'])->name('password.kirim');
+
+    Route::get('/reset-password/{token}', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'tampilkan'])->name('password.reset');
+    Route::post('/reset-password', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'simpan'])->name('password.simpan');
 });
 
 Route::middleware('auth')->group(function () {
@@ -119,6 +125,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [DataKaryawanController::class, 'index'])->middleware('izin:data_karyawan.kelola')->name('index');
         Route::get('/tambah', [DataKaryawanController::class, 'tambah'])->middleware('izin:data_karyawan.kelola')->name('tambah');
         Route::post('/', [DataKaryawanController::class, 'simpan'])->middleware('izin:data_karyawan.kelola')->name('simpan');
+        Route::get('/template', [DataKaryawanController::class, 'downloadTemplate'])->middleware('izin:data_karyawan.kelola')->name('template');
+        Route::post('/import', [DataKaryawanController::class, 'import'])->middleware('izin:data_karyawan.kelola')->name('import');
         Route::get('/{data_karyawan}/ubah', [DataKaryawanController::class, 'ubah'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('ubah');
         Route::put('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('perbarui');
         Route::patch('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('perbarui');

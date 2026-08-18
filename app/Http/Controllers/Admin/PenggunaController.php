@@ -94,47 +94,53 @@ class PenggunaController extends Controller
                 ->withErrors(['tipe_akun' => 'Peran untuk tipe akun ini belum tersedia di sistem.']);
         }
 
-        DB::transaction(function () use ($data, $peran) {
-            $user = User::create([
-                'name' => $data['nama_karyawan'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'no_hp' => $data['no_hp'],
-                'jenis_kelamin' => $data['jenis_kelamin'],
-                'tipe_akun' => 'karyawan',
-                'peran_id' => $peran->id,
-                'status' => 'aktif',
-            ]);
+        try {
+            DB::transaction(function () use ($data, $peran) {
+                $user = User::create([
+                    'name' => $data['nama_karyawan'],
+                    'email' => $data['email'],
+                    'password' => Hash::make($data['password']),
+                    'no_hp' => $data['no_hp'],
+                    'jenis_kelamin' => $data['jenis_kelamin'],
+                    'tipe_akun' => 'karyawan',
+                    'peran_id' => $peran->id,
+                    'status' => 'aktif',
+                ]);
 
-            $departemen = Departemen::findOrFail($data['departemen']);
-            $jabatanNama = null;
-            if (!empty($data['jabatan'])) {
-                $jabatan = Posisi::find($data['jabatan']);
-                $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
-            }
+                $departemen = Departemen::findOrFail($data['departemen']);
+                $jabatanNama = null;
+                if (!empty($data['jabatan'])) {
+                    $jabatan = Posisi::find($data['jabatan']);
+                    $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
+                }
 
-            $dataMaster = DataKaryawan::where('nik_karyawan', $data['nik_karyawan'])
-                ->lockForUpdate()
-                ->first();
+                $dataMaster = DataKaryawan::where('nik_karyawan', $data['nik_karyawan'])
+                    ->lockForUpdate()
+                    ->first();
 
-            if (! $dataMaster || strcasecmp($dataMaster->nama_karyawan, $data['nama_karyawan']) !== 0) {
-                throw new \RuntimeException('NIK dan nama tidak cocok dengan data karyawan.');
-            }
+                if (! $dataMaster || strcasecmp($dataMaster->nama_karyawan, $data['nama_karyawan']) !== 0) {
+                    throw new \RuntimeException('NIK dan nama tidak cocok dengan data karyawan.');
+                }
 
-            if ($dataMaster->status === 'sudah_terpakai') {
-                throw new \RuntimeException('NIK ini sudah terpakai oleh akun lain.');
-            }
+                if ($dataMaster->status === 'sudah_terpakai') {
+                    throw new \RuntimeException('NIK ini sudah terpakai oleh akun lain.');
+                }
 
-            ProfilKaryawan::create([
-                'user_id' => $user->id,
-                'nama_karyawan' => $data['nama_karyawan'],
-                'nik_karyawan' => $dataMaster->nik_karyawan,
-                'departemen' => $departemen->nama_departemen,
-                'jabatan' => $jabatanNama,
-            ]);
+                ProfilKaryawan::create([
+                    'user_id' => $user->id,
+                    'nama_karyawan' => $data['nama_karyawan'],
+                    'nik_karyawan' => $dataMaster->nik_karyawan,
+                    'departemen' => $departemen->nama_departemen,
+                    'jabatan' => $jabatanNama,
+                ]);
 
-            $dataMaster->update(['status' => 'sudah_terpakai', 'jenis_kelamin' => $data['jenis_kelamin']]);
-        });
+                $dataMaster->update(['status' => 'sudah_terpakai', 'jenis_kelamin' => $data['jenis_kelamin']]);
+            });
+        } catch (\RuntimeException $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['nik_karyawan' => $e->getMessage()]);
+        }
 
         return redirect()
             ->route('admin.akun-karyawan.index')

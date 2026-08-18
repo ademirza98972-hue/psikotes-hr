@@ -1,7 +1,7 @@
 @extends('layouts.admin', ['judulHalaman' => 'Data Karyawan'])
 
 @section('content')
-<div x-data="{ modalHapus: false, idHapus: null, namaHapus: '' }">
+<div x-data="{ modalHapus: false, idHapus: null, namaHapus: '', modalImport: false }">
 
     {{-- PAGE HEADER --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -11,14 +11,62 @@
         </div>
         @auth
             @if(auth()->user()->hasIzin('data_karyawan.kelola'))
-                <a href="{{ route('admin.data-karyawan.tambah') }}"
-                   class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors active:scale-[0.98]">
-                    <span class="material-symbols-outlined text-[18px]">person_add</span>
-                    Tambah Data Karyawan
-                </a>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('admin.data-karyawan.template') }}"
+                       class="inline-flex items-center gap-2 rounded-lg border border-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-[#2C5F6F] hover:bg-[#2C5F6F]/5 transition-colors active:scale-[0.98]">
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+                        Download Template
+                    </a>
+                    <button type="button" @click="modalImport = true"
+                       class="inline-flex items-center gap-2 rounded-lg border border-[#2C5F6F] bg-white px-4 py-2.5 text-sm font-semibold text-[#2C5F6F] hover:bg-[#2C5F6F]/5 transition-colors active:scale-[0.98]">
+                        <span class="material-symbols-outlined text-[18px]">upload_file</span>
+                        Import Excel
+                    </button>
+                    <a href="{{ route('admin.data-karyawan.tambah') }}"
+                       class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors active:scale-[0.98]">
+                        <span class="material-symbols-outlined text-[18px]">person_add</span>
+                        Tambah Data Karyawan
+                    </a>
+                </div>
             @endif
         @endauth
     </div>
+
+    {{-- NOTIFIKASI SUKSES --}}
+    @if (session('sukses'))
+        <div class="mb-4 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            <span class="material-symbols-outlined text-[18px] mt-0.5 shrink-0">check_circle</span>
+            <span>{{ session('sukses') }}</span>
+        </div>
+    @endif
+
+    {{-- NOTIFIKASI NIK DUPLIKAT --}}
+    @if (session('info'))
+        <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-[18px] mt-0.5 shrink-0">warning</span>
+                <div>
+                    <p class="font-semibold mb-1">NIK Duplikat Ditemukan</p>
+                    <p>{{ session('info') }}</p>
+                    @if(session('duplikat_nik'))
+                        <div class="mt-2 flex flex-wrap gap-1.5">
+                            @foreach(session('duplikat_nik') as $nik)
+                                <span class="inline-block rounded-md bg-amber-100 border border-amber-300 px-2 py-0.5 text-xs font-mono font-semibold text-amber-800">{{ $nik }}</span>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- NOTIFIKASI ERROR --}}
+    @if (session('error'))
+        <div class="mb-4 flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <span class="material-symbols-outlined text-[18px] mt-0.5 shrink-0">error</span>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
 
     {{-- FILTER BAR --}}
     <form method="GET" action="{{ route('admin.data-karyawan.index') }}" class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -197,6 +245,71 @@
                 </div>
             </div>
         @endif
+    </div>
+
+    {{-- MODAL IMPORT --}}
+    <div x-show="modalImport" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-[#191c1e]/50 px-4">
+        <div class="w-full max-w-md rounded-xl bg-white shadow-xl" @click.outside="modalImport = false">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-5 py-4 border-b border-[#e0e3e5]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2C5F6F]/10">
+                        <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">upload_file</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-[#191c1e]">Import Data Karyawan</h3>
+                        <p class="text-[11px] text-[#40484b]">Upload file Excel sesuai template</p>
+                    </div>
+                </div>
+                <button type="button" @click="modalImport = false"
+                        class="text-[#71787c] hover:text-[#191c1e] transition-colors p-1 rounded-md hover:bg-[#f2f4f6]">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <form method="POST" action="{{ route('admin.data-karyawan.import') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="px-5 py-4 space-y-4">
+
+                    {{-- File input --}}
+                    <div>
+                        <label class="block text-xs font-semibold text-[#40484b] mb-1.5">File Excel</label>
+                        <input id="file_excel" name="file_excel" type="file" accept=".xlsx,.xls"
+                               class="block w-full text-sm text-[#40484b] rounded-lg border border-[#c0c8cb] cursor-pointer bg-[#f7f9fb]
+                                      file:mr-3 file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-2.5 file:text-xs file:font-semibold file:text-white file:cursor-pointer hover:file:bg-[#234853]">
+                        <p class="mt-1 text-[11px] text-[#71787c]">Format: .xlsx atau .xls &bull; Maks 5 MB</p>
+                        @error('file_excel')
+                            <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Ketentuan --}}
+                    <div class="rounded-lg bg-[#f0f7f9] border border-[#c0d8e0] px-3 py-2.5 text-xs text-[#40484b] space-y-1">
+                        <p class="font-semibold text-[#2C5F6F] mb-1">Ketentuan:</p>
+                        <p>• Kolom <strong>NIK</strong>, <strong>Nama Karyawan</strong>, <strong>Departemen</strong> wajib diisi</p>
+                        <p>• NIK duplikat akan dilewati dan dilaporkan</p>
+                        <p>• Departemen/Jabatan baru otomatis dibuat</p>
+                        <p>• Jenis Kelamin: <strong>L</strong> (Laki-laki) atau <strong>P</strong> (Perempuan)</p>
+                    </div>
+
+                </div>
+
+                {{-- Footer --}}
+                <div class="flex justify-end gap-2 px-5 py-4 border-t border-[#e0e3e5]">
+                    <button type="button" @click="modalImport = false"
+                            class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">upload</span>
+                        Import
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     {{-- MODAL HAPUS --}}

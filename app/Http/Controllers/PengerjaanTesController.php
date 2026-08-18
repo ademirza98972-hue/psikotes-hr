@@ -16,11 +16,13 @@ use Illuminate\Support\Facades\Session;
 
 class PengerjaanTesController extends Controller
 {
+    public function __construct(private ScoringEngineService $scoringService) {}
+
     /**
      * Ambil semua sesi_tes di mana user login terdaftar sebagai peserta,
      * lengkap dengan daftar kode alat tes yang ditugaskan.
      */
-    private function getSesiDummy(): array
+    private function getSesiPeserta(): array
     {
         $userId = auth()->id();
         if (!$userId) return [];
@@ -72,7 +74,7 @@ class PengerjaanTesController extends Controller
      * Ambil semua soal + opsi_jawaban untuk alat tes yang ditugaskan
      * ke sesi-sesi milik user login. Output keyed by kode_alat_tes.
      */
-    private function getSoalDummy(): array
+    private function getSoalPeserta(): array
     {
         $userId = auth()->id();
         if (!$userId) return [];
@@ -185,7 +187,7 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
         }
 
-        $soalDummy     = $this->getSoalDummy();
+        $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
 
         // Ambil alat_tes_id untuk setiap kode alat tes yang ditugaskan
@@ -548,7 +550,7 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', 'Sesi tes tidak ditemukan.');
         }
 
-        $soalDummy     = $this->getSoalDummy();
+        $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
         $userId        = auth()->id();
 
@@ -587,7 +589,7 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
         }
 
-        $soalDummy     = $this->getSoalDummy();
+        $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
 
         // Flatten hanya soal dari alat tes aktif (sama seperti kerjakan())
@@ -702,7 +704,7 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
         }
 
-        $soalDummy     = $this->getSoalDummy();
+        $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
         $userId        = auth()->id();
 
@@ -716,9 +718,7 @@ class PengerjaanTesController extends Controller
             ->keyBy('kode')
             ->map(fn ($a) => $a->id);
 
-        // Panggil scoring untuk setiap alat tes yang pakai forced_choice
-        $scoringService = app(ScoringEngineService::class);
-        $skorHasil      = [];
+        $skorHasil = [];
 
         foreach ($daftarAlatTes as $kodeAlat) {
             if (!isset($soalDummy[$kodeAlat])) {
@@ -752,7 +752,7 @@ class PengerjaanTesController extends Controller
                 $kelompokSegmen = 'default'; // akan diupdate saat norma lengkap
             }
 
-            $skorHasil[$kodeAlat] = $scoringService->dispatch(
+            $skorHasil[$kodeAlat] = $this->scoringService->dispatch(
                 $userId,
                 $sesiId,
                 $alatTesId,
@@ -781,7 +781,7 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
         }
 
-        $soalData = $this->getSoalDummy();
+        $soalData = $this->getSoalPeserta();
 
         $alatTesGrid = null;
         $kodeGrid = null;

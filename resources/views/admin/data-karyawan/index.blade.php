@@ -171,7 +171,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-[#40484b]">
-                                {{ $row->departemenRel?->nama_departemen ?? $row->departemen ?? '-' }}
+                                {{ $row->departemen?->nama_departemen ?? $row->getRawOriginal('departemen') ?? '-' }}
                             </td>
                             <td class="px-6 py-4 text-sm text-[#40484b]">
                                 {{ $row->posisi?->nama_posisi ?? $row->jabatan ?? '-' }}

@@ -27,7 +27,6 @@ class SimpanPenggunaAdminRequest extends FormRequest
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'no_hp' => ['required', 'string', 'max:30'],
-            'tipe_akun' => ['required', Rule::in(['custom'])],
             'peran_id' => [
                 'required',
                 'integer',
@@ -66,7 +65,6 @@ class SimpanPenggunaAdminRequest extends FormRequest
             'email' => 'email',
             'password' => 'password',
             'no_hp' => 'no HP',
-            'tipe_akun' => 'tipe akun',
             'peran_id' => 'peran',
             'status' => 'status',
         ];

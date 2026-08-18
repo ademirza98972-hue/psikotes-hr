@@ -30,19 +30,9 @@ class DataKaryawan extends Model
         return $this->belongsTo(Departemen::class);
     }
 
-    public function departemenRel(): BelongsTo
-    {
-        return $this->departemen();
-    }
-
     public function posisi(): BelongsTo
     {
         return $this->belongsTo(Posisi::class);
-    }
-
-    public function posisiRel(): BelongsTo
-    {
-        return $this->posisi();
     }
 
     public function pengguna(): HasMany

@@ -12,15 +12,12 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class PenjadwalanTesController extends Controller
 {
     public function index(): View
     {
-        $today = Carbon::today();
-
         $penjadwalan = SesiTes::withCount([
             'pesertaSesiTes as jumlah_peserta_count',
             'pesertaSesiTes as jumlah_selesai_count' => function ($q) {
@@ -28,23 +25,7 @@ class PenjadwalanTesController extends Controller
             }
         ])->with(['departemenTerkait', 'alatTes'])
             ->orderByDesc('tanggal_mulai')
-            ->get()
-            ->map(function ($sesi) use ($today) {
-                $endDate = Carbon::parse($sesi->tanggal_selesai);
-                $startDate = Carbon::parse($sesi->tanggal_mulai);
-
-                if ($sesi->status === 'Draft') {
-                    $sesi->status_display = 'Draft';
-                } elseif ($today > $endDate) {
-                    $sesi->status_display = 'Kedaluwarsa';
-                } elseif ($today >= $startDate) {
-                    $sesi->status_display = 'Aktif';
-                } else {
-                    $sesi->status_display = 'Belum Dimulai';
-                }
-
-                return $sesi;
-            });
+            ->get();
 
         return view('admin.penjadwalan-tes.index', [
             'penjadwalan' => $penjadwalan,

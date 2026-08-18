@@ -18,6 +18,8 @@ use Illuminate\View\View;
 
 class HasilTesController extends Controller
 {
+    public function __construct(private FormatHasilEppsService $eppsService) {}
+
     public function index(Request $request): View
     {
         $selectedSesiId = $request->integer('sesi');
@@ -31,21 +33,6 @@ class HasilTesController extends Controller
         ])
             ->orderByDesc('tanggal_mulai')
             ->get();
-
-        $today = now()->toDateString();
-        foreach ($sesiList as $sesi) {
-            if ($sesi->status === 'Draft') {
-                $sesi->status_display = 'Draft';
-            } elseif ($sesi->status === 'Selesai') {
-                $sesi->status_display = 'Selesai';
-            } elseif ($today > $sesi->tanggal_selesai?->toDateString()) {
-                $sesi->status_display = 'Kedaluwarsa';
-            } elseif ($today >= $sesi->tanggal_mulai?->toDateString()) {
-                $sesi->status_display = 'Aktif';
-            } else {
-                $sesi->status_display = 'Belum Dimulai';
-            }
-        }
 
         $penjadwalan = $sesiList->map(fn($sesi) => [
             'id'                 => $sesi->id,
@@ -397,7 +384,7 @@ class HasilTesController extends Controller
             return $hasilAlatPeserta;
         }
 
-        $eppsRows = (new FormatHasilEppsService())
+        $eppsRows = $this->eppsService
             ->formatHasilEppsUntukTampilan($userId, $sesiId);
 
         if ($eppsRows->isEmpty()) {

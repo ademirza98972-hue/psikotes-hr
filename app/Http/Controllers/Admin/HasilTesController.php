@@ -166,7 +166,10 @@ class HasilTesController extends Controller
                         COALESCE(SUM(jumlah_kelewat),0) as total_kelewat,
                         COUNT(kolom_ke) as total_kolom
                     ')->first();
+                $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
                 $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']   = $gridExtra['chart'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']  = $gridExtra['hanker'];
             }
         }
 
@@ -250,7 +253,10 @@ class HasilTesController extends Controller
                         COALESCE(SUM(jumlah_kelewat),0) as total_kelewat,
                         COUNT(kolom_ke) as total_kolom
                     ')->first();
+                $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
                 $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']   = $gridExtra['chart'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']  = $gridExtra['hanker'];
             }
         }
 
@@ -339,7 +345,10 @@ class HasilTesController extends Controller
                         COALESCE(SUM(jumlah_kelewat),0) as total_kelewat,
                         COUNT(kolom_ke) as total_kolom
                     ')->first();
+                $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
                 $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']   = $gridExtra['chart'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']  = $gridExtra['hanker'];
             }
         }
 
@@ -353,6 +362,46 @@ class HasilTesController extends Controller
         return view('admin.hasil-tes.print', compact(
             'hasilTes', 'sesi', 'papScores', 'psikogram', 'bisaLihatSensitif'
         ));
+    }
+
+    private function buildGridExtra(int $userId, int $sesiId, int $alatTesId): array
+    {
+        $perKolom = HasilKolomGrid::where('user_id', $userId)
+            ->where('sesi_tes_id', $sesiId)
+            ->where('alat_tes_id', $alatTesId)
+            ->orderBy('kolom_ke')
+            ->get(['kolom_ke', 'jumlah_benar', 'jumlah_salah', 'jumlah_kelewat']);
+
+        $chartData = $perKolom->map(fn($r) => [
+            'kolom' => $r->kolom_ke,
+            'benar' => (int) $r->jumlah_benar,
+        ])->all();
+
+        $n = $perKolom->count();
+        $hanker = ['y0' => 0, 'y50' => 0, 'delta' => 0, 'trend' => 'stabil'];
+
+        if ($n > 1) {
+            $sumX = $sumY = $sumXY = $sumX2 = 0;
+            foreach ($perKolom as $row) {
+                $x = (float) $row->kolom_ke;
+                $y = (float) $row->jumlah_benar;
+                $sumX += $x; $sumY += $y; $sumXY += $x * $y; $sumX2 += $x * $x;
+            }
+            $denom = $n * $sumX2 - $sumX * $sumX;
+            $b = $denom != 0 ? ($n * $sumXY - $sumX * $sumY) / $denom : 0;
+            $a = ($sumY / $n) - $b * ($sumX / $n);
+            $y0    = round($a, 7);
+            $y50   = round($a + 50 * $b, 7);
+            $delta = round($y50 - $y0, 7);
+            $hanker = [
+                'y0'    => $y0,
+                'y50'   => $y50,
+                'delta' => $delta,
+                'trend' => $delta > 0.0001 ? 'meningkat' : ($delta < -0.0001 ? 'menurun' : 'stabil'),
+            ];
+        }
+
+        return ['chart' => $chartData, 'hanker' => $hanker];
     }
 
     public function simpanCatatan(Request $request, int $sesiId, int $pesertaId): RedirectResponse

@@ -370,27 +370,149 @@
                         </div>
                     @endif
 
-                {{-- Kraepelin — Grid: ringkasan jumlah kolom --}}
+                {{-- Kraepelin — Grid: tampilan scoring ala Excel --}}
                 @elseif ($alatTes['format_dasar'] === 'Grid' && ($gridRingkasan = $alatTes['grid_ringkasan'] ?? null))
-                    <table style="margin-top:8px;">
-                        <thead class="th-row"><tr><th style="width:50%;">Dimensi</th><th style="width:20%; text-align:center;">Skor Mentah</th><th style="width:20%; text-align:center;">Skor Akhir</th><th style="width:10%; text-align:center;">Kategori</th></tr></thead>
-                        <tbody>
-                            @foreach ($alatTes['skor_ringkas'] as $skor)
-                            <tr style="border-bottom:1px solid #e0e3e5;">
-                                <td style="padding:3px 5px;">{{ $skor['dimensi'] }}</td>
-                                <td style="padding:3px 5px; text-align:center;">{{ $skor['skor_mentah'] }}</td>
-                                <td style="padding:3px 5px; text-align:center;">{{ $skor['skor_skala'] }}</td>
-                                <td style="padding:3px 5px; text-align:center;">{{ $skor['kategori'] }}</td>
+                    @php
+                        $gridSkor   = collect($alatTes['skor_ringkas'])->keyBy(fn($s) => explode(' - ', $s['dimensi'])[0]);
+                        $panker     = $gridSkor->get('KECEPATAN');
+                        $janker     = $gridSkor->get('KEAJEGAN');
+                        $tianker    = $gridSkor->get('KETELITIAN');
+                        $hankerRaw  = $gridSkor->get('KETAHANAN');
+                        $hanker     = $alatTes['grid_hanker'] ?? ['y0'=>0,'y50'=>0,'delta'=>0,'trend'=>'stabil'];
+                        $chartData  = $alatTes['grid_chart'] ?? [];
+                        $chartId    = 'kraepChart_' . $loop->index;
+                        $trendLabel = match($hanker['trend']) { 'meningkat'=>'meningkat','menurun'=>'menurun',default=>'stabil' };
+                        $trendColor = match($hanker['trend']) { 'meningkat'=>'#16a34a','menurun'=>'#dc2626',default=>'#6b7280' };
+                    @endphp
+
+                    {{-- Ringkasan Error & Skip --}}
+                    <div style="display:flex; gap:32px; margin-top:10px; font-size:11px;">
+                        <div><span style="color:#555;">Sum of Error</span> &nbsp;
+                            <strong style="background:#e5e7eb; padding:2px 10px; border-radius:3px;">{{ $gridRingkasan->total_salah }}</strong>
+                        </div>
+                        <div><span style="color:#555;">Sum of Skipeds</span> &nbsp;
+                            <strong style="background:#e5e7eb; padding:2px 10px; border-radius:3px;">{{ $gridRingkasan->total_kelewat }}</strong>
+                        </div>
+                        <div style="margin-left:auto; color:#555; font-size:10px;">Kolom dikerjakan: <strong>{{ $gridRingkasan->total_kolom }}</strong> &nbsp;|&nbsp; Total benar: <strong>{{ $gridRingkasan->total_benar }}</strong></div>
+                    </div>
+
+                    {{-- Tabel Scoring Kraepelin --}}
+                    <table style="margin-top:10px; font-size:11px;">
+                        <thead>
+                            <tr style="background:#f3f4f6; border-bottom:2px solid #000;">
+                                <th style="padding:4px 8px; text-align:left; width:130px;"></th>
+                                <th style="padding:4px 8px; text-align:center; width:80px;">Nilai</th>
+                                <th style="padding:4px 8px; text-align:center; width:80px;">Pembulatan</th>
+                                <th style="padding:4px 8px; text-align:left; width:130px;"></th>
+                                <th style="padding:4px 8px; text-align:left;">Analisis</th>
                             </tr>
-                            @endforeach
+                        </thead>
+                        <tbody>
+                            {{-- Panker --}}
+                            <tr>
+                                <td style="padding:4px 8px; font-weight:700;">Panker</td>
+                                <td style="padding:4px 8px; text-align:center;">{{ number_format($panker['skor_mentah'] ?? 0, 2) }}</td>
+                                <td style="padding:4px 8px; text-align:center; background:#fee2e2; font-weight:700; border:1px solid #fca5a5;">
+                                    {{ round($panker['skor_mentah'] ?? 0) }}
+                                </td>
+                                <td style="padding:4px 8px; color:#6b7280; font-style:italic;">(speed factor)</td>
+                                <td style="padding:4px 8px; color:#1d4ed8; font-weight:600;">{{ $panker['kategori'] !== '—' ? $panker['kategori'] : '—' }}</td>
+                            </tr>
+                            {{-- Janker --}}
+                            <tr>
+                                <td style="padding:4px 8px; font-weight:700;">Janker</td>
+                                <td style="padding:4px 8px; text-align:center;">{{ number_format($janker['skor_mentah'] ?? 0, 2) }}</td>
+                                <td style="padding:4px 8px; text-align:center; background:#fee2e2; font-weight:700; border:1px solid #fca5a5;">
+                                    {{ round($janker['skor_mentah'] ?? 0, 2) }}
+                                </td>
+                                <td style="padding:4px 8px; color:#6b7280; font-style:italic;">(rithme factor)</td>
+                                <td style="padding:4px 8px; color:#1d4ed8; font-weight:600;">{{ $janker['kategori'] !== '—' ? $janker['kategori'] : '—' }}</td>
+                            </tr>
+                            {{-- Hanker header --}}
+                            <tr>
+                                <td style="padding:4px 8px; font-weight:700;">Hanker</td>
+                                <td colspan="2"></td>
+                                <td style="padding:4px 8px; color:#6b7280; font-style:italic;">(ausdeur factor)</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:2px 8px 2px 20px; color:#555;">y(0)</td>
+                                <td style="padding:2px 8px; text-align:center;">{{ number_format($hanker['y0'], 7) }}</td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:2px 8px 2px 20px; color:#555;">y(50)</td>
+                                <td style="padding:2px 8px; text-align:center;">{{ number_format($hanker['y50'], 7) }}</td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:2px 8px 2px 20px; color:#555;">y(50)-y(0)</td>
+                                <td style="padding:2px 8px; text-align:center;">{{ number_format($hanker['delta'], 7) }}</td>
+                                <td style="padding:2px 8px; text-align:center; background:#fee2e2; font-weight:700; border:1px solid #fca5a5;">
+                                    {{ round($hanker['delta'], 2) }}
+                                </td>
+                                <td style="padding:2px 8px; font-weight:600; color:{{ $trendColor }};">{{ $trendLabel }}</td>
+                                <td style="padding:2px 8px; color:#1d4ed8; font-weight:600;">{{ $hankerRaw['kategori'] !== '—' ? $hankerRaw['kategori'] : '—' }}</td>
+                            </tr>
+                            {{-- Tianker --}}
+                            <tr>
+                                <td style="padding:4px 8px; font-weight:700;">Tianker</td>
+                                <td style="padding:4px 8px; text-align:center;">{{ $tianker['skor_mentah'] ?? 0 }}</td>
+                                <td style="padding:4px 8px; text-align:center; background:#fee2e2; font-weight:700; border:1px solid #fca5a5;">
+                                    {{ round($tianker['skor_mentah'] ?? 0) }}
+                                </td>
+                                <td></td>
+                                <td style="padding:4px 8px; color:#1d4ed8; font-weight:600;">{{ $tianker['kategori'] !== '—' ? $tianker['kategori'] : '—' }}</td>
+                            </tr>
                         </tbody>
                     </table>
-                    <div style="margin-top:8px; padding:8px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; font-size:10px; color:#334155; display:grid; grid-template-columns:1fr 1fr; gap:4px 16px;">
-                        <div><strong>Total Jawaban Benar:</strong> {{ $gridRingkasan->total_benar }}</div>
-                        <div><strong>Total Jawaban Salah:</strong> {{ $gridRingkasan->total_salah }}</div>
-                        <div><strong>Total Kelewat:</strong> {{ $gridRingkasan->total_kelewat }}</div>
-                        <div><strong>Total Kolom Dikerjakan:</strong> {{ $gridRingkasan->total_kolom }}</div>
+
+                    {{-- Grafik per kolom --}}
+                    @if (!empty($chartData))
+                    <div style="margin-top:16px; border:1px solid #e2e8f0; border-radius:4px; padding:12px;">
+                        <p style="font-weight:700; font-size:11px; text-align:center; letter-spacing:0.5px; margin-bottom:8px;">GRAFIK HASIL TES KRAEPELIN</p>
+                        <canvas id="{{ $chartId }}" height="80"></canvas>
+                        <script>
+                        (function() {
+                            var labels = {!! json_encode(array_column($chartData, 'kolom')) !!};
+                            var data   = {!! json_encode(array_column($chartData, 'benar')) !!};
+                            function renderKraepChart() {
+                                new Chart(document.getElementById('{{ $chartId }}'), {
+                                type: 'line',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Nilai Y',
+                                        data: data,
+                                        borderColor: '#3b82f6',
+                                        backgroundColor: 'rgba(59,130,246,0.05)',
+                                        borderWidth: 1.2,
+                                        pointRadius: 2,
+                                        tension: 0.1,
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: { legend: { display: false } },
+                                    scales: {
+                                        x: { title: { display: true, text: 'Kolom ke-', font: { size: 10 } }, ticks: { font: { size: 9 } } },
+                                        y: { title: { display: true, text: 'Nilai Y', font: { size: 10 } }, ticks: { font: { size: 9 } }, beginAtZero: true }
+                                    }
+                                }
+                                });
+                            }
+                            if (typeof Chart !== 'undefined') {
+                                renderKraepChart();
+                            } else {
+                                var s = document.createElement('script');
+                                s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                                s.onload = renderKraepChart;
+                                document.head.appendChild(s);
+                            }
+                        })();
+                        </script>
                     </div>
+                    @endif
                 @elseif (str_contains(strtoupper($alatTes['nama_alat_tes']), 'PAPIKOSTIK') && !empty($alatTes['skor_ringkas']))
                     @php
                         $papKelompok = [

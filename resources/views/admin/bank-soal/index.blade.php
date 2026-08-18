@@ -10,6 +10,8 @@
 
 <div class="space-y-6">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5] space-y-4">
     {{-- PAGE HEADER --}}
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -73,6 +75,8 @@
             </div>
         </form>
     </div>
+
+    </div>{{-- /STICKY HEADER --}}
 
     {{-- TAMPILAN: MODE TERPILIH (satu alat tes) --}}
     @if($alatTesTerpilih)

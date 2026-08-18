@@ -8,8 +8,11 @@
 @endphp
 <div x-data="{ modalHapus: false, idHapus: null, namaHapus: '' }">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
+
     {{-- PAGE HEADER --}}
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
         <div>
             <h2 class="text-[24px] font-bold text-[#001a22] leading-snug">Kelola Admin & Staff</h2>
             <p class="text-[14px] text-[#41484b] mt-1">Manajemen akses dan kontrol untuk seluruh administrator sistem.</p>
@@ -26,7 +29,7 @@
     </div>
 
     {{-- FILTER BAR --}}
-    <form method="GET" action="{{ route('admin.pengguna-admin.index') }}" class="bg-[#f2f4f6] p-4 rounded-xl border border-[#c0c8cb] mb-6 flex flex-wrap items-center gap-3 shadow-sm">
+    <form method="GET" action="{{ route('admin.pengguna-admin.index') }}" class="bg-[#f2f4f6] p-4 rounded-xl border border-[#c0c8cb] flex flex-wrap items-center gap-3 shadow-sm">
         <div class="flex-1 min-w-[240px] relative">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#41484b] text-[18px]">search</span>
             <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama atau email..."
@@ -60,8 +63,10 @@
         @endif
     </form>
 
+    </div>{{-- /STICKY HEADER --}}
+
     {{-- DATA TABLE --}}
-    <div class="bg-white rounded-xl border border-[#c0c8cb] overflow-hidden shadow-sm">
+    <div class="mt-4 bg-white rounded-xl border border-[#c0c8cb] overflow-hidden shadow-sm">
         <div class="mb-2 px-6 pt-4 text-[12px] text-[#41484b]">
             Menampilkan <strong class="text-[#191c1e]">{{ $pengguna->firstItem() ?? $pengguna->total() }}</strong> dari <strong class="text-[#191c1e]">{{ $pengguna->total() }}</strong> pengguna
         </div>

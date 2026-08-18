@@ -3,8 +3,11 @@
 @section('content')
 <div x-data="{ modalHapus: false, idHapus: null, namaHapus: '' }">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
+
     {{-- Header Section --}}
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-0">
         <div>
             <nav class="flex items-center gap-2 mb-2 text-[#40484b] text-sm">
                 <a href="{{ route('admin.dashboard') }}" class="hover:text-[#2C5F6F] transition-colors">Dashboard</a>
@@ -43,6 +46,8 @@
             @endauth
         </div>
     </div>
+
+    </div>{{-- /STICKY HEADER --}}
 
     {{-- Role Stats / Info --}}
     <div class="mb-4 flex items-center justify-between">

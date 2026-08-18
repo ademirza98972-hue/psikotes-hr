@@ -13,8 +13,11 @@
     tutupAksi() { this.modalAksi = { buka: false, id: null, nama: '', tipe: '' }; }
 }">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
+
     {{-- PAGE HEADER --}}
-    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-xl font-bold text-[#191c1e]">Daftar Akun Kandidat</h1>
             <p class="mt-1 text-sm text-[#40484b]">Verifikasi dan kelola akses kandidat untuk proses rekrutmen perusahaan.</p>
@@ -29,7 +32,7 @@
     </div>
 
     {{-- FILTER BAR --}}
-    <form method="GET" action="{{ route('admin.data-kandidat.index') }}" class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <form method="GET" action="{{ route('admin.data-kandidat.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div class="flex flex-1 flex-wrap items-end gap-2">
             {{-- Search --}}
             <div class="relative flex-1 min-w-[200px]">
@@ -78,8 +81,10 @@
         </div>
     </form>
 
+    </div>{{-- /STICKY HEADER --}}
+
     {{-- TABLE + PAGINATION + EMPTY STATE --}}
-    <div class="rounded-xl border border-[#e0e3e5] bg-white overflow-hidden shadow-sm">
+    <div class="mt-4 rounded-xl border border-[#e0e3e5] bg-white overflow-hidden shadow-sm">
 
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">

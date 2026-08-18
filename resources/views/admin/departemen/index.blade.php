@@ -2,10 +2,17 @@
 
 @section('content')
 <div x-data="departemenPage()">
-    <div class="w-full rounded-xl border border-[#c0c8cb] bg-white overflow-hidden shadow-sm">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
+        <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-[#191c1e]">Data Departemen</h1>
+                <p class="mt-1 text-sm text-[#40484b]">Kelola daftar departemen yang tersedia dalam sistem.</p>
+            </div>
+        </div>
         {{-- FILTER BAR --}}
-        <form method="GET" action="{{ route('admin.departemen.index') }}" class="px-6 pt-5 pb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <form method="GET" action="{{ route('admin.departemen.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div class="flex flex-1 flex-wrap items-end gap-2">
                 <div class="relative flex-1 min-w-[200px] max-w-sm">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#71787b] text-[18px]">search</span>
@@ -35,6 +42,9 @@
                 @endif
             @endauth
         </form>
+    </div>{{-- /STICKY HEADER --}}
+
+    <div class="mt-4 w-full rounded-xl border border-[#c0c8cb] bg-white overflow-hidden shadow-sm">
 
         {{-- INDICATOR --}}
         <div class="px-6 pb-3 text-xs text-[#40484b]">

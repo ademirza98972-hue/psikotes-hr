@@ -2,8 +2,19 @@
 
 @section('content')
 
-    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <form method="GET" action="{{ route('admin.aktivitas.index') }}" class="flex flex-1 gap-2">
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
+        <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-[#191c1e]">Aktivitas Terbaru</h1>
+                <p class="mt-1 text-sm text-[#40484b]">Daftar seluruh pengguna sistem dari semua tipe akun.</p>
+            </div>
+            <a href="{{ route('admin.dashboard') }}"
+               class="self-start rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-200">
+                ← Kembali ke Dashboard
+            </a>
+        </div>
+        <form method="GET" action="{{ route('admin.aktivitas.index') }}" class="flex gap-2">
             <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama atau email..."
                 class="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
             <button type="submit" class="rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">Cari</button>
@@ -11,18 +22,13 @@
                 <a href="{{ route('admin.aktivitas.index') }}" class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Reset</a>
             @endif
         </form>
+    </div>{{-- /STICKY HEADER --}}
 
-        <a href="{{ route('admin.dashboard') }}"
-           class="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-200">
-            ← Kembali ke Dashboard
-        </a>
-    </div>
-
-    <div class="mb-3 border-b border-slate-200 pb-3 text-xs text-slate-500">
+    <div class="mt-4 mb-3 border-b border-slate-200 pb-3 text-xs text-slate-500">
         Daftar seluruh pengguna sistem yang terdaftar di semua tipe akun (karyawan, kandidat, admin/staff), diurutkan dari yang paling baru.
     </div>
 
-    <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                 <tr>

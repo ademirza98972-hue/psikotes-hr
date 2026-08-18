@@ -16,8 +16,11 @@
 @section('content')
 <div>
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-0 border-b border-[#e0e3e5]">
+
     {{-- HEADER SECTION --}}
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4">
         <div>
             <h2 class="text-[36px] leading-[44px] -tracking-[0.02em] font-semibold text-primary">Data Terhapus</h2>
             <p class="text-[16px] leading-[24px] text-on-surface-variant mt-1">Kelola data yang telah dihapus untuk dipulihkan atau dihapus secara permanen.</p>
@@ -27,17 +30,8 @@
         </div>
     </div>
 
-    {{-- WARNING BANNER --}}
-    <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl flex items-start gap-4 mb-6">
-        <span class="material-symbols-outlined text-amber-600 mt-0.5">warning</span>
-        <div class="space-y-1">
-            <h4 class="text-[12px] font-bold text-amber-900 uppercase">Peringatan Penghapusan Otomatis</h4>
-            <p class="text-[14px] text-amber-800">Data yang berada di tempat sampah selama lebih dari 30 hari akan dihapus secara <span class="font-bold">permanen oleh sistem</span> secara otomatis. Tindakan ini tidak dapat dibatalkan.</p>
-        </div>
-    </div>
-
     {{-- HORIZONTAL TABS --}}
-    <div class="border-b border-outline-variant mb-6">
+    <div class="border-b border-outline-variant">
         <nav class="flex overflow-x-auto gap-8">
             @foreach ($daftarJenis as $key => $konfig)
                 <a href="{{ route('admin.data-terhapus.index', ['jenis' => $key]) }}"
@@ -55,6 +49,17 @@
                 </a>
             @endforeach
         </nav>
+    </div>
+
+    </div>{{-- /STICKY HEADER --}}
+
+    {{-- WARNING BANNER --}}
+    <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl flex items-start gap-4 mt-4 mb-4">
+        <span class="material-symbols-outlined text-amber-600 mt-0.5">warning</span>
+        <div class="space-y-1">
+            <h4 class="text-[12px] font-bold text-amber-900 uppercase">Peringatan Penghapusan Otomatis</h4>
+            <p class="text-[14px] text-amber-800">Data yang berada di tempat sampah selama lebih dari 30 hari akan dihapus secara <span class="font-bold">permanen oleh sistem</span> secara otomatis. Tindakan ini tidak dapat dibatalkan.</p>
+        </div>
     </div>
 
     {{-- ====== AKUN KARYAWAN ====== --}}

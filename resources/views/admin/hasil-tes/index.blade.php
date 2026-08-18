@@ -101,8 +101,11 @@
 }" x-init=""
 class="w-full">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-0 border-b border-[#e0e3e5]">
+
     {{-- PAGE HEADER --}}
-    <div class="mb-6">
+    <div class="mb-4">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
                 <h3 class="text-3xl font-bold text-[var(--color-primary)]">Hasil Tes Psikotes</h3>
@@ -124,7 +127,7 @@ class="w-full">
     </div>
 
     {{-- TAB NAVIGATION --}}
-    <div class="flex border-b border-[var(--color-outline-variant)] mb-6">
+    <div class="flex border-b border-[var(--color-outline-variant)]">
         <button type="button"
                 @click="tab = 'sesi'"
                 :class="tab === 'sesi' ? 'border-[var(--color-psikotes)] text-[var(--color-psikotes)] font-semibold' : 'border-transparent text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'"
@@ -138,6 +141,8 @@ class="w-full">
             Per Peserta
         </button>
     </div>
+
+    </div>{{-- /STICKY HEADER --}}
 
     {{-- ============ TAB A: PER SESI ============ --}}
     <div x-show="tab === 'sesi'" x-cloak>

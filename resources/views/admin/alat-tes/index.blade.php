@@ -16,6 +16,8 @@
 
 <div class="space-y-6">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
     {{-- PAGE HEADER --}}
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -30,6 +32,7 @@
         </a>
         @endif
     </div>
+    </div>{{-- /STICKY HEADER --}}
 
     {{-- STATS CARDS --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -2,10 +2,17 @@
 
 @section('content')
 <div x-data="posisiPage()">
-    <div class="w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
+        <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-[#191c1e]">Data Posisi</h1>
+                <p class="mt-1 text-sm text-[#40484b]">Kelola daftar posisi dan jabatan dalam setiap departemen.</p>
+            </div>
+        </div>
         {{-- FILTER BAR --}}
-        <form method="GET" action="{{ route('admin.posisi.index') }}" class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <form method="GET" action="{{ route('admin.posisi.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex flex-1 flex-wrap items-end gap-2">
                 {{-- Search --}}
                 <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama posisi..."
@@ -41,6 +48,9 @@
                 @endif
             @endauth
         </form>
+    </div>{{-- /STICKY HEADER --}}
+
+    <div class="mt-4 w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
 
         {{-- INDICATOR --}}
         <div class="mb-2 text-xs text-slate-500">

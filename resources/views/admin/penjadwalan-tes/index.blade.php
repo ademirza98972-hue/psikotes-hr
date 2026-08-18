@@ -26,6 +26,8 @@
 
 <div class="space-y-6">
 
+    {{-- STICKY HEADER --}}
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="text-lg font-bold text-[#191c1e]">Daftar Penjadwalan Tes</h2>
@@ -37,6 +39,7 @@
             Tambah Penjadwalan
         </a>
     </div>
+    </div>{{-- /STICKY HEADER --}}
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         @forelse ($penjadwalan as $sesi)

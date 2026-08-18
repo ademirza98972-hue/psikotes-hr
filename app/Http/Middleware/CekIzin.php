@@ -12,7 +12,8 @@ class CekIzin
     public function handle(Request $request, Closure $next, string $kodeIzin): Response
     {
         if (! Auth::check()) {
-            return redirect()->route('login');
+            $routeLogin = str_starts_with($request->path(), 'admin') ? 'login.admin' : 'login';
+            return redirect()->route($routeLogin);
         }
 
         $pengguna = Auth::user();

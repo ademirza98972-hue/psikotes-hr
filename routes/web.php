@@ -24,8 +24,11 @@ Route::get('/', function () {
 Route::get('api/posisi/daftar/{departemen}', [\App\Http\Controllers\Admin\PosisiController::class, 'daftarByDepartemen'])->name('api.posisi.daftar');
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AutentikasiController::class, 'tampilkanLogin'])->name('login');
-    Route::post('/login', [AutentikasiController::class, 'login']);
+    Route::get('/login', [AutentikasiController::class, 'tampilkanLoginPeserta'])->name('login');
+    Route::post('/login', [AutentikasiController::class, 'loginPeserta']);
+
+    Route::get('/admin/login', [AutentikasiController::class, 'tampilkanLoginAdmin'])->name('login.admin');
+    Route::post('/admin/login', [AutentikasiController::class, 'loginAdmin']);
 
     Route::get('/daftar', [AutentikasiController::class, 'tampilkanRegister'])->name('register');
     Route::post('/daftar', [AutentikasiController::class, 'register']);

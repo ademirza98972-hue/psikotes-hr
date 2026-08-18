@@ -3,8 +3,8 @@
 @section('content')
 <div x-data="{ showPwd: false }" class="space-y-6">
     <div class="space-y-1">
-        <h2 class="font-body font-semibold text-2xl text-on-surface">Masuk sebagai Peserta</h2>
-        <p class="font-body text-sm text-on-surface-variant">Silakan masukkan email dan kata sandi Anda untuk melanjutkan.</p>
+        <h2 class="font-body font-semibold text-2xl text-on-surface">Masuk ke Dashboard Admin</h2>
+        <p class="font-body text-sm text-on-surface-variant">Silakan masukkan kredensial admin Anda untuk melanjutkan.</p>
     </div>
 
     @if ($errors->any())
@@ -17,7 +17,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+    <form method="POST" action="{{ route('login.admin') }}" class="space-y-5">
         @csrf
 
         <div class="space-y-1.5">
@@ -88,14 +88,9 @@
         </button>
     </form>
 
-    <div class="text-center mt-4 text-sm text-slate-500">
-        Belum punya akun?
-        <a href="{{ route('register') }}" class="text-[#2C5F6F] font-semibold hover:underline">Daftar di sini</a>
-    </div>
-
     <div class="pt-6 border-t border-surface-variant">
         <p class="font-body text-sm text-on-surface-variant text-center">
-            Admin/HR? <a href="{{ route('login.admin') }}" class="text-psikotes font-medium hover:underline">Login sebagai Admin</a>
+            Bukan admin? <a href="{{ route('login') }}" class="text-psikotes font-medium hover:underline">Login sebagai Peserta</a>
         </p>
         <p class="font-body text-sm text-on-surface-variant text-center mt-2">
             Membutuhkan bantuan akses? <a href="#" class="text-psikotes font-medium hover:underline">Hubungi IT Support</a>

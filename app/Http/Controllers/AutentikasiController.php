@@ -20,12 +20,27 @@ use Illuminate\View\View;
 
 class AutentikasiController extends Controller
 {
-    public function tampilkanLogin(): View
+    public function tampilkanLoginPeserta(): View
     {
         return view('auth.login');
     }
 
-    public function login(LoginRequest $request): RedirectResponse
+    public function tampilkanLoginAdmin(): View
+    {
+        return view('auth.login-admin');
+    }
+
+    public function loginPeserta(LoginRequest $request): RedirectResponse
+    {
+        return $this->prosesLogin($request, tipeYangDiizinkan: ['kandidat', 'karyawan'], routeGagal: 'login');
+    }
+
+    public function loginAdmin(LoginRequest $request): RedirectResponse
+    {
+        return $this->prosesLogin($request, tipeYangDiizinkan: null, routeGagal: 'login.admin');
+    }
+
+    private function prosesLogin(LoginRequest $request, ?array $tipeYangDiizinkan, string $routeGagal): RedirectResponse
     {
         $kredensial = $request->only('email', 'password');
 
@@ -43,6 +58,24 @@ class AutentikasiController extends Controller
             return back()
                 ->withInput($request->only('email', 'ingat_saya'))
                 ->withErrors(['email' => 'Email atau password salah, atau akun belum aktif.']);
+        }
+
+        $user = Auth::user();
+
+        if ($tipeYangDiizinkan !== null && ! in_array($user->tipe_akun, $tipeYangDiizinkan, true)) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login.admin')
+                ->withErrors(['email' => 'Akun ini adalah akun admin. Silakan login melalui portal admin.']);
+        }
+
+        if ($tipeYangDiizinkan === null && in_array($user->tipe_akun, ['kandidat', 'karyawan'], true)) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Akun ini bukan akun admin. Silakan login melalui portal peserta.']);
         }
 
         $request->session()->regenerate();
@@ -132,11 +165,13 @@ class AutentikasiController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
+        $tipeAkun = Auth::user()?->tipe_akun;
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        $routeLogin = in_array($tipeAkun, ['kandidat', 'karyawan'], true) ? 'login' : 'login.admin';
+        return redirect()->route($routeLogin);
     }
 
     protected function tujuanDashboard(): string

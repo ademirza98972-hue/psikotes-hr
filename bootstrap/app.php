@@ -1,12 +1,17 @@
 <?php
 
 use App\Http\Middleware\CekIzin;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
+Authenticate::redirectUsing(function (Request $request) {
+    return str_starts_with($request->path(), 'admin') ? route('login.admin') : route('login');
+});
 
 RedirectIfAuthenticated::redirectUsing(function (Request $request) {
     $pengguna = Auth::user();

@@ -40,7 +40,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/keluar', [AutentikasiController::class, 'logout'])->name('logout');
 
-    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->middleware('izin:dashboard.lihat')->name('admin.dashboard');
     Route::get('/admin/aktivitas', [DashboardController::class, 'aktivitas'])->name('admin.aktivitas.index');
     Route::get('/peserta/dashboard', [DashboardController::class, 'peserta'])->name('peserta.dashboard');
 

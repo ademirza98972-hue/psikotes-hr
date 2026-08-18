@@ -112,7 +112,9 @@
             @auth
 
             {{-- MENU UTAMA --}}
+            @if(auth()->user()->hasIzin('dashboard.lihat') || auth()->user()->hasIzin('data_karyawan.kelola') || auth()->user()->hasIzin('pengguna.lihat'))
             <div class="section-label">Menu Utama</div>
+            @endif
 
             @if(auth()->user()->hasIzin('dashboard.lihat'))
                 <a href="{{ route('admin.dashboard') }}"
@@ -122,20 +124,20 @@
                 </a>
             @endif
 
-            @if(auth()->user()->hasIzin('data_karyawan.kelola') || auth()->user()->hasIzin('pengguna.lihat'))
+            @if(auth()->user()->hasIzin('data_karyawan.kelola'))
                 <a href="{{ route('admin.data-karyawan.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.data-karyawan.*') ? 'active' : '' }}">
                     <span class="material-symbols-outlined text-[20px]">group</span>
                     <span>Data Karyawan</span>
                 </a>
-                
+            @endif
+
+            @if(auth()->user()->hasIzin('pengguna.lihat'))
                 <a href="{{ route('admin.akun-karyawan.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.akun-karyawan.*') ? 'active' : '' }}">
                     <span class="material-symbols-outlined text-[20px]">badge</span>
                     <span>Akun Karyawan</span>
                 </a>
-
-                
             @endif
 
             @if(auth()->user()->hasIzin('pengguna.lihat'))
@@ -146,6 +148,7 @@
                 </a>
             @endif
 
+            @if(auth()->user()->hasIzin('soal.lihat') || auth()->user()->hasIzin('kategori_tes.kelola') || auth()->user()->hasIzin('hasil_tes.lihat'))
             <div class="nav-divider"></div>
 
             {{-- TES & ASSESSMENT --}}
@@ -178,7 +181,9 @@
                     <span>Hasil Tes</span>
                 </a>
             @endif
+            @endif
 
+            @if(auth()->user()->hasIzin('peran.kelola') || auth()->user()->hasIzin('pengguna_admin.kelola') || auth()->user()->hasIzin('master_data.kelola') || auth()->user()->hasIzin('data_terhapus.kelola'))
             <div class="nav-divider"></div>
 
             {{-- SYSTEM --}}
@@ -226,6 +231,8 @@
                         <span class="ml-auto rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{{ $jumlahTrash }}</span>
                     @endif
                 </a>
+            @endif
+
             @endif
 
             @endauth

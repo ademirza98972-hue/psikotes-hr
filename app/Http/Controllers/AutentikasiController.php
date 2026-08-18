@@ -147,6 +147,25 @@ class AutentikasiController extends Controller
             return route('peserta.dashboard');
         }
 
+        $peta = [
+            'dashboard.lihat'       => 'admin.dashboard',
+            'data_karyawan.kelola'  => 'admin.data-karyawan.index',
+            'pengguna.lihat'        => 'admin.akun-karyawan.index',
+            'soal.lihat'            => 'admin.alat-tes.index',
+            'kategori_tes.kelola'   => 'admin.alat-tes.index',
+            'hasil_tes.lihat'       => 'admin.hasil-tes.index',
+            'peran.kelola'          => 'admin.peran.index',
+            'pengguna_admin.kelola' => 'admin.pengguna-admin.index',
+            'master_data.kelola'    => 'admin.departemen.index',
+            'data_terhapus.kelola'  => 'admin.data-terhapus.index',
+        ];
+
+        foreach ($peta as $izin => $namaRoute) {
+            if ($user && $user->hasIzin($izin)) {
+                return route($namaRoute);
+            }
+        }
+
         return route('admin.dashboard');
     }
 }

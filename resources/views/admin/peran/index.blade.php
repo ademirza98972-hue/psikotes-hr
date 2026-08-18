@@ -49,23 +49,6 @@
 
     </div>{{-- /STICKY HEADER --}}
 
-    {{-- Role Stats / Info --}}
-    <div class="mb-4 flex items-center justify-between">
-        <span class="text-[12px] leading-[16px] font-medium text-[#40484b] bg-[#e6e8ea] px-3 py-1 rounded-full">
-            Menampilkan <strong>{{ $peran->firstItem() ?? $peran->total() }}</strong> dari <strong>{{ $peran->total() }}</strong> peran
-        </span>
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-purple-500"></div>
-                <span class="text-[11px] font-medium text-[#40484b] uppercase tracking-wider">System Role</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-[#2C5F6F]"></div>
-                <span class="text-[11px] font-medium text-[#40484b] uppercase tracking-wider">Custom Role</span>
-            </div>
-        </div>
-    </div>
-
     {{-- Warning Info --}}
     <div class="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 flex items-start gap-3">
         <span class="material-symbols-outlined text-[#d97706] text-[20px] mt-0.5 shrink-0">warning</span>
@@ -174,26 +157,28 @@
             </table>
         </div>
 
-        @if ($peran->hasPages())
-            <div class="px-6 py-4 bg-white border-t border-[#c0c8cb] flex items-center justify-between">
-                <span class="text-[12px] leading-[16px] font-medium text-[#40484b]">
-                    Halaman {{ $peran->currentPage() }} dari {{ $peran->lastPage() }}
-                </span>
-                <div class="flex gap-2">
-                    <button {{ $peran->onFirstPage() ? 'disabled' : '' }}
-                        class="p-2 rounded-lg border border-[#c0c8cb] text-[#40484b] {{ $peran->onFirstPage() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#f2f4f6] transition-colors' }}">
-                        <span class="material-symbols-outlined">chevron_left</span>
-                    </button>
-                    <button {{ !$peran->hasMorePages() ? 'disabled' : '' }}
-                        class="p-2 rounded-lg border border-[#c0c8cb] text-[#40484b] {{ !$peran->hasMorePages() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#f2f4f6] transition-colors' }}">
-                        <span class="material-symbols-outlined">chevron_right</span>
-                    </button>
+        <div class="border-t border-[#c0c8cb] px-6 py-4 flex items-center justify-between gap-4">
+            <p class="text-[11px] text-[#40484b]">
+                Menampilkan <span class="font-semibold text-[#191c1e]">{{ $peran->firstItem() ?? $peran->total() }}</span> -
+                <span class="font-semibold text-[#191c1e]">{{ $peran->lastItem() ?? $peran->total() }}</span> dari
+                <span class="font-semibold text-[#191c1e]">{{ $peran->total() }}</span> peran
+            </p>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                        <span class="text-[11px] text-[#40484b] uppercase tracking-wider">System Role</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#2C5F6F]"></div>
+                        <span class="text-[11px] text-[#40484b] uppercase tracking-wider">Custom Role</span>
+                    </div>
                 </div>
+                @if ($peran->hasPages())
+                    {{ $peran->links() }}
+                @endif
             </div>
-            <div class="px-6 py-3 border-t border-[#c0c8cb]">
-                {{ $peran->links() }}
-            </div>
-        @endif
+        </div>
     </div>
 
     {{-- Delete Modal --}}

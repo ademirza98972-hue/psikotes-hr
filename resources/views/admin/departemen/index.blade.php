@@ -46,11 +46,6 @@
 
     <div class="mt-4 w-full rounded-xl border border-[#c0c8cb] bg-white overflow-hidden shadow-sm">
 
-        {{-- INDICATOR --}}
-        <div class="px-6 pb-3 text-xs text-[#40484b]">
-            Menampilkan <strong>{{ $departemen->firstItem() ?? $departemen->total() }}</strong> dari <strong>{{ $departemen->total() }}</strong> departemen
-        </div>
-
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead class="bg-[#f2f4f6]">
@@ -111,14 +106,16 @@
             </table>
         </div>
 
-        @if ($departemen->hasPages())
-            <div class="px-6 py-4 bg-[#f2f4f6] flex items-center justify-between border-t border-[#c0c8cb]">
-                <p class="text-xs text-[#40484b]">Menampilkan {{ $departemen->firstItem() ?? 1 }} - {{ min($departemen->lastItem() ?? $departemen->total(), $departemen->total()) }} dari {{ $departemen->total() }} departemen</p>
-                <div class="flex items-center gap-1">
-                    {{ $departemen->links() }}
-                </div>
-            </div>
-        @endif
+        <div class="border-t border-[#c0c8cb] px-6 py-4 flex items-center justify-between gap-4">
+            <p class="text-[11px] text-[#40484b]">
+                Menampilkan <span class="font-semibold text-[#191c1e]">{{ $departemen->firstItem() ?? $departemen->total() }}</span> -
+                <span class="font-semibold text-[#191c1e]">{{ $departemen->lastItem() ?? $departemen->total() }}</span> dari
+                <span class="font-semibold text-[#191c1e]">{{ $departemen->total() }}</span> departemen
+            </p>
+            @if ($departemen->hasPages())
+                {{ $departemen->links() }}
+            @endif
+        </div>
     </div>
 
     {{-- MODAL --}}

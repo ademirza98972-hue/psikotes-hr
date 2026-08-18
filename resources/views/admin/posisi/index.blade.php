@@ -52,11 +52,6 @@
 
     <div class="mt-4 w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
 
-        {{-- INDICATOR --}}
-        <div class="mb-2 text-xs text-slate-500">
-            Menampilkan <strong>{{ $posisi->firstItem() ?? $posisi->total() }}</strong> dari <strong>{{ $posisi->total() }}</strong> posisi
-        </div>
-
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
                 <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
@@ -107,11 +102,16 @@
             </table>
         </div>
 
-        @if ($posisi->hasPages())
-            <div class="mt-4">
+        <div class="border-t border-slate-200 px-6 py-4 flex items-center justify-between gap-4">
+            <p class="text-[11px] text-[#40484b]">
+                Menampilkan <span class="font-semibold text-[#191c1e]">{{ $posisi->firstItem() ?? $posisi->total() }}</span> -
+                <span class="font-semibold text-[#191c1e]">{{ $posisi->lastItem() ?? $posisi->total() }}</span> dari
+                <span class="font-semibold text-[#191c1e]">{{ $posisi->total() }}</span> posisi
+            </p>
+            @if ($posisi->hasPages())
                 {{ $posisi->links() }}
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 
     {{-- Modal --}}

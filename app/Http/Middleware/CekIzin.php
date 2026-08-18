@@ -26,12 +26,6 @@ class CekIzin
 
     protected function tolakAkses(Request $request, string $kodeIzin): Response
     {
-        $request->session()->flash('error', 'Anda tidak punya akses ke halaman ini.');
-
-        $tujuan = \Illuminate\Support\Facades\Route::has('dashboard')
-            ? redirect()->route('dashboard')
-            : redirect('/');
-
-        return $tujuan;
+        abort(403, 'Anda tidak punya akses ke halaman ini.');
     }
 }

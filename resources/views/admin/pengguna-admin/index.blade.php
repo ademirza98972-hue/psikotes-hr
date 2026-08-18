@@ -67,9 +67,6 @@
 
     {{-- DATA TABLE --}}
     <div class="mt-4 bg-white rounded-xl border border-[#c0c8cb] overflow-hidden shadow-sm">
-        <div class="mb-2 px-6 pt-4 text-[12px] text-[#41484b]">
-            Menampilkan <strong class="text-[#191c1e]">{{ $pengguna->firstItem() ?? $pengguna->total() }}</strong> dari <strong class="text-[#191c1e]">{{ $pengguna->total() }}</strong> pengguna
-        </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -171,22 +168,16 @@
             </table>
         </div>
 
-        @if ($pengguna->hasPages())
-            <div class="px-6 py-4 bg-[#f2f4f6] border-t border-[#c0c8cb] flex items-center justify-between">
-                <span class="text-[12px] text-[#41484b]">Menampilkan {{ $pengguna->firstItem() }}-{{ $pengguna->lastItem() }} dari {{ $pengguna->total() }} entri</span>
-                <div class="flex items-center gap-2">
-                    @foreach ($pengguna->links()->elements[0] as $page => $url)
-                        @if ($page == $pengguna->currentPage())
-                            <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#001a22] text-white text-[12px] font-medium">{{ $page }}</span>
-                        @elseif ($page === '...')
-                            <span class="w-8 h-8 flex items-center justify-center text-[12px] text-[#41484b]">...</span>
-                        @else
-                            <a href="{{ $url }}" class="w-8 h-8 flex items-center justify-center rounded-lg border border-[#c0c8cb] bg-white text-[#41484b] text-[12px] font-medium hover:bg-[#e6e8ea] transition-colors">{{ $page }}</a>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
-        @endif
+        <div class="border-t border-[#c0c8cb] px-6 py-4 flex items-center justify-between gap-4">
+            <p class="text-[11px] text-[#41484b]">
+                Menampilkan <span class="font-semibold text-[#191c1e]">{{ $pengguna->firstItem() ?? $pengguna->total() }}</span> -
+                <span class="font-semibold text-[#191c1e]">{{ $pengguna->lastItem() ?? $pengguna->total() }}</span> dari
+                <span class="font-semibold text-[#191c1e]">{{ $pengguna->total() }}</span> pengguna
+            </p>
+            @if ($pengguna->hasPages())
+                {{ $pengguna->links() }}
+            @endif
+        </div>
     </div>
 
     {{-- MODAL KONFIRMASI HAPUS --}}

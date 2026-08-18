@@ -1,4 +1,4 @@
-@extends('layouts.auth', ['judulHalaman' => 'Login Admin'])
+@extends('layouts.auth', ['judulHalaman' => 'Login Peserta'])
 
 @section('content')
 <div x-data="{ showPwd: false }" class="space-y-6">

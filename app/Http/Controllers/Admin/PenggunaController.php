@@ -128,6 +128,7 @@ class PenggunaController extends Controller
 
                 ProfilKaryawan::create([
                     'user_id' => $user->id,
+                    'data_karyawan_id' => $dataMaster->id,
                     'nama_karyawan' => $data['nama_karyawan'],
                     'nik_karyawan' => $dataMaster->nik_karyawan,
                     'departemen' => $departemen->nama_departemen,

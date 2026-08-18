@@ -141,21 +141,11 @@
                     @forelse ($data as $row)
                         @php
                             $inisial = strtoupper(mb_substr(explode(' ', $row->nama_karyawan)[0], 0, 2));
-                            $warnaStatus = match($row->status) {
-                                'belum_terpakai' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                'sudah_terpakai' => 'bg-[#f2f4f6] text-[#40484b] border-[#c0c8cb]',
-                                default => 'bg-[#f2f4f6] text-[#40484b] border-[#c0c8cb]',
-                            };
-                            $labelStatus = match($row->status) {
-                                'belum_terpakai' => 'Belum Terpakai',
-                                'sudah_terpakai' => 'Sudah Terpakai',
-                                default => $row->status,
-                            };
-                            $dotColor = match($row->status) {
-                                'belum_terpakai' => 'bg-emerald-600',
-                                'sudah_terpakai' => 'bg-[#40484b]',
-                                default => 'bg-[#40484b]',
-                            };
+                            $warnaStatus = $row->memiliki_akun
+                                ? 'bg-[#f2f4f6] text-[#40484b] border-[#c0c8cb]'
+                                : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                            $labelStatus = $row->memiliki_akun ? 'Sudah Terpakai' : 'Belum Terpakai';
+                            $dotColor = $row->memiliki_akun ? 'bg-[#40484b]' : 'bg-emerald-600';
                             $avatarBg = match(hexdec(substr(substr(md5($row->nama_karyawan), 0, 6), 0, 6)) % 4) {
                                 0 => 'bg-[#2C5F6F]/10 text-[#2C5F6F]',
                                 1 => 'bg-blue-100 text-blue-700',
@@ -196,7 +186,7 @@
                                                title="Edit">
                                                 <span class="material-symbols-outlined text-[18px]">edit</span>
                                             </a>
-                                            @if ($row->status === 'sudah_terpakai')
+                                            @if ($row->memiliki_akun)
                                                 <button type="button" disabled
                                                         title="NIK ini sudah dipakai untuk registrasi, tidak bisa dihapus."
                                                         class="p-2 rounded-lg text-[#40484b] opacity-40 cursor-not-allowed"

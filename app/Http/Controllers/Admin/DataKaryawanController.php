@@ -12,11 +12,21 @@ use App\Models\Departemen;
 use App\Models\Posisi;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 
 class DataKaryawanController extends Controller
 {
+    private function subqueryMemilikiAkun(): string
+    {
+        return 'EXISTS(
+            SELECT 1 FROM profil_karyawan pk
+            JOIN users u ON u.id = pk.user_id AND u.deleted_at IS NULL
+            WHERE pk.nik_karyawan = data_karyawan.nik_karyawan
+        )';
+    }
+
     public function index(Request $request): View
     {
         $kataKunci = $request->input('cari');
@@ -28,8 +38,11 @@ class DataKaryawanController extends Controller
             $filterStatus = null;
         }
 
+        $subquery = $this->subqueryMemilikiAkun();
+
         $data = DataKaryawan::query()
             ->with(['departemen', 'posisi'])
+            ->selectRaw("data_karyawan.*, ({$subquery}) as memiliki_akun")
             ->when($kataKunci, function ($query, $kataKunci) {
                 $query->where(function ($q) use ($kataKunci) {
                     $q->where('nik_karyawan', 'like', '%' . $kataKunci . '%')
@@ -39,9 +52,8 @@ class DataKaryawanController extends Controller
             ->when($filterDepartemen, function ($query, $filterDepartemen) {
                 $query->where('departemen_id', (int) $filterDepartemen);
             })
-            ->when($filterStatus, function ($query, $filterStatus) {
-                $query->where('status', $filterStatus);
-            })
+            ->when($filterStatus === 'sudah_terpakai', fn ($q) => $q->whereRaw($subquery))
+            ->when($filterStatus === 'belum_terpakai', fn ($q) => $q->whereRaw("NOT ({$subquery})"))
             ->orderBy('nama_karyawan')
             ->paginate(15)
             ->withQueryString();
@@ -102,7 +114,13 @@ class DataKaryawanController extends Controller
     {
         $data = DataKaryawan::findOrFail($data_karyawan);
 
-        if ($data->status === 'sudah_terpakai') {
+        $memilikiAkun = DB::table('profil_karyawan')
+            ->join('users', 'profil_karyawan.user_id', '=', 'users.id')
+            ->whereNull('users.deleted_at')
+            ->where('profil_karyawan.nik_karyawan', $data->nik_karyawan)
+            ->exists();
+
+        if ($memilikiAkun) {
             return back()->with('error', 'NIK ini sudah dipakai untuk registrasi, tidak bisa dihapus. Hapus dulu akun user terkait jika ingin melepas NIK ini.');
         }
 
@@ -155,4 +173,5 @@ class DataKaryawanController extends Controller
     {
         return Excel::download(new DataKaryawanTemplateExport(), 'template-data-karyawan.xlsx');
     }
+
 }

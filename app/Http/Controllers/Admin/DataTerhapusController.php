@@ -8,6 +8,7 @@ use App\Models\DataKaryawan;
 use App\Models\Departemen;
 use App\Models\Peran;
 use App\Models\Posisi;
+use App\Models\ProfilKaryawan;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -81,6 +82,15 @@ class DataTerhapusController extends Controller
 
         $item = $this->buatQuery($jenis)->findOrFail($id);
         $item->restore();
+
+        if ($jenis === 'karyawan') {
+            $profil = ProfilKaryawan::where('user_id', $item->id)->first();
+            if ($profil) {
+                DataKaryawan::where('nik_karyawan', $profil->nik_karyawan)
+                    ->where('status', 'belum_terpakai')
+                    ->update(['status' => 'sudah_terpakai']);
+            }
+        }
 
         return redirect()
             ->route('admin.data-terhapus.index', ['jenis' => $jenis])

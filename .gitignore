@@ -25,3 +25,12 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Debug & inspect scripts (local only)
+debug_*.php
+inspect_*.php
+dummy_*.php
+integration_test.php
+cookies.txt
+tests_manual/
+database/scripts/dummy_*.php

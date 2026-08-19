@@ -121,7 +121,28 @@
                     <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
+            <div class="space-y-1.5">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="nik_kandidat">NIK KTP <span class="text-rose-600">*</span></label>
+                <div class="relative focused-input group">
+                    <input
+                        id="nik_kandidat"
+                        name="nik_kandidat"
+                        type="text"
+                        value="{{ old('nik_kandidat') }}"
+                        :disabled="tipe !== 'kandidat'"
+                        :required="tipe === 'kandidat'"
+                        maxlength="16"
+                        inputmode="numeric"
+                        pattern="[0-9]{16}"
+                        placeholder="16 digit NIK"
+                        class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('nik_kandidat') border-rose-500 @else border-surface-variant @enderror"
+                    >
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">badge</span>
+                </div>
+                @error('nik_kandidat')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
             <div class="space-y-1.5">
                 <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="posisi_dilamar">Posisi yang Dilamar</label>
                 <div class="relative">
@@ -179,70 +200,12 @@
                 @enderror
             </div>
 
-            <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="nik_kandidat">NIK KTP <span class="text-rose-600">*</span></label>
-                <div class="relative focused-input group">
-                    <input
-                        id="nik_kandidat"
-                        name="nik_kandidat"
-                        type="text"
-                        value="{{ old('nik_kandidat') }}"
-                        :disabled="tipe !== 'kandidat'"
-                        :required="tipe === 'kandidat'"
-                        maxlength="16"
-                        inputmode="numeric"
-                        pattern="[0-9]{16}"
-                        placeholder="16 digit NIK"
-                        class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('nik_kandidat') border-rose-500 @else border-surface-variant @enderror"
-                    >
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">badge</span>
-                </div>
-                @error('nik_kandidat')
-                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+            
         </div>
 
         {{-- Field Karyawan --}}
         <div x-show="tipe === 'karyawan'" x-cloak class="space-y-4 border-t border-surface-variant pt-4">
             <p class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant">Data Karyawan</p>
-
-            <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="departemen_karyawan">Departemen</label>
-                <div class="relative">
-                    <select
-                        id="departemen_karyawan"
-                        x-model="departemenId"
-                        @change="muatPosisi()"
-                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none"
-                    >
-                        <option value="">-- Pilih Departemen --</option>
-                        @foreach($departemen as $dept)
-                            <option value="{{ $dept->id }}">{{ $dept->nama_departemen }}</option>
-                        @endforeach
-                    </select>
-                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
-                </div>
-            </div>
-
-            <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="posisi_karyawan">Posisi</label>
-                <div class="relative">
-                    <select
-                        id="posisi_karyawan"
-                        name="posisi_karyawan"
-                        :disabled="tipe !== 'karyawan' || departemenId === ''"
-                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none"
-                    >
-                        <option value="">-- Pilih Posisi --</option>
-                        <template x-for="p in karyawanPosisi" :key="p.id">
-                            <option :value="p.nama_posisi" x-text="p.nama_posisi"></option>
-                        </template>
-                    </select>
-                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
-                </div>
-                <p class="font-body text-xs text-on-surface-variant mt-1" x-show="departemenId === ''">Pilih departemen terlebih dahulu untuk melihat posisi.</p>
-            </div>
 
             <div class="space-y-1.5">
                 <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="name_karyawan">Nama Lengkap</label>
@@ -283,6 +246,45 @@
                     <p class="font-body text-xs text-on-surface-variant mt-1">Harap isi NIK dan Nama Karyawan dengan benar.</p>
                 @enderror
             </div>
+
+            <div class="space-y-1.5">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="departemen_karyawan">Departemen</label>
+                <div class="relative">
+                    <select
+                        id="departemen_karyawan"
+                        x-model="departemenId"
+                        @change="muatPosisi()"
+                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none"
+                    >
+                        <option value="">-- Pilih Departemen --</option>
+                        @foreach($departemen as $dept)
+                            <option value="{{ $dept->id }}">{{ $dept->nama_departemen }}</option>
+                        @endforeach
+                    </select>
+                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="posisi_karyawan">Posisi</label>
+                <div class="relative">
+                    <select
+                        id="posisi_karyawan"
+                        name="posisi_karyawan"
+                        :disabled="tipe !== 'karyawan' || departemenId === ''"
+                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none"
+                    >
+                        <option value="">-- Pilih Posisi --</option>
+                        <template x-for="p in karyawanPosisi" :key="p.id">
+                            <option :value="p.nama_posisi" x-text="p.nama_posisi"></option>
+                        </template>
+                    </select>
+                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
+                </div>
+                <p class="font-body text-xs text-on-surface-variant mt-1" x-show="departemenId === ''">Pilih departemen terlebih dahulu untuk melihat posisi.</p>
+            </div>
+
+            
         </div>
 
         {{-- Password --}}

@@ -54,6 +54,20 @@
             background: var(--outline-variant);
             margin: 8px 24px;
         }
+
+        /* Collapsed sidebar */
+        aside.collapsed .sidebar-link {
+            justify-content: center;
+            padding: 10px 0;
+            gap: 0;
+        }
+        aside.collapsed .sidebar-link > span:not(.material-symbols-outlined) { display: none; }
+        aside.collapsed .sidebar-link .ml-auto { display: none; }
+        aside.collapsed .section-label { display: none; }
+        aside.collapsed .nav-divider { margin: 8px 4px; }
+        aside.collapsed .link-text { display: none; }
+        aside.collapsed .logo-area { justify-content: center; }
+        aside.collapsed .user-card-actions { display: none; }
     </style>
 </head>
 <body class="min-h-screen bg-[#f7f9fb] font-body antialiased">
@@ -93,15 +107,18 @@
     </div>
 </div>
 
-<div class="flex h-screen overflow-hidden">
+<div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false' }" x-init="$watch('sidebarOpen', v => localStorage.setItem('sidebarOpen', v))">
 
     {{-- SIDEBAR --}}
-    <aside class="fixed inset-y-0 left-0 z-50 w-[280px] flex flex-col bg-white border-r border-[#e0e3e5] overflow-y-auto">
+    <aside class="fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-[#e0e3e5] overflow-y-auto overflow-x-hidden"
+           style="transition: width 0.2s ease;"
+           :style="{ width: sidebarOpen ? '280px' : '64px' }"
+           :class="{ collapsed: !sidebarOpen }">
 
         {{-- Logo --}}
-        <div class="flex items-center gap-3 px-6 h-16 border-b border-[#e0e3e5] shrink-0">
-            <img src="{{ asset('images/logo.png') }}" alt="Psikotes HR Logo" class="h-9 w-auto object-contain">
-            <div>
+        <div class="logo-area flex items-center gap-3 px-3 h-16 border-b border-[#e0e3e5] shrink-0">
+            <img src="{{ asset('images/logo.png') }}" alt="Psikotes HR Logo" class="h-9 w-auto object-contain shrink-0">
+            <div class="link-text whitespace-nowrap">
                 <p class="text-sm font-bold text-[#2C5F6F] leading-none">Psikotes HR</p>
                 <p class="text-[11px] text-[#40484b] mt-0.5">Admin Panel</p>
             </div>
@@ -252,16 +269,18 @@
                         <span>{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                     @endif
                 </div>
-                <div class="min-w-0 flex-1">
-                    <p class="text-sm font-semibold text-[#191c1e] truncate">{{ auth()->user()->name }}</p>
-                    <p class="text-[11px] text-[#40484b] truncate">{{ auth()->user()->peran->nama_peran ?? '-' }}</p>
+                <div class="user-card-actions min-w-0 flex-1 flex items-center gap-2">
+                    <div class="min-w-0 flex-1 link-text">
+                        <p class="text-sm font-semibold text-[#191c1e] truncate">{{ auth()->user()->name }}</p>
+                        <p class="text-[11px] text-[#40484b] truncate">{{ auth()->user()->peran->nama_peran ?? '-' }}</p>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1" title="Keluar">
+                            <span class="material-symbols-outlined text-[18px]">logout</span>
+                        </button>
+                    </form>
                 </div>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1" title="Keluar">
-                        <span class="material-symbols-outlined text-[18px]">logout</span>
-                    </button>
-                </form>
             </div>
             @endauth
         </div>
@@ -269,12 +288,21 @@
     </aside>
 
     {{-- MAIN AREA --}}
-    <div class="flex-1 flex flex-col ml-[280px] min-h-screen overflow-hidden">
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden"
+         style="transition: margin-left 0.2s ease;"
+         :style="{ marginLeft: sidebarOpen ? '280px' : '64px' }">
 
         {{-- HEADER --}}
         <header class="flex h-16 items-center justify-between border-b border-[#e0e3e5] bg-white px-6 shrink-0 sticky top-0 z-40">
 
             <div class="flex items-center gap-4">
+                {{-- Hamburger --}}
+                <button @click="sidebarOpen = !sidebarOpen"
+                        class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1.5 rounded-md hover:bg-[#f2f4f6]"
+                        title="Toggle Sidebar">
+                    <span class="material-symbols-outlined text-[22px]">menu</span>
+                </button>
+
                 {{-- Breadcrumb --}}
                 <nav class="flex items-center gap-2 text-[13px] text-[#40484b]">
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-[#2C5F6F] transition-colors">Home</a>

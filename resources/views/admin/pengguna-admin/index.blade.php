@@ -22,7 +22,7 @@
                 <a href="{{ route('admin.pengguna-admin.tambah') }}"
                    class="self-start inline-flex items-center gap-2 bg-[#2C5F6F] text-white px-5 py-2.5 rounded-xl text-[14px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all shadow-sm">
                     <span class="material-symbols-outlined text-[20px]">add</span>
-                    + Tambah Admin/Staff
+                    Tambah Admin/Staff
                 </a>
             @endif
         @endauth
@@ -159,7 +159,7 @@
                                         </a>
                                     </div>
                                 @else
-                                    <p class="text-[14px] text-[#41484b]">Belum ada data pengguna internal. Klik <span class="font-semibold">+ Tambah Admin/Staff</span> untuk menambahkan.</p>
+                                    <p class="text-[14px] text-[#41484b]">Belum ada data pengguna internal. Klik <span class="font-semibold">Tambah Admin/Staff</span> untuk menambahkan.</p>
                                 @endif
                             </td>
                         </tr>

@@ -52,13 +52,13 @@
 
     <div class="mt-4 w-full rounded-lg border border-slate-200 bg-white px-6 pt-3 pb-4 shadow-sm">
 
-        <div class="overflow-x-auto">
+        <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                    <tr>
-                        <th class="px-4 py-3">Posisi</th>
-                        <th class="px-4 py-3">Departemen</th>
-                        <th class="px-4 py-3 text-right">Aksi</th>
+                <thead style="position: sticky; top: 0; z-index: 5;">
+                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-4 py-3" style="color: #7db8c2;">Posisi</th>
+                        <th class="px-4 py-3" style="color: #7db8c2;">Departemen</th>
+                        <th class="px-4 py-3 text-right" style="color: #7db8c2;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">

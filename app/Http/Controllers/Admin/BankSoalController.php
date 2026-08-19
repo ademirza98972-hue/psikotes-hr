@@ -38,22 +38,16 @@ class BankSoalController extends Controller
                 $daftarSoal = $soalRow->map(fn (Soal $s) => $this->mapSoalUntukView($s, $alatTesTerpilih->format_dasar))->all();
             }
         } else {
-            $semuaSoal = Soal::with(['alatTes', 'opsiJawaban.bobotOpsiDimensi.dimensi'])
-                ->orderBy('alat_tes_id')
-                ->orderBy('urutan')
-                ->orderBy('id')
-                ->get()
-                ->groupBy('alat_tes_id');
+            $counts = Soal::select('alat_tes_id', DB::raw('count(*) as jumlah'))
+                ->groupBy('alat_tes_id')
+                ->pluck('jumlah', 'alat_tes_id');
 
-            foreach ($semuaSoal as $alatId => $rows) {
-                $alat = $alatTesSemua->firstWhere('id', $alatId);
-                if (!$alat) {
-                    continue;
-                }
-                $kelompokSoalSemua[$alatId] = [
+            foreach ($alatTesSemua as $alat) {
+                $jumlah = $counts[$alat->id] ?? 0;
+                if ($jumlah === 0) continue;
+                $kelompokSoalSemua[$alat->id] = [
                     'alat'       => $alat,
-                    'soal'       => $rows->map(fn (Soal $s) => $this->mapSoalUntukView($s, $alat->format_dasar))->all(),
-                    'jumlahSoal' => $rows->count(),
+                    'jumlahSoal' => $jumlah,
                 ];
             }
         }

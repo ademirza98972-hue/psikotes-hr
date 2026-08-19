@@ -135,52 +135,48 @@
                 <p class="text-sm text-[#40484b]">Belum ada soal tersedia.</p>
             </div>
         @else
-            @foreach($kelompokSoalSemua as $alatId => $kelompok)
-                @if(empty($kelompok['alat'])) @continue @endif
-                @php
-                    $kodeAlat = '';
-                    foreach (['EPPS'] as $k) {
-                        if (str_contains($kelompok['alat']->nama, $k)) {
-                            $kodeAlat = $k;
-                            break;
+            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                @foreach($kelompokSoalSemua as $alatId => $kelompok)
+                    @php
+                        $kodeAlat = '';
+                        foreach (['EPPS'] as $k) {
+                            if (str_contains($kelompok['alat']->nama, $k)) { $kodeAlat = $k; break; }
                         }
-                    }
-                @endphp
-
-                {{-- Section Header --}}
-                <div class="flex items-center justify-between mt-6 first:mt-0">
-                    <div class="flex items-center gap-3">
-                        <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $warnaKode[$kodeAlat] ?? 'bg-slate-100 text-slate-700' }}">
-                            {{ $kodeAlat }}
-                        </span>
-                        @php
-                            $namaTampilAll = ($kelompok['alat']->nama === $kodeAlat)
-                                ? 'Instrument ' . $kodeAlat
-                                : $kelompok['alat']->nama;
-                        @endphp
-                        <h3 class="text-sm font-semibold text-[#191c1e]">{{ $namaTampilAll }}</h3>
-                        <span class="inline-block rounded-full border border-[#c0c8cb] px-2.5 py-0.5 text-[11px] font-medium text-[#40484b]">
-                            {{ $kelompok['alat']->format_dasar }}
-                        </span>
-                    </div>
-                    <span class="text-[12px] text-[#40484b]">{{ $kelompok['jumlahSoal'] }} soal</span>
-                </div>
-
-                {{-- Soal Cards --}}
-                <div class="space-y-3 mt-3">
-                    @foreach($kelompok['soal'] as $idx => $soal)
-                        @include('admin.bank-soal.partials.kartu-soal', [
-                            'nomor'       => $idx + 1,
-                            'soal'        => $soal,
-                            'format'      => $kelompok['alat']->format_dasar,
-                            'kodeAlat'    => $kodeAlat,
-                            'warnaKode'   => $warnaKode,
-                        ])
-                    @endforeach
-                </div>
-            @endforeach
+                        $namaTampilAll = ($kelompok['alat']->nama === $kodeAlat)
+                            ? 'Instrument ' . $kodeAlat
+                            : $kelompok['alat']->nama;
+                    @endphp
+                    <a href="{{ route('admin.bank-soal.index', ['alat_tes_id' => $alatId]) }}"
+                       class="flex items-center justify-between rounded-xl border border-[#e0e3e5] bg-white px-5 py-4 shadow-sm hover:shadow-md hover:border-[#2C5F6F]/40 transition-all group">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $warnaKode[$kodeAlat] ?? 'bg-slate-100 text-slate-700' }}">
+                                {{ $kodeAlat ?: '?' }}
+                            </span>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-[#191c1e] truncate">{{ $namaTampilAll }}</p>
+                                <p class="text-[11px] text-[#40484b]">{{ $kelompok['alat']->format_dasar }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 ml-3">
+                            <span class="text-[13px] font-bold text-[#2C5F6F]">{{ $kelompok['jumlahSoal'] }}</span>
+                            <span class="text-[11px] text-[#40484b]">soal</span>
+                            <span class="material-symbols-outlined text-[18px] text-[#c0c8cb] group-hover:text-[#2C5F6F] transition-colors">chevron_right</span>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
         @endif
     @endif
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function confirmHapus(soalId, url) {
+    if (confirm('Yakin ingin menghapus soal ini?')) {
+        document.getElementById('hapus-soal-' + soalId).submit();
+    }
+}
+</script>
+@endpush

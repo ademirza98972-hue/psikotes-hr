@@ -67,15 +67,15 @@
 
     {{-- DATA TABLE --}}
     <div class="mt-4 bg-white rounded-xl border border-[#c0c8cb] overflow-hidden shadow-sm">
-        <div class="overflow-x-auto">
+        <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-[#f2f4f6] border-b border-[#c0c8cb]">
-                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#41484b]">Nama</th>
-                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#41484b]">Email</th>
-                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#41484b]">Peran</th>
-                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#41484b]">Status</th>
-                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#41484b] text-right">Aksi</th>
+                <thead style="position: sticky; top: 0; z-index: 5;">
+                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider" style="color: #7db8c2;">Nama</th>
+                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider" style="color: #7db8c2;">Email</th>
+                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider" style="color: #7db8c2;">Peran</th>
+                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider" style="color: #7db8c2;">Status</th>
+                        <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider text-right" style="color: #7db8c2;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#c0c8cb]/30">

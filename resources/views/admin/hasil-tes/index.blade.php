@@ -226,20 +226,20 @@ class="w-full">
         @foreach ($penjadwalan as $sesi)
         @php $listPeserta = $pesertaBySesi[$sesi['id']] ?? []; @endphp
         <div x-show="sesiTerpilih == '{{ $sesi['id'] }}'" x-transition class="bg-white border border-[var(--color-outline-variant)] rounded-xl overflow-hidden shadow-sm">
-            <div class="overflow-x-auto">
+            <div style="overflow: auto; max-height: calc(100vh - 300px);">
                 <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-[var(--color-surface-container)] border-b border-[var(--color-outline-variant)]/50">
+                    <thead style="position: sticky; top: 0; z-index: 5;">
+                        <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
                             <th class="py-4 px-6 w-12">
                                 <input type="checkbox"
                                        class="w-4 h-4 rounded border-[var(--color-outline-variant)] text-[var(--color-psikotes)] focus:ring-[var(--color-psikotes)] cursor-pointer"
                                        @change="toggleAll($event.target.checked)">
                             </th>
-                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">PESERTA</th>
-                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">DEPARTEMEN / POSISI</th>
-                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">ALAT TES</th>
-                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">STATUS</th>
-                            <th class="py-4 px-6 text-right text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">AKSI</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">PESERTA</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">DEPARTEMEN / POSISI</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">ALAT TES</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">STATUS</th>
+                            <th class="py-4 px-6 text-right text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">AKSI</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[var(--color-outline-variant)]/40">

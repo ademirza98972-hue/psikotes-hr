@@ -122,12 +122,12 @@
     </div>{{-- /STICKY HEADER --}}
 
     {{-- TABLE + PAGINATION + EMPTY STATE --}}
-    <div class="mt-4 rounded-xl border border-[#e0e3e5] bg-white shadow-sm" style="clip-path: inset(0 round 12px);">
+    <div class="mt-4 rounded-xl border border-[#e0e3e5] bg-white overflow-hidden shadow-sm">
 
-        <div>
+        <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left border-collapse">
                 <caption class="sr-only">Daftar Data Karyawan</caption>
-                <thead id="dk-thead">
+                <thead style="position: sticky; top: 0; z-index: 5;">
                     <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
                         <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">NIK</th>
                         <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">Nama Karyawan</th>
@@ -332,23 +332,4 @@
 
 <style>[x-cloak] { display: none !important; }</style>
 
-@push('scripts')
-<script>
-    requestAnimationFrame(function () {
-        const thead = document.getElementById('dk-thead');
-        const stickyBar = document.querySelector('[data-sticky-bar]');
-        if (!thead) return;
-
-        const top = stickyBar ? stickyBar.getBoundingClientRect().height : 0;
-        thead.style.position = 'sticky';
-        thead.style.top = top + 'px';
-        thead.style.zIndex = '5';
-
-        window.addEventListener('resize', function () {
-            const h = stickyBar ? stickyBar.getBoundingClientRect().height : 0;
-            thead.style.top = h + 'px';
-        });
-    });
-</script>
-@endpush
 @endsection

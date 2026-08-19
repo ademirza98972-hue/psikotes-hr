@@ -79,16 +79,16 @@
 
     {{-- TABLE CARD --}}
     <div class="bg-white border border-[#e0e3e5] rounded-xl overflow-hidden">
-        <div class="overflow-x-auto">
+        <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left text-sm border-collapse">
-                <thead>
-                    <tr class="bg-[#f2f4f6] border-b border-[#e0e3e5]">
-                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] w-24">KODE</th>
-                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b]">Nama Alat Tes</th>
-                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] text-center">Soal</th>
-                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b]">Format</th>
-                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b]">Status</th>
-                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] text-right">Aksi</th>
+                <thead style="position: sticky; top: 0; z-index: 5;">
+                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold w-24" style="color: #7db8c2;">KODE</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold" style="color: #7db8c2;">Nama Alat Tes</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-center" style="color: #7db8c2;">Soal</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold" style="color: #7db8c2;">Format</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold" style="color: #7db8c2;">Status</th>
+                        <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-right" style="color: #7db8c2;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#e0e3e5]/60">

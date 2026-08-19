@@ -46,13 +46,13 @@
 
     <div class="mt-4 w-full rounded-xl border border-[#c0c8cb] bg-white overflow-hidden shadow-sm">
 
-        <div class="overflow-x-auto">
+        <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left border-collapse">
-                <thead class="bg-[#f2f4f6]">
-                    <tr>
-                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-[#40484b]">NAMA DEPARTEMEN</th>
-                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-[#40484b] text-center">JUMLAH POSISI</th>
-                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-[#40484b] text-right">AKSI</th>
+                <thead style="position: sticky; top: 0; z-index: 5;">
+                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest" style="color: #7db8c2;">NAMA DEPARTEMEN</th>
+                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-center" style="color: #7db8c2;">JUMLAH POSISI</th>
+                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-right" style="color: #7db8c2;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#c0c8cb]/30 text-sm">

@@ -3,16 +3,16 @@
         <div class="mb-2 px-6 pt-4 text-[12px] text-on-surface-variant">
             Menampilkan <strong>{{ $items->firstItem() ?? $items->total() }}</strong> dari <strong>{{ $items->total() }}</strong> data karyawan
         </div>
-        <div class="overflow-x-auto">
+        <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-surface-container-low border-b border-outline-variant">
-                        <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">NIK</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Nama Karyawan</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Departemen</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Dihapus Pada</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider text-right">Aksi</th>
+                <thead style="position: sticky; top: 0; z-index: 5;">
+                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">NIK</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Nama Karyawan</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Departemen</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Status</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Dihapus Pada</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color: #7db8c2;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-outline-variant/30">

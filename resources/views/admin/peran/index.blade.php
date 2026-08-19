@@ -60,15 +60,15 @@
 
     {{-- Table Card --}}
     <div class="bg-white border border-[#c0c8cb] rounded-xl overflow-hidden shadow-sm">
-        <div class="overflow-x-auto">
+        <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-[#f2f4f6] border-b border-[#c0c8cb]">
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b]">Nama Peran</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b]">Deskripsi</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b] text-center">Jumlah Izin</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b] text-center">Jumlah Pengguna</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-[#40484b] text-right">Aksi</th>
+                <thead style="position: sticky; top: 0; z-index: 5;">
+                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em]" style="color: #7db8c2;">Nama Peran</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em]" style="color: #7db8c2;">Deskripsi</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-center" style="color: #7db8c2;">Jumlah Izin</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-center" style="color: #7db8c2;">Jumlah Pengguna</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-right" style="color: #7db8c2;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#c0c8cb]/30">

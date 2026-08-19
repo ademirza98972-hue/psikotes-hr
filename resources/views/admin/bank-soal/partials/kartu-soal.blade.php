@@ -26,13 +26,6 @@
         </div>
     </div>
 
-    <script>
-    function confirmHapus(soalId, url) {
-        if (confirm('Yakin ingin menghapus soal ini?')) {
-            document.getElementById('hapus-soal-' + soalId).submit();
-        }
-    }
-    </script>
 
     @if (($soal['tipe_format'] ?? '') === 'grid')
         <div style="font-family: monospace; font-size: 13px; color: #374151; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; letter-spacing: 2px;">

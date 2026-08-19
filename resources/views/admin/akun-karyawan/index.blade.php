@@ -83,8 +83,8 @@
                 <caption class="sr-only">Daftar Akun Karyawan</caption>
                 <thead>
                     <tr class="bg-[#f2f4f6] border-b border-[#e0e3e5]">
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Nama Karyawan</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">NIK</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Nama Karyawan</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Departemen</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Posisi</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b] text-center">Status Akun</th>
@@ -121,6 +121,9 @@
                             };
                         @endphp
                         <tr class="hover:bg-[#f7f9fb] transition-colors group">
+                            <td class="px-6 py-4 text-sm font-mono text-[#40484b]">
+                                {{ $u->profilKaryawan?->nik_karyawan ?? '-' }}
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold {{ $avatarBg }}">
@@ -131,9 +134,6 @@
                                         <p class="text-[11px] text-[#40484b]">{{ $u->email }}</p>
                                     </div>
                                 </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm font-mono text-[#40484b]">
-                                {{ $u->profilKaryawan?->nik_karyawan ?? '-' }}
                             </td>
                             <td class="px-6 py-4 text-sm text-[#40484b]">
                                 {{ $u->profilKaryawan?->departemen ?? '-' }}

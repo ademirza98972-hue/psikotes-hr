@@ -24,6 +24,11 @@
             <div class="space-y-4">
                 <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Akun</p>
                 <div>
+                    <label for="nik_kandidat" class="block text-sm font-medium text-slate-700">NIK KTP <span class="text-rose-600">*</span></label>
+                    <input id="nik_kandidat" name="nik_kandidat" type="text" value="{{ old('nik_kandidat') }}" maxlength="16" required
+                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                </div>
+                <div>
                     <label for="nama_kandidat" class="block text-sm font-medium text-slate-700">Nama Kandidat</label>
                     <input id="nama_kandidat" name="nama_kandidat" type="text" value="{{ old('nama_kandidat') }}" required
                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
@@ -88,11 +93,7 @@
                            placeholder="contoh: S1 Psikologi"
                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
                 </div>
-                <div>
-                    <label for="nik_kandidat" class="block text-sm font-medium text-slate-700">NIK KTP <span class="text-rose-600">*</span></label>
-                    <input id="nik_kandidat" name="nik_kandidat" type="text" value="{{ old('nik_kandidat') }}" maxlength="16" required
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-                </div>
+                
             </div>
 
             <div class="rounded-md border border-sky-600 bg-sky-500 px-4 py-3 text-sm text-white">

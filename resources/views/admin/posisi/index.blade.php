@@ -83,17 +83,27 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-4 py-10 text-center">
+                            <td colspan="3" class="px-4 py-14 text-center">
                                 @if ($kataKunci || $filterDepartemen)
-                                    <p class="text-sm text-slate-500">Tidak ada posisi yang cocok dengan filter aktif.</p>
-                                    <div class="mt-3">
-                                        <a href="{{ route('admin.posisi.index') }}"
-                                            class="inline-block rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">
-                                            Reset Filter
-                                        </a>
-                                    </div>
+                                    <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
+                                    <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>
+                                    <p class="text-[12px] text-[#71787c] mb-4">Coba ubah kata kunci atau hapus filter aktif.</p>
+                                    <a href="{{ route('admin.posisi.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
+                                        <span class="material-symbols-outlined text-[16px]">close</span>
+                                        Reset Filter
+                                    </a>
                                 @else
-                                    <p class="text-sm text-slate-500">Belum ada data posisi.</p>
+                                    <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">work</span>
+                                    <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Data Posisi</p>
+                                    <p class="text-[12px] text-[#71787c] mb-4">Tambahkan posisi jabatan untuk melengkapi data organisasi.</p>
+                                    @auth
+                                        @if(auth()->user()->hasIzin('master_data.kelola'))
+                                            <button type="button" @click="openModal()" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                                <span class="material-symbols-outlined text-[16px]">add</span>
+                                                Tambah Posisi
+                                            </button>
+                                        @endif
+                                    @endauth
                                 @endif
                             </td>
                         </tr>

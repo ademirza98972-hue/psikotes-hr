@@ -149,17 +149,27 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-10 text-center">
+                            <td colspan="5" class="px-6 py-14 text-center">
                                 @if ($kataKunci || $filterPeran || $filterStatus)
-                                    <p class="text-[14px] text-[#41484b]">Tidak ada data pengguna internal yang cocok dengan filter aktif.</p>
-                                    <div class="mt-3">
-                                        <a href="{{ route('admin.pengguna-admin.index') }}"
-                                            class="inline-block border border-[#71787b] px-4 py-2 rounded-xl text-[14px] font-medium text-[#41484b] hover:bg-white transition-colors">
-                                            Reset Filter
-                                        </a>
-                                    </div>
+                                    <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
+                                    <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>
+                                    <p class="text-[12px] text-[#71787c] mb-4">Coba ubah kata kunci atau hapus filter aktif.</p>
+                                    <a href="{{ route('admin.pengguna-admin.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
+                                        <span class="material-symbols-outlined text-[16px]">close</span>
+                                        Reset Filter
+                                    </a>
                                 @else
-                                    <p class="text-[14px] text-[#41484b]">Belum ada data pengguna internal. Klik <span class="font-semibold">Tambah Admin/Staff</span> untuk menambahkan.</p>
+                                    <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">admin_panel_settings</span>
+                                    <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Pengguna Admin</p>
+                                    <p class="text-[12px] text-[#71787c] mb-4">Tambahkan pengguna admin atau staff untuk sistem.</p>
+                                    @auth
+                                        @if(auth()->user()->hasIzin('pengguna.tambah'))
+                                            <a href="{{ route('admin.pengguna-admin.tambah') }}" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                                <span class="material-symbols-outlined text-[16px]">add</span>
+                                                Tambah Admin/Staff
+                                            </a>
+                                        @endif
+                                    @endauth
                                 @endif
                             </td>
                         </tr>

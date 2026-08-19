@@ -56,7 +56,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-body-md text-on-surface-variant">Tidak ada peran yang dihapus.</td>
+                            <td colspan="5" class="px-6 py-14 text-center">
+                                <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">delete_sweep</span>
+                                <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak Ada Data Terhapus</p>
+                                <p class="text-[12px] text-[#71787c]">Tidak ada peran yang dihapus.</p>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

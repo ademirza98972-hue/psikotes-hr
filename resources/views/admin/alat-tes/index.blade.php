@@ -162,8 +162,16 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-12 text-center text-sm text-[#40484b]">
-                                Belum ada data alat tes.
+                            <td colspan="6" class="px-6 py-14 text-center">
+                                <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">quiz</span>
+                                <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Alat Tes</p>
+                                <p class="text-[12px] text-[#71787c] mb-4">Tambahkan instrumen tes psikometri untuk digunakan dalam sesi.</p>
+                                @if(auth()->user()->hasIzin('kategori_tes.kelola'))
+                                    <a href="{{ route('admin.alat-tes.tambah') }}" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                        <span class="material-symbols-outlined text-[16px]">add</span>
+                                        Tambah Alat Tes
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @endforelse

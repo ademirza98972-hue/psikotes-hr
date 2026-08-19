@@ -304,8 +304,10 @@ class="w-full">
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="py-8 text-center text-sm text-[var(--color-on-surface-variant)]">
-                                Belum ada peserta dengan hasil tes pada sesi ini.
+                            <td colspan="6" class="px-6 py-14 text-center">
+                                <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">assignment</span>
+                                <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Hasil Tes</p>
+                                <p class="text-[12px] text-[#71787c] mb-4">Belum ada peserta dengan hasil tes pada sesi ini.</p>
                             </td>
                         </tr>
                         @endforelse

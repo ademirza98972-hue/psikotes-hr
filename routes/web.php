@@ -58,6 +58,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/peserta/tes/{sesiId}/kraepelin', [PengerjaanTesController::class, 'kerjakanGrid'])->name('peserta.tes.kraepelin');
     Route::post('/peserta/tes/{sesiId}/kraepelin', [PengerjaanTesController::class, 'simpanKolomGrid'])->name('peserta.tes.simpanKolomGrid');
     Route::get('/peserta/tes/{sesiId}/selesai', [PengerjaanTesController::class, 'selesai'])->name('peserta.tes.selesai');
+    Route::get('/peserta/tes/{sesiId}/hafalan-me', [PengerjaanTesController::class, 'hafalanMe'])->name('peserta.tes.hafalan-me');
+    Route::post('/peserta/tes/{sesiId}/hafalan-me-selesai', [PengerjaanTesController::class, 'hafalanMeSelesai'])->name('peserta.tes.hafalan-me-selesai');
+    Route::get('/peserta/tes/{sesiId}/panduan-ist/{kodeSubtes}', [PengerjaanTesController::class, 'panduanIst'])->name('peserta.tes.panduan-ist');
+    Route::post('/peserta/tes/{sesiId}/panduan-ist/{kodeSubtes}/mulai', [PengerjaanTesController::class, 'panduanIstMulai'])->name('peserta.tes.panduan-ist-mulai');
 
     Route::prefix('admin/akun-karyawan')->name('admin.akun-karyawan.')->group(function () {
         Route::get('/', [PenggunaController::class, 'index'])->middleware('izin:pengguna.lihat')->name('index');

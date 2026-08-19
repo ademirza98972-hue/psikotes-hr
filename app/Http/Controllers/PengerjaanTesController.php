@@ -355,6 +355,31 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.kraepelin', $sesiId);
         }
 
+        // IST: panduan per subtes + hafalan ME
+        if ($kodeAlatTes === 'IST') {
+            $nomorSoal = $soal['nomor'] ?? 0;
+            $kodeSub = match(true) {
+                $nomorSoal <= 20  => 'SE',
+                $nomorSoal <= 40  => 'WA',
+                $nomorSoal <= 60  => 'AN',
+                $nomorSoal <= 76  => 'GE',
+                $nomorSoal <= 96  => 'RA',
+                $nomorSoal <= 116 => 'ZR',
+                $nomorSoal <= 136 => 'FA',
+                $nomorSoal <= 156 => 'WU',
+                default           => 'ME',
+            };
+            if ($kodeSub === 'ME') {
+                if (!Session::get($this->sessionKey($sesiId, 'me_hafalan_selesai'))) {
+                    return redirect()->route('peserta.tes.hafalan-me', $sesiId);
+                }
+            } else {
+                if (!Session::get($this->sessionKey($sesiId, "ist_panduan_{$kodeSub}_selesai"))) {
+                    return redirect()->route('peserta.tes.panduan-ist', [$sesiId, $kodeSub]);
+                }
+            }
+        }
+
         // IST per-subtes timer
         $kodeSubtesSaat = $kodeAlatTes;
         $alatTesSaat = \App\Models\AlatTes::where('kode', $kodeSubtesSaat)->first()
@@ -541,6 +566,36 @@ class PengerjaanTesController extends Controller
             'kode_subtes_timer'     => $kodeSubtesTimer ?? null,
             'is_ist'                => $isIST ?? false,
         ]);
+    }
+
+    public function panduanIst(int $sesiId, string $kodeSubtes)
+    {
+        $sesi = $this->getSesiById($sesiId);
+        if (!$sesi) return redirect()->route('peserta.dashboard');
+        $valid = ['SE','WA','AN','GE','RA','ZR','FA','WU'];
+        if (!in_array($kodeSubtes, $valid)) return redirect()->route('peserta.tes.kerjakan', $sesiId);
+        return view('peserta.panduan-ist-subtes', ['sesiId' => $sesiId, 'kodeSubtes' => $kodeSubtes]);
+    }
+
+    public function panduanIstMulai(int $sesiId, string $kodeSubtes)
+    {
+        Session::put($this->sessionKey($sesiId, "ist_panduan_{$kodeSubtes}_selesai"), true);
+        return redirect()->route('peserta.tes.kerjakan', $sesiId);
+    }
+
+    public function hafalanMe(int $sesiId)
+    {
+        $sesi = $this->getSesiById($sesiId);
+        if (!$sesi) {
+            return redirect()->route('peserta.dashboard');
+        }
+        return view('peserta.hafalan-me', ['sesiId' => $sesiId]);
+    }
+
+    public function hafalanMeSelesai(Request $request, int $sesiId)
+    {
+        Session::put($this->sessionKey($sesiId, 'me_hafalan_selesai'), true);
+        return redirect()->route('peserta.tes.kerjakan', $sesiId);
     }
 
     public function timeoutSesi(Request $request, int $sesiId)

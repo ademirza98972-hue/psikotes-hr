@@ -30,8 +30,8 @@
     <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="text-lg font-bold text-[#191c1e]">Daftar Penjadwalan Tes</h2>
-            <p class="mt-0.5 text-sm text-[#41484b]">Sesi tes yang dijadwalkan untuk kandidat dan karyawan.</p>
+            <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">Daftar Penjadwalan Tes</h2>
+            <p class="mt-0.5 text-[14px] text-[#40484b]">Sesi tes yang dijadwalkan untuk kandidat dan karyawan.</p>
         </div>
         <a href="{{ route('admin.penjadwalan-tes.tambah') }}"
            class="self-start inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors whitespace-nowrap">
@@ -48,7 +48,7 @@
                     ? round(($sesi->jumlah_selesai_count / $sesi->jumlah_peserta_count) * 100)
                     : 0;
             @endphp
-            <div class="rounded-xl border border-[#c1c7cb] bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#2C5F6F] hover:shadow-md flex flex-col justify-between">
+            <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#2C5F6F] hover:shadow-md flex flex-col justify-between">
 
                 <div>
                     <div class="flex justify-between items-start mb-4">
@@ -92,7 +92,7 @@
                         <div class="h-full rounded-full transition-all" style="width: {{ $persen }}%; background-color: #2C5F6F;"></div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 border-t border-[#c1c7cb] pt-4">
+                    <div class="flex items-center justify-end gap-2 border-t border-[#e0e3e5] pt-4">
                         <a href="{{ route('admin.penjadwalan-tes.detail', $sesi->id) }}"
                            class="px-4 py-2 text-sm font-semibold text-[#2C5F6F] hover:bg-[#2C5F6F]/5 rounded-lg transition-colors">
                             Detail
@@ -116,8 +116,15 @@
 
             </div>
         @empty
-            <div class="col-span-full rounded-xl border border-dashed border-[#c1c7cb] bg-white px-6 py-10 text-center text-sm text-[#41484b]">
-                Belum ada penjadwalan tes.
+            <div class="col-span-full py-14 text-center">
+                <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">event_busy</span>
+                <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum ada penjadwalan tes</p>
+                <p class="text-[12px] text-[#71787c] mb-4">Buat sesi tes pertama untuk mulai menjadwalkan peserta.</p>
+                <a href="{{ route('admin.penjadwalan-tes.tambah') }}"
+                   class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-[16px]">add</span>
+                    Tambah Penjadwalan
+                </a>
             </div>
         @endforelse
     </div>

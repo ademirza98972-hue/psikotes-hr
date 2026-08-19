@@ -6,51 +6,46 @@
     <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
         <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-xl font-bold text-[#191c1e]">Aktivitas Terbaru</h1>
+                <h1 class="text-[28px] leading-9 font-semibold text-[#00303c]">Aktivitas Terbaru</h1>
                 <p class="mt-1 text-sm text-[#40484b]">Daftar seluruh pengguna sistem dari semua tipe akun.</p>
             </div>
             <a href="{{ route('admin.dashboard') }}"
-               class="self-start rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-200">
+               class="self-start inline-flex items-center gap-1.5 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
                 ← Kembali ke Dashboard
             </a>
         </div>
         <form method="GET" action="{{ route('admin.aktivitas.index') }}" class="flex gap-2">
             <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama atau email..."
-                class="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
-            <button type="submit" class="rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">Cari</button>
+                class="flex-1 rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+            <button type="submit" class="rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1E414C] transition-all">Cari</button>
             @if ($kataKunci)
-                <a href="{{ route('admin.aktivitas.index') }}" class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Reset</a>
+                <a href="{{ route('admin.aktivitas.index') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Reset</a>
             @endif
         </form>
     </div>{{-- /STICKY HEADER --}}
 
-    <div class="mt-4 mb-3 border-b border-slate-200 pb-3 text-xs text-slate-500">
-        Daftar seluruh pengguna sistem yang terdaftar di semua tipe akun (karyawan, kandidat, admin/staff), diurutkan dari yang paling baru.
-    </div>
-
-    <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-        <table class="min-w-full divide-y divide-slate-200 text-sm">
-            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
-                <tr>
-                    <th class="px-4 py-3">Nama</th>
-                    <th class="px-4 py-3">Email</th>
-                    <th class="px-4 py-3">Tipe Akun</th>
-                    <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3 text-right">Dibuat</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 bg-white">
+    <div class="mt-4 rounded-xl border border-[#e0e3e5] bg-white overflow-hidden shadow-sm">
+        <div style="overflow: auto; max-height: calc(100vh - 300px);">
+        <table class="w-full divide-y divide-[#e0e3e5] text-sm">
+            <thead style="position: sticky; top: 0; z-index: 5;"><tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Nama</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Email</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Tipe Akun</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Status</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Dibuat</th>
+            </tr></thead>
+            <tbody class="divide-y divide-[#e0e3e5] bg-white">
                 @forelse ($aktivitas as $u)
-                    <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3 font-medium text-slate-900">{{ $u->name }}</td>
-                        <td class="px-4 py-3 text-slate-600">{{ $u->email }}</td>
+                    <tr class="transition-colors" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background=''">
+                        <td class="px-4 py-3 font-medium text-[#191c1e]">{{ $u->name }}</td>
+                        <td class="px-4 py-3 text-[#40484b]">{{ $u->email }}</td>
                         <td class="px-4 py-3">
                             @php
                                 $badgeClass = match($u->tipe_akun) {
-                                    'karyawan' => 'bg-[#2C5F6F] text-white',
-                                    'kandidat' => 'bg-emerald-600 text-white',
-                                    'custom' => 'bg-purple-600 text-white',
-                                    default => 'bg-slate-500 text-white',
+                                    'karyawan' => 'bg-[#2C5F6F]/10 text-[#2C5F6F] border border-[#2C5F6F]/20',
+                                    'kandidat' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+                                    'custom' => 'bg-violet-50 text-violet-700 border border-violet-200',
+                                    default => 'bg-[#f2f4f6] text-[#40484b] border border-[#c0c8cb]',
                                 };
                                 $labelTipe = match($u->tipe_akun) {
                                     'karyawan' => 'Karyawan',
@@ -66,11 +61,11 @@
                         <td class="px-4 py-3">
                             @php
                                 $warnaStatus = match($u->status) {
-                                    'aktif' => 'bg-emerald-600 text-white border-emerald-700',
-                                    'menunggu_verifikasi' => 'bg-amber-500 text-white border-amber-600',
-                                    'ditolak' => 'bg-rose-600 text-white border-rose-700',
-                                    'nonaktif' => 'bg-slate-500 text-white border-slate-600',
-                                    default => 'bg-slate-500 text-white border-slate-600',
+                                    'aktif' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+                                    'menunggu_verifikasi' => 'bg-amber-50 text-amber-700 border border-amber-200',
+                                    'ditolak' => 'bg-rose-50 text-rose-700 border border-rose-200',
+                                    'nonaktif' => 'bg-[#f2f4f6] text-[#40484b] border border-[#c0c8cb]',
+                                    default => 'bg-[#f2f4f6] text-[#40484b] border border-[#c0c8cb]',
                                 };
                                 $labelStatus = match($u->status) {
                                     'aktif' => 'Aktif',
@@ -84,18 +79,29 @@
                                 {{ $labelStatus }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-right text-xs text-slate-500">
-                            <div class="font-medium text-slate-700">{{ $u->created_at->format('d M Y') }}</div>
-                            <div class="text-slate-400">{{ $u->created_at->format('H:i') }}</div>
+                        <td class="px-4 py-3 text-right text-xs text-[#40484b]">
+                            <div class="font-medium text-[#191c1e]">{{ $u->created_at->format('d M Y') }}</div>
+                            <div class="text-[#71787c]">{{ $u->created_at->format('H:i') }}</div>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">Tidak ada aktivitas ditemukan.</td></tr>
+                    <tr>
+                        <td colspan="5" class="px-4 py-14 text-center">
+                            <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
+                            <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>
+                            <p class="text-[12px] text-[#71787c] mb-4">Coba ubah kata kunci pencarian.</p>
+                            <a href="{{ route('admin.aktivitas.index') }}"
+                               class="inline-flex items-center gap-1.5 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
+                                Reset Filter
+                            </a>
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
+        </div>
 
-        <div class="border-t border-slate-200 px-4 py-3">
+        <div class="border-t border-[#e0e3e5] px-6 py-4 flex justify-end">
             {{ $aktivitas->links() }}
         </div>
     </div>

@@ -71,8 +71,8 @@
                     <span class="material-symbols-outlined text-[22px] text-[#2C5F6F]">assignment</span>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $totalSesi }}</p>
-                    <p class="text-xs text-slate-500">Total Ditugaskan</p>
+                    <p class="text-2xl font-bold text-[#191c1e]">{{ $totalSesi }}</p>
+                    <p class="text-xs text-[#40484b]">Total Ditugaskan</p>
                 </div>
             </div>
         </div>
@@ -83,8 +83,8 @@
                     <span class="material-symbols-outlined text-[22px] text-amber-500">pending_actions</span>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $perluDikerjakan }}</p>
-                    <p class="text-xs text-slate-500">Perlu Dikerjakan</p>
+                    <p class="text-2xl font-bold text-[#191c1e]">{{ $perluDikerjakan }}</p>
+                    <p class="text-xs text-[#40484b]">Perlu Dikerjakan</p>
                 </div>
             </div>
         </div>
@@ -95,8 +95,8 @@
                     <span class="material-symbols-outlined text-[22px] text-emerald-600">task_alt</span>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $selesai }}</p>
-                    <p class="text-xs text-slate-500">Selesai Dikerjakan</p>
+                    <p class="text-2xl font-bold text-[#191c1e]">{{ $selesai }}</p>
+                    <p class="text-xs text-[#40484b]">Selesai Dikerjakan</p>
                 </div>
             </div>
         </div>
@@ -104,7 +104,7 @@
 
     {{-- Sesi Perlu Dikerjakan --}}
     <div id="sesi-aktif" class="scroll-mt-20">
-        <h3 class="text-base font-semibold text-slate-900 mb-3 flex items-center gap-2">
+        <h3 class="text-base font-semibold text-[#191c1e] mb-3 flex items-center gap-2">
             <span class="material-symbols-outlined text-[18px] text-[#2C5F6F]">pending_actions</span>
             Perlu Dikerjakan
             @if ($sesiAktif->isNotEmpty())
@@ -124,9 +124,9 @@
                         {{-- Header --}}
                         <div class="flex items-start justify-between gap-4 mb-4">
                             <div class="min-w-0">
-                                <h4 class="text-base font-semibold text-slate-900 truncate">{{ $sesi['nama_sesi'] }}</h4>
+                                <h4 class="text-base font-semibold text-[#191c1e] truncate">{{ $sesi['nama_sesi'] }}</h4>
                                 @if($sesi['departemen_terkait'])
-                                    <div class="flex items-center gap-1 mt-1 text-xs text-slate-500">
+                                    <div class="flex items-center gap-1 mt-1 text-xs text-[#40484b]">
                                         <span class="material-symbols-outlined text-[14px]">business</span>
                                         {{ $sesi['departemen_terkait'] }}
                                     </div>
@@ -144,7 +144,7 @@
 
                                 {{-- Status badge --}}
                                 @if ($sesi['status_sesi'] === 'Belum Dimulai')
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 border border-slate-200">
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-[#f7f9fb] px-3 py-1 text-xs font-medium text-[#40484b] border border-[#e0e3e5]">
                                         <span class="material-symbols-outlined text-[13px]">schedule</span>
                                         Belum Dimulai
                                     </span>
@@ -163,15 +163,15 @@
                         </div>
 
                         {{-- Meta info --}}
-                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-500 mb-4">
+                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#40484b] mb-4">
                             <span class="flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-[14px] text-slate-400">calendar_today</span>
+                                <span class="material-symbols-outlined text-[14px] text-[#71787c]">calendar_today</span>
                                 {{ \Carbon\Carbon::parse($sesi['tanggal_mulai'])->translatedFormat('d M Y') }}
                                 &ndash;
                                 {{ \Carbon\Carbon::parse($sesi['tanggal_selesai'])->translatedFormat('d M Y') }}
                             </span>
                             <span class="flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-[14px] text-slate-400">quiz</span>
+                                <span class="material-symbols-outlined text-[14px] text-[#71787c]">quiz</span>
                                 {{ count($sesi['daftar_alat_tes_ditugaskan'] ?? []) }} alat tes
                             </span>
                         </div>
@@ -179,7 +179,7 @@
                         {{-- Alat Tes Chips --}}
                         <div class="flex flex-wrap gap-2 mb-5">
                             @foreach ($sesi['daftar_alat_tes_ditugaskan'] as $alat)
-                                <span class="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 border border-slate-200">
+                                <span class="inline-flex items-center rounded-md bg-[#f2f4f6] px-2.5 py-1 text-[11px] font-medium text-[#40484b] border border-[#e0e3e5]">
                                     {{ $alat }}
                                 </span>
                             @endforeach
@@ -188,7 +188,7 @@
                         {{-- CTA --}}
                         @if ($sesi['status_sesi'] === 'Belum Dimulai')
                             <button disabled
-                                    class="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed">
+                                    class="inline-flex items-center gap-2 rounded-lg bg-[#f2f4f6] px-5 py-2.5 text-sm font-medium text-[#71787c] cursor-not-allowed">
                                 <span class="material-symbols-outlined text-base">schedule</span>
                                 Belum Dimulai
                             </button>
@@ -210,15 +210,15 @@
             </div>
         @else
             <div class="rounded-xl border border-dashed border-[#e0e3e5] bg-white p-8 text-center">
-                <span class="material-symbols-outlined text-3xl text-slate-200 block mb-2">check_circle</span>
-                <p class="text-sm text-slate-400">Tidak ada sesi yang perlu dikerjakan saat ini.</p>
+                <span class="material-symbols-outlined text-3xl text-[#c0c8cb] block mb-2">check_circle</span>
+                <p class="text-sm text-[#71787c]">Tidak ada sesi yang perlu dikerjakan saat ini.</p>
             </div>
         @endif
     </div>
 
     {{-- Riwayat Tes --}}
     <div id="riwayat" class="scroll-mt-20">
-        <h3 class="text-base font-semibold text-slate-500 mb-3 flex items-center gap-2">
+        <h3 class="text-base font-semibold text-[#40484b] mb-3 flex items-center gap-2">
             <span class="material-symbols-outlined text-[18px]">history</span>
             Riwayat Tes
         </h3>
@@ -230,8 +230,8 @@
 
                         <div class="flex items-center justify-between gap-4">
                             <div class="min-w-0">
-                                <h4 class="text-sm font-semibold text-slate-700 truncate">{{ $sesi['nama_sesi'] }}</h4>
-                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-xs text-slate-400">
+                                <h4 class="text-sm font-semibold text-[#40484b] truncate">{{ $sesi['nama_sesi'] }}</h4>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-xs text-[#71787c]">
                                     @if($sesi['departemen_terkait'])
                                         <span class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-[12px]">business</span>
@@ -268,8 +268,8 @@
             </div>
         @else
             <div class="rounded-xl border border-dashed border-[#e0e3e5] bg-white p-8 text-center">
-                <span class="material-symbols-outlined text-3xl text-slate-200 block mb-2">history</span>
-                <p class="text-sm text-slate-400">Belum ada riwayat tes.</p>
+                <span class="material-symbols-outlined text-3xl text-[#c0c8cb] block mb-2">history</span>
+                <p class="text-sm text-[#71787c]">Belum ada riwayat tes.</p>
             </div>
         @endif
     </div>

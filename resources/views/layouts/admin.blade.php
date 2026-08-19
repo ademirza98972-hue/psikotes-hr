@@ -312,7 +312,7 @@
          :style="{ marginLeft: sidebarOpen ? '280px' : '64px' }">
 
         {{-- HEADER --}}
-        <header class="flex h-16 items-center justify-between border-b border-[#e0e3e5] bg-white px-6 shrink-0 sticky top-0 z-40">
+        <header class="flex h-16 items-center justify-between bg-white px-6 shrink-0 sticky top-0 z-40" style="border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 12px rgba(0,0,0,0.10);">
 
             <div class="flex items-center gap-4">
                 {{-- Hamburger --}}

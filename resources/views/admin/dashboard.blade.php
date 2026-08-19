@@ -2,6 +2,50 @@
 
 @section('content')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        .stat-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            border-left: 4px solid;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .stat-card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.09);
+            transform: translateY(-2px);
+        }
+        .stat-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .stat-number {
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.1;
+            margin-top: 2px;
+        }
+        .stat-sub {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+    </style>
 
     <div class="max-w-[1440px] mx-auto space-y-5">
 
@@ -41,66 +85,66 @@
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
 
             {{-- Total Karyawan --}}
-            <div class="relative flex flex-col rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#2C5F6F]/10 text-[#2C5F6F]">
-                    <span class="material-symbols-outlined text-[28px]">group</span>
+            <div class="stat-card group" style="border-left-color: #2C5F6F;">
+                <div class="stat-icon" style="background: #e8f4f6; color: #2C5F6F;">
+                    <span class="material-symbols-outlined text-[26px]">group</span>
                 </div>
-                <p class="text-[12px] text-[#40484b]">Total Karyawan Terdaftar</p>
-                <h3 class="mt-1 text-[32px] font-bold text-[#191c1e]">{{ number_format($totalKaryawan) }}</h3>
+                <p class="stat-label">Total Karyawan Terdaftar</p>
+                <h3 class="stat-number">{{ number_format($totalKaryawan) }}</h3>
             </div>
 
             {{-- Total Kandidat --}}
-            <div class="relative flex flex-col rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#d4e3ff]/40 text-[#505f76]">
-                    <span class="material-symbols-outlined text-[28px]">person_search</span>
+            <div class="stat-card group" style="border-left-color: #3b82f6;">
+                <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
+                    <span class="material-symbols-outlined text-[26px]">person_search</span>
                 </div>
-                <p class="text-[12px] text-[#40484b]">Total Kandidat</p>
-                <h3 class="mt-1 text-[32px] font-bold text-[#191c1e]">{{ number_format($totalKandidat) }}</h3>
+                <p class="stat-label">Total Kandidat</p>
+                <h3 class="stat-number">{{ number_format($totalKandidat) }}</h3>
                 <div class="mt-3 flex items-center gap-3 text-[12px]">
-                    <span class="text-amber-600 font-semibold">{{ $kandidatMenunggu }}</span> menunggu
-                    <span class="text-emerald-600 font-semibold">{{ $kandidatAktif }}</span> aktif
-                    <span class="text-rose-600 font-semibold">{{ $kandidatDitolak }}</span> ditolak
+                    <span class="font-semibold text-amber-600">{{ $kandidatMenunggu }}</span> menunggu
+                    <span class="font-semibold text-emerald-600">{{ $kandidatAktif }}</span> aktif
+                    <span class="font-semibold text-rose-600">{{ $kandidatDitolak }}</span> ditolak
                 </div>
             </div>
 
             {{-- Admin & Staff --}}
-            <div class="relative flex flex-col rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#dae2fd]/50 text-[#232b3f]">
-                    <span class="material-symbols-outlined text-[28px]">admin_panel_settings</span>
+            <div class="stat-card group" style="border-left-color: #7c3aed;">
+                <div class="stat-icon" style="background: #f5f3ff; color: #7c3aed;">
+                    <span class="material-symbols-outlined text-[26px]">admin_panel_settings</span>
                 </div>
-                <p class="text-[12px] text-[#40484b]">Admin & Staff</p>
-                <h3 class="mt-1 text-[32px] font-bold text-[#191c1e]">{{ number_format($totalAdminStaff) }}</h3>
-                <p class="mt-1 text-[11px] text-[#40484b]">Admin/staff sistem</p>
+                <p class="stat-label">Admin & Staff</p>
+                <h3 class="stat-number">{{ number_format($totalAdminStaff) }}</h3>
+                <p class="stat-sub">Admin/staff sistem</p>
             </div>
 
             {{-- NIK Belum Terpakai --}}
-            <div class="relative flex flex-col rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                    <span class="material-symbols-outlined text-[28px]">badge</span>
+            <div class="stat-card group" style="border-left-color: #d97706;">
+                <div class="stat-icon" style="background: #fffbeb; color: #d97706;">
+                    <span class="material-symbols-outlined text-[26px]">badge</span>
                 </div>
-                <p class="text-[12px] text-[#40484b]">NIK Belum Terpakai</p>
-                <h3 class="mt-1 text-[32px] font-bold text-[#191c1e]">{{ number_format($nikBelumTerpakai) }}</h3>
-                <p class="mt-1 text-[11px] text-[#40484b]">NIK siap digunakan</p>
+                <p class="stat-label">NIK Belum Terpakai</p>
+                <h3 class="stat-number">{{ number_format($nikBelumTerpakai) }}</h3>
+                <p class="stat-sub">NIK siap digunakan</p>
             </div>
 
             {{-- Total Peran --}}
-            <div class="relative flex flex-col rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#e0e3e5]/60 text-[#191c1e]">
-                    <span class="material-symbols-outlined text-[28px]">key</span>
+            <div class="stat-card group" style="border-left-color: #475569;">
+                <div class="stat-icon" style="background: #f1f5f9; color: #475569;">
+                    <span class="material-symbols-outlined text-[26px]">key</span>
                 </div>
-                <p class="text-[12px] text-[#40484b]">Total Peran</p>
-                <h3 class="mt-1 text-[32px] font-bold text-[#191c1e]">{{ number_format($totalPeran) }}</h3>
-                <p class="mt-1 text-[11px] text-[#40484b]">Peran yang tersedia</p>
+                <p class="stat-label">Total Peran</p>
+                <h3 class="stat-number">{{ number_format($totalPeran) }}</h3>
+                <p class="stat-sub">Peran yang tersedia</p>
             </div>
 
             {{-- Total Data Karyawan --}}
-            <div class="relative flex flex-col rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700">
-                    <span class="material-symbols-outlined text-[28px]">database</span>
+            <div class="stat-card group" style="border-left-color: #0891b2;">
+                <div class="stat-icon" style="background: #ecfeff; color: #0891b2;">
+                    <span class="material-symbols-outlined text-[26px]">database</span>
                 </div>
-                <p class="text-[12px] text-[#40484b]">Total Data Karyawan</p>
-                <h3 class="mt-1 text-[32px] font-bold text-[#191c1e]">{{ number_format($totalDataKaryawan) }}</h3>
-                <p class="mt-1 text-[11px] text-[#40484b]">Seluruh data karyawan (semua status)</p>
+                <p class="stat-label">Total Data Karyawan</p>
+                <h3 class="stat-number">{{ number_format($totalDataKaryawan) }}</h3>
+                <p class="stat-sub">Seluruh data karyawan (semua status)</p>
             </div>
 
         </div>

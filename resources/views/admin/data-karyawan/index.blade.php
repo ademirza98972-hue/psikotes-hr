@@ -4,7 +4,7 @@
 <div x-data="{ modalHapus: false, idHapus: null, namaHapus: '', modalImport: false }">
 
     {{-- STICKY HEADER --}}
-    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
+    <div data-sticky-bar class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
 
     {{-- PAGE HEADER --}}
     <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -122,19 +122,19 @@
     </div>{{-- /STICKY HEADER --}}
 
     {{-- TABLE + PAGINATION + EMPTY STATE --}}
-    <div class="mt-4 rounded-xl border border-[#e0e3e5] bg-white overflow-hidden shadow-sm">
+    <div class="mt-4 rounded-xl border border-[#e0e3e5] bg-white shadow-sm" style="clip-path: inset(0 round 12px);">
 
-        <div class="overflow-x-auto">
+        <div>
             <table class="w-full text-left border-collapse">
                 <caption class="sr-only">Daftar Data Karyawan</caption>
-                <thead>
-                    <tr class="bg-[#f2f4f6] border-b border-[#e0e3e5]">
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">NIK</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Nama Karyawan</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Departemen</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Jabatan</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b] text-center">Status</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b] text-right">Aksi</th>
+                <thead id="dk-thead">
+                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">NIK</th>
+                        <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">Nama Karyawan</th>
+                        <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">Departemen</th>
+                        <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">Jabatan</th>
+                        <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color: #7db8c2;">Status</th>
+                        <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-right" style="color: #7db8c2;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#e0e3e5]">
@@ -142,10 +142,10 @@
                         @php
                             $inisial = strtoupper(mb_substr(explode(' ', $row->nama_karyawan)[0], 0, 2));
                             $warnaStatus = $row->memiliki_akun
-                                ? 'bg-[#f2f4f6] text-[#40484b] border-[#c0c8cb]'
+                                ? 'bg-slate-100 text-slate-600 border-slate-200'
                                 : 'bg-emerald-50 text-emerald-700 border-emerald-200';
                             $labelStatus = $row->memiliki_akun ? 'Sudah Terpakai' : 'Belum Terpakai';
-                            $dotColor = $row->memiliki_akun ? 'bg-[#40484b]' : 'bg-emerald-600';
+                            $dotColor = $row->memiliki_akun ? 'bg-slate-400' : 'bg-emerald-500';
                             $avatarBg = match(hexdec(substr(substr(md5($row->nama_karyawan), 0, 6), 0, 6)) % 4) {
                                 0 => 'bg-[#2C5F6F]/10 text-[#2C5F6F]',
                                 1 => 'bg-blue-100 text-blue-700',
@@ -153,7 +153,7 @@
                                 default => 'bg-amber-100 text-amber-700',
                             };
                         @endphp
-                        <tr class="hover:bg-[#f7f9fb] transition-colors group">
+                        <tr class="transition-colors group" style="border-bottom: 1px solid #f1f5f9;" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background=''">
                             <td class="px-6 py-4 text-sm font-mono text-[#40484b]">
                                 {{ $row->nik_karyawan }}
                             </td>
@@ -331,4 +331,24 @@
 </div>
 
 <style>[x-cloak] { display: none !important; }</style>
+
+@push('scripts')
+<script>
+    requestAnimationFrame(function () {
+        const thead = document.getElementById('dk-thead');
+        const stickyBar = document.querySelector('[data-sticky-bar]');
+        if (!thead) return;
+
+        const top = stickyBar ? stickyBar.getBoundingClientRect().height : 0;
+        thead.style.position = 'sticky';
+        thead.style.top = top + 'px';
+        thead.style.zIndex = '5';
+
+        window.addEventListener('resize', function () {
+            const h = stickyBar ? stickyBar.getBoundingClientRect().height : 0;
+            thead.style.top = h + 'px';
+        });
+    });
+</script>
+@endpush
 @endsection

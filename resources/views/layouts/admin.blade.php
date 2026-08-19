@@ -16,30 +16,45 @@
             --outline-variant: #c0c8cb;
             --on-surface: #191c1e;
             --on-surface-variant: #40484b;
+
+            /* Dark sidebar tokens */
+            --sb-bg: #0d2028;
+            --sb-border: rgba(255,255,255,0.08);
+            --sb-text: #7db8c2;
+            --sb-text-hover: #b0d8df;
+            --sb-text-active: #5fcfdf;
+            --sb-active-bg: rgba(44,95,111,0.35);
+            --sb-hover-bg: rgba(255,255,255,0.05);
+            --sb-label: #3d7a88;
+            --sb-divider: rgba(255,255,255,0.07);
         }
+
+        /* Sidebar base */
+        aside { background: var(--sb-bg) !important; border-right-color: var(--sb-border) !important; }
+
         .sidebar-link {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 10px 24px;
-            color: var(--on-surface-variant);
+            color: var(--sb-text);
             font-size: 14px;
             text-decoration: none;
             border-left: 3px solid transparent;
             transition: all 0.15s ease;
         }
         .sidebar-link:hover {
-            background: var(--surface-container-high);
-            color: var(--on-surface);
+            background: var(--sb-hover-bg);
+            color: var(--sb-text-hover);
         }
         .sidebar-link.active {
-            background: color-mix(in srgb, var(--psikotes) 8%, white);
-            color: var(--psikotes);
-            border-left-color: var(--psikotes);
+            background: var(--sb-active-bg);
+            color: var(--sb-text-active);
+            border-left-color: var(--sb-text-active);
             font-weight: 600;
         }
         .sidebar-link.active .material-symbols-outlined {
-            color: var(--psikotes);
+            color: var(--sb-text-active);
         }
         .section-label {
             padding: 16px 24px 6px;
@@ -47,11 +62,11 @@
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #919eab;
+            color: var(--sb-label);
         }
         .nav-divider {
             height: 1px;
-            background: var(--outline-variant);
+            background: var(--sb-divider);
             margin: 8px 24px;
         }
 
@@ -110,17 +125,17 @@
 <div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false' }" x-init="$watch('sidebarOpen', v => localStorage.setItem('sidebarOpen', v))">
 
     {{-- SIDEBAR --}}
-    <aside class="fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-[#e0e3e5] overflow-y-auto overflow-x-hidden"
+    <aside class="fixed inset-y-0 left-0 z-50 flex flex-col overflow-y-auto overflow-x-hidden"
            style="transition: width 0.2s ease;"
            :style="{ width: sidebarOpen ? '280px' : '64px' }"
            :class="{ collapsed: !sidebarOpen }">
 
         {{-- Logo --}}
-        <div class="logo-area flex items-center gap-3 px-3 h-16 border-b border-[#e0e3e5] shrink-0">
+        <div class="logo-area flex items-center gap-3 px-3 h-16 shrink-0" style="border-bottom: 1px solid var(--sb-border);">
             <img src="{{ asset('images/logo.png') }}" alt="Psikotes HR Logo" class="h-9 w-auto object-contain shrink-0">
             <div class="link-text whitespace-nowrap">
-                <p class="text-sm font-bold text-[#2C5F6F] leading-none">Psikotes HR</p>
-                <p class="text-[11px] text-[#40484b] mt-0.5">Admin Panel</p>
+                <p class="text-sm font-bold leading-none" style="color: #e2e8f0;">Psikotes HR</p>
+                <p class="text-[11px] mt-0.5" style="color: var(--sb-text);">Admin Panel</p>
             </div>
         </div>
 
@@ -256,27 +271,31 @@
         </nav>
 
         {{-- Bottom User Card --}}
-        <div class="border-t border-[#e0e3e5] p-4 shrink-0">
+        <div class="p-4 shrink-0" style="border-top: 1px solid var(--sb-border);">
             @auth
             <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}" id="avatar-sidebar-{{ auth()->id() }}">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                     style="background: rgba(44,95,111,0.4); color: var(--sb-text-active);"
+                     id="avatar-sidebar-{{ auth()->id() }}">
                     @if(auth()->user()->foto_profil)
                         <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                              class="h-9 w-9 rounded-full object-cover" alt="Foto Profil"
                              onerror="handleAvatarError(this, 'avatar-sidebar-{{ auth()->id() }}-fallback')">
                         <span id="avatar-sidebar-{{ auth()->id() }}-fallback" class="hidden text-xs font-bold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                     @else
-                        <span>{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
+                        {{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}
                     @endif
                 </div>
                 <div class="user-card-actions min-w-0 flex-1 flex items-center gap-2">
                     <div class="min-w-0 flex-1 link-text">
-                        <p class="text-sm font-semibold text-[#191c1e] truncate">{{ auth()->user()->name }}</p>
-                        <p class="text-[11px] text-[#40484b] truncate">{{ auth()->user()->peran->nama_peran ?? '-' }}</p>
+                        <p class="text-sm font-semibold truncate" style="color: #e2e8f0;">{{ auth()->user()->name }}</p>
+                        <p class="text-[11px] truncate" style="color: var(--sb-text);">{{ auth()->user()->peran->nama_peran ?? '-' }}</p>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1" title="Keluar">
+                        <button type="submit" class="transition-colors p-1" style="color: var(--sb-text);"
+                                onmouseover="this.style.color='var(--sb-text-active)'" onmouseout="this.style.color='var(--sb-text)'"
+                                title="Keluar">
                             <span class="material-symbols-outlined text-[18px]">logout</span>
                         </button>
                     </form>

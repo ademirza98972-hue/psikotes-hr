@@ -1,75 +1,86 @@
 @extends('layouts.admin', ['judulHalaman' => 'Tambah Admin/Staff'])
 
 @section('content')
-<div class="mb-8">
-    <a href="{{ route('admin.pengguna-admin.index') }}" class="inline-flex items-center gap-1 text-[#2C5F6F] text-[14px] font-medium hover:underline transition-all mb-2">
-        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        Kembali
-    </a>
-    <h2 class="text-[24px] font-bold text-[#001a22] leading-snug">Tambah Pengguna Internal</h2>
-</div>
+<div class="max-w-2xl mx-auto space-y-6">
 
-{{-- FORM CONTAINER --}}
-<div class="bg-white border border-[#c0c8cb] rounded-xl overflow-hidden shadow-sm">
-    <form method="POST" action="{{ route('admin.pengguna-admin.simpan') }}" class="p-8 space-y-8">
+    {{-- PAGE HEADER --}}
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-[24px] font-semibold text-[#00303c]">Tambah Pengguna Internal</h2>
+            <p class="mt-0.5 text-[13px] text-[#40484b]">Buat akun baru untuk admin atau staff.</p>
+        </div>
+        <a href="{{ route('admin.pengguna-admin.index') }}"
+           class="inline-flex items-center gap-1.5 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Kembali
+        </a>
+    </div>
+
+    {{-- ERROR --}}
+    @if ($errors->any())
+        <div class="rounded-xl border border-rose-200 bg-rose-50 px-5 py-4">
+            <p class="mb-2 text-sm font-semibold text-rose-700">Terdapat kesalahan:</p>
+            <ul class="list-disc space-y-1 pl-5 text-sm text-rose-600">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('admin.pengguna-admin.simpan') }}">
         @csrf
 
-        @if ($errors->any())
-            <div class="mb-0 rounded-lg border border-[#ba1a1a] bg-[#fef2f2] px-4 py-3 text-[14px] text-[#93000a]">
-                <ul class="list-disc space-y-1 pl-5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+        {{-- SECTION: Peran --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
+            <div class="border-b border-[#e0e3e5] px-6 py-4">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Peran</p>
             </div>
-        @endif
-
-        {{-- ROLE SECTION --}}
-        <div class="space-y-3 max-w-2xl">
-            <label class="block text-[11px] font-semibold uppercase tracking-widest text-[#41484b]">Peran</label>
-            <select id="peran_id" name="peran_id" required
-                    class="w-full bg-[#f7f9fb] border border-[#c0c8cb] rounded-xl px-4 py-3 text-[14px] text-[#191c1e] focus:border-[#2C5F6F] focus:ring-2 focus:ring-[#2C5F6F] transition-all outline-none">
-                <option value="">-- Pilih Peran Internal --</option>
-                @foreach ($daftarPeran as $peran)
-                    <option value="{{ $peran->id }}" {{ (string)old('peran_id') === (string)$peran->id ? 'selected' : '' }}>
-                        {{ $peran->nama_peran }}
-                    </option>
-                @endforeach
-            </select>
-            <p class="text-[12px] text-[#41484b] flex items-center gap-1">
-                <span class="material-symbols-outlined text-[16px]">info</span>
-                Hanya peran internal (bukan Kandidat/Karyawan) yang tersedia di sini.
-            </p>
+            <div class="space-y-5 px-6 py-5">
+                <div>
+                    <label for="peran_id" class="block text-[13px] font-medium text-[#191c1e] mb-1">Peran</label>
+                    <select id="peran_id" name="peran_id" required
+                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                        <option value="">-- Pilih Peran Internal --</option>
+                        @foreach ($daftarPeran as $peran)
+                            <option value="{{ $peran->id }}" {{ (string)old('peran_id') === (string)$peran->id ? 'selected' : '' }}>
+                                {{ $peran->nama_peran }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1.5 text-[11px] text-[#40484b]">Hanya peran internal (bukan Kandidat/Karyawan) yang tersedia di sini.</p>
+                </div>
+            </div>
         </div>
 
-        <hr class="border-[#c0c8cb] opacity-30">
-
-        {{-- ACCOUNT SECTION --}}
-        <div class="space-y-5">
-            <h3 class="text-[11px] font-semibold uppercase tracking-widest text-[#41484b] border-l-4 border-[#2C5F6F] pl-3">Akun</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label for="name" class="block text-[12px] font-medium text-[#191c1e]">Nama Lengkap</label>
+        {{-- SECTION: Akun --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm mt-4">
+            <div class="border-b border-[#e0e3e5] px-6 py-4">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Akun</p>
+            </div>
+            <div class="space-y-5 px-6 py-5">
+                <div>
+                    <label for="name" class="block text-[13px] font-medium text-[#191c1e] mb-1">Nama Lengkap</label>
                     <input id="name" name="name" type="text" value="{{ old('name') }}" required
-                           class="w-full bg-[#f7f9fb] border border-[#c0c8cb] rounded-xl px-4 py-3 text-[14px] text-[#191c1e] focus:border-[#2C5F6F] focus:ring-2 focus:ring-[#2C5F6F] transition-all outline-none placeholder:text-[#919eab]"
-                           placeholder="Contoh: Budi Santoso">
+                           placeholder="Contoh: Budi Santoso"
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('name') border-rose-400 @enderror">
                 </div>
-                <div class="space-y-2">
-                    <label for="email" class="block text-[12px] font-medium text-[#191c1e]">Email</label>
+                <div>
+                    <label for="email" class="block text-[13px] font-medium text-[#191c1e] mb-1">Email</label>
                     <input id="email" name="email" type="email" value="{{ old('email') }}" required
-                           class="w-full bg-[#f7f9fb] border border-[#c0c8cb] rounded-xl px-4 py-3 text-[14px] text-[#191c1e] focus:border-[#2C5F6F] focus:ring-2 focus:ring-[#2C5F6F] transition-all outline-none placeholder:text-[#919eab]"
-                           placeholder="email@perusahaan.com">
+                           placeholder="email@perusahaan.com"
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('email') border-rose-400 @enderror">
                 </div>
-                <div class="space-y-2">
-                    <label for="no_hp" class="block text-[12px] font-medium text-[#191c1e]">No HP</label>
+                <div>
+                    <label for="no_hp" class="block text-[13px] font-medium text-[#191c1e] mb-1">No HP</label>
                     <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp') }}" required
-                           class="w-full bg-[#f7f9fb] border border-[#c0c8cb] rounded-xl px-4 py-3 text-[14px] text-[#191c1e] focus:border-[#2C5F6F] focus:ring-2 focus:ring-[#2C5F6F] transition-all outline-none placeholder:text-[#919eab]"
-                           placeholder="081234567890">
+                           placeholder="081234567890"
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
                 </div>
-                <div class="space-y-2">
-                    <label for="status" class="block text-[12px] font-medium text-[#191c1e]">Status</label>
+                <div>
+                    <label for="status" class="block text-[13px] font-medium text-[#191c1e] mb-1">Status</label>
                     <select id="status" name="status" required
-                            class="w-full bg-[#f7f9fb] border border-[#c0c8cb] rounded-xl px-4 py-3 text-[14px] text-[#191c1e] focus:border-[#2C5F6F] focus:ring-2 focus:ring-[#2C5F6F] transition-all outline-none">
+                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
                         <option value="aktif" {{ old('status', 'aktif') === 'aktif' ? 'selected' : '' }}>Aktif</option>
                         <option value="nonaktif" {{ old('status') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                     </select>
@@ -77,31 +88,31 @@
             </div>
         </div>
 
-        <hr class="border-[#c0c8cb] opacity-30">
-
-        {{-- PASSWORD SECTION --}}
-        <div class="space-y-5">
-            <h3 class="text-[11px] font-semibold uppercase tracking-widest text-[#41484b] border-l-4 border-[#2C5F6F] pl-3">Password</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label for="password" class="block text-[12px] font-medium text-[#191c1e]">Password</label>
+        {{-- SECTION: Password --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm mt-4">
+            <div class="border-b border-[#e0e3e5] px-6 py-4">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Password</p>
+            </div>
+            <div class="space-y-5 px-6 py-5">
+                <div>
+                    <label for="password" class="block text-[13px] font-medium text-[#191c1e] mb-1">Password</label>
                     <div class="relative">
                         <input id="password" name="password" type="password" required minlength="8"
-                               class="w-full bg-[#f7f9fb] border border-[#c0c8cb] rounded-xl px-4 py-3 text-[14px] text-[#191c1e] focus:border-[#2C5F6F] focus:ring-2 focus:ring-[#2C5F6F] transition-all outline-none pr-12 placeholder:text-[#919eab]"
-                               placeholder="Masukkan password">
-                        <button type="button" onclick="togglePassword('password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-[#41484b] hover:text-[#191c1e] transition-colors">
+                               placeholder="Masukkan password"
+                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-11 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('password') border-rose-400 @enderror">
+                        <button type="button" onclick="togglePassword('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#40484b] hover:text-[#191c1e] transition-colors">
                             <span class="material-symbols-outlined text-[20px]">visibility</span>
                         </button>
                     </div>
-                    <p class="text-[12px] text-[#41484b]">Minimal 8 karakter.</p>
+                    <p class="mt-1.5 text-[11px] text-[#40484b]">Minimal 8 karakter.</p>
                 </div>
-                <div class="space-y-2">
-                    <label for="password_confirmation" class="block text-[12px] font-medium text-[#191c1e]">Konfirmasi Password</label>
+                <div>
+                    <label for="password_confirmation" class="block text-[13px] font-medium text-[#191c1e] mb-1">Konfirmasi Password</label>
                     <div class="relative">
                         <input id="password_confirmation" name="password_confirmation" type="password" required minlength="8"
-                               class="w-full bg-[#f7f9fb] border border-[#c0c8cb] rounded-xl px-4 py-3 text-[14px] text-[#191c1e] focus:border-[#2C5F6F] focus:ring-2 focus:ring-[#2C5F6F] transition-all outline-none pr-12 placeholder:text-[#919eab]"
-                               placeholder="Ulangi password">
-                        <button type="button" onclick="togglePassword('password_confirmation', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-[#41484b] hover:text-[#191c1e] transition-colors">
+                               placeholder="Ulangi password"
+                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-11 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                        <button type="button" onclick="togglePassword('password_confirmation', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#40484b] hover:text-[#191c1e] transition-colors">
                             <span class="material-symbols-outlined text-[20px]">visibility</span>
                         </button>
                     </div>
@@ -109,15 +120,13 @@
             </div>
         </div>
 
-        {{-- FOOTER ACTIONS --}}
-        <div class="flex justify-end items-center gap-4 pt-2 border-t border-[#c0c8cb]">
+        {{-- ACTION BAR --}}
+        <div class="sticky bottom-0 mt-4 flex items-center justify-end gap-3 rounded-xl border border-[#e0e3e5] bg-white/95 px-6 py-4 shadow-[0_-2px_12px_rgba(0,0,0,0.06)] backdrop-blur">
             <a href="{{ route('admin.pengguna-admin.index') }}"
-               class="px-6 py-2.5 rounded-xl border border-[#71787b] text-[14px] font-medium text-[#41484b] hover:bg-[#f2f4f6] transition-colors">
-                Batal
-            </a>
+               class="rounded-xl border border-[#c0c8cb] px-5 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</a>
             <button type="submit"
-                    class="px-8 py-2.5 rounded-xl bg-[#2C5F6F] text-white text-[14px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 shadow-sm">
-                <span class="material-symbols-outlined text-[20px]">save</span>
+                    class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                <span class="material-symbols-outlined text-[16px]">save</span>
                 Simpan
             </button>
         </div>

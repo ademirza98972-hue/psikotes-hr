@@ -92,7 +92,7 @@
                 <thead>
                     <tr class="bg-[#f2f4f6] border-b border-[#e0e3e5]">
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Nama Kandidat</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">NIK KTP</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">NIK</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Email</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b]">Posisi yang Dilamar</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-[#40484b] text-center">Status</th>

@@ -36,9 +36,6 @@
                 >
                 <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
             </div>
-            @error('email')
-                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-            @enderror
         </div>
 
         <div class="space-y-1.5">

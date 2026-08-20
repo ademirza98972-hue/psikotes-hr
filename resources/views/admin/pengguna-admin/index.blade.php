@@ -71,6 +71,7 @@
             <table class="w-full text-left border-collapse">
                 <thead style="position: sticky; top: 0; z-index: 5;">
                     <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
                         <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider" style="color: #7db8c2;">Nama</th>
                         <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider" style="color: #7db8c2;">Email</th>
                         <th class="px-6 py-4 text-[11px] font-semibold uppercase tracking-wider" style="color: #7db8c2;">Peran</th>
@@ -95,6 +96,7 @@
                             $isSuperAdmin = $u->peran && $u->peran->nama_peran === 'Super Admin';
                         @endphp
                         <tr class="hover:bg-[#f2f4f6] transition-colors">
+                            <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($pengguna->currentPage() - 1) * $pengguna->perPage() + $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-full {{ $isSuperAdmin ? 'bg-[#001a22] text-white' : 'bg-[#001a22]/10 text-[#001a22]' }} flex items-center justify-center font-bold text-[14px] border {{ $isSuperAdmin ? 'border-transparent' : 'border-[#001a22]/20' }}">
@@ -149,7 +151,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-14 text-center">
+                            <td colspan="6" class="px-6 py-14 text-center">
                                 @if ($kataKunci || $filterPeran || $filterStatus)
                                     <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
                                     <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>
@@ -178,11 +180,11 @@
             </table>
         </div>
 
-        <div class="border-t border-[#c0c8cb] px-6 py-4 flex items-center justify-between gap-4">
-            <p class="text-[11px] text-[#41484b]">
-                Menampilkan <span class="font-semibold text-[#191c1e]">{{ $pengguna->firstItem() ?? $pengguna->total() }}</span> -
-                <span class="font-semibold text-[#191c1e]">{{ $pengguna->lastItem() ?? $pengguna->total() }}</span> dari
-                <span class="font-semibold text-[#191c1e]">{{ $pengguna->total() }}</span> pengguna
+        <div class="border-t border-[#c0c8cb] px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-[12px] text-[#71787c]">
+                Menampilkan
+                <span class="font-semibold text-[#191c1e]">{{ $pengguna->firstItem() ?? 0 }}</span>–<span class="font-semibold text-[#191c1e]">{{ $pengguna->lastItem() ?? 0 }}</span>
+                dari <span class="font-semibold text-[#191c1e]">{{ $pengguna->total() }}</span> data
             </p>
             @if ($pengguna->hasPages())
                 {{ $pengguna->links() }}

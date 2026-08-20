@@ -22,7 +22,9 @@ class DepartemenController extends Controller
             $q->where('nama_departemen', 'like', '%' . $kataKunci . '%');
         });
 
-        $departemen = $query->paginate(10)->withQueryString();
+        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 10;
+
+        $departemen = $query->paginate($perPage)->withQueryString();
 
         return view('admin.departemen.index', [
             'departemen' => $departemen,

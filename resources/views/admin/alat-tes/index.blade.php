@@ -7,11 +7,7 @@
         'Skala Likert'  => 'border-[#71787c] text-[#40484b]',
         'Forced Choice' => 'border-[#71787c] text-[#40484b]',
     ];
-
-    // TODO: tambahkan field `status` (enum: aktif/nonaktif) ke tabel alat_tes saat backend siap
-    // Saat ini semua alat tes dianggap Aktif
-    $totalAlat = $alatTes->count();
-    // totalSoal dikirim dari controller (sum of soal_count)
+    // totalAlat, totalSoal, alatPopuler dikirim dari controller
 @endphp
 
 <div class="space-y-6">
@@ -70,7 +66,6 @@
             <div>
                 <p class="text-[11px] text-[#40484b] uppercase tracking-wider font-semibold">Terpopuler</p>
                 <p class="text-[14px] leading-5 font-bold text-[#191c1e]">
-                    @php $alatPopuler = $alatTes->sortByDesc('soal_count')->first(); @endphp
                     {{ $alatPopuler->nama ?? '-' }}
                 </p>
             </div>
@@ -83,6 +78,7 @@
             <table class="w-full text-left text-sm border-collapse">
                 <thead style="position: sticky; top: 0; z-index: 5;">
                     <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
                         <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold w-24" style="color: #7db8c2;">KODE</th>
                         <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold" style="color: #7db8c2;">Nama Alat Tes</th>
                         <th class="px-5 py-3.5 text-[11px] uppercase tracking-widest font-bold text-center" style="color: #7db8c2;">Soal</th>
@@ -102,6 +98,7 @@
                             $badgeKode = $warnaKode[$kode] ?? 'bg-slate-100 text-slate-700';
                         @endphp
                         <tr class="hover:bg-[#f2f4f6] transition-colors group">
+                            <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($alatTes->currentPage() - 1) * $alatTes->perPage() + $loop->iteration }}</td>
                             <td class="px-5 py-3.5">
                                 <span class="inline-block px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $badgeKode }}">
                                     {{ $kode }}
@@ -162,7 +159,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-14 text-center">
+                            <td colspan="7" class="px-6 py-14 text-center">
                                 <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">quiz</span>
                                 <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Alat Tes</p>
                                 <p class="text-[12px] text-[#71787c] mb-4">Tambahkan instrumen tes psikometri untuk digunakan dalam sesi.</p>
@@ -179,14 +176,17 @@
             </table>
         </div>
 
-        {{-- Pagination info --}}
-        @if ($totalAlat > 0)
-        <div class="px-5 py-3.5 flex items-center justify-between border-t border-[#e0e3e5] bg-[#f2f4f6]">
-            <p class="text-[12px] text-[#40484b]">
-                Menampilkan <span class="font-semibold text-[#191c1e]">{{ $totalAlat }}</span> data
+        {{-- FOOTER --}}
+        <div class="px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-t border-[#e0e3e5] bg-[#f2f4f6]">
+            <p class="text-[12px] text-[#71787c]">
+                Menampilkan
+                <span class="font-semibold text-[#191c1e]">{{ $alatTes->firstItem() ?? 0 }}</span>–<span class="font-semibold text-[#191c1e]">{{ $alatTes->lastItem() ?? 0 }}</span>
+                dari <span class="font-semibold text-[#191c1e]">{{ $alatTes->total() }}</span> data
             </p>
+            @if($alatTes->hasPages())
+                {{ $alatTes->links() }}
+            @endif
         </div>
-        @endif
     </div>
 
     {{-- INFO CARD --}}

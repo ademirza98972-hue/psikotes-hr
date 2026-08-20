@@ -7,6 +7,7 @@
             <table class="w-full text-left border-collapse">
                 <thead style="position: sticky; top: 0; z-index: 5;">
                     <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Nama Departemen</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Jumlah Posisi Terkait</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Dihapus Pada</th>
@@ -16,6 +17,7 @@
                 <tbody class="divide-y divide-outline-variant/30">
                     @forelse ($items as $item)
                         <tr class="hover:bg-surface-container/30 transition-colors">
+                            <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($items->currentPage() - 1) * $items->perPage() + $loop->iteration }}</td>
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-action-teal">

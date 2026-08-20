@@ -185,6 +185,8 @@ class DashboardController extends Controller
     {
         $kataKunci = $request->input('cari');
 
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 20;
+
         $aktivitas = User::query()
             ->when($kataKunci, function ($query, $kataKunci) {
                 $query->where(function ($q) use ($kataKunci) {
@@ -193,7 +195,7 @@ class DashboardController extends Controller
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(20)
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('admin.aktivitas.index', [

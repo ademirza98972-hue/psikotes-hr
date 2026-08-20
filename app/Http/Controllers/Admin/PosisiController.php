@@ -28,7 +28,9 @@ class PosisiController extends Controller
             $q->where('departemen_id', $filterDepartemenId);
         });
 
-        $posisi = $query->paginate(15)->withQueryString();
+        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15;
+
+        $posisi = $query->paginate($perPage)->withQueryString();
         $departemen = Departemen::orderBy('nama_departemen')->get();
 
         return view('admin.posisi.index', [

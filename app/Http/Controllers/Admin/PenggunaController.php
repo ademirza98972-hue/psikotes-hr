@@ -53,7 +53,9 @@ class PenggunaController extends Controller
             $q->whereHas('profilKaryawan', fn ($pq) => $pq->where('jabatan', $filterPosisiNama));
         });
 
-        $pengguna = $query->orderBy('name')->paginate(15)->withQueryString();
+        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15;
+
+        $pengguna = $query->orderBy('name')->paginate($perPage)->withQueryString();
 
         $semuaDepartemen = Departemen::orderBy('nama_departemen')->get();
         $semuaPosisiQuery = Posisi::orderBy('nama_posisi');

@@ -31,6 +31,7 @@
                     Terapkan Filter
                 </button>
 
+
                 @if ($kataKunci || $filterDepartemen)
                     <a href="{{ route('admin.posisi.index') }}"
                         class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300 whitespace-nowrap">
@@ -56,6 +57,7 @@
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
                 <thead style="position: sticky; top: 0; z-index: 5;">
                     <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
                         <th class="px-4 py-3" style="color: #7db8c2;">Posisi</th>
                         <th class="px-4 py-3" style="color: #7db8c2;">Departemen</th>
                         <th class="px-4 py-3 text-right" style="color: #7db8c2;">Aksi</th>
@@ -64,6 +66,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($posisi as $item)
                         <tr class="hover:bg-slate-50">
+                            <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($posisi->currentPage() - 1) * $posisi->perPage() + $loop->iteration }}</td>
                             <td class="px-4 py-3 font-medium text-slate-900">{{ $item->nama_posisi }}</td>
                             <td class="px-4 py-3 text-slate-600">{{ $item->departemen ? $item->departemen->nama_departemen : '-' }}</td>
                             <td class="px-4 py-3 text-right">
@@ -83,7 +86,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-4 py-14 text-center">
+                            <td colspan="4" class="px-4 py-14 text-center">
                                 @if ($kataKunci || $filterDepartemen)
                                     <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
                                     <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>
@@ -112,11 +115,11 @@
             </table>
         </div>
 
-        <div class="border-t border-slate-200 px-6 py-4 flex items-center justify-between gap-4">
-            <p class="text-[11px] text-[#40484b]">
-                Menampilkan <span class="font-semibold text-[#191c1e]">{{ $posisi->firstItem() ?? $posisi->total() }}</span> -
-                <span class="font-semibold text-[#191c1e]">{{ $posisi->lastItem() ?? $posisi->total() }}</span> dari
-                <span class="font-semibold text-[#191c1e]">{{ $posisi->total() }}</span> posisi
+        <div class="border-t border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-[12px] text-[#71787c]">
+                Menampilkan
+                <span class="font-semibold text-[#191c1e]">{{ $posisi->firstItem() ?? 0 }}</span>–<span class="font-semibold text-[#191c1e]">{{ $posisi->lastItem() ?? 0 }}</span>
+                dari <span class="font-semibold text-[#191c1e]">{{ $posisi->total() }}</span> data
             </p>
             @if ($posisi->hasPages())
                 {{ $posisi->links() }}

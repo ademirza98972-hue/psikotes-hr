@@ -16,8 +16,10 @@ use Illuminate\View\View;
 
 class PenjadwalanTesController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 10;
+
         $penjadwalan = SesiTes::withCount([
             'pesertaSesiTes as jumlah_peserta_count',
             'pesertaSesiTes as jumlah_selesai_count' => function ($q) {
@@ -25,7 +27,8 @@ class PenjadwalanTesController extends Controller
             }
         ])->with(['departemenTerkait', 'alatTes'])
             ->orderByDesc('tanggal_mulai')
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('admin.penjadwalan-tes.index', [
             'penjadwalan' => $penjadwalan,

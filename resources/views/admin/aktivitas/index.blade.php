@@ -14,9 +14,9 @@
                 ← Kembali ke Dashboard
             </a>
         </div>
-        <form method="GET" action="{{ route('admin.aktivitas.index') }}" class="flex gap-2">
+        <form method="GET" action="{{ route('admin.aktivitas.index') }}" class="flex flex-wrap gap-2 items-center">
             <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama atau email..."
-                class="flex-1 rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                class="flex-1 min-w-[200px] rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
             <button type="submit" class="rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1E414C] transition-all">Cari</button>
             @if ($kataKunci)
                 <a href="{{ route('admin.aktivitas.index') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Reset</a>
@@ -28,6 +28,7 @@
         <div style="overflow: auto; max-height: calc(100vh - 300px);">
         <table class="w-full divide-y divide-[#e0e3e5] text-sm">
             <thead style="position: sticky; top: 0; z-index: 5;"><tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2; width:52px">No.</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Nama</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Email</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Tipe Akun</th>
@@ -37,6 +38,7 @@
             <tbody class="divide-y divide-[#e0e3e5] bg-white">
                 @forelse ($aktivitas as $u)
                     <tr class="transition-colors" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background=''">
+                        <td class="px-4 py-3 text-sm text-[#71787c] tabular-nums text-center">{{ ($aktivitas->currentPage() - 1) * $aktivitas->perPage() + $loop->iteration }}</td>
                         <td class="px-4 py-3 font-medium text-[#191c1e]">{{ $u->name }}</td>
                         <td class="px-4 py-3 text-[#40484b]">{{ $u->email }}</td>
                         <td class="px-4 py-3">
@@ -86,7 +88,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-14 text-center">
+                        <td colspan="6" class="px-4 py-14 text-center">
                             <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
                             <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>
                             <p class="text-[12px] text-[#71787c] mb-4">Coba ubah kata kunci pencarian.</p>
@@ -101,8 +103,15 @@
         </table>
         </div>
 
-        <div class="border-t border-[#e0e3e5] px-6 py-4 flex justify-end">
-            {{ $aktivitas->links() }}
+        <div class="border-t border-[#e0e3e5] px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-[12px] text-[#71787c]">
+                Showing <span class="font-semibold text-[#191c1e]">{{ $aktivitas->firstItem() ?? 0 }}</span>
+                to <span class="font-semibold text-[#191c1e]">{{ $aktivitas->lastItem() ?? 0 }}</span>
+                of <span class="font-semibold text-[#191c1e]">{{ $aktivitas->total() }}</span> entries
+            </p>
+            @if($aktivitas->hasPages())
+                {{ $aktivitas->links() }}
+            @endif
         </div>
     </div>
 

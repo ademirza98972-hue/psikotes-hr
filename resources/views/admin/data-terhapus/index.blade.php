@@ -25,8 +25,10 @@
             <h2 class="text-[36px] leading-[44px] -tracking-[0.02em] font-semibold text-primary">Data Terhapus</h2>
             <p class="text-[16px] leading-[24px] text-on-surface-variant mt-1">Kelola data yang telah dihapus untuk dipulihkan atau dihapus secara permanen.</p>
         </div>
-        <div class="bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant shrink-0">
-            <span class="text-[12px] text-on-surface-variant">Menampilkan <span class="font-bold text-action-teal">{{ $items->total() }}</span> {{ strtolower($konfigAktif['label']) }}</span>
+        <div class="flex items-center gap-3">
+            <div class="bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant shrink-0">
+                <span class="text-[12px] text-on-surface-variant">Menampilkan <span class="font-bold text-action-teal">{{ $items->total() }}</span> {{ strtolower($konfigAktif['label']) }}</span>
+            </div>
         </div>
     </div>
 

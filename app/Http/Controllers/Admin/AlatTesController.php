@@ -13,18 +13,25 @@ use Illuminate\View\View;
 
 class AlatTesController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        // withCount('soal') mengambil jumlah soal real dari tabel soal
+        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 10;
+
+        // Compute stats before paginating
+        $totalSoal = AlatTes::withCount('soal')->get()->sum('soal_count');
+        $totalAlat = AlatTes::count();
+        $alatPopuler = AlatTes::withCount('soal')->orderByDesc('soal_count')->first();
+
         $alatTes = AlatTes::withCount('soal')
             ->orderBy('nama')
-            ->get();
-
-        $totalSoal = $alatTes->sum('soal_count');
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('admin.alat-tes.index', [
-            'alatTes' => $alatTes,
-            'totalSoal' => $totalSoal,
+            'alatTes'    => $alatTes,
+            'totalSoal'  => $totalSoal,
+            'totalAlat'  => $totalAlat,
+            'alatPopuler' => $alatPopuler,
         ]);
     }
 

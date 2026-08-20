@@ -26,7 +26,9 @@ class PeranController extends Controller
             $q->where('nama_peran', 'like', '%' . $kataKunci . '%');
         });
 
-        $peran = $query->paginate(15)->withQueryString();
+        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15;
+
+        $peran = $query->paginate($perPage)->withQueryString();
 
         return view('admin.peran.index', [
             'peran' => $peran,

@@ -64,6 +64,7 @@
                 </span>
             </div>
 
+
             @if($kataKunci || $filterDepartemen || $filterPosisi)
                 <a href="{{ route('admin.akun-karyawan.index') }}"
                    class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors whitespace-nowrap">
@@ -83,6 +84,7 @@
                 <caption class="sr-only">Daftar Akun Karyawan</caption>
                 <thead style="position: sticky; top: 0; z-index: 5;">
                     <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">NIK</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Nama Karyawan</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Departemen</th>
@@ -121,6 +123,7 @@
                             };
                         @endphp
                         <tr class="hover:bg-[#f7f9fb] transition-colors group">
+                            <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($pengguna->currentPage() - 1) * $pengguna->perPage() + $loop->iteration }}</td>
                             <td class="px-6 py-4 text-sm font-mono text-[#40484b]">
                                 {{ $u->profilKaryawan?->nik_karyawan ?? '-' }}
                             </td>
@@ -188,7 +191,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-14 text-center">
+                            <td colspan="7" class="px-6 py-14 text-center">
                                 @if($kataKunci || $filterDepartemen || $filterPosisi)
                                     <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
                                     <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>
@@ -217,19 +220,17 @@
             </table>
         </div>
 
-        {{-- PAGINATION --}}
-        @if ($pengguna->hasPages())
-            <div class="border-t border-[#e0e3e5] px-6 py-4 flex items-center justify-between">
-                <p class="text-[11px] text-[#40484b]">
-                    Menampilkan <span class="font-semibold text-[#191c1e]">{{ $pengguna->firstItem() }}</span> -
-                    <span class="font-semibold text-[#191c1e]">{{ $pengguna->lastItem() }}</span> dari
-                    <span class="font-semibold text-[#191c1e]">{{ $pengguna->total() }}</span> karyawan
-                </p>
-                <div>
-                    {{ $pengguna->links() }}
-                </div>
-            </div>
-        @endif
+        {{-- FOOTER --}}
+        <div class="border-t border-[#e0e3e5] px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-[12px] text-[#71787c]">
+                Menampilkan
+                <span class="font-semibold text-[#191c1e]">{{ $pengguna->firstItem() ?? 0 }}</span>–<span class="font-semibold text-[#191c1e]">{{ $pengguna->lastItem() ?? 0 }}</span>
+                dari <span class="font-semibold text-[#191c1e]">{{ $pengguna->total() }}</span> data
+            </p>
+            @if($pengguna->hasPages())
+                {{ $pengguna->links() }}
+            @endif
+        </div>
     </div>
 
     {{-- Modal Konfirmasi Hapus --}}

@@ -56,9 +56,11 @@ class DataKandidatController extends Controller
             $q->whereHas('profilKandidat', fn ($pk) => $pk->where('posisi_dilamar', $filterPosisiNama));
         });
 
+        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15;
+
         $kandidat = $query->with(['profilKandidat.posisi'])
             ->orderBy('name')
-            ->paginate(15)
+            ->paginate($perPage)
             ->withQueryString();
 
         $semuaPosisi = Posisi::orderBy('nama_posisi')->get();

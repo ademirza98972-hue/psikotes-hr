@@ -40,6 +40,8 @@ class DataKaryawanController extends Controller
 
         $subquery = $this->subqueryMemilikiAkun();
 
+        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15;
+
         $data = DataKaryawan::query()
             ->with(['departemen', 'posisi'])
             ->selectRaw("data_karyawan.*, ({$subquery}) as memiliki_akun")
@@ -55,7 +57,7 @@ class DataKaryawanController extends Controller
             ->when($filterStatus === 'sudah_terpakai', fn ($q) => $q->whereRaw($subquery))
             ->when($filterStatus === 'belum_terpakai', fn ($q) => $q->whereRaw("NOT ({$subquery})"))
             ->orderBy('nama_karyawan')
-            ->paginate(15)
+            ->paginate($perPage)
             ->withQueryString();
 
         $semuaDepartemen = Departemen::orderBy('nama_departemen')->get();

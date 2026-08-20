@@ -138,6 +138,13 @@ class ScoringEngineService
             }
 
             // Simpan skor per subtes
+            $skorAkhirSubtes = NormaKonversi::where('alat_tes_id', $alatTesId)
+                ->where('dimensi_id', $dimensiMap[$kode])
+                ->where('kelompok_segmen', $kelompokSegmen)
+                ->where('skor_mentah_min', '<=', $benar)
+                ->where('skor_mentah_max', '>=', $benar)
+                ->value('skor_hasil') ?? 0;
+
             HasilSkorPeserta::updateOrCreate(
                 [
                     'user_id'     => $userId,
@@ -147,13 +154,8 @@ class ScoringEngineService
                 ],
                 [
                     'skor_mentah' => $benar,
-                    'skor_akhir'  => NormaKonversi::where('alat_tes_id', $alatTesId)
-                        ->where('dimensi_id', $dimensiMap[$kode])
-                        ->where('kelompok_segmen', $kelompokSegmen)
-                        ->where('skor_mentah_min', '<=', $benar)
-                        ->where('skor_mentah_max', '>=', $benar)
-                        ->value('skor_hasil') ?? 0,
-                    'level_id'    => null,
+                    'skor_akhir'  => $skorAkhirSubtes,
+                    'level_id'    => $this->cariLevelId($dimensiMap[$kode], (float) $skorAkhirSubtes),
                 ]
             );
 

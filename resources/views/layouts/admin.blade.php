@@ -122,6 +122,14 @@
         aside.collapsed .user-card-actions { display: none; }
         aside.collapsed .sb-header-expanded { display: none !important; }
         aside:not(.collapsed) .sb-header-collapsed { display: none !important; }
+        /* Page enter animation */
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        main > * {
+            animation: pageEnter 0.22s ease-out both;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-[#f7f9fb] font-body antialiased">

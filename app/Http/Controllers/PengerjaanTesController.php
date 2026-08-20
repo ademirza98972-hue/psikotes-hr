@@ -355,6 +355,11 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.kraepelin', $sesiId);
         }
 
+        // EPPS: panduan sekali di awal
+        if ($kodeAlatTes === 'EPPS' && !Session::get($this->sessionKey($sesiId, 'epps_panduan_selesai'))) {
+            return redirect()->route('peserta.tes.panduan-epps', $sesiId);
+        }
+
         // IST: panduan per subtes + hafalan ME
         if ($kodeAlatTes === 'IST') {
             $nomorSoal = $soal['nomor'] ?? 0;
@@ -566,6 +571,23 @@ class PengerjaanTesController extends Controller
             'kode_subtes_timer'     => $kodeSubtesTimer ?? null,
             'is_ist'                => $isIST ?? false,
         ]);
+    }
+
+    public function panduanEpps(int $sesiId)
+    {
+        $sesi = $this->getSesiById($sesiId);
+        if (!$sesi) return redirect()->route('peserta.dashboard');
+        $alatTes = \App\Models\AlatTes::where('kode', 'EPPS')->first();
+        return view('peserta.panduan-epps', [
+            'sesiId'  => $sesiId,
+            'alatTes' => $alatTes,
+        ]);
+    }
+
+    public function panduanEppsMulai(int $sesiId)
+    {
+        Session::put($this->sessionKey($sesiId, 'epps_panduan_selesai'), true);
+        return redirect()->route('peserta.tes.kerjakan', $sesiId);
     }
 
     public function panduanIst(int $sesiId, string $kodeSubtes)

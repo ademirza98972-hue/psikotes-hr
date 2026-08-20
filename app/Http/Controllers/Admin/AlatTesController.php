@@ -45,6 +45,7 @@ class AlatTesController extends Controller
             'jumlah_soal' => 'nullable|integer|min:0',
             'durasi_total_menit' => 'nullable|integer|min:0',
             'batas_waktu_per_soal_aktif' => 'boolean',
+            'batas_waktu_per_soal_detik' => 'nullable|integer|min:1',
             'is_sensitif' => 'boolean',
         ]);
 
@@ -56,6 +57,7 @@ class AlatTesController extends Controller
             'jumlah_soal' => $data['jumlah_soal'] ?? null,
             'durasi_total_menit' => $data['durasi_total_menit'] ?? null,
             'batas_waktu_per_soal_aktif' => $request->boolean('batas_waktu_per_soal_aktif'),
+            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'] ?? null,
             'is_sensitif' => $request->boolean('is_sensitif'),
             'is_aktif' => true,
         ]);
@@ -85,6 +87,7 @@ class AlatTesController extends Controller
             'jumlah_soal' => 'nullable|integer|min:0',
             'durasi_total_menit' => 'nullable|integer|min:0',
             'batas_waktu_per_soal_aktif' => 'boolean',
+            'batas_waktu_per_soal_detik' => 'nullable|integer|min:1',
             'is_sensitif' => 'boolean',
         ]);
 
@@ -97,6 +100,7 @@ class AlatTesController extends Controller
             'jumlah_soal' => $data['jumlah_soal'] ?? null,
             'durasi_total_menit' => $data['durasi_total_menit'] ?? null,
             'batas_waktu_per_soal_aktif' => $request->boolean('batas_waktu_per_soal_aktif'),
+            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'] ?? null,
             'is_sensitif' => $request->boolean('is_sensitif'),
         ]);
 

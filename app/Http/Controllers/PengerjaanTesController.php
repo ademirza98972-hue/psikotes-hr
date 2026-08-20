@@ -391,6 +391,11 @@ class PengerjaanTesController extends Controller
             ?? \App\Models\AlatTes::find($alatTesByKode->get($kodeSubtesSaat) ?? 0);
         $isIST = ($alatTesSaat?->kode === 'IST' || str_contains($alatTesSaat?->nama ?? '', 'IST'));
 
+        // Per-soal timer (berlaku untuk semua alat tes yang mengaktifkannya)
+        $detikPerSoal = ($alatTesSaat?->batas_waktu_per_soal_aktif && $alatTesSaat?->batas_waktu_per_soal_detik)
+            ? (int) $alatTesSaat->batas_waktu_per_soal_detik
+            : null;
+
         $sisaWaktuDetik = null;
         $durasiSubtes = null;
         $kodeSubtesTimer = null;
@@ -570,6 +575,7 @@ class PengerjaanTesController extends Controller
             'durasi_subtes'         => $durasiSubtes ?? null,
             'kode_subtes_timer'     => $kodeSubtesTimer ?? null,
             'is_ist'                => $isIST ?? false,
+            'detik_per_soal'        => $detikPerSoal ?? null,
         ]);
     }
 

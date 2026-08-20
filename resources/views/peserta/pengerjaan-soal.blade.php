@@ -154,6 +154,45 @@
         </div>
         @endif
 
+        {{-- Timer Per Soal --}}
+        @if(isset($detik_per_soal) && $detik_per_soal)
+        <div x-data="{
+            sisa: {{ $detik_per_soal }},
+            durasi: {{ $detik_per_soal }},
+            submitted: false,
+            get menit() { return String(Math.floor(this.sisa / 60)).padStart(2, '0') },
+            get detik() { return String(this.sisa % 60).padStart(2, '0') },
+            get persen() { return (this.sisa / this.durasi) * 100 },
+            get warnaBar() { return this.sisa <= 10 ? 'bg-red-500' : (this.sisa <= 30 ? 'bg-amber-400' : 'bg-[#2C5F6F]') },
+            get warnaTimer() { return this.sisa <= 10 ? 'text-red-600' : (this.sisa <= 30 ? 'text-amber-600' : 'text-slate-700') },
+            init() {
+                const interval = setInterval(() => {
+                    if (this.sisa > 0) { this.sisa--; }
+                    else {
+                        clearInterval(interval);
+                        if (!this.submitted) {
+                            this.submitted = true;
+                            document.getElementById('form-jawaban').submit();
+                        }
+                    }
+                }, 1000);
+            }
+        }" class="rounded-lg border border-slate-200 bg-white shadow-sm px-5 py-3 mb-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[15px]" :class="warnaTimer">timer</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Waktu per Soal</span>
+            </div>
+            <div class="flex items-center gap-3 flex-1">
+                <div class="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-1000" :class="warnaBar" :style="`width:${persen}%`"></div>
+                </div>
+                <span class="font-mono font-bold text-sm tabular-nums" :class="warnaTimer">
+                    <span x-text="menit"></span>:<span x-text="detik"></span>
+                </span>
+            </div>
+        </div>
+        @endif
+
         {{-- Question Card --}}
         <form id="form-jawaban" action="{{ route('peserta.tes.jawab', $sesiId) }}" method="POST">
             @csrf

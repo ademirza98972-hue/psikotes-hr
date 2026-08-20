@@ -423,7 +423,7 @@
             });
         });
         @if(session('alert'))
-        Swal.fire({ icon: 'info', title: 'Informasi', text: @json(session('alert')), timer: 4000, timerProgressBar: true, showConfirmButton: false, toast: true, position: 'top-end' });
+        Swal.fire({ icon: 'info', title: 'Informasi', text: @json(session('alert')), timer: 3000, timerProgressBar: true, showConfirmButton: false });
         @endif
         @if(session('info'))
         @php
@@ -438,6 +438,9 @@
         @endif
         @if(session('warning'))
         Swal.fire({ icon: 'warning', title: 'Perhatian', text: @json(session('warning')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        @endif
+        @if($errors->any())
+        Swal.fire({ icon: 'error', title: 'Terdapat Kesalahan', html: '<ul style="text-align:left;list-style:disc;padding-left:1.2rem">' + @json($errors->all()).map(e => `<li>${e}</li>`).join('') + '</ul>', confirmButtonColor: '#2C5F6F' });
         @endif
     </script>
     @stack('scripts')

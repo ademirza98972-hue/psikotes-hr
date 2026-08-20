@@ -75,7 +75,7 @@ class PenjadwalanTesController extends Controller
 
         return redirect()
             ->route('admin.penjadwalan-tes.index')
-            ->with('alert', 'Sesi penjadwalan berhasil dibuat.');
+            ->with('sukses', 'Sesi penjadwalan berhasil dibuat.');
     }
 
     public function hapus(int $id): RedirectResponse
@@ -84,7 +84,7 @@ class PenjadwalanTesController extends Controller
 
         return redirect()
             ->route('admin.penjadwalan-tes.index')
-            ->with('alert', 'Sesi penjadwalan berhasil dihapus.');
+            ->with('sukses', 'Sesi penjadwalan berhasil dihapus.');
     }
 
     public function detail(int $id): View
@@ -139,7 +139,7 @@ class PenjadwalanTesController extends Controller
 
         return redirect()
             ->route('admin.penjadwalan-tes.detail', $id)
-            ->with('alert', 'Sesi penjadwalan berhasil diperbarui.');
+            ->with('sukses', 'Sesi penjadwalan berhasil diperbarui.');
     }
 
     public function tambahPeserta(Request $request, int $id): RedirectResponse
@@ -201,6 +201,6 @@ class PenjadwalanTesController extends Controller
 
         return redirect()
             ->route('admin.penjadwalan-tes.detail', $id)
-            ->with('alert', 'Peserta berhasil dihapus.');
+            ->with('sukses', 'Peserta berhasil dihapus.');
     }
 }

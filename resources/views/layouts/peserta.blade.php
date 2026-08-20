@@ -267,19 +267,45 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        @if(session('error'))
-            Swal.fire({ icon: 'error', title: 'Perhatian', text: @json(session('error')), confirmButtonColor: '#2C5F6F' });
-        @endif
-        @if(session('sukses'))
-            Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('sukses')), timer: 3000, timerProgressBar: true, showConfirmButton: false, toast: true, position: 'top-end' });
-        @endif
-    </script>
-    <script>
         function handleAvatarError(imgElement, fallbackId) {
             imgElement.style.display = 'none';
             const fallback = document.getElementById(fallbackId);
             if (fallback) fallback.style.display = 'flex';
         }
+
+        @if(session('sukses'))
+        Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('sukses')), timer: 2500, timerProgressBar: true, showConfirmButton: false });
+        @endif
+        @if(session('error'))
+        Swal.fire({ icon: 'error', title: 'Perhatian', text: @json(session('error')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        @endif
+        @if(session('warning'))
+        Swal.fire({ icon: 'warning', title: 'Perhatian', text: @json(session('warning')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        @endif
+        @if(session('alert'))
+        Swal.fire({ icon: 'info', title: 'Informasi', text: @json(session('alert')), timer: 4000, timerProgressBar: true, showConfirmButton: false, toast: true, position: 'top-end' });
+        @endif
+        @if($errors->any())
+        Swal.fire({ icon: 'error', title: 'Terdapat Kesalahan', html: '<ul style="text-align:left;list-style:disc;padding-left:1.2rem">' + @json($errors->all()).map(e => `<li>${e}</li>`).join('') + '</ul>', confirmButtonColor: '#2C5F6F' });
+        @endif
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('form[onsubmit]').forEach(form => {
+                const attr = form.getAttribute('onsubmit') || '';
+                const match = attr.match(/confirm\(['"`]([\s\S]*?)['"`]\)/);
+                if (!match) return;
+                const pesan = match[1].replace(/\\'/g, "'").replace(/\\"/g, '"');
+                form.removeAttribute('onsubmit');
+                form.addEventListener('submit', e => {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning', title: 'Konfirmasi', text: pesan,
+                        showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Lanjutkan', cancelButtonText: 'Batal',
+                    }).then(r => { if (r.isConfirmed) form.submit(); });
+                });
+            });
+        });
     </script>
     @stack('scripts')
 </body>

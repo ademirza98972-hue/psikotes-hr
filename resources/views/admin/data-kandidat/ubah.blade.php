@@ -16,18 +16,6 @@
         </a>
     </div>
 
-    {{-- ERROR --}}
-    @if ($errors->any())
-        <div class="rounded-xl border border-rose-200 bg-rose-50 px-5 py-4">
-            <p class="mb-2 text-sm font-semibold text-rose-700">Terdapat kesalahan:</p>
-            <ul class="list-disc space-y-1 pl-5 text-sm text-rose-600">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <form method="POST" action="{{ route('admin.data-kandidat.perbarui', $kandidat->id) }}">
         @csrf
         @method('PUT')

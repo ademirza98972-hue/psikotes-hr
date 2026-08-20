@@ -129,5 +129,11 @@
         @endforelse
     </div>
 
+    @if ($penjadwalan->hasPages())
+    <div class="flex justify-center">
+        {{ $penjadwalan->links() }}
+    </div>
+    @endif
+
 </div>
 @endsection

@@ -28,16 +28,6 @@
         Form mengikuti format dasar <strong>{{ $format }}</strong>.
     </p>
 
-    @if ($errors->any())
-        <div class="mb-4 rounded-md border border-rose-600 bg-rose-600 px-4 py-3 text-sm text-white">
-            <ul class="list-disc space-y-1 pl-5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <form method="POST" action="{{ route('admin.bank-soal.update', $soal->id) }}" enctype="multipart/form-data" class="space-y-4">
         @csrf
         @method('PUT')

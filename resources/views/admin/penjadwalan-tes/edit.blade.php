@@ -15,15 +15,6 @@
         </a>
     </div>
 
-    @if ($errors->any())
-        <div class="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            <ul class="list-disc space-y-1 pl-5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
 
     <form method="POST" action="{{ route('admin.penjadwalan-tes.update', $sesi->id) }}" class="max-w-2xl mx-auto space-y-5">
         @csrf

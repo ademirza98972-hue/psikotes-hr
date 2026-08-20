@@ -93,10 +93,10 @@
     },
     printPdf() {
         if (!this.checkedIds.length) {
-            alert('Pilih minimal satu peserta untuk cetak PDF.');
+            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih minimal satu peserta untuk cetak PDF.', confirmButtonColor: '#2C5F6F' });
             return;
         }
-        alert('Fitur cetak PDF terpilih akan aktif setelah backend selesai dibangun.');
+        Swal.fire({ icon: 'info', title: 'Info', text: 'Fitur cetak PDF terpilih akan aktif setelah backend selesai dibangun.', confirmButtonColor: '#2C5F6F' });
     }
 }" x-init=""
 class="w-full">

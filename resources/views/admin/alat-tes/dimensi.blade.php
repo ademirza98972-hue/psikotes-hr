@@ -22,17 +22,6 @@
     </div>
 
 
-    @if($errors->any())
-        <div class="rounded-xl border border-rose-300 bg-rose-50
-                    px-4 py-3 text-sm text-rose-700">
-            <ul class="list-disc pl-5 space-y-0.5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     {{-- FORM TAMBAH DIMENSI --}}
     <div class="bg-white border border-[#e0e3e5] rounded-xl p-6">
         <h3 class="text-[16px] font-bold text-[#00303c] mb-4 flex items-center gap-2">

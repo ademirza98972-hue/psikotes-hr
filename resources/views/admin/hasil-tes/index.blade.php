@@ -102,7 +102,7 @@
 class="w-full">
 
     {{-- STICKY HEADER --}}
-    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-0 border-b border-[#e0e3e5]">
+    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-4 px-4 pt-6 pb-0 border-b border-[#e0e3e5]">
 
     {{-- PAGE HEADER --}}
     <div class="mb-4">
@@ -329,33 +329,39 @@ class="w-full">
         </div>
 
         {{-- Stats Overview --}}
-        <div x-show="sesiTerpilih" x-transition class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="md:col-span-1 bg-blue-50 border border-blue-100 rounded-xl p-5">
-                <h5 class="text-blue-800 text-xs font-semibold tracking-widest uppercase mb-3">TINGKAT PENYELESAIAN</h5>
-                <div class="flex items-end justify-between">
-                    <span class="text-blue-900 text-3xl font-bold" x-text="penyelesaianRate + '%'"></span>
+        <div x-show="sesiTerpilih" x-transition
+             class="mt-5 flex items-stretch gap-0 rounded-2xl border border-[#e0e3e5] bg-white shadow-sm overflow-hidden">
+            <div class="flex flex-1 items-center gap-3 px-5 py-4 border-r border-[#e0e3e5]">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#2C5F6F]/10">
+                    <span class="material-symbols-outlined text-[18px] text-[#2C5F6F]">percent</span>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Penyelesaian</p>
+                    <p class="text-2xl font-bold text-[#2C5F6F]" x-text="penyelesaianRate + '%'"></p>
                 </div>
             </div>
-            <div class="md:col-span-1 bg-emerald-50 border border-emerald-100 rounded-xl p-5">
-                <h5 class="text-emerald-800 text-xs font-semibold tracking-widest uppercase mb-3">STATUS SELESAI</h5>
-                <div class="flex items-end justify-between">
-                    <span class="text-emerald-900 text-3xl font-bold" x-text="selesaiCount"></span>
-                    <div class="text-emerald-700 text-xs font-medium mb-2">/ <span x-text="totalPeserta + ' Peserta'"></span></div>
+            <div class="flex flex-1 items-center gap-3 px-5 py-4 border-r border-[#e0e3e5]">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100">
+                    <span class="material-symbols-outlined text-[18px] text-emerald-600">check_circle</span>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Selesai</p>
+                    <p class="text-2xl font-bold text-emerald-600">
+                        <span x-text="selesaiCount"></span>
+                        <span class="text-sm font-normal text-slate-400"> / <span x-text="totalPeserta"></span></span>
+                    </p>
                 </div>
             </div>
-            <div class="md:col-span-2 bg-white border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between">
-                <div>
-                    <h5 class="text-[var(--color-on-surface-variant)] text-xs font-semibold tracking-widest uppercase mb-1">PROGRES KOLEKTIF</h5>
-                    <p class="text-[16px] font-semibold text-[var(--color-primary)] mb-3"><span x-text="selesaiCount + ' dari ' + totalPeserta + ' peserta telah selesai'"></span></p>
-                    <div class="w-full bg-[var(--color-surface-container-high)] rounded-full h-2 min-w-[200px]">
-                        <div class="bg-[var(--color-psikotes)] h-2 rounded-full" :style="'width: ' + penyelesaianRate + '%'"></div>
+            <div class="flex flex-[2] items-center gap-4 px-5 py-4">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                    <span class="material-symbols-outlined text-[18px] text-slate-500">bar_chart</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Progres Kolektif</p>
+                    <div class="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                        <div class="h-full rounded-full bg-[#2C5F6F] transition-all" :style="'width: ' + penyelesaianRate + '%'"></div>
                     </div>
-                </div>
-                <div class="hidden lg:block text-right">
-                    <span class="text-[var(--color-psikotes)] text-sm font-medium flex items-center cursor-default">
-                        Lihat Detail Progres
-                        <span class="material-symbols-outlined text-[18px] ml-1">arrow_forward</span>
-                    </span>
+                    <p class="mt-1 text-[11px] text-slate-500"><span x-text="selesaiCount"></span> dari <span x-text="totalPeserta"></span> peserta selesai</p>
                 </div>
             </div>
         </div>
@@ -384,79 +390,98 @@ class="w-full">
         </div>
 
         {{-- Participant Grid --}}
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        @php
+            $paletAvatar = ['#2C5F6F','#0891b2','#7c3aed','#db2777','#d97706','#16a34a','#dc2626','#9333ea','#0284c7','#c2410c'];
+        @endphp
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
             @foreach ($pesertaByNama as $peserta)
+            @php
+                $colorIdx = abs(crc32($peserta['nama_peserta'])) % count($paletAvatar);
+                $avatarColor = $paletAvatar[$colorIdx];
+                $isKaryawan = $peserta['jenis_peserta'] === 'Karyawan';
+                $selesaiCount = collect($peserta['sesi_diikuti'])->where('status', 'Selesai')->count();
+                $totalSesi = count($peserta['sesi_diikuti']);
+            @endphp
             <div x-show="!search || '{{ strtolower($peserta['nama_peserta']) }}'.includes(search.toLowerCase())"
-                 class="bg-white border border-[var(--color-outline-variant)] rounded-xl overflow-hidden shadow-sm flex flex-col hover:border-[var(--color-psikotes)] transition-all duration-300">
+                 class="flex flex-col rounded-2xl border border-[#e2e8f0] bg-white shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5 overflow-hidden">
 
                 {{-- Card Header --}}
-                <div class="p-4 pb-3 flex items-start gap-4">
-                    <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white flex-shrink-0 bg-[var(--color-secondary-fixed)] flex items-center justify-center text-[var(--color-on-secondary-container)] font-bold text-lg">
+                <div class="flex items-center gap-4 px-5 py-4" style="background: linear-gradient(135deg, {{ $avatarColor }}18 0%, {{ $avatarColor }}06 100%); border-bottom: 1px solid {{ $avatarColor }}20;">
+                    <div class="shrink-0 flex h-12 w-12 items-center justify-center rounded-2xl text-white font-bold text-[16px] shadow-sm" style="background-color: {{ $avatarColor }}">
                         {{ avatarInitialsHasilTes($peserta['nama_peserta']) }}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between gap-2 mb-1">
-                            <h4 class="text-lg font-semibold text-[var(--color-primary)] truncate">{{ $peserta['nama_peserta'] }}</h4>
-                            @if ($peserta['jenis_peserta'] === 'Karyawan')
-                                <span class="px-2 py-0.5 rounded-full border border-[var(--color-primary)]/20 bg-[var(--color-primary-fixed)]/30 text-[var(--color-primary)] text-xs font-semibold">KARYAWAN</span>
+                        <div class="flex items-start justify-between gap-2">
+                            <h4 class="text-[15px] font-bold text-slate-800 truncate leading-tight">{{ $peserta['nama_peserta'] }}</h4>
+                            @if ($isKaryawan)
+                                <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-[#2C5F6F]/10 text-[#2C5F6F]">KARYAWAN</span>
                             @else
-                                <span class="px-2 py-0.5 rounded-full border border-[var(--color-tertiary)]/20 bg-[var(--color-tertiary-fixed)]/30 text-[var(--color-tertiary)] text-xs font-semibold">KANDIDAT</span>
+                                <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-700">KANDIDAT</span>
                             @endif
                         </div>
-                        <p class="text-sm text-[var(--color-on-surface-variant)] mb-2">{{ $peserta['departemen'] }} - {{ $peserta['posisi'] }}</p>
-                        <div class="flex gap-4">
-                            <div class="flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[18px] text-[var(--color-on-surface-variant)]">id_card</span>
-                                <span class="text-xs text-[var(--color-on-surface-variant)]">ID: {{ $peserta['peserta_id'] }}</span>
-                            </div>
-                        </div>
+                        <p class="text-[12px] text-slate-500 mt-0.5 truncate">
+                            {{ $peserta['departemen'] ?: '—' }}@if($peserta['posisi']) · {{ $peserta['posisi'] }}@endif
+                        </p>
                     </div>
                 </div>
 
                 {{-- Card Body: test history --}}
-                <div class="px-4 pb-4 pt-3 flex-1">
-                    <h5 class="text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)] mb-3">Riwayat Tes</h5>
-                    <div class="space-y-2">
+                <div class="flex-1 px-5 py-3">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Riwayat Tes</p>
+                        <span class="text-[10px] font-semibold text-slate-400">{{ $selesaiCount }}/{{ $totalSesi }} selesai</span>
+                    </div>
+                    <div class="space-y-1.5">
                         @foreach ($peserta['sesi_diikuti'] as $sesiRow)
-                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--color-surface-container-low)] transition-colors">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded bg-[var(--color-secondary-fixed)] flex items-center justify-center text-[var(--color-on-secondary-container)]">
-                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold text-[var(--color-primary)]">{{ $sesiRow['nama_sesi'] }}</p>
-                                    <p class="text-xs text-[var(--color-on-surface-variant)]">
-                                        {{ $sesiRow['tanggal'] ? $tglId($sesiRow['tanggal']) : '-' }}
-                                        @if ($sesiRow['status'] === 'Selesai')
-                                            <span class="text-green-600"> • Selesai</span>
-                                        @elseif ($sesiRow['status'] === 'Sedang Berjalan')
-                                            <span class="text-amber-600"> • Sedang Berjalan</span>
-                                        @else
-                                            <span class="text-[var(--color-on-surface-variant)]"> • Belum Mengerjakan</span>
+                        @php
+                            $rowSelesai = $sesiRow['status'] === 'Selesai';
+                            $rowBerjalan = $sesiRow['status'] === 'Sedang Berjalan';
+                        @endphp
+                        <div class="flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 transition-colors hover:bg-slate-50
+                            {{ $rowSelesai ? 'border-emerald-100 bg-emerald-50/40' : ($rowBerjalan ? 'border-amber-100 bg-amber-50/40' : 'border-slate-100') }}">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-[13px] font-semibold text-slate-700 truncate">{{ $sesiRow['nama_sesi'] }}</p>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    @if ($rowSelesai)
+                                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                        <span class="text-[11px] text-emerald-600 font-medium">Selesai</span>
+                                        @if($sesiRow['tanggal'])
+                                            <span class="text-[11px] text-slate-400">· {{ $tglId($sesiRow['tanggal']) }}</span>
                                         @endif
-                                    </p>
+                                    @elseif ($rowBerjalan)
+                                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0"></span>
+                                        <span class="text-[11px] text-amber-600 font-medium">Sedang Berjalan</span>
+                                    @else
+                                        <span class="h-1.5 w-1.5 rounded-full bg-slate-300 shrink-0"></span>
+                                        <span class="text-[11px] text-slate-400">Belum Mengerjakan</span>
+                                    @endif
                                 </div>
                             </div>
-                            @if ($sesiRow['status'] === 'Selesai')
+                            @if ($rowSelesai)
                                 <a href="{{ route('admin.hasil-tes.detail', [$sesiRow['sesi_id'], $sesiRow['peserta_id']]) }}"
-                                   class="px-3 py-1.5 text-[var(--color-psikotes)] border border-[var(--color-psikotes)]/30 rounded-lg text-xs font-medium hover:bg-[var(--color-psikotes)] hover:text-white transition-all">
+                                   class="shrink-0 inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-emerald-700 transition hover:bg-emerald-50">
+                                    <span class="material-symbols-outlined text-[13px]">open_in_new</span>
                                     Lihat Detail
                                 </a>
                             @else
-                                <button class="px-3 py-1.5 bg-[var(--color-psikotes)] text-white rounded-lg text-xs font-medium hover:opacity-90 transition-all">
+                                <a href="{{ route('admin.penjadwalan-tes.detail', $sesiRow['sesi_id']) }}"
+                                   class="shrink-0 inline-flex items-center gap-1 rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1E414C]">
+                                    <span class="material-symbols-outlined text-[13px]">visibility</span>
                                     Monitor
-                                </button>
+                                </a>
                             @endif
                         </div>
                         @endforeach
                     </div>
                 </div>
+
             </div>
             @endforeach
 
             @if (empty($pesertaByNama))
-            <div class="col-span-2 rounded-xl border border-dashed border-[var(--color-outline-variant)] bg-white px-6 py-10 text-center text-sm text-[var(--color-on-surface-variant)]">
-                Belum ada data peserta.
+            <div class="col-span-2 rounded-2xl border border-dashed border-[#c0c8cb] bg-white py-16 text-center">
+                <span class="material-symbols-outlined text-[44px] text-slate-300">person_off</span>
+                <p class="mt-3 text-sm font-medium text-slate-500">Belum ada data peserta.</p>
             </div>
             @endif
         </div>

@@ -1,201 +1,218 @@
 @extends('layouts.admin', ['judulHalaman' => 'Dashboard'])
 
 @section('content')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <style>
-        .stat-card {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            border-left: 4px solid;
-            padding: 1.25rem 1.5rem;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-            transition: box-shadow 0.2s ease, transform 0.2s ease;
-        }
-        .stat-card:hover {
-            box-shadow: 0 6px 20px rgba(0,0,0,0.09);
-            transform: translateY(-2px);
-        }
-        .stat-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 500;
-        }
-        .stat-number {
-            font-size: 34px;
-            font-weight: 700;
-            color: #111827;
-            line-height: 1.1;
-            margin-top: 2px;
-        }
-        .stat-sub {
-            font-size: 11px;
-            color: #9ca3af;
-            margin-top: 4px;
-        }
-    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 
-    <div class="max-w-[1440px] mx-auto space-y-5">
+<div class="max-w-[1440px] mx-auto space-y-6">
 
-        {{-- 1. AKSI CEPAT --}}
-        <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm">
-            <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-[#40484b]">Aksi Cepat</p>
-            <div class="flex flex-wrap gap-3">
+    {{-- ── WELCOME BANNER ── --}}
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#2C5F6F] via-[#1E414C] to-[#0f2a31] px-7 py-6 shadow-md">
+        {{-- decorative circles --}}
+        <div class="pointer-events-none absolute -right-10 -top-10 h-52 w-52 rounded-full bg-white/5"></div>
+        <div class="pointer-events-none absolute -bottom-8 right-32 h-36 w-36 rounded-full bg-white/5"></div>
+
+        <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-medium text-white/60">{{ $tanggalHariIni }}</p>
+                <h1 class="mt-0.5 text-2xl font-bold text-white">{{ $sapaan }}, {{ $namaPengguna }} 👋</h1>
+                <p class="mt-1 text-sm text-white/60">Selamat datang di panel admin Psikotes HR.</p>
+            </div>
+            {{-- Quick actions --}}
+            <div class="flex flex-wrap gap-2">
                 @auth
                     @if(auth()->user()->hasIzin('pengguna.tambah'))
                         <a href="{{ route('admin.akun-karyawan.tambah') }}"
-                           class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1E414C]">
-                            <span class="material-symbols-outlined text-[18px]">add</span>
-                            Tambah Karyawan
+                           class="inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/25">
+                            <span class="material-symbols-outlined text-[15px]">add</span>
+                            Karyawan
                         </a>
-                    @endif
-
-                    @if(auth()->user()->hasIzin('pengguna.tambah'))
                         <a href="{{ route('admin.data-kandidat.tambah') }}"
-                           class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1E414C]">
-                            <span class="material-symbols-outlined text-[18px]">add</span>
-                            Tambah Kandidat
+                           class="inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/25">
+                            <span class="material-symbols-outlined text-[15px]">add</span>
+                            Kandidat
                         </a>
                     @endif
-
                     @if(auth()->user()->hasIzin('peran.kelola'))
                         <a href="{{ route('admin.peran.tambah') }}"
-                           class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1E414C]">
-                            <span class="material-symbols-outlined text-[18px]">add</span>
-                            Tambah Peran
+                           class="inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/25">
+                            <span class="material-symbols-outlined text-[15px]">add</span>
+                            Peran
                         </a>
                     @endif
                 @endauth
             </div>
         </div>
 
-        {{-- 2. STAT CARDS --}}
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-
-            {{-- Total Karyawan --}}
-            <div class="stat-card group" style="border-left-color: #2C5F6F;">
-                <div class="stat-icon" style="background: #e8f4f6; color: #2C5F6F;">
-                    <span class="material-symbols-outlined text-[26px]">group</span>
+        {{-- mini stat strip --}}
+        <div class="relative mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            @php
+                $strips = [
+                    ['label' => 'Akun Karyawan', 'sub' => 'Karyawan aktif di sistem', 'val' => $totalKaryawan, 'trend' => $karyawanBaru7Hari, 'icon' => 'group'],
+                    ['label' => 'Akun Kandidat', 'sub' => 'Kandidat terdaftar', 'val' => $totalKandidat, 'trend' => $kandidatBaru7Hari, 'icon' => 'person_search'],
+                    ['label' => 'Perlu Verifikasi', 'sub' => 'Kandidat menunggu disetujui', 'val' => $kandidatMenunggu, 'trend' => null, 'icon' => 'pending_actions'],
+                    ['label' => 'NIK Tersedia', 'sub' => 'Slot karyawan belum punya akun', 'val' => $nikBelumTerpakai, 'trend' => null, 'icon' => 'badge'],
+                ];
+            @endphp
+            @foreach($strips as $s)
+                <div class="rounded-xl bg-white/10 px-4 py-3 backdrop-blur">
+                    <div class="flex items-center justify-between">
+                        <span class="material-symbols-outlined text-[18px] text-white/70">{{ $s['icon'] }}</span>
+                        @if($s['trend'] !== null)
+                            <span class="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                                +{{ $s['trend'] }} baru
+                            </span>
+                        @endif
+                    </div>
+                    <p class="mt-2 text-xl font-bold text-white">{{ number_format($s['val']) }}</p>
+                    <p class="text-[12px] font-medium text-white/90">{{ $s['label'] }}</p>
+                    <p class="text-[10px] text-white/50 mt-0.5">{{ $s['sub'] }}</p>
                 </div>
-                <p class="stat-label">Total Karyawan Terdaftar</p>
-                <h3 class="stat-number">{{ number_format($totalKaryawan) }}</h3>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- ── STAT CARDS (detail) ── --}}
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+
+        {{-- Kandidat breakdown --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-500">
+                    <span class="material-symbols-outlined text-[22px]">person_search</span>
+                </div>
+                <div>
+                    <p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Total Kandidat</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ number_format($totalKandidat) }}</p>
+                </div>
             </div>
-
-            {{-- Total Kandidat --}}
-            <div class="stat-card group" style="border-left-color: #3b82f6;">
-                <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
-                    <span class="material-symbols-outlined text-[26px]">person_search</span>
+            <div class="mt-4 grid grid-cols-3 divide-x divide-slate-100 rounded-lg bg-slate-50 text-center text-xs">
+                <div class="py-2">
+                    <p class="font-bold text-amber-600">{{ $kandidatMenunggu }}</p>
+                    <p class="text-slate-400">Menunggu</p>
                 </div>
-                <p class="stat-label">Total Kandidat</p>
-                <h3 class="stat-number">{{ number_format($totalKandidat) }}</h3>
-                <div class="mt-3 flex items-center gap-3 text-[12px]">
-                    <span class="font-semibold text-amber-600">{{ $kandidatMenunggu }}</span> menunggu
-                    <span class="font-semibold text-emerald-600">{{ $kandidatAktif }}</span> aktif
-                    <span class="font-semibold text-rose-600">{{ $kandidatDitolak }}</span> ditolak
+                <div class="py-2">
+                    <p class="font-bold text-emerald-600">{{ $kandidatAktif }}</p>
+                    <p class="text-slate-400">Aktif</p>
+                </div>
+                <div class="py-2">
+                    <p class="font-bold text-rose-500">{{ $kandidatDitolak }}</p>
+                    <p class="text-slate-400">Ditolak</p>
                 </div>
             </div>
-
-            {{-- Admin & Staff --}}
-            <div class="stat-card group" style="border-left-color: #7c3aed;">
-                <div class="stat-icon" style="background: #f5f3ff; color: #7c3aed;">
-                    <span class="material-symbols-outlined text-[26px]">admin_panel_settings</span>
-                </div>
-                <p class="stat-label">Admin & Staff</p>
-                <h3 class="stat-number">{{ number_format($totalAdminStaff) }}</h3>
-                <p class="stat-sub">Admin/staff sistem</p>
-            </div>
-
-            {{-- NIK Belum Terpakai --}}
-            <div class="stat-card group" style="border-left-color: #d97706;">
-                <div class="stat-icon" style="background: #fffbeb; color: #d97706;">
-                    <span class="material-symbols-outlined text-[26px]">badge</span>
-                </div>
-                <p class="stat-label">NIK Belum Terpakai</p>
-                <h3 class="stat-number">{{ number_format($nikBelumTerpakai) }}</h3>
-                <p class="stat-sub">NIK siap digunakan</p>
-            </div>
-
-            {{-- Total Peran --}}
-            <div class="stat-card group" style="border-left-color: #475569;">
-                <div class="stat-icon" style="background: #f1f5f9; color: #475569;">
-                    <span class="material-symbols-outlined text-[26px]">key</span>
-                </div>
-                <p class="stat-label">Total Peran</p>
-                <h3 class="stat-number">{{ number_format($totalPeran) }}</h3>
-                <p class="stat-sub">Peran yang tersedia</p>
-            </div>
-
-            {{-- Total Data Karyawan --}}
-            <div class="stat-card group" style="border-left-color: #0891b2;">
-                <div class="stat-icon" style="background: #ecfeff; color: #0891b2;">
-                    <span class="material-symbols-outlined text-[26px]">database</span>
-                </div>
-                <p class="stat-label">Total Data Karyawan</p>
-                <h3 class="stat-number">{{ number_format($totalDataKaryawan) }}</h3>
-                <p class="stat-sub">Seluruh data karyawan (semua status)</p>
-            </div>
-
         </div>
 
-        {{-- 3. KANDIDAT MENUNGGU VERIFIKASI --}}
-        @if($kandidatMenunggu > 0)
-            <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm">
-                <div class="mb-5 flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50">
-                        <span class="material-symbols-outlined text-[24px] text-amber-600">pending_actions</span>
-                    </div>
-                    <div>
-                        <h2 class="text-base font-semibold text-[#191c1e]">Kandidat Menunggu Verifikasi</h2>
-                        <p class="text-[12px] text-[#40484b]">{{ $kandidatMenunggu }} kandidat menunggu persetujuan</p>
-                    </div>
-                    <span class="ml-auto inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">{{ $kandidatMenunggu }} menunggu</span>
+        {{-- Data Karyawan --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-50 text-cyan-600">
+                    <span class="material-symbols-outlined text-[22px]">database</span>
                 </div>
+                <div>
+                    <p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Data Karyawan</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ number_format($totalDataKaryawan) }}</p>
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-2 divide-x divide-slate-100 rounded-lg bg-slate-50 text-center text-xs">
+                <div class="py-2">
+                    <p class="font-bold text-[#2C5F6F]">{{ number_format($totalKaryawan) }}</p>
+                    <p class="text-slate-400">Punya Akun</p>
+                </div>
+                <div class="py-2">
+                    <p class="font-bold text-amber-600">{{ number_format($nikBelumTerpakai) }}</p>
+                    <p class="text-slate-400">NIK Bebas</p>
+                </div>
+            </div>
+        </div>
 
-                <div class="space-y-0">
+        {{-- Admin & Peran --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                    <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+                </div>
+                <div>
+                    <p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Admin & Staff</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ number_format($totalAdminStaff) }}</p>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between rounded-lg bg-slate-50 px-4 py-2">
+                <p class="text-xs text-slate-400">Peran tersedia</p>
+                <p class="text-sm font-bold text-violet-600">{{ number_format($totalPeran) }} peran</p>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- ── LOWER SECTION: Chart + Pending ── --}}
+    <div class="grid gap-4 xl:grid-cols-3">
+
+        {{-- Chart: 2/3 lebar --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm xl:col-span-2">
+            <div class="mb-5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-semibold text-slate-800">Pendaftaran 7 Hari Terakhir</h2>
+                    <p class="text-[12px] text-slate-400">Semua tipe akun baru per hari</p>
+                </div>
+                <div class="flex items-center gap-2 rounded-lg bg-[#2C5F6F]/8 px-3 py-1.5">
+                    <span class="material-symbols-outlined text-[18px] text-[#2C5F6F]">bar_chart</span>
+                    <span class="text-xs font-semibold text-[#2C5F6F]">7 hari</span>
+                </div>
+            </div>
+            <div class="h-60">
+                <canvas id="barPendaftaran"></canvas>
+            </div>
+        </div>
+
+        {{-- Pending verifikasi: 1/3 lebar --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm xl:col-span-1">
+            <div class="flex items-center justify-between border-b border-[#f2f4f6] px-5 py-4">
+                <div>
+                    <h2 class="text-sm font-semibold text-slate-800">Menunggu Verifikasi</h2>
+                    <p class="text-[11px] text-slate-400">Kandidat perlu persetujuan</p>
+                </div>
+                @if($kandidatMenunggu > 0)
+                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white">
+                        {{ $kandidatMenunggu }}
+                    </span>
+                @endif
+            </div>
+
+            @if($kandidatMenunggu === 0)
+                <div class="flex flex-col items-center justify-center gap-2 py-12 text-center text-slate-400">
+                    <span class="material-symbols-outlined text-[40px]">check_circle</span>
+                    <p class="text-sm">Tidak ada yang menunggu</p>
+                </div>
+            @else
+                <div class="divide-y divide-[#f2f4f6]">
                     @foreach($kandidatMenungguList as $k)
                         @php
                             $lama = $k->created_at->diffForHumans(null, true);
-                            $hari = $k->created_at->diffInDays(now());
-                            $terlambat = $hari > 2;
                             $profil = $k->profilKandidat;
                             $posisi = $profil ? $profil->posisi_dilamar : '-';
-                            $inisial = mb_substr($k->name, 0, 1, 'UTF-8');
+                            $inisial = mb_strtoupper(mb_substr($k->name, 0, 1, 'UTF-8'), 'UTF-8');
                         @endphp
-                        <div class="flex items-center justify-between {{ !$loop->last ? 'border-b border-[#f2f4f6]' : '' }} py-3">
-                            <div class="flex items-center gap-3 min-w-0 flex-1">
-                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2C5F6F]/10 text-[#2C5F6F] text-xs font-bold">
+                        <div class="px-5 py-4">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2C5F6F]/10 text-[#2C5F6F] text-xs font-bold">
                                     {{ $inisial }}
                                 </div>
-                                <div class="min-w-0">
-                                    <p class="truncate text-sm font-medium text-[#191c1e]">{{ $k->name }}</p>
-                                    <p class="text-[11px] text-[#40484b]">{{ $posisi }}</p>
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-sm font-semibold text-slate-800">{{ $k->name }}</p>
+                                    <p class="text-[11px] text-slate-400 truncate">{{ $posisi }} · {{ $lama }}</p>
                                 </div>
-                                <span class="shrink-0 text-[11px] text-[#40484b]">{{ $lama }}</span>
                             </div>
-                            <div class="ml-3 shrink-0 flex items-center gap-2">
-                                <form action="{{ route('admin.data-kandidat.approve', $k->id) }}" method="POST">
+                            <div class="flex gap-2">
+                                <form action="{{ route('admin.data-kandidat.approve', $k->id) }}" method="POST" class="flex-1">
                                     @csrf
-                                    <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-emerald-700 transition">
-                                        <span class="material-symbols-outlined text-[16px]">check</span>
+                                    <button type="submit" class="w-full inline-flex items-center justify-center gap-1 rounded-lg bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 transition hover:bg-emerald-100">
+                                        <span class="material-symbols-outlined text-[14px]">check</span>
                                         Aktifkan
                                     </button>
                                 </form>
-                                <form action="{{ route('admin.data-kandidat.tolak', $k->id) }}" method="POST" onsubmit="return confirm('Tolak kandidat {{ $k->name }}?')">
+                                <form action="{{ route('admin.data-kandidat.tolak', $k->id) }}" method="POST" onsubmit="return confirm('Tolak kandidat {{ $k->name }}?')" class="flex-1">
                                     @csrf
-                                    <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-rose-600 px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-rose-700 transition">
-                                        <span class="material-symbols-outlined text-[16px]">close</span>
+                                    <button type="submit" class="w-full inline-flex items-center justify-center gap-1 rounded-lg bg-rose-50 px-3 py-1.5 text-[11px] font-semibold text-rose-600 transition hover:bg-rose-100">
+                                        <span class="material-symbols-outlined text-[14px]">close</span>
                                         Tolak
                                     </button>
                                 </form>
@@ -205,96 +222,74 @@
                 </div>
 
                 @if($kandidatMenunggu > 2)
-                    <div class="mt-4 pt-3 border-t border-[#e0e3e5] text-center">
+                    <div class="border-t border-[#f2f4f6] px-5 py-3">
                         <a href="{{ route('admin.data-kandidat.index') }}"
-                           class="inline-flex items-center gap-2 rounded-lg border border-[#e0e3e5] bg-[#f2f4f6] px-4 py-2 text-sm font-semibold text-[#2C5F6F] hover:bg-[#e8f0f2] transition">
-                            Lihat {{ $kandidatMenunggu - 2 }} lainnya
-                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                           class="flex items-center justify-center gap-1 text-xs font-semibold text-[#2C5F6F] hover:underline">
+                            Lihat {{ $kandidatMenunggu - 2 }} kandidat lainnya
+                            <span class="material-symbols-outlined text-[15px]">chevron_right</span>
                         </a>
                     </div>
                 @endif
-            </div>
-        @endif
-
-        {{-- 4. GRAFIK PENDAFTARAN 7 HARI TERAKHIR --}}
-        <div class="rounded-xl border border-[#e0e3e5] bg-white p-6 shadow-sm">
-            <div class="mb-6 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2C5F6F]/10">
-                        <span class="material-symbols-outlined text-[24px] text-[#2C5F6F]">bar_chart</span>
-                    </div>
-                    <div>
-                        <h2 class="text-base font-semibold text-[#191c1e]">Pendaftaran 7 Hari Terakhir</h2>
-                        <p class="text-[12px] text-[#40484b]">Grafik rekapitulasi pendaftaran harian</p>
-                    </div>
-                </div>
-            </div>
-            <div class="h-64">
-                <canvas id="barPendaftaran"></canvas>
-            </div>
+            @endif
         </div>
+
     </div>
 
-    <script>
-        (function() {
-            const ctx = document.getElementById('barPendaftaran');
-            if (!ctx) return;
+</div>
 
-            const chartLabels = @json($labelTanggal);
-            const chartData = @json($pendaftaran7Hari);
+<script>
+(function() {
+    const ctx = document.getElementById('barPendaftaran');
+    if (!ctx) return;
 
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: 'Pendaftaran',
-                        data: chartData,
-                        backgroundColor: 'rgba(44, 95, 111, 0.85)',
-                        hoverBackgroundColor: 'rgba(44, 95, 111, 1)',
-                        borderRadius: 8,
-                        borderSkipped: false,
-                        barPercentage: 0.55,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#fff',
-                            bodyColor: '#cbd5e1',
-                            padding: 12,
-                            cornerRadius: 8,
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) {
-                                    return context.parsed.y + ' pendaftaran';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94a3b8', font: { size: 12 } },
-                            border: { display: false }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: '#94a3b8',
-                                font: { size: 12 },
-                                stepSize: 1,
-                            },
-                            grid: { color: '#f2f4f6' },
-                            border: { display: false }
-                        }
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: @json($labelTanggal),
+            datasets: [{
+                label: 'Pendaftaran',
+                data: @json($pendaftaran7Hari),
+                backgroundColor: 'rgba(44, 95, 111, 0.15)',
+                hoverBackgroundColor: 'rgba(44, 95, 111, 0.85)',
+                borderColor: 'rgba(44, 95, 111, 0.9)',
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+                barPercentage: 0.6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#fff',
+                    bodyColor: '#cbd5e1',
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: false,
+                    callbacks: {
+                        label: ctx => ctx.parsed.y + ' pendaftaran'
                     }
                 }
-            });
-        })();
-    </script>
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8', font: { size: 11 } },
+                    border: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#94a3b8', font: { size: 11 }, stepSize: 1 },
+                    grid: { color: '#f1f5f9' },
+                    border: { display: false }
+                }
+            }
+        }
+    });
+})();
+</script>
 @endsection

@@ -376,7 +376,7 @@
         </header>
 
         {{-- CONTENT --}}
-        <main class="flex-1 overflow-y-auto px-6 py-6">
+        <main class="flex-1 overflow-y-auto px-4 py-5">
             @yield('content')
         </main>
 

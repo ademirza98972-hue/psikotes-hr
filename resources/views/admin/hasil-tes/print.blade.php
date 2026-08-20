@@ -104,11 +104,11 @@
             margin: 10px 0; background: #f8fafc;
         }
         .grid-summary {
-            margin-top: 8px; padding: 8px 10px;
-            background: #f8fafc; border: 1px solid #e2e8f0;
+            margin-top: 8px; background: #f8fafc; border: 1px solid #e2e8f0;
             border-radius: 4px; font-size: 9px; color: #334155;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 3px 16px;
+            width: 100%; border-collapse: collapse;
         }
+        .grid-summary td { padding: 4px 10px; border: none; width: 50%; }
 
         /* ── Signature ── */
         .ttd-space { margin-bottom: 40px; font-size: 11px; }
@@ -158,8 +158,13 @@
             .no-print { display: none !important; }
             .dokumen { width: 100%; margin: 0; padding: 0; }
             body { font-size: 10.5px; margin: 0; }
+            table { page-break-inside: avoid; }
+            .section-title { page-break-after: avoid; }
+            .sub-title { page-break-after: avoid; }
+            .kelompok-header { page-break-after: avoid; }
+            tr { page-break-inside: avoid; }
         }
-        @page { size: A4 portrait; margin: 15mm 15mm 20mm 15mm; }
+        @page { size: A4 portrait; margin: 15mm 14mm 20mm 14mm; }
     </style>
 </head>
 <body>
@@ -401,30 +406,125 @@
 
         {{-- EPPS --}}
         @if ($alat['nama_alat_tes'] === 'EPPS' && is_array($alat['skor_ringkas']) && isset($alat['skor_ringkas'][0]['dimensi']))
+            @php
+                $eppsDesc = [
+                    'ach' => ['R'=>'Kurang memiliki dorongan untuk berprestasi dan cenderung puas dengan hasil yang biasa-biasa saja.','K'=>'Motivasi berprestasi masih kurang optimal, perlu dorongan dari luar untuk mencapai hasil yang lebih baik.','C'=>'Memiliki motivasi berprestasi yang cukup dan berusaha menyelesaikan pekerjaan dengan hasil yang memadai.','B'=>'Memiliki motivasi berprestasi yang baik, berorientasi pada hasil dan berusaha memberikan yang terbaik.','T'=>'Memiliki dorongan berprestasi yang sangat kuat, selalu berusaha mencapai hasil terbaik dan tidak mudah puas.'],
+                    'def' => ['R'=>'Kurang dapat mengikuti aturan dan arahan, cenderung bertindak sesuai keinginan sendiri tanpa mempertimbangkan otoritas.','K'=>'Ketaatan terhadap aturan dan arahan masih perlu ditingkatkan, kadang kurang konsisten dalam mengikuti prosedur.','C'=>'Cukup patuh terhadap aturan dan arahan atasan, mampu mengikuti prosedur yang berlaku dengan baik.','B'=>'Memiliki ketaatan yang baik terhadap aturan dan otoritas, dapat diandalkan dalam mengikuti prosedur kerja.','T'=>'Sangat patuh dan taat terhadap aturan, arahan, dan otoritas, selalu mengikuti prosedur dengan disiplin tinggi.'],
+                    'ord' => ['R'=>'Kurang teratur dan sistematis dalam bekerja, cenderung tidak memperhatikan kerapian dan urutan pekerjaan.','K'=>'Sistematika kerja masih perlu ditingkatkan, kadang kurang memperhatikan keteraturan dalam menyelesaikan tugas.','C'=>'Cukup teratur dan sistematis dalam bekerja, mampu mengatur pekerjaan dengan cara yang cukup terstruktur.','B'=>'Bekerja dengan cara yang teratur dan sistematis, memperhatikan kerapian dan urutan dalam setiap pekerjaan.','T'=>'Sangat teratur, sistematis, dan detail dalam bekerja, selalu memastikan setiap pekerjaan dilakukan secara terstruktur dan rapi.'],
+                    'exh' => ['R'=>'Kurang memiliki keinginan untuk menonjolkan diri, cenderung tidak ingin menjadi pusat perhatian.','K'=>'Dorongan untuk menonjolkan diri masih rendah, kurang aktif mengekspresikan diri di hadapan orang lain.','C'=>'Cukup memiliki keinginan untuk menonjolkan diri dan mengekspresikan diri di hadapan orang lain.','B'=>'Memiliki keinginan yang baik untuk menonjolkan diri, aktif mengekspresikan pendapat dan menarik perhatian orang lain.','T'=>'Sangat ingin menjadi pusat perhatian, aktif dan ekspresif dalam mengungkapkan diri di hadapan orang lain.'],
+                    'aut' => ['R'=>'Kurang mandiri, cenderung bergantung pada orang lain dalam mengambil keputusan dan menyelesaikan masalah.','K'=>'Kemandirian masih perlu ditingkatkan, kadang masih membutuhkan bimbingan dalam menentukan arah tindakan.','C'=>'Cukup mandiri dalam mengambil keputusan dan menyelesaikan pekerjaan tanpa bergantung berlebihan pada orang lain.','B'=>'Memiliki kemandirian yang baik, mampu mengambil keputusan dan bertindak sesuai pertimbangan sendiri.','T'=>'Sangat mandiri dan bebas dalam bertindak, tidak ingin terikat aturan dan selalu mengambil keputusan secara independen.'],
+                    'aff' => ['R'=>'Kurang memiliki kebutuhan untuk bergaul dan menjalin hubungan sosial, cenderung menyukai kesendirian.','K'=>'Keterampilan sosial masih perlu dikembangkan, kurang aktif dalam menjalin dan mempertahankan hubungan sosial.','C'=>'Cukup memiliki keterampilan sosial, mampu bergaul dan menjalin hubungan yang cukup baik dengan orang lain.','B'=>'Memiliki keterampilan sosial yang baik, aktif bergaul dan mampu membina hubungan yang harmonis dengan orang lain.','T'=>'Sangat suka bergaul dan bersosialisasi, aktif menjalin hubungan dan memiliki jaringan pertemanan yang luas.'],
+                    'int' => ['R'=>'Kurang memiliki kemampuan untuk memahami dan menganalisa perasaan orang lain, kurang empati.','K'=>'Kemampuan empati masih perlu dikembangkan, kurang peka terhadap perasaan dan kondisi orang lain.','C'=>'Cukup mampu memahami perasaan dan kondisi orang lain, memiliki kepekaan empati yang memadai.','B'=>'Memiliki empati yang baik, mampu memahami dan merasakan kondisi orang lain dengan baik.','T'=>'Sangat peka dan empatik, mampu mendalami perasaan dan motivasi orang lain secara mendalam.'],
+                    'suc' => ['R'=>'Sangat mandiri dan tidak membutuhkan dukungan atau bantuan dari orang lain dalam menghadapi kesulitan.','K'=>'Kebutuhan afeksi rendah, cenderung tidak mengharapkan simpati atau bantuan dari orang lain.','C'=>'Memiliki kebutuhan afeksi yang cukup, kadang mengharapkan dukungan dan perhatian dari orang-orang terdekat.','B'=>'Memiliki kebutuhan afeksi yang cukup tinggi, menginginkan dukungan dan perhatian dari lingkungan sekitar.','T'=>'Sangat membutuhkan dukungan, perhatian, dan simpati dari orang lain, terutama saat menghadapi kesulitan.'],
+                    'dom' => ['R'=>'Kurang memiliki keinginan untuk memimpin dan mengarahkan orang lain, cenderung mengikuti arahan.','K'=>'Potensi memimpin masih perlu dikembangkan, kurang aktif dalam mengambil peran kepemimpinan.','C'=>'Cukup memiliki kemampuan untuk memimpin dan mengarahkan orang lain dalam situasi tertentu.','B'=>'Memiliki jiwa kepemimpinan yang baik, mampu mengarahkan dan mempengaruhi orang lain secara efektif.','T'=>'Sangat dominan dan berjiwa pemimpin, selalu ingin mengambil kendali dan mengarahkan orang lain.'],
+                    'aba' => ['R'=>'Kurang jujur dalam mengungkapkan diri, cenderung menutup-nutupi kelemahan dan kesalahan.','K'=>'Kejujuran dalam mengungkapkan diri masih perlu ditingkatkan, kadang kurang terbuka tentang kelemahan diri.','C'=>'Cukup jujur dalam mengungkapkan diri, mampu mengakui kesalahan dan kelemahan dengan cukup terbuka.','B'=>'Memiliki kejujuran yang baik, mampu mengakui kesalahan dan mengungkapkan diri secara terbuka.','T'=>'Sangat jujur dan terbuka, selalu mengakui kesalahan dan kelemahan diri tanpa rasa sungkan.'],
+                    'nur' => ['R'=>'Kurang memiliki kepedulian terhadap orang lain, jarang memberikan bantuan atau dukungan kepada sesama.','K'=>'Kepedulian sosial masih perlu ditingkatkan, kurang aktif memberikan bantuan kepada orang yang membutuhkan.','C'=>'Cukup peduli terhadap orang lain, mampu memberikan bantuan dan dukungan kepada sesama saat dibutuhkan.','B'=>'Memiliki kepedulian sosial yang baik, aktif memberikan bantuan dan dukungan kepada orang lain.','T'=>'Sangat peduli dan murah hati, selalu siap memberikan bantuan, dukungan, dan perhatian kepada orang lain.'],
+                    'chg' => ['R'=>'Kurang menyukai perubahan, cenderung memilih rutinitas dan cara-cara yang sudah terbiasa.','K'=>'Kreativitas dan keterbukaan terhadap perubahan masih perlu dikembangkan.','C'=>'Cukup terbuka terhadap perubahan dan hal-hal baru, mampu beradaptasi dengan situasi yang berubah.','B'=>'Menyukai perubahan dan hal-hal baru, aktif mencari pengalaman dan cara baru dalam bekerja.','T'=>'Sangat kreatif dan menyukai perubahan, selalu mencari hal-hal baru dan tidak menyukai rutinitas.'],
+                    'end' => ['R'=>'Kurang tekun dan mudah menyerah saat menghadapi pekerjaan yang sulit atau membutuhkan waktu lama.','K'=>'Ketekunan masih perlu ditingkatkan, kadang mudah putus asa saat menghadapi hambatan dalam pekerjaan.','C'=>'Cukup tekun dalam menyelesaikan pekerjaan, mampu bertahan menghadapi hambatan dengan cukup baik.','B'=>'Memiliki ketekunan yang baik, mampu bertahan dan bekerja keras hingga pekerjaan selesai.','T'=>'Sangat tekun dan gigih, tidak mudah menyerah dan selalu berusaha menyelesaikan pekerjaan hingga tuntas.'],
+                    'het' => ['R'=>'Kurang tertarik pada interaksi sosial dengan lawan jenis dalam konteks profesional.','K'=>'Interaksi sosial dengan lawan jenis dalam konteks profesional masih terbatas.','C'=>'Cukup mampu berinteraksi secara sosial dengan lawan jenis dalam konteks profesional.','B'=>'Memiliki kemampuan interaksi sosial yang baik dengan lawan jenis dalam konteks profesional.','T'=>'Sangat aktif dan nyaman dalam berinteraksi sosial dengan lawan jenis dalam berbagai konteks.'],
+                    'agg' => ['R'=>'Sangat rendah agresifitasnya, cenderung menghindari konflik dan tidak mudah marah.','K'=>'Agresifitas rendah, jarang menunjukkan sikap menyerang atau bertentangan dengan orang lain.','C'=>'Memiliki agresifitas yang cukup, kadang dapat bersikap tegas dan mempertahankan pendapat.','B'=>'Cukup agresif dalam mempertahankan pendapat dan posisi, tidak segan mengkritik atau menentang.','T'=>'Sangat agresif, mudah marah, dan sering menunjukkan sikap menyerang atau menentang orang lain.'],
+                    'con' => ['R'=>'Validitas meragukan, peserta kemungkinan tidak konsisten atau tidak jujur dalam menjawab.','K'=>'Konsistensi jawaban kurang, hasil perlu diinterpretasikan dengan hati-hati.','C'=>'Konsistensi jawaban cukup, hasil dapat digunakan dengan pertimbangan.','B'=>'Konsistensi jawaban baik, hasil dapat dipercaya.','T'=>'Konsistensi jawaban sangat baik, hasil sangat dapat dipercaya.'],
+                ];
+                $eppsKelompok = [
+                    'SIKAP DAN POTENSI KERJA' => [
+                        'ach' => 'Motivasi Berprestasi',
+                        'end' => 'Ketekunan',
+                        'ord' => 'Sistematika Kerja',
+                        'dom' => 'Dominasi',
+                        'agg' => 'Agresifitas',
+                        'def' => 'Ketaatan',
+                        'aba' => 'Kejujuran',
+                        'aut' => 'Kemandirian',
+                        'chg' => 'Kreativitas',
+                    ],
+                    'KEMAMPUAN INTERPERSONAL' => [
+                        'aff' => 'Keterampilan Sosial',
+                        'suc' => 'Kebutuhan Afeksi',
+                        'int' => 'Empati',
+                        'exh' => 'Menonjolkan Diri',
+                        'nur' => 'Kontak Sosial',
+                        'het' => 'Interaksi Sosial',
+                    ],
+                ];
+                $katMap = [
+                    'Sangat Rendah' => 'R',
+                    'Rendah'        => 'K',
+                    'Sedang'        => 'C',
+                    'Cukup'         => 'C',
+                    'Baik'          => 'B',
+                    'Tinggi'        => 'T',
+                    'Sangat Tinggi' => 'T',
+                ];
+                $eppsScores = [];
+                foreach ($alat['skor_ringkas'] as $_s) {
+                    $_parts = explode(' - ', $_s['dimensi'] ?? '');
+                    $_kode  = strtolower(trim($_parts[0] ?? ''));
+                    $eppsScores[$_kode] = $_s;
+                }
+            @endphp
             <div class="section-title">{{ $index + 1 }}. {{ $alat['nama_alat_tes'] }} &ndash; {{ $alat['format_dasar'] }}</div>
             <p style="margin:4px 0 10px 0; color:#64748b; font-size:9.5px;">
                 Format: Forced Choice &ndash; Skor Mentah (1–100), Skor Skala (1–10)
             </p>
-            <table>
-                <thead class="th-row">
-                    <tr>
-                        <th style="width:40%;">Dimensi</th>
-                        <th class="mark" style="width:20%;">Skor Mentah</th>
-                        <th class="mark" style="width:20%;">Skor Akhir</th>
-                        <th style="width:20%;">Kategori</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($alat['skor_ringkas'] as $dim)
-                    <tr>
-                        <td>{{ $dim['dimensi'] }}</td>
-                        <td class="mark">{{ $dim['skor_mentah'] ?? '—' }}</td>
-                        <td class="mark">{{ $dim['skor_skala'] ?? '—' }}</td>
-                        <td>{{ $dim['kategori'] ?? '—' }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            @foreach ($eppsKelompok as $_groupName => $_dimensiPeta)
+                <div class="kelompok-header">{{ $_groupName }}</div>
+                <table>
+                    <thead class="th-row">
+                        <tr>
+                            <th style="width:32%;">Aspek Psikologis</th>
+                            <th style="width:5%;text-align:center;">R</th>
+                            <th style="width:5%;text-align:center;">K</th>
+                            <th style="width:5%;text-align:center;">C</th>
+                            <th style="width:5%;text-align:center;">B</th>
+                            <th style="width:5%;text-align:center;">T</th>
+                            <th>Deskripsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($_dimensiPeta as $_kode => $_namaAspek)
+                            @php $_skor = $eppsScores[$_kode] ?? null; $_kat = $_skor ? ($katMap[$_skor['kategori']] ?? '') : ''; @endphp
+                            <tr>
+                                <td style="padding:3px 6px;"><strong>{{ $_namaAspek }}</strong></td>
+                                <td class="mark" style="font-size:12px;">{!! $_kat === 'R' ? '&check;' : '&bull;' !!}</td>
+                                <td class="mark" style="font-size:12px;">{!! $_kat === 'K' ? '&check;' : '&bull;' !!}</td>
+                                <td class="mark" style="font-size:12px;">{!! $_kat === 'C' ? '&check;' : '&bull;' !!}</td>
+                                <td class="mark" style="font-size:12px;">{!! $_kat === 'B' ? '&check;' : '&bull;' !!}</td>
+                                <td class="mark" style="font-size:12px;">{!! $_kat === 'T' ? '&check;' : '&bull;' !!}</td>
+                                <td style="font-size:9px;color:#333;line-height:1.4;">{{ $_kat ? ($eppsDesc[$_kode][$_kat] ?? '-') : '-' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endforeach
+            @if (isset($eppsScores['con']))
+                @php $_con = $eppsScores['con']; $_conKat = $katMap[$_con['kategori']] ?? ''; @endphp
+                <div style="background:#1a1a1a; color:#fff; font-weight:700; font-size:10px; padding:3px 8px; margin-top:8px; letter-spacing:0.5px;">CATATAN VALIDITAS</div>
+                <table>
+                    <thead class="th-row">
+                        <tr>
+                            <th style="width:32%;">Aspek</th>
+                            <th style="width:5%;text-align:center;">R</th>
+                            <th style="width:5%;text-align:center;">K</th>
+                            <th style="width:5%;text-align:center;">C</th>
+                            <th style="width:5%;text-align:center;">B</th>
+                            <th style="width:5%;text-align:center;">T</th>
+                            <th>Deskripsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding:3px 6px;"><strong>Validitas</strong></td>
+                            <td class="mark" style="font-size:12px;">{!! $_conKat === 'R' ? '&check;' : '&bull;' !!}</td>
+                            <td class="mark" style="font-size:12px;">{!! $_conKat === 'K' ? '&check;' : '&bull;' !!}</td>
+                            <td class="mark" style="font-size:12px;">{!! $_conKat === 'C' ? '&check;' : '&bull;' !!}</td>
+                            <td class="mark" style="font-size:12px;">{!! $_conKat === 'B' ? '&check;' : '&bull;' !!}</td>
+                            <td class="mark" style="font-size:12px;">{!! $_conKat === 'T' ? '&check;' : '&bull;' !!}</td>
+                            <td style="font-size:9px;color:#333;line-height:1.4;">{{ $_conKat ? ($eppsDesc['con'][$_conKat] ?? '-') : '-' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            @endif
+            <div class="footnote"><strong>Keterangan:</strong> R = Rendah &middot; K = Kurang &middot; C = Cukup &middot; B = Baik &middot; T = Tinggi</div>
 
         {{-- CFIT --}}
         @elseif (str_contains($alat['nama_alat_tes'], 'CFIT') && !empty($alat['skor_ringkas']))
@@ -447,37 +547,117 @@
 
         {{-- Kraepelin / Grid --}}
         @elseif ($alat['format_dasar'] === 'Grid' && ($gridRingkasan = $alat['grid_ringkasan'] ?? null))
+            @php
+                $gridSkor  = collect($alat['skor_ringkas'])->keyBy(fn($s) => explode(' - ', $s['dimensi'])[0]);
+                $panker    = $gridSkor->get('KECEPATAN');
+                $janker    = $gridSkor->get('KEAJEGAN');
+                $tianker   = $gridSkor->get('KETELITIAN');
+                $hankerRaw = $gridSkor->get('KETAHANAN');
+                $hanker    = $alat['grid_hanker'] ?? ['y0'=>0,'y50'=>0,'delta'=>0,'trend'=>'stabil'];
+                $chartData = $alat['grid_chart'] ?? [];
+                $kraepChartId = 'kraepChart_' . $index;
+                $trendLabel = match($hanker['trend'] ?? 'stabil') { 'meningkat'=>'meningkat','menurun'=>'menurun',default=>'stabil' };
+                $trendColor = match($hanker['trend'] ?? 'stabil') { 'meningkat'=>'#16a34a','menurun'=>'#dc2626',default=>'#6b7280' };
+            @endphp
             <div class="section-title">{{ $index + 1 }}. {{ $alat['nama_alat_tes'] }} &ndash; {{ $alat['format_dasar'] }}</div>
 
-            @if (!empty($alat['skor_ringkas']))
-            <table>
-                <thead class="th-row">
-                    <tr>
-                        <th style="width:50%;">Dimensi</th>
-                        <th class="mark" style="width:15%;">Skor Mentah</th>
-                        <th class="mark" style="width:15%;">Skor Akhir</th>
-                        <th style="width:20%;">Kategori</th>
+            <div style="display:flex; gap:32px; margin-top:10px; font-size:11px;">
+                <div><span style="color:#555;">Sum of Error</span> &nbsp;
+                    <strong style="background:#e5e7eb; padding:2px 10px; border-radius:3px;">{{ $gridRingkasan->total_salah }}</strong>
+                </div>
+                <div><span style="color:#555;">Sum of Skipeds</span> &nbsp;
+                    <strong style="background:#e5e7eb; padding:2px 10px; border-radius:3px;">{{ $gridRingkasan->total_kelewat }}</strong>
+                </div>
+                <div style="margin-left:auto; color:#555; font-size:10px;">Kolom dikerjakan: <strong>{{ $gridRingkasan->total_kolom }}</strong> &nbsp;|&nbsp; Total benar: <strong>{{ $gridRingkasan->total_benar }}</strong></div>
+            </div>
+
+            <table style="margin-top:10px; font-size:11px;">
+                <thead>
+                    <tr style="background:#f3f4f6; border-bottom:2px solid #000;">
+                        <th style="padding:4px 8px; text-align:left; width:130px;"></th>
+                        <th style="padding:4px 8px; text-align:center; width:80px;">Nilai</th>
+                        <th style="padding:4px 8px; text-align:center; width:80px;">Pembulatan</th>
+                        <th style="padding:4px 8px; text-align:left; width:130px;"></th>
+                        <th style="padding:4px 8px; text-align:left;">Analisis</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($alat['skor_ringkas'] as $sk)
                     <tr>
-                        <td style="padding:3px 6px;">{{ $sk['dimensi'] }}</td>
-                        <td class="mark">{{ $sk['skor_mentah'] ?? '—' }}</td>
-                        <td class="mark">{{ $sk['skor_skala'] ?? '—' }}</td>
-                        <td>{{ $sk['kategori'] ?? '—' }}</td>
+                        <td style="padding:4px 8px; font-weight:700;">Panker</td>
+                        <td style="padding:4px 8px; text-align:center;">{{ number_format($panker['skor_mentah'] ?? 0, 2) }}</td>
+                        <td style="padding:4px 8px; text-align:center; background:#fee2e2; font-weight:700; border:1px solid #fca5a5;">{{ round($panker['skor_mentah'] ?? 0) }}</td>
+                        <td style="padding:4px 8px; color:#6b7280; font-style:italic;">(speed factor)</td>
+                        <td style="padding:4px 8px; color:#1d4ed8; font-weight:600;">{{ ($panker['kategori'] ?? '—') !== '—' ? ($panker['kategori'] ?? '—') : '—' }}</td>
                     </tr>
-                    @endforeach
+                    <tr>
+                        <td style="padding:4px 8px; font-weight:700;">Janker</td>
+                        <td style="padding:4px 8px; text-align:center;">{{ number_format($janker['skor_mentah'] ?? 0, 2) }}</td>
+                        <td style="padding:4px 8px; text-align:center; background:#fee2e2; font-weight:700; border:1px solid #fca5a5;">{{ round($janker['skor_mentah'] ?? 0, 2) }}</td>
+                        <td style="padding:4px 8px; color:#6b7280; font-style:italic;">(rithme factor)</td>
+                        <td style="padding:4px 8px; color:#1d4ed8; font-weight:600;">{{ ($janker['kategori'] ?? '—') !== '—' ? ($janker['kategori'] ?? '—') : '—' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px 8px; font-weight:700;">Hanker</td>
+                        <td colspan="2"></td>
+                        <td style="padding:4px 8px; color:#6b7280; font-style:italic;">(ausdeur factor)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px 8px 2px 20px; color:#555;">y(0)</td>
+                        <td style="padding:2px 8px; text-align:center;">{{ number_format($hanker['y0'] ?? 0, 7) }}</td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px 8px 2px 20px; color:#555;">y(50)</td>
+                        <td style="padding:2px 8px; text-align:center;">{{ number_format($hanker['y50'] ?? 0, 7) }}</td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px 8px 2px 20px; color:#555;">y(50)-y(0)</td>
+                        <td style="padding:2px 8px; text-align:center;">{{ number_format($hanker['delta'] ?? 0, 7) }}</td>
+                        <td style="padding:2px 8px; text-align:center; background:#fee2e2; font-weight:700; border:1px solid #fca5a5;">{{ round($hanker['delta'] ?? 0, 2) }}</td>
+                        <td style="padding:2px 8px; font-weight:600; color:{{ $trendColor }};">{{ $trendLabel }}</td>
+                        <td style="padding:2px 8px; color:#1d4ed8; font-weight:600;">{{ ($hankerRaw['kategori'] ?? '—') !== '—' ? ($hankerRaw['kategori'] ?? '—') : '—' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px 8px; font-weight:700;">Tianker</td>
+                        <td style="padding:4px 8px; text-align:center;">{{ $tianker['skor_mentah'] ?? 0 }}</td>
+                        <td style="padding:4px 8px; text-align:center; background:#fee2e2; font-weight:700; border:1px solid #fca5a5;">{{ round($tianker['skor_mentah'] ?? 0) }}</td>
+                        <td></td>
+                        <td style="padding:4px 8px; color:#1d4ed8; font-weight:600;">{{ ($tianker['kategori'] ?? '—') !== '—' ? ($tianker['kategori'] ?? '—') : '—' }}</td>
+                    </tr>
                 </tbody>
             </table>
-            @endif
 
-            <div class="grid-summary">
-                <div><strong>Total Jawaban Benar:</strong> {{ $gridRingkasan->total_benar ?? 0 }}</div>
-                <div><strong>Total Jawaban Salah:</strong> {{ $gridRingkasan->total_salah ?? 0 }}</div>
-                <div><strong>Total Kelewat:</strong> {{ $gridRingkasan->total_kelewat ?? 0 }}</div>
-                <div><strong>Total Kolom Dikerjakan:</strong> {{ $gridRingkasan->total_kolom ?? 0 }}</div>
+            @if (!empty($chartData))
+            <div style="margin-top:16px; border:1px solid #e2e8f0; border-radius:4px; padding:12px;">
+                <p style="font-weight:700; font-size:11px; text-align:center; letter-spacing:0.5px; margin-bottom:8px;">GRAFIK HASIL TES KRAEPELIN</p>
+                <canvas id="{{ $kraepChartId }}" height="80"></canvas>
+                <script>
+                (function() {
+                    var labels = {!! json_encode(array_column($chartData, 'kolom')) !!};
+                    var data   = {!! json_encode(array_column($chartData, 'benar')) !!};
+                    setTimeout(function() {
+                        new Chart(document.getElementById('{{ $kraepChartId }}'), {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{ label: 'Nilai Y', data: data, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.05)', borderWidth: 1.2, pointRadius: 2, tension: 0.1 }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    x: { title: { display: true, text: 'Kolom ke-', font: { size: 10 } }, ticks: { font: { size: 9 } } },
+                                    y: { title: { display: true, text: 'Nilai Y', font: { size: 10 } }, ticks: { font: { size: 9 } }, beginAtZero: true }
+                                }
+                            }
+                        });
+                    }, 300);
+                })();
+                </script>
             </div>
+            @endif
 
         {{-- PAPIKOSTIK --}}
         @elseif (str_contains(strtoupper($alat['nama_alat_tes']), 'PAPIKOSTIK'))
@@ -513,7 +693,11 @@
                     'F' => ['db'=>'DUKUNGAN_ATASAN','nama'=>'Dukungan terhadap atasan','R'=>'Cenderung egois, kemungkinan bisa bersikap memberontak terhadap atasan atau aturan.','K'=>'Kurang mendukung dan mengikuti arahan atasan, kadang bersikap tidak kooperatif.','C'=>'Cukup mendukung dan menghormati atasan, mampu mengikuti arahan dengan baik.','B'=>'Memiliki loyalitas dan dukungan yang baik terhadap atasan dan kebijakan organisasi.','T'=>'Sangat loyal dan mendukung atasan, selalu berusaha memenuhi harapan dan arahan pimpinan.'],
                     'W' => ['db'=>'TAAT_ATURAN',    'nama'=>'Kebutuhan taat pada aturan & pengarahan','R'=>'Berorientasi pada tujuan, mandiri, tidak terlalu membutuhkan aturan yang ketat.','K'=>'Kurang menyukai aturan yang mengikat, lebih suka bekerja dengan kebebasan yang besar.','C'=>'Cukup patuh terhadap aturan dan pengarahan yang berlaku di lingkungan kerja.','B'=>'Memiliki kepatuhan yang baik terhadap aturan, prosedur, dan pengarahan yang diberikan.','T'=>'Sangat membutuhkan aturan yang jelas, disiplin tinggi dalam mengikuti prosedur dan pengarahan.'],
                 ];
-                $papScores = $papScores ?? [];
+                $papScores = [];
+                foreach ($alat['skor_ringkas'] as $_s) {
+                    $_kode = explode(' - ', $_s['dimensi'] ?? '')[0] ?? '';
+                    $papScores[trim($_kode)] = $_s;
+                }
             @endphp
 
             <div class="section-title">{{ $index + 1 }}. {{ $alat['nama_alat_tes'] }} &ndash; {{ $alat['format_dasar'] }}</div>
@@ -645,8 +829,94 @@
 
         {{-- IST --}}
         @elseif (str_contains(strtoupper($alat['nama_alat_tes']), 'IST'))
+            @php
+                $istSkorByKode = collect($alat['skor_ringkas'])->keyBy(fn($s) => explode(' - ', $s['dimensi'])[0]);
+                $iqData = $istSkorByKode->get('IQ');
+                $iqSkor = (float) ($iqData['skor_skala'] ?? $iqData['skor_mentah'] ?? 0);
+                $klasifikasiIQ = match(true) {
+                    $iqSkor >= 141 => 'Genius',
+                    $iqSkor >= 128 => 'Very Superior',
+                    $iqSkor >= 120 => 'Superior',
+                    $iqSkor >= 111 => 'High Average (Di Atas Rata-rata)',
+                    $iqSkor >= 91  => 'Average (Rata-rata)',
+                    $iqSkor >= 80  => 'Low Average (Di Bawah Rata-rata)',
+                    $iqSkor > 0    => 'Borderline',
+                    default        => '-',
+                };
+                $aspekPsikologis = [
+                    ['no'=>1, 'nama'=>'Kecerdasan Umum',             'deskripsi'=>'Kemampuan dasar untuk menghadapi, mengolah, mempelajari dan memecahkan masalah di sekitarnya.',                                   'kode'=>'WU'],
+                    ['no'=>2, 'nama'=>'Kemampuan Analisis - Sintesa', 'deskripsi'=>'Kemampuan analisa terhadap sebuah masalah.',                                                                                      'kode'=>'WA'],
+                    ['no'=>3, 'nama'=>'Kemampuan Berfikir Fleksibel', 'deskripsi'=>'Kemampuan untuk berpikir secara fleksibel dan adanya kejelasan dalam proses pikir.',                                             'kode'=>'AN'],
+                    ['no'=>4, 'nama'=>'Kemampuan Verbal',             'deskripsi'=>'Potensi untuk mencerna konsep dalam kata dan memahami polanya sehingga menarik kesimpulan secara umum.',                         'kode'=>'SE'],
+                    ['no'=>5, 'nama'=>'Kemampuan Berpikir Praktis',   'deskripsi'=>'Kemampuan untuk memahami realita dan membuat keputusan yang didasarkan atas fakta.',                                             'kode'=>'ZR'],
+                    ['no'=>6, 'nama'=>'Kemampuan Numerikal',          'deskripsi'=>'Potensi untuk mencerna konsep angka dan menggunakannya dalam memecahkan persoalan hitungan, baik yang praktis maupun yang menuntut logika berpikir.', 'kode'=>'RA'],
+                    ['no'=>7, 'nama'=>'Daya Kreatifitas',             'deskripsi'=>'Kemampuan untuk melepaskan diri dari pemikiran yang bersifat konvensional.',                                                     'kode'=>'FA'],
+                    ['no'=>8, 'nama'=>'Kemampuan Abstraksi',          'deskripsi'=>'Potensi untuk membayangkan (berimajinasi) secara konstruktif yang bersifat menyeluruh dan analitis.',                            'kode'=>'GE'],
+                    ['no'=>9, 'nama'=>'Kemampuan Daya Ingat / Memori','deskripsi'=>'Kemampuan untuk mengingat informasi yang diterima secara akurat.',                                                              'kode'=>'ME'],
+                ];
+                $katIST = fn(float $s): string => match(true) {
+                    $s >= 120 => 'ST', $s >= 110 => 'T', $s >= 90 => 'C', $s >= 80 => 'R', $s > 0 => 'SR', default => '',
+                };
+            @endphp
             <div class="section-title">{{ $index + 1 }}. {{ $alat['nama_alat_tes'] }} &ndash; {{ $alat['format_dasar'] }}</div>
             @if (!empty($alat['skor_ringkas']))
+                <div style="margin-bottom:16px;">
+                    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="background:#2d7a2d;color:#fff;padding:8px 10px;text-align:left;border:1px solid #ccc;" rowspan="2">ASPEK-ASPEK PSIKOLOGIS</th>
+                                <th colspan="5" style="background:#2d7a2d;color:#fff;padding:6px;text-align:center;border:1px solid #ccc;">KATEGORI</th>
+                            </tr>
+                            <tr>
+                                <th style="background:#c0392b;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">SR<br><span style="font-weight:400;font-size:9px;">Sangat Rendah</span></th>
+                                <th style="background:#e67e22;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">R<br><span style="font-weight:400;font-size:9px;">Rendah</span></th>
+                                <th style="background:#27ae60;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">C<br><span style="font-weight:400;font-size:9px;">Cukup</span></th>
+                                <th style="background:#2980b9;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">T<br><span style="font-weight:400;font-size:9px;">Tinggi</span></th>
+                                <th style="background:#8e44ad;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">ST<br><span style="font-weight:400;font-size:9px;">Sangat Tinggi</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($aspekPsikologis as $aspek)
+                                @php
+                                    $s = $istSkorByKode->get($aspek['kode']);
+                                    $skor = (float)($s['skor_skala'] ?? 0);
+                                    $kat = $katIST($skor);
+                                    $bg = $aspek['no'] % 2 === 0 ? '#f8fafc' : '#ffffff';
+                                @endphp
+                                <tr style="background:{{ $bg }};border-bottom:1px solid #e0e3e5;">
+                                    <td style="padding:6px 8px;border:1px solid #ddd;color:#64748b;text-align:center;width:4%;">{{ $aspek['no'] }}</td>
+                                    <td style="padding:6px 10px;border:1px solid #ddd;">
+                                        <strong style="color:#1a1a1a;font-size:11px;">{{ $aspek['nama'] }}</strong><br>
+                                        <span style="color:#64748b;font-size:10px;">{{ $aspek['deskripsi'] }}</span>
+                                    </td>
+                                    <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'SR' ? '✓' : '' }}</td>
+                                    <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'R'  ? '✓' : '' }}</td>
+                                    <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'C'  ? '✓' : '' }}</td>
+                                    <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'T'  ? '✓' : '' }}</td>
+                                    <td style="padding:6px;text-align:center;border:1px solid #ddd;font-size:14px;">{{ $kat === 'ST' ? '✓' : '' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @if ($iqSkor > 0)
+                <div style="display:flex;gap:16px;margin-bottom:16px;">
+                    <table style="border-collapse:collapse;font-size:11px;flex:1;">
+                        <thead>
+                            <tr>
+                                <th style="background:#2d7a2d;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">IQ</th>
+                                <th style="background:#2d7a2d;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">Klasifikasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:8px 14px;border:1px solid #ddd;text-align:center;font-size:20px;font-weight:700;color:#0a2463;">{{ $iqSkor }}</td>
+                                <td style="padding:8px 14px;border:1px solid #ddd;font-weight:600;color:#1a5696;">{{ $klasifikasiIQ }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                @endif
                 <table>
                     <thead class="th-row">
                         <tr>

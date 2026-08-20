@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" style="width:170mm; margin:0 auto;">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #000; margin: 0; padding: 0; }
-        .dokumen { width: 170mm; margin: 0 auto; padding: 0; box-sizing: border-box; }
+        .dokumen { width: 100%; box-sizing: border-box; }
         .company-name { font-weight: 700; font-size: 15px; margin: 0; }
         .company-sub { font-size: 10px; color: #444; margin: 2px 0 0 0; }
         .rahasia-badge { border: 1px solid #b91c1c; color: #b91c1c; font-size: 8px; font-weight: bold; padding: 2px 6px; white-space: nowrap; }
@@ -33,8 +33,11 @@
         .page2-header .rahasia-badge { font-size: 8px; padding: 2px 6px; }
         .page2-title { font-weight: 700; font-size: 11px; letter-spacing: 0.5px; margin-bottom: 10px; text-align: center; }
         .page-break { page-break-after: always; break-after: page; }
+        .container-formal { page-break-inside: avoid; }
+        table { page-break-inside: avoid; }
         @page {
             size: A4 portrait;
+            margin: 15mm 14mm 20mm 14mm;
         }
         p, div, td { orphans: 3; widows: 3; }
     </style>
@@ -296,12 +299,16 @@
                         @endforeach
                     </tbody>
                 </table>
-                <div style="margin-top:8px; padding:8px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; font-size:9px; color:#334155; display:grid; grid-template-columns:1fr 1fr; gap:3px 16px;">
-                    <div><strong>Total Jawaban Benar:</strong> {{ $gridRingkasan->total_benar }}</div>
-                    <div><strong>Total Jawaban Salah:</strong> {{ $gridRingkasan->total_salah }}</div>
-                    <div><strong>Total Kelewat:</strong> {{ $gridRingkasan->total_kelewat }}</div>
-                    <div><strong>Total Kolom Dikerjakan:</strong> {{ $gridRingkasan->total_kolom }}</div>
-                </div>
+                <table style="margin-top:6px; font-size:9px; background:#f8fafc; border:1px solid #e2e8f0;">
+                    <tr>
+                        <td style="border:none; padding:4px 8px; width:50%;"><strong>Total Jawaban Benar:</strong> {{ $gridRingkasan->total_benar }}</td>
+                        <td style="border:none; padding:4px 8px; width:50%;"><strong>Total Jawaban Salah:</strong> {{ $gridRingkasan->total_salah }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border:none; padding:4px 8px;"><strong>Total Kelewat:</strong> {{ $gridRingkasan->total_kelewat }}</td>
+                        <td style="border:none; padding:4px 8px;"><strong>Total Kolom Dikerjakan:</strong> {{ $gridRingkasan->total_kolom }}</td>
+                    </tr>
+                </table>
             @elseif (str_contains(strtoupper($alatTes['nama_alat_tes']), 'PAPIKOSTIK') && !empty($alatTes['skor_ringkas']))
                 @php
                     $papKelompok = [

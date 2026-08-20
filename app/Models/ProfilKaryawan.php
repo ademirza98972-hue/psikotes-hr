@@ -19,6 +19,7 @@ class ProfilKaryawan extends Model
         'nik_karyawan',
         'departemen',
         'jabatan',
+        'tanggal_lahir',
     ];
 
     public function pengguna(): BelongsTo

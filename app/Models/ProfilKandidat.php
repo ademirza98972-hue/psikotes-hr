@@ -19,6 +19,7 @@ class ProfilKandidat extends Model
         'posisi_dilamar',
         'pendidikan_terakhir',
         'nik_kandidat',
+        'tanggal_lahir',
     ];
 
     public function pengguna(): BelongsTo

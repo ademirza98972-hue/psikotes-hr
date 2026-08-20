@@ -67,14 +67,12 @@ class ScoringEngineService
     /**
      * Hitung skor IST per subtes (SE, WA, AN, GE, RA, ZR, FA, WU, ME) dan IQ Total.
      */
-    public function scoreIST(int $userId, int $sesiTesId, int $alatTesId, string $kelompokSegmen = 'SLTA'): void
+    public function scoreIST(int $userId, int $sesiTesId, int $alatTesId, string $kelompokSegmen = 'USIA_21_25'): void
     {
-        // 1. Ambil semua dimensi subtes IST (SE, WA, AN, GE, RA, ZR, FA, WU, ME, IQ)
         $dimensiMap = DB::table('dimensi_alat_tes')
             ->where('alat_tes_id', $alatTesId)
             ->pluck('id', 'kode_dimensi');
 
-        // 2. Ambil semua soal IST beserta kunci jawaban dan range nomor per subtes
         $subtesRange = [
             'SE' => [1, 20],
             'WA' => [21, 40],
@@ -87,7 +85,6 @@ class ScoringEngineService
             'ME' => [157, 176],
         ];
 
-        // 3. Ambil semua jawaban peserta untuk IST
         $jawaban = JawabanPeserta::where('user_id', $userId)
             ->where('sesi_tes_id', $sesiTesId)
             ->whereHas('soal', fn($q) => $q->where('alat_tes_id', $alatTesId))
@@ -95,12 +92,10 @@ class ScoringEngineService
             ->get()
             ->keyBy('soal_id');
 
-        // 4. Ambil semua soal IST dengan kunci jawaban
         $soalList = Soal::where('alat_tes_id', $alatTesId)
             ->get()
             ->keyBy('id');
 
-        // 5. Hitung skor per subtes
         $skorMentahTotal = 0;
         foreach ($subtesRange as $kode => [$nomorMin, $nomorMax]) {
             if (!isset($dimensiMap[$kode])) {
@@ -110,34 +105,50 @@ class ScoringEngineService
             $soalSubtes = $soalList->filter(fn($s) => $s->nomor >= $nomorMin && $s->nomor <= $nomorMax);
             $benar = 0;
 
-            foreach ($soalSubtes as $soal) {
-                $jaw = $jawaban->get($soal->id);
-                if (!$jaw) {
-                    continue;
+            if ($kode === 'GE') {
+                // GE: kunci_jawaban is JSON {"2":["word"],"1":["word"]}, score 0/1/2 per item
+                $rawGE = 0;
+                foreach ($soalSubtes as $soal) {
+                    $jaw = $jawaban->get($soal->id);
+                    if (!$jaw) continue;
+                    $kunciRaw = $soal->kunci_jawaban ?? '';
+                    if (!$kunciRaw) continue;
+                    $kunci = json_decode($kunciRaw, true);
+                    if (!is_array($kunci)) continue;
+                    $jawPeserta = strtolower(trim($jaw->jawaban_teks ?? ''));
+                    $score2 = array_map('strtolower', $kunci['2'] ?? []);
+                    $score1 = array_map('strtolower', $kunci['1'] ?? []);
+                    if (in_array($jawPeserta, $score2)) {
+                        $rawGE += 2;
+                    } elseif (in_array($jawPeserta, $score1)) {
+                        $rawGE += 1;
+                    }
                 }
+                $benar = $this->convertGeRawToEquivalent($rawGE);
+            } else {
+                foreach ($soalSubtes as $soal) {
+                    $jaw = $jawaban->get($soal->id);
+                    if (!$jaw) continue;
+                    $kunciJawaban = strtolower(trim($soal->kunci_jawaban ?? ''));
+                    if ($kunciJawaban === '') continue;
 
-                $kunciJawaban = strtolower(trim($soal->kunci_jawaban ?? ''));
-                if ($kunciJawaban === '') {
-                    continue;
-                }
-
-                if ($soal->tipe_format === 'pilihan_ganda' || $soal->tipe_format === 'pilihan_gambar') {
-                    if ($jaw->opsi_dipilih_id) {
-                        $opsiDipilih = OpsiJawaban::find($jaw->opsi_dipilih_id);
-                        $hurufDipilih = chr(96 + ($opsiDipilih?->urutan ?? 0));
-                        if ($hurufDipilih === $kunciJawaban) {
+                    if ($soal->tipe_format === 'pilihan_ganda' || $soal->tipe_format === 'pilihan_gambar') {
+                        if ($jaw->opsi_dipilih_id) {
+                            $opsiDipilih = OpsiJawaban::find($jaw->opsi_dipilih_id);
+                            $hurufDipilih = chr(96 + ($opsiDipilih?->urutan ?? 0));
+                            if ($hurufDipilih === $kunciJawaban) {
+                                $benar++;
+                            }
+                        }
+                    } elseif (in_array($soal->tipe_format, ['isian_teks', 'isian_angka'])) {
+                        $jawabanPeserta = strtolower(trim($jaw->jawaban_teks ?? ''));
+                        if ($jawabanPeserta === $kunciJawaban) {
                             $benar++;
                         }
-                    }
-                } elseif (in_array($soal->tipe_format, ['isian_teks', 'isian_angka'])) {
-                    $jawabanPeserta = strtolower(trim($jaw->jawaban_teks ?? ''));
-                    if ($jawabanPeserta === $kunciJawaban) {
-                        $benar++;
                     }
                 }
             }
 
-            // Simpan skor per subtes
             $skorAkhirSubtes = NormaKonversi::where('alat_tes_id', $alatTesId)
                 ->where('dimensi_id', $dimensiMap[$kode])
                 ->where('kelompok_segmen', $kelompokSegmen)
@@ -162,12 +173,11 @@ class ScoringEngineService
             $skorMentahTotal += $benar;
         }
 
-        // 6. Hitung IQ Total dari skor mentah total
+        // IQ Total: sum of all 9 subtest RW (GE uses equivalent), lookup by age group
         if (isset($dimensiMap['IQ'])) {
-            $kelompokIQ = $kelompokSegmen === 'SLTP' ? 'SLTP' : 'GTSLTP';
             $iqTotal = NormaKonversi::where('alat_tes_id', $alatTesId)
                 ->where('dimensi_id', $dimensiMap['IQ'])
-                ->where('kelompok_segmen', $kelompokIQ)
+                ->where('kelompok_segmen', $kelompokSegmen)
                 ->where('skor_mentah_min', '<=', $skorMentahTotal)
                 ->where('skor_mentah_max', '>=', $skorMentahTotal)
                 ->value('skor_hasil') ?? 0;
@@ -186,6 +196,32 @@ class ScoringEngineService
                 ]
             );
         }
+    }
+
+    private function convertGeRawToEquivalent(int $rawGE): int
+    {
+        return match(true) {
+            $rawGE >= 31 => 20,
+            $rawGE === 30 => 19,
+            $rawGE === 29 => 18,
+            $rawGE === 28 => 17,
+            $rawGE === 27 => 16,
+            $rawGE >= 25  => 15,
+            $rawGE >= 23  => 14,
+            $rawGE >= 21  => 13,
+            $rawGE >= 19  => 12,
+            $rawGE >= 17  => 11,
+            $rawGE >= 15  => 10,
+            $rawGE >= 13  => 9,
+            $rawGE >= 11  => 8,
+            $rawGE >= 9   => 7,
+            $rawGE >= 7   => 6,
+            $rawGE >= 5   => 5,
+            $rawGE === 4  => 4,
+            $rawGE === 3  => 3,
+            $rawGE === 2  => 2,
+            default       => 1,
+        };
     }
 
     public function scoreForcedChoice(int $userId, int $sesiTesId, int $alatTesId, string $kelompokSegmen, bool $pakaiNorma = true): Collection

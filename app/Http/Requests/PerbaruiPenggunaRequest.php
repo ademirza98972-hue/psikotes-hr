@@ -46,6 +46,7 @@ class PerbaruiPenggunaRequest extends FormRequest
             $aturan['nama_karyawan'] = ['required', 'string', 'max:255'];
             $aturan['departemen'] = ['required', 'integer', 'exists:departemen,id'];
             $aturan['jabatan'] = ['nullable', 'integer', 'exists:posisi,id'];
+            $aturan['tanggal_lahir'] = ['nullable', 'date'];
         }
 
         return $aturan;

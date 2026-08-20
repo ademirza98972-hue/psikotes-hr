@@ -32,8 +32,10 @@ class RegisterRequest extends FormRequest
             $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
             $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
             $aturan['nik_kandidat'] = ['required', 'string', 'digits:16'];
+            $aturan['tanggal_lahir'] = ['nullable', 'date'];
         } elseif ($this->input('tipe_akun') === 'karyawan') {
             $aturan['nik_karyawan'] = ['required', 'string', 'max:30'];
+            $aturan['tanggal_lahir'] = ['nullable', 'date'];
         }
 
         return $aturan;

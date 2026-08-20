@@ -135,6 +135,7 @@ class PenggunaController extends Controller
                     'nik_karyawan' => $dataMaster->nik_karyawan,
                     'departemen' => $departemen->nama_departemen,
                     'jabatan' => $jabatanNama,
+                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
                 ]);
 
                 $dataMaster->update(['status' => 'sudah_terpakai', 'jenis_kelamin' => $data['jenis_kelamin']]);
@@ -214,6 +215,7 @@ class PenggunaController extends Controller
                     'nama_karyawan' => $data['nama_karyawan'] ?? $pengguna->name,
                     'departemen' => $departemen->nama_departemen,
                     'jabatan' => $jabatanNama,
+                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
                 ]);
 
                 $dataMaster = DataKaryawan::where('nik_karyawan', $profil->nik_karyawan)->first();

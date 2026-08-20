@@ -914,13 +914,18 @@ class PengerjaanTesController extends Controller
                 };
             } elseif ($kodeAlat === 'IST') {
                 $user = Auth::user();
-                $pendidikan = $user->profilKaryawan?->pendidikan_terakhir
-                    ?? $user->profilKandidat?->pendidikan_terakhir
-                    ?? 'SLTA';
-                $kelompokSegmen = match (strtoupper($pendidikan)) {
-                    'SD', 'SMP', 'SLTP' => 'SLTP',
-                    'S1', 'S2', 'S3', 'D3', 'D4', 'SARJANA', 'SARJ' => 'SARJ',
-                    default => 'SLTA',
+                $tanggalLahir = $user->profilKaryawan?->tanggal_lahir
+                    ?? $user->profilKandidat?->tanggal_lahir;
+                $usia = $tanggalLahir
+                    ? (int) \Carbon\Carbon::parse($tanggalLahir)->diffInYears(now())
+                    : 25;
+                $kelompokSegmen = match(true) {
+                    $usia <= 25 => 'USIA_21_25',
+                    $usia <= 30 => 'USIA_26_30',
+                    $usia <= 35 => 'USIA_31_35',
+                    $usia <= 40 => 'USIA_36_40',
+                    $usia <= 45 => 'USIA_41_45',
+                    default     => 'USIA_51_60',
                 };
             } else {
                 $kelompokSegmen = 'default'; // akan diupdate saat norma lengkap

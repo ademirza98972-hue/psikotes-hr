@@ -67,6 +67,7 @@ class SimpanPenggunaRequest extends FormRequest
                     }
                 },
             ],
+            'tanggal_lahir' => ['nullable', 'date'],
         ];
     }
 

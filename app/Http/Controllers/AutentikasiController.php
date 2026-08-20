@@ -138,6 +138,7 @@ class AutentikasiController extends Controller
                     'nama_kandidat' => $data['name'],
                     'posisi_dilamar' => $data['posisi_dilamar'],
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],
+                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
                     'nik_kandidat' => $data['nik_kandidat'] ?? null,
                 ]);
             } elseif ($tipeAkun === 'karyawan') {
@@ -152,6 +153,7 @@ class AutentikasiController extends Controller
                     'nik_karyawan' => $dataMaster->nik_karyawan,
                     'departemen' => $dataMaster->departemen,
                     'jabatan' => $dataMaster->jabatan,
+                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
                 ]);
 
                 $dataMaster->update(['status' => 'sudah_terpakai']);

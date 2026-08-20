@@ -115,6 +115,7 @@ class DataKandidatController extends Controller
                 'nama_kandidat' => $data['nama_kandidat'],
                 'posisi_dilamar' => $namaPosisi,
                 'pendidikan_terakhir' => $data['pendidikan_terakhir'],
+                'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
                 'nik_kandidat' => $data['nik_kandidat'] ?? null,
             ]);
         });
@@ -175,6 +176,7 @@ class DataKandidatController extends Controller
                     'nama_kandidat' => $data['nama_kandidat'],
                     'posisi_dilamar' => $namaPosisi,
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],
+                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
                     'nik_kandidat' => $data['nik_kandidat'] ?? null,
                 ]);
             }

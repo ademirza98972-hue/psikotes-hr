@@ -69,6 +69,11 @@
                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nama_karyawan') border-rose-400 @enderror">
                     <p class="mt-1.5 text-[11px] text-[#40484b]">Nama ini akan digunakan untuk nama tampilan akun dan data profil karyawan.</p>
                 </div>
+                <div>
+                    <label for="tanggal_lahir" class="block text-[13px] font-medium text-[#191c1e] mb-1">Tanggal Lahir <span class="text-slate-400 font-normal">(untuk norma IST)</span></label>
+                    <input id="tanggal_lahir" name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir', optional($profilKaryawan)->tanggal_lahir ?? '') }}"
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
+                </div>
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label for="departemen" class="block text-[13px] font-medium text-[#191c1e] mb-1">Departemen</label>

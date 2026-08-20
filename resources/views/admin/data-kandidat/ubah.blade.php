@@ -84,6 +84,11 @@
                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('pendidikan_terakhir') border-rose-400 @enderror">
                 </div>
                 <div>
+                    <label for="tanggal_lahir" class="block text-[13px] font-medium text-[#191c1e] mb-1">Tanggal Lahir <span class="text-slate-400 font-normal">(untuk norma IST)</span></label>
+                    <input id="tanggal_lahir" name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir', $profilKandidat->tanggal_lahir ?? '') }}"
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
+                </div>
+                <div>
                     <label for="nik_kandidat" class="block text-[13px] font-medium text-[#191c1e] mb-1">NIK KTP <span class="text-rose-600">*</span></label>
                     <input id="nik_kandidat" name="nik_kandidat" type="text" value="{{ old('nik_kandidat', $profilKandidat->nik_kandidat ?? '') }}" maxlength="16" required
                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nik_kandidat') border-rose-400 @enderror">

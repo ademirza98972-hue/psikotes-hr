@@ -53,6 +53,7 @@ class SimpanKandidatRequest extends FormRequest
             'no_hp' => ['required', 'string', 'max:30'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'pendidikan_terakhir' => ['required', 'string', 'max:255'],
+            'tanggal_lahir' => ['nullable', 'date'],
             'nik_kandidat' => ['required', 'string', 'digits:16'],
         ];
     }

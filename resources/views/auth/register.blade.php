@@ -200,7 +200,23 @@
                 @enderror
             </div>
 
-            
+            <div class="space-y-1.5">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="tanggal_lahir_kandidat">Tanggal Lahir</label>
+                <div class="relative focused-input group">
+                    <input
+                        id="tanggal_lahir_kandidat"
+                        name="tanggal_lahir"
+                        type="date"
+                        value="{{ old('tanggal_lahir') }}"
+                        :disabled="tipe !== 'kandidat'"
+                        class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors"
+                    >
+                </div>
+                @error('tanggal_lahir')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
         </div>
 
         {{-- Field Karyawan --}}
@@ -284,7 +300,20 @@
                 <p class="font-body text-xs text-on-surface-variant mt-1" x-show="departemenId === ''">Pilih departemen terlebih dahulu untuk melihat posisi.</p>
             </div>
 
-            
+            <div class="space-y-1.5">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="tanggal_lahir_karyawan">Tanggal Lahir</label>
+                <div class="relative focused-input group">
+                    <input
+                        id="tanggal_lahir_karyawan"
+                        name="tanggal_lahir"
+                        type="date"
+                        value="{{ old('tanggal_lahir') }}"
+                        :disabled="tipe !== 'karyawan'"
+                        class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors"
+                    >
+                </div>
+            </div>
+
         </div>
 
         {{-- Password --}}

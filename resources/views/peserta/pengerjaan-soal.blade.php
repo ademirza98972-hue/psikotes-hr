@@ -157,7 +157,7 @@
         {{-- Timer Per Soal --}}
         @if(isset($detik_per_soal) && $detik_per_soal)
         <div x-data="{
-            sisa: {{ $detik_per_soal }},
+            sisa: {{ $sisa_detik_per_soal ?? $detik_per_soal }},
             durasi: {{ $detik_per_soal }},
             submitted: false,
             get menit() { return String(Math.floor(this.sisa / 60)).padStart(2, '0') },
@@ -172,6 +172,7 @@
                         clearInterval(interval);
                         if (!this.submitted) {
                             this.submitted = true;
+                            document.getElementById('timer-expired-flag').value = '1';
                             document.getElementById('form-jawaban').submit();
                         }
                     }
@@ -196,6 +197,7 @@
         {{-- Question Card --}}
         <form id="form-jawaban" action="{{ route('peserta.tes.jawab', $sesiId) }}" method="POST">
             @csrf
+            <input type="hidden" name="timer_expired" id="timer-expired-flag" value="0">
             <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
                 <div class="p-8">
                     {{-- Forced Choice Format --}}
@@ -305,7 +307,7 @@
 
                 {{-- Footer Navigation --}}
                 <div class="px-6 py-4 bg-slate-50 rounded-b-xl flex justify-between items-center border-t border-slate-100">
-                    @if(!$is_first_soal)
+                    @if(!$is_first_soal && !$detik_per_soal)
                         <a href="{{ route('peserta.tes.kerjakan', $sesiId) }}?prev=1"
                            class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-white transition">
                             &larr; Sebelumnya

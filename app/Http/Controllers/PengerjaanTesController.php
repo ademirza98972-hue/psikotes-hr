@@ -302,8 +302,11 @@ class PengerjaanTesController extends Controller
 
         // Tangani query ?prev=1 (kembali ke soal sebelumnya)
         if ($request->query('prev') === '1' && $currentStep > 0) {
-            $currentStep = $currentStep - 1;
-            Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
+            $alatTesCheck = \App\Models\AlatTes::where('kode', $kodeAlatTesAktif)->first();
+            if (!($alatTesCheck?->batas_waktu_per_soal_aktif)) {
+                $currentStep = $currentStep - 1;
+                Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
+            }
         }
 
         // Tangani query ?next=1 (loncat ke soal berikutnya tanpa menyimpan)
@@ -400,6 +403,23 @@ class PengerjaanTesController extends Controller
         $detikPerSoal = ($alatTesSaat?->batas_waktu_per_soal_aktif && $alatTesSaat?->batas_waktu_per_soal_detik)
             ? (int) $alatTesSaat->batas_waktu_per_soal_detik
             : null;
+
+        $sisaDetikPerSoal = $detikPerSoal;
+        if ($detikPerSoal) {
+            $timerPerSoalKey = $this->sessionKey($sesiId, 'timer_per_soal_' . $soal['id']);
+            $waktuMulaiPerSoal = Session::get($timerPerSoalKey);
+            if (!$waktuMulaiPerSoal) {
+                Session::put($timerPerSoalKey, now()->timestamp);
+                $waktuMulaiPerSoal = now()->timestamp;
+            }
+            $sisaDetikPerSoal = max(0, $detikPerSoal - (now()->timestamp - $waktuMulaiPerSoal));
+            if ($sisaDetikPerSoal <= 0) {
+                Session::forget($timerPerSoalKey);
+                $nextStep = $currentStep + 1;
+                Session::put($this->sessionKey($sesiId, 'current_step'), $nextStep < count($daftarSoalFlat) ? $nextStep : 0);
+                return redirect()->route('peserta.tes.kerjakan', $sesiId);
+            }
+        }
 
         $sisaWaktuDetik = null;
         $durasiSubtes = null;
@@ -580,6 +600,7 @@ class PengerjaanTesController extends Controller
             'kode_subtes_timer'     => $kodeSubtesTimer ?? null,
             'is_ist'                => $isIST ?? false,
             'detik_per_soal'        => $detikPerSoal ?? null,
+            'sisa_detik_per_soal'   => $sisaDetikPerSoal ?? null,
         ]);
     }
 
@@ -779,24 +800,32 @@ class PengerjaanTesController extends Controller
         $soalId = $soal['id'];
         $tipeFormat = $soal['tipe_format'] ?? 'pilihan_ganda';
 
+        Session::forget($this->sessionKey($sesiId, 'timer_per_soal_' . $soalId));
+
+        $timerExpired = $request->boolean('timer_expired');
+
         if (in_array($tipeFormat, ['isian_teks', 'isian_angka'])) {
             $jawabanTeks = $request->input('jawaban_teks');
-            if ($jawabanTeks === null || $jawabanTeks === '') {
+            if (!$timerExpired && ($jawabanTeks === null || $jawabanTeks === '')) {
                 return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', 'Silakan isi jawaban terlebih dahulu.');
             }
-            JawabanPeserta::updateOrCreate(
-                ['user_id' => auth()->id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
-                ['jawaban_teks' => $jawabanTeks, 'opsi_dipilih_id' => null, 'waktu_jawab' => now()]
-            );
+            if ($jawabanTeks !== null && $jawabanTeks !== '') {
+                JawabanPeserta::updateOrCreate(
+                    ['user_id' => auth()->id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
+                    ['jawaban_teks' => $jawabanTeks, 'opsi_dipilih_id' => null, 'waktu_jawab' => now()]
+                );
+            }
         } else {
             $opsiId = $request->input('opsi_id');
-            if ($opsiId === null || $opsiId === '') {
+            if (!$timerExpired && ($opsiId === null || $opsiId === '')) {
                 return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', 'Silakan pilih jawaban terlebih dahulu.');
             }
-            JawabanPeserta::updateOrCreate(
-                ['user_id' => auth()->id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
-                ['opsi_dipilih_id' => (int) $opsiId, 'jawaban_teks' => null, 'waktu_jawab' => now()]
-            );
+            if ($opsiId !== null && $opsiId !== '') {
+                JawabanPeserta::updateOrCreate(
+                    ['user_id' => auth()->id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
+                    ['opsi_dipilih_id' => (int) $opsiId, 'jawaban_teks' => null, 'waktu_jawab' => now()]
+                );
+            }
         }
 
         // Pindah ke soal berikutnya (session hanya untuk navigasi)

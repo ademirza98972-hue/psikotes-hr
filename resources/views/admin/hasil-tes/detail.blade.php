@@ -896,11 +896,6 @@
         <div class="container-formal">
             <div class="section-title">CATATAN & REKOMENDASI HR</div>
 
-            @if(session('sukses'))
-                <div style="background:#f0fdf4; border:1px solid #86efac; padding:8px 12px; border-radius:6px; color:#166534; font-size:11px; margin-bottom:10px;">
-                    {{ session('sukses') }}
-                </div>
-            @endif
 
             <form method="POST"
                   action="{{ route('admin.hasil-tes.simpanCatatan', [$sesi->id, $hasilTes['peserta_id']]) }}">

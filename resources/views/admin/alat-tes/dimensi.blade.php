@@ -21,13 +21,6 @@
         </a>
     </div>
 
-    @if(session('sukses'))
-        <div class="rounded-xl border border-emerald-300 bg-emerald-50
-                    px-4 py-3 text-sm text-emerald-700 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px]">check_circle</span>
-            {{ session('sukses') }}
-        </div>
-    @endif
 
     @if($errors->any())
         <div class="rounded-xl border border-rose-300 bg-rose-50

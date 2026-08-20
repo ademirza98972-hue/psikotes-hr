@@ -87,40 +87,6 @@
 </head>
 <body class="min-h-screen bg-[#f7f9fb] font-body antialiased">
 
-<div x-data="{
-    show: false,
-    type: 'sukses',
-    message: '',
-    init() {
-        @if(session('sukses'))
-            this.type = 'sukses';
-            this.message = '{{ session('sukses') }}';
-            this.show = true;
-            setTimeout(() => this.show = false, 4000);
-        @elseif(session('error'))
-            this.type = 'error';
-            this.message = '{{ session('error') }}';
-            this.show = true;
-            setTimeout(() => this.show = false, 4000);
-        @endif
-    }
-}">
-    <div x-show="show"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 translate-x-8"
-         x-transition:enter-end="opacity-100 translate-x-0"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 translate-x-0"
-         x-transition:leave-end="opacity-0 translate-x-8"
-         class="fixed top-4 right-4 z-[9999] flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium max-w-sm"
-         :class="type === 'sukses' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'">
-        <span class="material-symbols-outlined text-[20px] shrink-0" x-text="type === 'sukses' ? 'check_circle' : 'error'"></span>
-        <span x-text="message" class="flex-1"></span>
-        <button @click="show = false" class="shrink-0 opacity-70 hover:opacity-100 transition-opacity">
-            <span class="material-symbols-outlined text-[18px]">close</span>
-        </button>
-    </div>
-</div>
 
 <div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false' }" x-init="$watch('sidebarOpen', v => localStorage.setItem('sidebarOpen', v))">
 
@@ -418,12 +384,37 @@
 
 </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function handleAvatarError(imgElement, fallbackId) {
             imgElement.style.display = 'none';
             const fallback = document.getElementById(fallbackId);
             if (fallback) fallback.style.display = 'flex';
         }
+
+        @if(session('sukses'))
+        Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('sukses')), timer: 3000, timerProgressBar: true, showConfirmButton: false, toast: true, position: 'top-end' });
+        @endif
+        @if(session('error'))
+        Swal.fire({ icon: 'error', title: 'Gagal', text: @json(session('error')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        @endif
+        @if(session('alert'))
+        Swal.fire({ icon: 'info', title: 'Informasi', text: @json(session('alert')), timer: 4000, timerProgressBar: true, showConfirmButton: false, toast: true, position: 'top-end' });
+        @endif
+        @if(session('info'))
+        @php
+            $nikList = session('duplikat_nik', []);
+            $nikHtml = !empty($nikList)
+                ? '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center">'
+                  . collect($nikList)->map(fn($n) => '<span style="background:#fef3c7;border:1px solid #fde68a;border-radius:4px;padding:2px 8px;font-family:monospace;font-size:12px;font-weight:600;color:#92400e">'.$n.'</span>')->implode('')
+                  . '</div>'
+                : '';
+        @endphp
+        Swal.fire({ icon: 'warning', title: 'Perhatian', html: @json(session('info') . $nikHtml), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        @endif
+        @if(session('warning'))
+        Swal.fire({ icon: 'warning', title: 'Perhatian', text: @json(session('warning')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        @endif
     </script>
     @stack('scripts')
 </body>

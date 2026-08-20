@@ -35,41 +35,6 @@
         @endauth
     </div>
 
-    {{-- NOTIFIKASI SUKSES --}}
-    @if (session('sukses'))
-        <div class="mb-4 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            <span class="material-symbols-outlined text-[18px] mt-0.5 shrink-0">check_circle</span>
-            <span>{{ session('sukses') }}</span>
-        </div>
-    @endif
-
-    {{-- NOTIFIKASI NIK DUPLIKAT --}}
-    @if (session('info'))
-        <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            <div class="flex items-start gap-3">
-                <span class="material-symbols-outlined text-[18px] mt-0.5 shrink-0">warning</span>
-                <div>
-                    <p class="font-semibold mb-1">NIK Duplikat Ditemukan</p>
-                    <p>{{ session('info') }}</p>
-                    @if(session('duplikat_nik'))
-                        <div class="mt-2 flex flex-wrap gap-1.5">
-                            @foreach(session('duplikat_nik') as $nik)
-                                <span class="inline-block rounded-md bg-amber-100 border border-amber-300 px-2 py-0.5 text-xs font-mono font-semibold text-amber-800">{{ $nik }}</span>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    @endif
-
-    {{-- NOTIFIKASI ERROR --}}
-    @if (session('error'))
-        <div class="mb-4 flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            <span class="material-symbols-outlined text-[18px] mt-0.5 shrink-0">error</span>
-            <span>{{ session('error') }}</span>
-        </div>
-    @endif
 
     {{-- FILTER BAR --}}
     <form method="GET" action="{{ route('admin.data-karyawan.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

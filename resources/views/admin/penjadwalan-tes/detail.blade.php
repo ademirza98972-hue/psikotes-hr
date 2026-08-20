@@ -46,21 +46,6 @@
         </a>
     </div>
 
-    @if (session('alert'))
-        <div class="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-            {{ session('alert') }}
-        </div>
-    @endif
-    @if (session('sukses'))
-        <div class="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-            {{ session('sukses') }}
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            {{ session('error') }}
-        </div>
-    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 

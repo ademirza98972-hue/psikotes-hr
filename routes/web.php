@@ -64,6 +64,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/peserta/tes/{sesiId}/panduan-ist/{kodeSubtes}/mulai', [PengerjaanTesController::class, 'panduanIstMulai'])->name('peserta.tes.panduan-ist-mulai');
     Route::get('/peserta/tes/{sesiId}/panduan-epps', [PengerjaanTesController::class, 'panduanEpps'])->name('peserta.tes.panduan-epps');
     Route::post('/peserta/tes/{sesiId}/panduan-epps/mulai', [PengerjaanTesController::class, 'panduanEppsMulai'])->name('peserta.tes.panduan-epps-mulai');
+    Route::get('/peserta/tes/{sesiId}/panduan-kraepelin', [PengerjaanTesController::class, 'panduanKraepelin'])->name('peserta.tes.panduan-kraepelin');
+    Route::post('/peserta/tes/{sesiId}/panduan-kraepelin/mulai', [PengerjaanTesController::class, 'panduanKraepelinMulai'])->name('peserta.tes.panduan-kraepelin-mulai');
 
     Route::prefix('admin/akun-karyawan')->name('admin.akun-karyawan.')->group(function () {
         Route::get('/', [PenggunaController::class, 'index'])->middleware('izin:pengguna.lihat')->name('index');

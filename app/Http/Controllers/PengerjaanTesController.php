@@ -579,6 +579,20 @@ class PengerjaanTesController extends Controller
         ]);
     }
 
+    public function panduanKraepelin(int $sesiId)
+    {
+        $sesi = $this->getSesiById($sesiId);
+        if (!$sesi) return redirect()->route('peserta.dashboard');
+        $alatTes = \App\Models\AlatTes::where('kode', 'KRP')->orWhere('pola_skoring', 'grid')->first();
+        return view('peserta.panduan-kraepelin', ['sesiId' => $sesiId, 'alatTes' => $alatTes]);
+    }
+
+    public function panduanKraepelinMulai(int $sesiId)
+    {
+        Session::put($this->sessionKey($sesiId, 'kraepelin_panduan_selesai'), true);
+        return redirect()->route('peserta.tes.kraepelin', $sesiId);
+    }
+
     public function panduanEpps(int $sesiId)
     {
         $sesi = $this->getSesiById($sesiId);
@@ -862,6 +876,10 @@ class PengerjaanTesController extends Controller
         $sesi = $this->getSesiById($sesiId);
         if (!$sesi) {
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
+        }
+
+        if (!Session::get($this->sessionKey($sesiId, 'kraepelin_panduan_selesai'))) {
+            return redirect()->route('peserta.tes.panduan-kraepelin', $sesiId);
         }
 
         $soalData = $this->getSoalPeserta();

@@ -18,30 +18,31 @@
             --on-surface-variant: #40484b;
 
             /* Dark sidebar tokens */
-            --sb-bg: #0d2028;
-            --sb-border: rgba(255,255,255,0.08);
-            --sb-text: #7db8c2;
-            --sb-text-hover: #b0d8df;
-            --sb-text-active: #5fcfdf;
-            --sb-active-bg: rgba(44,95,111,0.35);
-            --sb-hover-bg: rgba(255,255,255,0.05);
-            --sb-label: #3d7a88;
-            --sb-divider: rgba(255,255,255,0.07);
+            --sb-bg: #0d1629;
+            --sb-border: rgba(255,255,255,0.07);
+            --sb-text: #8fa8b8;
+            --sb-text-hover: #c5dde6;
+            --sb-text-active: #7fd8ea;
+            --sb-active-bg: rgba(95,207,223,0.22);
+            --sb-hover-bg: rgba(255,255,255,0.055);
+            --sb-label: #344d5c;
+            --sb-divider: rgba(255,255,255,0.06);
         }
 
         /* Sidebar base */
-        aside { background: var(--sb-bg) !important; border-right-color: var(--sb-border) !important; }
+        aside { background: var(--sb-bg) !important; border-right: 1px solid var(--sb-border) !important; }
 
         .sidebar-link {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 24px;
+            gap: 11px;
+            padding: 9px 12px;
+            margin: 1px 10px;
             color: var(--sb-text);
-            font-size: 14px;
+            font-size: 13.5px;
             text-decoration: none;
-            border-left: 3px solid transparent;
-            transition: all 0.15s ease;
+            border-radius: 8px;
+            transition: background 0.12s ease, color 0.12s ease;
         }
         .sidebar-link:hover {
             background: var(--sb-hover-bg);
@@ -50,39 +51,77 @@
         .sidebar-link.active {
             background: var(--sb-active-bg);
             color: var(--sb-text-active);
-            border-left-color: var(--sb-text-active);
             font-weight: 600;
+            box-shadow: inset 3px 0 0 var(--sb-text-active);
         }
         .sidebar-link.active .material-symbols-outlined {
             color: var(--sb-text-active);
         }
         .section-label {
-            padding: 16px 24px 6px;
-            font-size: 11px;
+            padding: 14px 22px 5px;
+            font-size: 10.5px;
             font-weight: 700;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.09em;
             text-transform: uppercase;
             color: var(--sb-label);
         }
         .nav-divider {
             height: 1px;
             background: var(--sb-divider);
-            margin: 8px 24px;
+            margin: 6px 22px;
         }
 
         /* Collapsed sidebar */
         aside.collapsed .sidebar-link {
             justify-content: center;
-            padding: 10px 0;
+            padding: 9px 0;
+            margin: 1px 0;
+            border-radius: 0;
             gap: 0;
+        }
+        aside.collapsed .sidebar-link:hover {
+            background: var(--sb-hover-bg);
+            border-radius: 0;
+        }
+        /* Active item in collapsed: full-width "tab" pointing right */
+        aside.collapsed .sidebar-link.active {
+            background: var(--sb-active-bg);
+            border-radius: 10px 0 0 10px;
+            margin: 1px 0 1px 8px;
+            position: relative;
+            overflow: visible;
+        }
+        /* Curved notch above active — sb-bg colored square, bottom-left corner rounded */
+        aside.collapsed .sidebar-link.active::before {
+            content: '';
+            position: absolute;
+            top: -12px; right: 0;
+            width: 12px; height: 12px;
+            background: var(--sb-bg);
+            border-bottom-left-radius: 12px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        /* Curved notch below active — sb-bg colored square, top-left corner rounded */
+        aside.collapsed .sidebar-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px; right: 0;
+            width: 12px; height: 12px;
+            background: var(--sb-bg);
+            border-top-left-radius: 12px;
+            pointer-events: none;
+            z-index: 2;
         }
         aside.collapsed .sidebar-link > span:not(.material-symbols-outlined) { display: none; }
         aside.collapsed .sidebar-link .ml-auto { display: none; }
         aside.collapsed .section-label { display: none; }
-        aside.collapsed .nav-divider { margin: 8px 4px; }
+        aside.collapsed .nav-divider { margin: 6px 8px; }
         aside.collapsed .link-text { display: none; }
-        aside.collapsed .logo-area { justify-content: center; }
+        aside.collapsed .sb-logo-text { display: none; }
         aside.collapsed .user-card-actions { display: none; }
+        aside.collapsed .sb-header-expanded { display: none !important; }
+        aside:not(.collapsed) .sb-header-collapsed { display: none !important; }
     </style>
 </head>
 <body class="min-h-screen bg-[#f7f9fb] font-body antialiased">
@@ -96,13 +135,34 @@
            :style="{ width: sidebarOpen ? '280px' : '64px' }"
            :class="{ collapsed: !sidebarOpen }">
 
-        {{-- Logo --}}
-        <div class="logo-area flex items-center gap-3 px-3 h-16 shrink-0" style="border-bottom: 1px solid var(--sb-border);">
-            <img src="{{ asset('images/logo.png') }}" alt="Psikotes HR Logo" class="h-9 w-auto object-contain shrink-0">
-            <div class="link-text whitespace-nowrap">
-                <p class="text-sm font-bold leading-none" style="color: #e2e8f0;">Psikotes HR</p>
-                <p class="text-[11px] mt-0.5" style="color: var(--sb-text);">Admin Panel</p>
+        {{-- Logo: Expanded --}}
+        <div class="sb-header-expanded flex items-center justify-between gap-2 px-4 shrink-0" style="height:64px; border-bottom: 1px solid var(--sb-border);">
+            <div class="flex items-center gap-3 min-w-0">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-8 w-8 object-contain shrink-0">
+                <div class="whitespace-nowrap min-w-0">
+                    <p class="text-sm font-bold leading-none" style="color: #e2e8f0;">Psikotes HR</p>
+                    <p class="text-[11px] mt-0.5" style="color: var(--sb-text);">Admin Panel</p>
+                </div>
             </div>
+            <button @click="sidebarOpen = false"
+                    class="shrink-0 flex items-center justify-center w-7 h-7 rounded-md"
+                    style="color: var(--sb-text);"
+                    onmouseover="this.style.color='var(--sb-text-hover)';this.style.background='var(--sb-hover-bg)'"
+                    onmouseout="this.style.color='var(--sb-text)';this.style.background=''">
+                <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+            </button>
+        </div>
+
+        {{-- Logo: Collapsed --}}
+        <div class="sb-header-collapsed flex flex-col items-center justify-center gap-2 shrink-0" style="height:64px; border-bottom: 1px solid var(--sb-border);">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-8 w-8 object-contain">
+            <button @click="sidebarOpen = true"
+                    class="flex items-center justify-center w-6 h-4 rounded"
+                    style="color: var(--sb-text);"
+                    onmouseover="this.style.color='var(--sb-text-hover)'"
+                    onmouseout="this.style.color='var(--sb-text)'">
+                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
         </div>
 
         {{-- Navigation --}}
@@ -280,16 +340,9 @@
         {{-- HEADER --}}
         <header class="flex h-16 items-center justify-between bg-white px-6 shrink-0 sticky top-0 z-40" style="border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 12px rgba(0,0,0,0.10);">
 
-            <div class="flex items-center gap-4">
-                {{-- Hamburger --}}
-                <button @click="sidebarOpen = !sidebarOpen"
-                        class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1.5 rounded-md hover:bg-[#f2f4f6]"
-                        title="Toggle Sidebar">
-                    <span class="material-symbols-outlined text-[22px]">menu</span>
-                </button>
-
+            <div class="flex items-center gap-3">
                 {{-- Breadcrumb --}}
-                <nav class="flex items-center gap-2 text-[13px] text-[#40484b]">
+                <nav class="flex items-center gap-1.5 text-[13px] text-[#40484b]">
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-[#2C5F6F] transition-colors">Home</a>
                     <span class="material-symbols-outlined text-[16px]">chevron_right</span>
                     <span class="font-semibold text-[#2C5F6F]">{{ $judulHalaman ?? 'Dashboard' }}</span>

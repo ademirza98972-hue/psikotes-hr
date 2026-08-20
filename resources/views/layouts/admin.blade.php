@@ -393,11 +393,35 @@
         }
 
         @if(session('sukses'))
-        Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('sukses')), timer: 3000, timerProgressBar: true, showConfirmButton: false, toast: true, position: 'top-end' });
+        Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('sukses')), timer: 2500, timerProgressBar: true, showConfirmButton: false });
         @endif
         @if(session('error'))
-        Swal.fire({ icon: 'error', title: 'Gagal', text: @json(session('error')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        Swal.fire({ icon: 'error', title: 'Perhatian', text: @json(session('error')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
         @endif
+
+        // Global interceptor: ganti semua onsubmit="return confirm(...)" dengan SweetAlert2
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('form[onsubmit]').forEach(form => {
+                const attr = form.getAttribute('onsubmit') || '';
+                const match = attr.match(/confirm\(['"`]([\s\S]*?)['"`]\)/);
+                if (!match) return;
+                const pesan = match[1].replace(/\\'/g, "'").replace(/\\"/g, '"');
+                form.removeAttribute('onsubmit');
+                form.addEventListener('submit', e => {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Konfirmasi',
+                        text: pesan,
+                        showCancelButton: true,
+                        confirmButtonColor: '#2C5F6F',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Lanjutkan',
+                        cancelButtonText: 'Batal',
+                    }).then(r => { if (r.isConfirmed) form.submit(); });
+                });
+            });
+        });
         @if(session('alert'))
         Swal.fire({ icon: 'info', title: 'Informasi', text: @json(session('alert')), timer: 4000, timerProgressBar: true, showConfirmButton: false, toast: true, position: 'top-end' });
         @endif

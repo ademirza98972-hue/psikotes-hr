@@ -174,9 +174,12 @@
 @push('scripts')
 <script>
 function confirmHapus(soalId, url) {
-    if (confirm('Yakin ingin menghapus soal ini?')) {
-        document.getElementById('hapus-soal-' + soalId).submit();
-    }
+    Swal.fire({
+        icon: 'warning', title: 'Hapus Soal?',
+        text: 'Soal ini akan dihapus secara permanen.',
+        showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
+    }).then(r => { if (r.isConfirmed) document.getElementById('hapus-soal-' + soalId).submit(); });
 }
 </script>
 @endpush

@@ -219,14 +219,20 @@
     }
 
     function confirmHapusAlatTes(id, nama) {
-        if (confirm(`Apakah Anda yakin ingin menghapus alat tes "${nama}"?`)) {
+        Swal.fire({
+            icon: 'warning', title: 'Hapus Alat Tes?',
+            text: `Alat tes "${nama}" akan dihapus secara permanen.`,
+            showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
+        }).then(r => {
+            if (!r.isConfirmed) return;
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = `/admin/alat-tes/${id}`;
             form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">';
             document.body.appendChild(form);
             form.submit();
-        }
+        });
     }
 </script>
 @endpush

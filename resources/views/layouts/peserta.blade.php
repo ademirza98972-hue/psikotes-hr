@@ -258,17 +258,6 @@
 
         {{-- CONTENT --}}
         <main class="flex-1 overflow-y-auto px-6 py-6">
-            @if (session('sukses'))
-                <div class="mb-4 rounded-md border border-emerald-600 bg-emerald-600 px-4 py-3 text-sm text-white">
-                    {{ session('sukses') }}
-                </div>
-            @endif
-            @if (session('error'))
-                <div class="mb-4 rounded-md border border-rose-600 bg-rose-600 px-4 py-3 text-sm text-white">
-                    {{ session('error') }}
-                </div>
-            @endif
-
             @yield('content')
         </main>
 
@@ -276,6 +265,15 @@
 
 </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if(session('error'))
+            Swal.fire({ icon: 'error', title: 'Perhatian', text: @json(session('error')), confirmButtonColor: '#2C5F6F' });
+        @endif
+        @if(session('sukses'))
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('sukses')), timer: 3000, timerProgressBar: true, showConfirmButton: false, toast: true, position: 'top-end' });
+        @endif
+    </script>
     <script>
         function handleAvatarError(imgElement, fallbackId) {
             imgElement.style.display = 'none';

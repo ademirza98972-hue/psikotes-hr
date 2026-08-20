@@ -115,9 +115,12 @@
                      ];
                  },
                  applyDefaults() {
-                     if (confirm('Kembalikan level ke default? Data level saat ini akan hilang.')) {
-                         this.levels = this.defaultLevels();
-                     }
+                     Swal.fire({
+                         icon: 'warning', title: 'Reset ke Default?',
+                         text: 'Data level saat ini akan hilang.',
+                         showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+                         confirmButtonText: 'Ya, Reset', cancelButtonText: 'Batal',
+                     }).then(r => { if (r.isConfirmed) this.levels = this.defaultLevels(); });
                  },
                  addLevel() {
                      this.levels.push({ label: '', skor_min: 0, skor_max: 0, urutan: this.levels.length });

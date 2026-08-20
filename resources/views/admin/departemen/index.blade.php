@@ -212,14 +212,20 @@ function departemenPage() {
 }
 
 function confirmHapus(id, nama) {
-    if (confirm(`Apakah Anda yakin ingin menghapus departemen "${nama}"?`)) {
+    Swal.fire({
+        icon: 'warning', title: 'Hapus Departemen?',
+        text: `Departemen "${nama}" akan dihapus.`,
+        showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
+    }).then(r => {
+        if (!r.isConfirmed) return;
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = `/admin/departemen/${id}`;
         form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">';
         document.body.appendChild(form);
         form.submit();
-    }
+    });
 }
 </script>
 

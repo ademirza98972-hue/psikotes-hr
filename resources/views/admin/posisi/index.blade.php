@@ -197,14 +197,20 @@ function posisiPage() {
 }
 
 function confirmHapus(id, nama) {
-    if (confirm(`Apakah Anda yakin ingin menghapus posisi "${nama}"?`)) {
+    Swal.fire({
+        icon: 'warning', title: 'Hapus Posisi?',
+        text: `Posisi "${nama}" akan dihapus.`,
+        showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
+    }).then(r => {
+        if (!r.isConfirmed) return;
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = `/admin/posisi/${id}`;
         form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">';
         document.body.appendChild(form);
         form.submit();
-    }
+    });
 }
 </script>
 

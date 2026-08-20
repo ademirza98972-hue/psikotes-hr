@@ -148,6 +148,21 @@ class PengerjaanTesController extends Controller
         return "pengerjaan_tes.sesi_{$sesiId}.{$name}";
     }
 
+    private function getKodeSubtesIst(int $nomor): string
+    {
+        return match(true) {
+            $nomor <= 20  => 'SE',
+            $nomor <= 40  => 'WA',
+            $nomor <= 60  => 'AN',
+            $nomor <= 76  => 'GE',
+            $nomor <= 96  => 'RA',
+            $nomor <= 116 => 'ZR',
+            $nomor <= 136 => 'FA',
+            $nomor <= 156 => 'WU',
+            default       => 'ME',
+        };
+    }
+
     private function getOrCreateSoalOrder(int $sesiId, string $kodeAlatTes, array $soalIds, ?string $kodeSubtes = null): array
     {
         $key = $kodeSubtes
@@ -303,10 +318,18 @@ class PengerjaanTesController extends Controller
         // Tangani query ?prev=1 (kembali ke soal sebelumnya)
         if ($request->query('prev') === '1' && $currentStep > 0) {
             $alatTesCheck = \App\Models\AlatTes::where('kode', $kodeAlatTesAktif)->first();
-            if (!($alatTesCheck?->batas_waktu_per_soal_aktif)) {
-                $currentStep = $currentStep - 1;
-                Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
+            $blockedPerSoal = $alatTesCheck?->batas_waktu_per_soal_aktif;
+            $blockedIst = $kodeAlatTesAktif === 'IST'
+                && $this->getKodeSubtesIst($daftarSoalFlat[$currentStep]['soal']['nomor'] ?? 0)
+                   !== $this->getKodeSubtesIst($daftarSoalFlat[$currentStep - 1]['soal']['nomor'] ?? 0);
+            if ($blockedPerSoal || $blockedIst) {
+                $pesan = $blockedIst
+                    ? 'Tidak dapat kembali ke subtes sebelumnya. Selesaikan subtes saat ini sesuai urutan.'
+                    : 'Tidak dapat kembali ke soal sebelumnya karena timer per soal sedang aktif.';
+                return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', $pesan);
             }
+            $currentStep = $currentStep - 1;
+            Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
         }
 
         // Tangani query ?next=1 (loncat ke soal berikutnya tanpa menyimpan)
@@ -322,10 +345,17 @@ class PengerjaanTesController extends Controller
                 $kodeTarget = $daftarSoalFlat[$targetStep]['kode_alat_tes'] ?? '';
                 $alatTesTarget = \App\Models\AlatTes::where('kode', $kodeTarget)->first();
                 $adaTimerPerSoal = $alatTesTarget?->batas_waktu_per_soal_aktif ?? false;
-                if (!$adaTimerPerSoal) {
-                    $currentStep = $targetStep;
-                    Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
+                $blockedIst = $kodeAlatTesAktif === 'IST'
+                    && $this->getKodeSubtesIst($daftarSoalFlat[$currentStep]['soal']['nomor'] ?? 0)
+                       !== $this->getKodeSubtesIst($daftarSoalFlat[$targetStep]['soal']['nomor'] ?? 0);
+                if ($adaTimerPerSoal || $blockedIst) {
+                    $pesan = $blockedIst
+                        ? 'Tidak dapat pindah ke subtes lain. Selesaikan subtes saat ini terlebih dahulu sesuai urutan.'
+                        : 'Tidak dapat berpindah soal karena timer per soal sedang aktif.';
+                    return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', $pesan);
                 }
+                $currentStep = $targetStep;
+                Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
             }
         }
 

@@ -360,6 +360,11 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.panduan-epps', $sesiId);
         }
 
+        // PAPI Kostick: panduan sekali di awal
+        if ($kodeAlatTes === 'PAP' && !Session::get($this->sessionKey($sesiId, 'papi_panduan_selesai'))) {
+            return redirect()->route('peserta.tes.panduan-papi', $sesiId);
+        }
+
         // IST: panduan per subtes + hafalan ME
         if ($kodeAlatTes === 'IST') {
             $nomorSoal = $soal['nomor'] ?? 0;
@@ -577,6 +582,20 @@ class PengerjaanTesController extends Controller
             'is_ist'                => $isIST ?? false,
             'detik_per_soal'        => $detikPerSoal ?? null,
         ]);
+    }
+
+    public function panduanPapi(int $sesiId)
+    {
+        $sesi = $this->getSesiById($sesiId);
+        if (!$sesi) return redirect()->route('peserta.dashboard');
+        $alatTes = \App\Models\AlatTes::where('kode', 'PAP')->first();
+        return view('peserta.panduan-papi', ['sesiId' => $sesiId, 'alatTes' => $alatTes]);
+    }
+
+    public function panduanPapiMulai(int $sesiId)
+    {
+        Session::put($this->sessionKey($sesiId, 'papi_panduan_selesai'), true);
+        return redirect()->route('peserta.tes.kerjakan', $sesiId);
     }
 
     public function panduanKraepelin(int $sesiId)

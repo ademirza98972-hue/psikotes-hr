@@ -122,7 +122,7 @@
                         <div id="{{ $prefixId }}" class="space-y-3">
                             @foreach ($daftar as $izin)
                                 @php
-                                    $dipaksa = $isSuperAdmin && in_array($izin->kode_izin, ['peran.kelola', 'izin.kelola'], true);
+                                    $dipaksa = $isSuperAdmin && $izin->kode_izin === 'peran.kelola';
                                 @endphp
                                 <label class="flex items-center gap-3 cursor-pointer select-none {{ $dipaksa ? '' : '' }}">
                                     <input type="checkbox" name="izin[]" value="{{ $izin->id }}"

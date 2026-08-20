@@ -164,25 +164,33 @@ $info = [
 
 $d     = $info[$kodeSubtes];
 $warna = $d['warna'];
+// Gunakan inline hex agar Tailwind JIT tidak perlu compile class dinamis
 $warnaCss = match($warna) {
-    'blue'   => ['ring' => 'ring-blue-200',   'bg' => 'bg-blue-50',   'text' => 'text-blue-700',   'badge' => 'bg-blue-100 text-blue-700',   'btn' => 'bg-blue-700 hover:bg-blue-800'],
-    'violet' => ['ring' => 'ring-violet-200', 'bg' => 'bg-violet-50', 'text' => 'text-violet-700', 'badge' => 'bg-violet-100 text-violet-700', 'btn' => 'bg-violet-700 hover:bg-violet-800'],
-    'teal'   => ['ring' => 'ring-teal-200',   'bg' => 'bg-teal-50',   'text' => 'text-teal-700',   'badge' => 'bg-teal-100 text-teal-700',   'btn' => 'bg-teal-700 hover:bg-teal-800'],
-    'amber'  => ['ring' => 'ring-amber-200',  'bg' => 'bg-amber-50',  'text' => 'text-amber-700',  'badge' => 'bg-amber-100 text-amber-700',  'btn' => 'bg-amber-600 hover:bg-amber-700'],
-    'orange' => ['ring' => 'ring-orange-200', 'bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'badge' => 'bg-orange-100 text-orange-700', 'btn' => 'bg-orange-600 hover:bg-orange-700'],
-    'indigo' => ['ring' => 'ring-indigo-200', 'bg' => 'bg-indigo-50', 'text' => 'text-indigo-700', 'badge' => 'bg-indigo-100 text-indigo-700', 'btn' => 'bg-indigo-700 hover:bg-indigo-800'],
-    'rose'   => ['ring' => 'ring-rose-200',   'bg' => 'bg-rose-50',   'text' => 'text-rose-700',   'badge' => 'bg-rose-100 text-rose-700',   'btn' => 'bg-rose-700 hover:bg-rose-800'],
-    'emerald'=> ['ring' => 'ring-emerald-200','bg' => 'bg-emerald-50','text' => 'text-emerald-700','badge' => 'bg-emerald-100 text-emerald-700','btn' => 'bg-emerald-700 hover:bg-emerald-800'],
-    default  => ['ring' => 'ring-gray-200',   'bg' => 'bg-gray-50',   'text' => 'text-gray-700',   'badge' => 'bg-gray-100 text-gray-700',   'btn' => 'bg-gray-700 hover:bg-gray-800'],
+    'blue'   => ['accent' => '#1d4ed8', 'bg' => '#eff6ff', 'text' => '#1d4ed8', 'border' => '#bfdbfe'],
+    'violet' => ['accent' => '#6d28d9', 'bg' => '#f5f3ff', 'text' => '#6d28d9', 'border' => '#ddd6fe'],
+    'teal'   => ['accent' => '#0f766e', 'bg' => '#f0fdfa', 'text' => '#0f766e', 'border' => '#99f6e4'],
+    'amber'  => ['accent' => '#b45309', 'bg' => '#fffbeb', 'text' => '#b45309', 'border' => '#fde68a'],
+    'orange' => ['accent' => '#c2410c', 'bg' => '#fff7ed', 'text' => '#c2410c', 'border' => '#fed7aa'],
+    'indigo' => ['accent' => '#3730a3', 'bg' => '#eef2ff', 'text' => '#3730a3', 'border' => '#c7d2fe'],
+    'rose'   => ['accent' => '#be123c', 'bg' => '#fff1f2', 'text' => '#be123c', 'border' => '#fecdd3'],
+    'emerald'=> ['accent' => '#065f46', 'bg' => '#ecfdf5', 'text' => '#065f46', 'border' => '#a7f3d0'],
+    default  => ['accent' => '#374151', 'bg' => '#f9fafb', 'text' => '#374151', 'border' => '#e5e7eb'],
 };
 @endphp
 
 @section('content')
-<div class="max-w-2xl mx-auto space-y-5">
+@php
+$accent = $warnaCss['accent'];
+$accentBg = $warnaCss['bg'];
+$accentText = $warnaCss['text'];
+$accentBorder = $warnaCss['border'];
+@endphp
+<div class="max-w-2xl mx-auto pb-8 space-y-5">
 
     {{-- Header --}}
     <div>
-        <div class="inline-flex items-center gap-2 rounded-lg {{ $warnaCss['badge'] }} px-3 py-1.5 mb-3">
+        <div class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 mb-3"
+             style="background:{{ $accentBg }};color:{{ $accentText }};border:1px solid {{ $accentBorder }}">
             <span class="material-symbols-outlined text-[14px]">{{ $d['icon'] }}</span>
             <span class="text-[11px] font-bold uppercase tracking-wider">IST — Subtes {{ $kodeSubtes }}</span>
         </div>
@@ -208,9 +216,11 @@ $warnaCss = match($warna) {
         <div class="px-6 py-5 space-y-3">
             <p class="text-[14px] text-[#191c1e] leading-relaxed">{!! $d['instruksi'] !!}</p>
             @if($d['catatan'])
-            <div class="rounded-lg {{ $warnaCss['bg'] }} {{ $warnaCss['ring'] }} ring-1 px-4 py-3 flex items-start gap-2">
-                <span class="material-symbols-outlined text-[16px] {{ $warnaCss['text'] }} shrink-0 mt-0.5">lightbulb</span>
-                <p class="text-[13px] {{ $warnaCss['text'] }}">{{ $d['catatan'] }}</p>
+            <div class="rounded-lg px-4 py-3 flex items-start gap-2"
+                 style="background:{{ $accentBg }};border:1px solid {{ $accentBorder }}">
+                <span class="material-symbols-outlined text-[16px] shrink-0 mt-0.5"
+                      style="color:{{ $accentText }}">lightbulb</span>
+                <p class="text-[13px]" style="color:{{ $accentText }}">{{ $d['catatan'] }}</p>
             </div>
             @endif
         </div>
@@ -234,15 +244,17 @@ $warnaCss = match($warna) {
                 @if(count($contoh['pilihan']) > 0)
                 <div class="flex flex-wrap gap-2 mb-4">
                     @foreach($contoh['pilihan'] as $j => $pil)
-                    <span class="rounded-lg border px-3 py-1.5 text-sm
-                        {{ $j === $contoh['kunci']
-                            ? $warnaCss['badge'] . ' border-current/30 font-semibold'
-                            : 'border-[#e0e3e5] text-[#40484b]' }}">
+                    @if($j === $contoh['kunci'])
+                    <span class="rounded-lg border px-3 py-1.5 text-sm font-semibold inline-flex items-center gap-1"
+                          style="background:{{ $accentBg }};color:{{ $accentText }};border-color:{{ $accentBorder }}">
                         {{ chr(97 + $j) }}) {{ $pil }}
-                        @if($j === $contoh['kunci'])
-                        <span class="material-symbols-outlined text-[12px] ml-1">check</span>
-                        @endif
+                        <span class="material-symbols-outlined text-[12px]">check</span>
                     </span>
+                    @else
+                    <span class="rounded-lg border border-[#e0e3e5] text-[#40484b] px-3 py-1.5 text-sm">
+                        {{ chr(97 + $j) }}) {{ $pil }}
+                    </span>
+                    @endif
                     @endforeach
                 </div>
                 @endif
@@ -261,11 +273,14 @@ $warnaCss = match($warna) {
     <form method="POST" action="{{ route('peserta.tes.panduan-ist-mulai', [$sesiId, $kodeSubtes]) }}">
         @csrf
         <button type="submit"
-                class="w-full inline-flex items-center justify-center gap-2 rounded-xl {{ $warnaCss['btn'] }} px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition-all active:scale-95">
+                class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition-all active:scale-95"
+                style="background:{{ $accent }}">
             <span class="material-symbols-outlined text-[18px]">play_arrow</span>
             Mulai Subtes {{ $kodeSubtes }}
         </button>
-        <p class="mt-2 text-center text-[11px] text-[#71787c]">Timer {{ $d['durasi'] }} dimulai setelah tombol ini ditekan</p>
+        <p class="mt-2 text-center text-[11px] text-[#71787c]">
+            Timer {{ $d['durasi'] }} dimulai setelah tombol ini ditekan
+        </p>
     </form>
 
 </div>

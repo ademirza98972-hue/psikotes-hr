@@ -14,7 +14,7 @@ use Illuminate\View\View;
 class PeranController extends Controller
 {
     protected const SUPER_ADMIN = 'Super Admin';
-    protected const IZIN_WAJIB_SUPER_ADMIN = ['peran.kelola', 'izin.kelola'];
+    protected const IZIN_WAJIB_SUPER_ADMIN = ['peran.kelola'];
 
     public function index(Request $request): View
     {
@@ -138,12 +138,11 @@ class PeranController extends Controller
             'dashboard' => 'Dashboard',
             'data_karyawan' => 'Data Karyawan',
             'hasil_tes' => 'Hasil Tes',
-            'izin' => 'Izin & Hak Akses',
             'kategori_tes' => 'Kategori Tes',
-            'pengguna' => 'Pengguna',
+            'pengguna' => 'Akun Karyawan & Kandidat',
             'pengguna_admin' => 'Admin & Staff',
             'peran' => 'Peran',
-            'soal' => 'Soal',
+            'soal' => 'Bank Soal & Alat Tes',
         ];
 
         return $peta[$prefix] ?? ucwords(str_replace('_', ' ', $prefix));

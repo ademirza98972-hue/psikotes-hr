@@ -483,8 +483,7 @@ class PengerjaanTesController extends Controller
                 $sisaWaktuSesiDetik = max(0, $durasiSesiDetik - (now()->timestamp - $waktuMulaiSesi));
 
                 if ($sisaWaktuSesiDetik <= 0) {
-                    Session::put($this->sessionKey($sesiId, 'current_step'), 0);
-                    return redirect()->route('peserta.tes.kerjakan', $sesiId);
+                    return redirect()->route('peserta.tes.selesai', $sesiId);
                 }
             }
         }

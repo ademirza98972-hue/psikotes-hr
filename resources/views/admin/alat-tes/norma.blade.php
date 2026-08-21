@@ -99,6 +99,28 @@
                 <p class="text-[12px] text-[#40484b]/70 mt-1">Upload file CSV pada form di atas untuk memulai</p>
             </div>
         @else
+            {{-- Filter & per-page --}}
+            <form method="GET" class="flex flex-wrap items-center gap-3 mb-3">
+                <select name="dimensi" onchange="this.form.submit()"
+                        class="rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                    <option value="">Semua Dimensi</option>
+                    @foreach($dimensi as $d)
+                        <option value="{{ $d->id }}" {{ $filterDimensi == $d->id ? 'selected' : '' }}>
+                            {{ $d->kode_dimensi }} — {{ $d->nama_dimensi }}
+                        </option>
+                    @endforeach
+                </select>
+                <select name="per_page" onchange="this.form.submit()"
+                        class="rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                    @foreach([25, 50, 100, 250] as $n)
+                        <option value="{{ $n }}" {{ $perPage == $n ? 'selected' : '' }}>{{ $n }} baris</option>
+                    @endforeach
+                </select>
+                <p class="ml-auto text-[12px] text-[#40484b]">
+                    Menampilkan <strong>{{ $contohNorma->firstItem() }}–{{ $contohNorma->lastItem() }}</strong> dari <strong>{{ $contohNorma->total() }}</strong> baris
+                </p>
+            </form>
+
             <div class="overflow-x-auto rounded-lg border border-[#e0e3e5]">
                 <table class="w-full text-left text-sm border-collapse">
                     <thead>
@@ -129,8 +151,9 @@
                     </tbody>
                 </table>
             </div>
-            @if($jumlahNorma > 10)
-                <p class="text-[12px] text-[#40484b] mt-2 text-right">Menampilkan 10 dari {{ $jumlahNorma }} baris</p>
+
+            @if($contohNorma->hasPages())
+                <div class="mt-4">{{ $contohNorma->links() }}</div>
             @endif
         @endif
     </div>

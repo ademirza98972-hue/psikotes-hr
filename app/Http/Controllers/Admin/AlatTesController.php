@@ -138,21 +138,27 @@ class AlatTesController extends Controller
             ->with('sukses', "Alat tes '{$nama}' berhasil dipulihkan.");
     }
 
-    public function norma(int $id): View
+    public function norma(Request $request, int $id): View
     {
         $alatTes = AlatTes::findOrFail($id);
         $dimensi = \App\Models\DimensiAlatTes::where('alat_tes_id', $id)
             ->orderBy('urutan')->get();
         $jumlahNorma = NormaKonversi::where('alat_tes_id', $id)->count();
+
+        $perPage = in_array((int) $request->input('per_page'), [25, 50, 100, 250]) ? (int) $request->input('per_page') : 25;
+        $filterDimensi = $request->input('dimensi');
+
         $contohNorma = NormaKonversi::where('alat_tes_id', $id)
             ->with('dimensi')
+            ->when($filterDimensi, fn($q) => $q->where('dimensi_id', $filterDimensi))
             ->orderBy('dimensi_id')
+            ->orderBy('kelompok_segmen')
             ->orderBy('skor_mentah_min')
-            ->limit(10)
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('admin.alat-tes.norma', compact(
-            'alatTes', 'dimensi', 'jumlahNorma', 'contohNorma'
+            'alatTes', 'dimensi', 'jumlahNorma', 'contohNorma', 'perPage', 'filterDimensi'
         ));
     }
 

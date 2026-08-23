@@ -125,6 +125,11 @@ class PeranController extends Controller
         foreach ($izin as $item) {
             $parts = explode('.', $item->kode_izin);
             $prefix = $parts[0] ?? 'lainnya';
+
+            if ($prefix === 'kategori_tes') {
+                continue;
+            }
+
             $label = $this->labelKelompok($prefix);
             $kelompok[$label][] = $item;
         }
@@ -140,7 +145,6 @@ class PeranController extends Controller
             'dashboard' => 'Dashboard',
             'data_karyawan' => 'Data Karyawan',
             'hasil_tes' => 'Hasil Tes',
-            'kategori_tes' => 'Kategori Tes',
             'pengguna' => 'Akun Karyawan & Kandidat',
             'pengguna_admin' => 'Admin & Staff',
             'peran' => 'Peran',

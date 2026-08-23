@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             PapikostikSoalSeeder::class,
             KraepelinSeeder::class,
             KraepelinSoalSeeder::class,
+            KraepelinLevelSeeder::class,
         ]);
     }
 }

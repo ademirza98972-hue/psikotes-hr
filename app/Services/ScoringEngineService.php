@@ -460,7 +460,7 @@ class ScoringEngineService
         } else {
             $b = ($n * $sumXY - $sumX * $sumY) / $denominator;
         }
-        $ketaahanan = round($b * $n, 2);
+        $ketaahanan = round($b * 50, 2);
 
         $keajegan = 0.00;
         if ($n > 0) {

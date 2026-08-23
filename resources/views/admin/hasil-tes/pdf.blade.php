@@ -305,9 +305,15 @@
                         <td style="border:none; padding:4px 8px; width:50%;"><strong>Total Jawaban Salah:</strong> {{ $gridRingkasan->total_salah }}</td>
                     </tr>
                     <tr>
-                        <td style="border:none; padding:4px 8px;"><strong>Total Kelewat:</strong> {{ $gridRingkasan->total_kelewat }}</td>
+                        <td style="border:none; padding:4px 8px;"><strong>Total yang Dilewati:</strong> {{ $gridRingkasan->total_kelewat }}</td>
                         <td style="border:none; padding:4px 8px;"><strong>Total Kolom Dikerjakan:</strong> {{ $gridRingkasan->total_kolom }}</td>
                     </tr>
+                    @if ($alatTes['grid_titikTertinggi'] ?? null)
+                    <tr>
+                        <td style="border:none; padding:4px 8px;"><strong style="color:#16a34a;">Titik Tertinggi:</strong> Kolom {{ $alatTes['grid_titikTertinggi']['kolom'] }} = {{ $alatTes['grid_titikTertinggi']['benar'] }}</td>
+                        <td style="border:none; padding:4px 8px;"><strong style="color:#dc2626;">Titik Terendah:</strong> Kolom {{ $alatTes['grid_titikTerendah']['kolom'] ?? '—' }} = {{ $alatTes['grid_titikTerendah']['benar'] ?? '—' }}</td>
+                    </tr>
+                    @endif
                 </table>
             @elseif (str_contains(strtoupper($alatTes['nama_alat_tes']), 'PAPIKOSTIK') && !empty($alatTes['skor_ringkas']))
                 @php

@@ -553,22 +553,30 @@
                 $janker    = $gridSkor->get('KEAJEGAN');
                 $tianker   = $gridSkor->get('KETELITIAN');
                 $hankerRaw = $gridSkor->get('KETAHANAN');
-                $hanker    = $alat['grid_hanker'] ?? ['y0'=>0,'y50'=>0,'delta'=>0,'trend'=>'stabil'];
-                $chartData = $alat['grid_chart'] ?? [];
-                $kraepChartId = 'kraepChart_' . $index;
+                $hanker          = $alat['grid_hanker'] ?? ['y0'=>0,'y50'=>0,'delta'=>0,'trend'=>'stabil'];
+                $chartData       = $alat['grid_chart'] ?? [];
+                $titikTertinggi  = $alat['grid_titikTertinggi'] ?? null;
+                $titikTerendah   = $alat['grid_titikTerendah']  ?? null;
+                $kraepChartId    = 'kraepChart_' . $index;
                 $trendLabel = match($hanker['trend'] ?? 'stabil') { 'meningkat'=>'meningkat','menurun'=>'menurun',default=>'stabil' };
                 $trendColor = match($hanker['trend'] ?? 'stabil') { 'meningkat'=>'#16a34a','menurun'=>'#dc2626',default=>'#6b7280' };
             @endphp
             <div class="section-title">{{ $index + 1 }}. {{ $alat['nama_alat_tes'] }} &ndash; {{ $alat['format_dasar'] }}</div>
 
             <div style="display:flex; gap:32px; margin-top:10px; font-size:11px;">
-                <div><span style="color:#555;">Sum of Error</span> &nbsp;
+                <div><span style="color:#555;">Sum of Error<br>(jumlah jawaban salah)</span> &nbsp;
                     <strong style="background:#e5e7eb; padding:2px 10px; border-radius:3px;">{{ $gridRingkasan->total_salah }}</strong>
                 </div>
-                <div><span style="color:#555;">Sum of Skipeds</span> &nbsp;
+                <div><span style="color:#555;">Sum of Skipeds<br>(jumlah yang dilewati)</span> &nbsp;
                     <strong style="background:#e5e7eb; padding:2px 10px; border-radius:3px;">{{ $gridRingkasan->total_kelewat }}</strong>
                 </div>
-                <div style="margin-left:auto; color:#555; font-size:10px;">Kolom dikerjakan: <strong>{{ $gridRingkasan->total_kolom }}</strong> &nbsp;|&nbsp; Total benar: <strong>{{ $gridRingkasan->total_benar }}</strong></div>
+                <div style="color:#555; font-size:10px;">Kolom dikerjakan: <strong>{{ $gridRingkasan->total_kolom }}</strong> &nbsp;|&nbsp; Total benar: <strong>{{ $gridRingkasan->total_benar }}</strong></div>
+                @if ($titikTertinggi)
+                <div style="color:#16a34a; font-size:10px;">Titik tertinggi: <strong>Kolom {{ $titikTertinggi['kolom'] }}</strong> = <strong>{{ $titikTertinggi['benar'] }}</strong></div>
+                @endif
+                @if ($titikTerendah)
+                <div style="color:#dc2626; font-size:10px;">Titik terendah: <strong>Kolom {{ $titikTerendah['kolom'] }}</strong> = <strong>{{ $titikTerendah['benar'] }}</strong></div>
+                @endif
             </div>
 
             <table style="margin-top:10px; font-size:11px;">

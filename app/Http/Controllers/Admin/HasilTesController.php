@@ -124,7 +124,7 @@ class HasilTesController extends Controller
 
         $hasilSkor = HasilSkorPeserta::where('user_id', $pesertaId)
             ->where('sesi_tes_id', $sesiId)
-            ->with(['dimensi.alatTes', 'alatTes'])
+            ->with(['dimensi.alatTes', 'alatTes', 'level'])
             ->get();
 
         $grouped = $hasilSkor->groupBy(fn($h) =>
@@ -168,8 +168,10 @@ class HasilTesController extends Controller
                     ')->first();
                 $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
                 $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']   = $gridExtra['chart'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']  = $gridExtra['hanker'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']        = $gridExtra['chart'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']       = $gridExtra['hanker'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTertinggi'] = $gridExtra['titikTertinggi'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTerendah']  = $gridExtra['titikTerendah'];
             }
         }
 
@@ -255,8 +257,10 @@ class HasilTesController extends Controller
                     ')->first();
                 $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
                 $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']   = $gridExtra['chart'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']  = $gridExtra['hanker'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']        = $gridExtra['chart'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']       = $gridExtra['hanker'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTertinggi'] = $gridExtra['titikTertinggi'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTerendah']  = $gridExtra['titikTerendah'];
             }
         }
 
@@ -347,8 +351,10 @@ class HasilTesController extends Controller
                     ')->first();
                 $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
                 $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']   = $gridExtra['chart'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']  = $gridExtra['hanker'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']        = $gridExtra['chart'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']       = $gridExtra['hanker'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTertinggi'] = $gridExtra['titikTertinggi'];
+                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTerendah']  = $gridExtra['titikTerendah'];
             }
         }
 
@@ -379,6 +385,14 @@ class HasilTesController extends Controller
 
         $n = $perKolom->count();
         $hanker = ['y0' => 0, 'y50' => 0, 'delta' => 0, 'trend' => 'stabil'];
+        $titikTertinggi = null;
+        $titikTerendah = null;
+
+        if ($n > 0) {
+            $sorted = $perKolom->sortByDesc('jumlah_benar')->values();
+            $titikTertinggi = ['kolom' => (int) $sorted[0]->kolom_ke, 'benar' => (int) $sorted[0]->jumlah_benar];
+            $titikTerendah  = ['kolom' => (int) $sorted[$n - 1]->kolom_ke, 'benar' => (int) $sorted[$n - 1]->jumlah_benar];
+        }
 
         if ($n > 1) {
             $sumX = $sumY = $sumXY = $sumX2 = 0;
@@ -401,7 +415,7 @@ class HasilTesController extends Controller
             ];
         }
 
-        return ['chart' => $chartData, 'hanker' => $hanker];
+        return ['chart' => $chartData, 'hanker' => $hanker, 'titikTertinggi' => $titikTertinggi, 'titikTerendah' => $titikTerendah];
     }
 
     public function simpanCatatan(Request $request, int $sesiId, int $pesertaId): RedirectResponse

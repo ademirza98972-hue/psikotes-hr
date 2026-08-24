@@ -185,7 +185,7 @@ class DashboardController extends Controller
     {
         $kataKunci = $request->input('cari');
 
-        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 20;
+        $perPage = $this->getPerPage($request, 20);
 
         $aktivitas = User::query()
             ->when($kataKunci, function ($query, $kataKunci) {

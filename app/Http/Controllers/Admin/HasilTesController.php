@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\BidangLaporan;
 use App\Models\DimensiAlatTes;
-use App\Models\DimensiBidangLaporan;
 use App\Models\HasilKolomGrid;
 use App\Models\HasilSkorPeserta;
 use App\Models\PesertaSesiTes;
@@ -97,7 +95,7 @@ class HasilTesController extends Controller
         return view('admin.hasil-tes.index', compact('hasilTes', 'penjadwalan', 'selectedSesiId'));
     }
 
-    public function detail(int $sesiId, int $pesertaId): View
+    private function buildHasilTesData(int $sesiId, int $pesertaId): array
     {
         $sesi = SesiTes::with('departemenTerkait')->findOrFail($sesiId);
         $user = \App\Models\User::findOrFail($pesertaId);
@@ -106,7 +104,6 @@ class HasilTesController extends Controller
             ->where('sesi_tes_id', $sesiId)
             ->first();
 
-        /** @var \App\Models\User $currentUser */
         $currentUser = auth()->user();
         $bisaLihatSensitif = $currentUser->hasIzin('hasil_tes.lihat_sensitif');
 
@@ -119,99 +116,6 @@ class HasilTesController extends Controller
             'tanggal_pengerjaan' => $pesertaSesi?->tanggal_pengerjaan,
             'catatan_hr'         => $pesertaSesi?->catatan_hr,
             'peserta_id'         => $pesertaId,
-            'hasil_alat_tes'     => [],
-        ];
-
-        $hasilSkor = HasilSkorPeserta::where('user_id', $pesertaId)
-            ->where('sesi_tes_id', $sesiId)
-            ->with(['dimensi.alatTes', 'alatTes', 'level'])
-            ->get();
-
-        $grouped = $hasilSkor->groupBy(fn($h) =>
-            $h->alatTes?->id ?? $h->dimensi?->alatTes?->id
-        );
-
-        $hasilAlatTes = [];
-        foreach ($grouped as $alatTesId => $skorList) {
-            $firstRow = $skorList->first();
-            $alatTes = $firstRow->alatTes
-                ?? $firstRow->dimensi?->alatTes;
-
-            if (!$alatTes) continue;
-
-            $skorRingkas = $skorList->map(fn($h) => [
-                'dimensi'          => ($h->dimensi?->kode_dimensi ?? '')
-                    . ' - '
-                    . ($h->dimensi?->nama_dimensi ?? '—'),
-                'skor_mentah'  => $h->skor_mentah,
-                'skor_skala'   => $h->skor_akhir,
-                'skor_persentil' => $h->skor_akhir,
-                'kategori'     => $h->level?->label ?? '—',
-            ])->values()->all();
-
-            $hasilAlatTes[] = [
-                'nama_alat_tes'            => $alatTes->nama,
-                'format_dasar'             => $alatTes->format_dasar,
-                'durasi_pengerjaan_aktual' => '—',
-                'skor_ringkas'             => $skorRingkas,
-            ];
-
-            if ($alatTes->format_dasar === 'Grid') {
-                $gridRows = HasilKolomGrid::where('user_id', $pesertaId)
-                    ->where('sesi_tes_id', $sesiId)
-                    ->where('alat_tes_id', $alatTesId)
-                    ->selectRaw('
-                        COALESCE(SUM(jumlah_benar),0) as total_benar,
-                        COALESCE(SUM(jumlah_salah),0) as total_salah,
-                        COALESCE(SUM(jumlah_kelewat),0) as total_kelewat,
-                        COUNT(kolom_ke) as total_kolom
-                    ')->first();
-                $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']        = $gridExtra['chart'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']       = $gridExtra['hanker'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTertinggi'] = $gridExtra['titikTertinggi'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTerendah']  = $gridExtra['titikTerendah'];
-            }
-        }
-
-        $hasilTes['hasil_alat_tes'] = $hasilAlatTes;
-
-        $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps(
-            $hasilTes['hasil_alat_tes'],
-            $pesertaId,
-            $sesiId
-        );
-
-        $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
-
-        return view('admin.hasil-tes.detail', compact(
-            'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
-        ));
-    }
-
-    public function exportPdf(int $sesiId, int $pesertaId)
-    {
-        $sesi = SesiTes::with('departemenTerkait')->findOrFail($sesiId);
-        $user = \App\Models\User::findOrFail($pesertaId);
-
-        $pesertaSesi = PesertaSesiTes::where('user_id', $pesertaId)
-            ->where('sesi_tes_id', $sesiId)
-            ->first();
-
-        /** @var \App\Models\User $currentUser */
-        $currentUser = auth()->user();
-        $bisaLihatSensitif = $currentUser->hasIzin('hasil_tes.lihat_sensitif');
-
-        $hasilTes = [
-            'nama_peserta'       => $user->name,
-            'no_peserta'         => 'HT-' . $sesiId . '-' . str_pad((string) $pesertaId, 3, '0', STR_PAD_LEFT),
-            'jenis_peserta'      => ucfirst($user->tipe_akun ?? '—'),
-            'departemen'         => '—',
-            'posisi'             => '—',
-            'peserta_id'         => $pesertaId,
-            'tanggal_pengerjaan' => $pesertaSesi?->tanggal_pengerjaan,
-            'catatan_hr'         => $pesertaSesi?->catatan_hr,
             'hasil_alat_tes'     => [],
         ];
 
@@ -246,6 +150,7 @@ class HasilTesController extends Controller
             ];
 
             if ($alatTes->format_dasar === 'Grid') {
+                $lastIndex = count($hasilAlatTes) - 1;
                 $gridRows = HasilKolomGrid::where('user_id', $pesertaId)
                     ->where('sesi_tes_id', $sesiId)
                     ->where('alat_tes_id', $alatTesId)
@@ -256,11 +161,11 @@ class HasilTesController extends Controller
                         COUNT(kolom_ke) as total_kolom
                     ')->first();
                 $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']        = $gridExtra['chart'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']       = $gridExtra['hanker'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTertinggi'] = $gridExtra['titikTertinggi'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTerendah']  = $gridExtra['titikTerendah'];
+                $hasilAlatTes[$lastIndex]['grid_ringkasan'] = $gridRows ?? null;
+                $hasilAlatTes[$lastIndex]['grid_chart']       = $gridExtra['chart'];
+                $hasilAlatTes[$lastIndex]['grid_hanker']      = $gridExtra['hanker'];
+                $hasilAlatTes[$lastIndex]['grid_titikTertinggi'] = $gridExtra['titikTertinggi'];
+                $hasilAlatTes[$lastIndex]['grid_titikTerendah']  = $gridExtra['titikTerendah'];
             }
         }
 
@@ -269,6 +174,22 @@ class HasilTesController extends Controller
             $hasilTes['hasil_alat_tes'], $pesertaId, $sesiId
         );
         $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
+
+        return compact('sesi', 'user', 'hasilTes', 'psikogram', 'bisaLihatSensitif');
+    }
+
+    public function detail(int $sesiId, int $pesertaId): View
+    {
+        extract($this->buildHasilTesData($sesiId, $pesertaId));
+
+        return view('admin.hasil-tes.detail', compact(
+            'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
+        ));
+    }
+
+    public function exportPdf(int $sesiId, int $pesertaId)
+    {
+        extract($this->buildHasilTesData($sesiId, $pesertaId));
 
         $pdf = Pdf::loadView('admin.hasil-tes.pdf', compact(
             'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
@@ -287,83 +208,8 @@ class HasilTesController extends Controller
 
     public function printView(int $sesiId, int $pesertaId)
     {
-        $sesi = SesiTes::with('departemenTerkait')->findOrFail($sesiId);
-        $user = \App\Models\User::findOrFail($pesertaId);
-
-        $pesertaSesi = PesertaSesiTes::where('user_id', $pesertaId)
-            ->where('sesi_tes_id', $sesiId)
-            ->first();
-
-        $currentUser = auth()->user();
-        $bisaLihatSensitif = $currentUser->hasIzin('hasil_tes.lihat_sensitif');
-
-        $hasilTes = [
-            'nama_peserta'       => $user->name,
-            'no_peserta'         => 'HT-' . $sesiId . '-' . str_pad((string) $pesertaId, 3, '0', STR_PAD_LEFT),
-            'jenis_peserta'      => ucfirst($user->tipe_akun ?? '—'),
-            'departemen'         => '—',
-            'posisi'             => '—',
-            'peserta_id'         => $pesertaId,
-            'tanggal_pengerjaan' => $pesertaSesi?->tanggal_pengerjaan,
-            'catatan_hr'         => $pesertaSesi?->catatan_hr,
-            'hasil_alat_tes'     => [],
-        ];
-
-        $hasilSkor = HasilSkorPeserta::where('user_id', $pesertaId)
-            ->where('sesi_tes_id', $sesiId)
-            ->with(['dimensi.alatTes', 'alatTes', 'level'])
-            ->get();
-
-        $grouped = $hasilSkor->groupBy(fn($h) =>
-            $h->alatTes?->id ?? $h->dimensi?->alatTes?->id
-        );
-
-        $hasilAlatTes = [];
-        foreach ($grouped as $alatTesId => $skorList) {
-            $firstRow = $skorList->first();
-            $alatTes = $firstRow->alatTes ?? $firstRow->dimensi?->alatTes;
-            if (!$alatTes) continue;
-
-            $skorRingkas = $skorList->map(fn($h) => [
-                'dimensi'        => ($h->dimensi?->kode_dimensi ?? '') . ' - ' . ($h->dimensi?->nama_dimensi ?? '—'),
-                'skor_mentah'    => $h->skor_mentah,
-                'skor_skala'     => $h->skor_akhir,
-                'skor_persentil' => $h->skor_akhir,
-                'kategori'       => $h->level?->label ?? '—',
-            ])->values()->all();
-
-            $hasilAlatTes[] = [
-                'nama_alat_tes'            => $alatTes->nama,
-                'format_dasar'             => $alatTes->format_dasar,
-                'durasi_pengerjaan_aktual' => '—',
-                'skor_ringkas'             => $skorRingkas,
-            ];
-
-            if ($alatTes->format_dasar === 'Grid') {
-                $gridRows = HasilKolomGrid::where('user_id', $pesertaId)
-                    ->where('sesi_tes_id', $sesiId)
-                    ->where('alat_tes_id', $alatTesId)
-                    ->selectRaw('
-                        COALESCE(SUM(jumlah_benar),0) as total_benar,
-                        COALESCE(SUM(jumlah_salah),0) as total_salah,
-                        COALESCE(SUM(jumlah_kelewat),0) as total_kelewat,
-                        COUNT(kolom_ke) as total_kolom
-                    ')->first();
-                $gridExtra = $this->buildGridExtra($pesertaId, $sesiId, $alatTesId);
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_ringkasan'] = $gridRows ?? null;
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_chart']        = $gridExtra['chart'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_hanker']       = $gridExtra['hanker'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTertinggi'] = $gridExtra['titikTertinggi'];
-                $hasilAlatTes[count($hasilAlatTes) - 1]['grid_titikTerendah']  = $gridExtra['titikTerendah'];
-            }
-        }
-
-        $hasilTes['hasil_alat_tes'] = $hasilAlatTes;
-        $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps(
-            $hasilTes['hasil_alat_tes'], $pesertaId, $sesiId
-        );
+        extract($this->buildHasilTesData($sesiId, $pesertaId));
         $papScores = $this->buildPapScores($hasilTes['hasil_alat_tes']);
-        $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
 
         return view('admin.hasil-tes.print', compact(
             'hasilTes', 'sesi', 'papScores', 'psikogram', 'bisaLihatSensitif'

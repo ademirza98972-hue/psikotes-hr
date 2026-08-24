@@ -47,7 +47,7 @@ class PenggunaAdminController extends Controller
                 $query->where('status', $filterStatus);
             })
             ->orderBy('name')
-            ->paginate(in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15)
+            ->paginate($this->getPerPage($request, 15))
             ->withQueryString();
 
         $semuaPeran = Peran::whereNotIn('nama_peran', self::PERAN_DIKECUALIKAN)

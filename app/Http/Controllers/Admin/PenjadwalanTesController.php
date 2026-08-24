@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TambahPesertaSesiRequest;
+use App\Http\Requests\PerbaruiSesiTesRequest;
+use App\Http\Requests\SimpanSesiTesRequest;
 use App\Models\AlatTes;
 use App\Models\Departemen;
 use App\Models\PesertaAlatTes;
@@ -18,7 +21,7 @@ class PenjadwalanTesController extends Controller
 {
     public function index(Request $request): View
     {
-        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 10;
+        $perPage = $this->getPerPage($request, 10);
 
         $penjadwalan = SesiTes::withCount([
             'pesertaSesiTes as jumlah_peserta_count',
@@ -46,18 +49,9 @@ class PenjadwalanTesController extends Controller
         ]);
     }
 
-    public function simpan(Request $request): RedirectResponse
+    public function simpan(SimpanSesiTesRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'nama_sesi'       => 'required|string|max:255',
-            'departemen_ids'   => 'nullable|array',
-            'departemen_ids.*' => 'exists:departemen,id',
-            'tanggal_mulai'   => 'required|date',
-            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'alat_tes_ids'    => 'required|array|min:1',
-            'alat_tes_ids.*'  => 'exists:alat_tes,id',
-            'status'          => 'required|in:Draft,Aktif,Selesai',
-        ]);
+        $validated = $request->validated();
 
         $sesi = SesiTes::create([
             'nama_sesi'             => $validated['nama_sesi'],
@@ -112,18 +106,9 @@ class PenjadwalanTesController extends Controller
         return view('admin.penjadwalan-tes.edit', compact('sesi', 'daftarAlatTes', 'daftarDepartemen'));
     }
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(PerbaruiSesiTesRequest $request, int $id): RedirectResponse
     {
-        $validated = $request->validate([
-            'nama_sesi'      => 'required|string|max:255',
-            'departemen_ids' => 'nullable|array',
-            'departemen_ids.*' => 'exists:departemen,id',
-            'tanggal_mulai'  => 'required|date',
-            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'alat_tes_ids'   => 'nullable|array',
-            'alat_tes_ids.*' => 'exists:alat_tes,id',
-            'status'         => 'required|in:Draft,Aktif,Selesai',
-        ]);
+        $validated = $request->validated();
 
         $sesi = SesiTes::findOrFail($id);
         $sesi->update([
@@ -142,14 +127,9 @@ class PenjadwalanTesController extends Controller
             ->with('sukses', 'Sesi penjadwalan berhasil diperbarui.');
     }
 
-    public function tambahPeserta(Request $request, int $id): RedirectResponse
+    public function tambahPeserta(TambahPesertaSesiRequest $request, int $id): RedirectResponse
     {
-        $validated = $request->validate([
-            'user_ids'        => 'required|array|min:1',
-            'user_ids.*'      => 'exists:users,id',
-            'alat_tes_ids'    => 'required|array|min:1',
-            'alat_tes_ids.*'  => 'exists:alat_tes,id',
-        ]);
+        $validated = $request->validated();
 
         $sesi = SesiTes::findOrFail($id);
         $ditambahkan = 0;

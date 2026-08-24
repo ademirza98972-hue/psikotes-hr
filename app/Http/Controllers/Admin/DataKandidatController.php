@@ -56,7 +56,7 @@ class DataKandidatController extends Controller
             $q->whereHas('profilKandidat', fn ($pk) => $pk->where('posisi_dilamar', $filterPosisiNama));
         });
 
-        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15;
+        $perPage = $this->getPerPage($request, 15);
 
         $kandidat = $query->with(['profilKandidat.posisi'])
             ->orderBy('name')

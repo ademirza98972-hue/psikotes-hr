@@ -40,7 +40,7 @@ class DataKaryawanController extends Controller
 
         $subquery = $this->subqueryMemilikiAkun();
 
-        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15;
+        $perPage = $this->getPerPage($request, 15);
 
         $data = DataKaryawan::query()
             ->with(['departemen', 'posisi'])

@@ -59,7 +59,7 @@ class DataTerhapusController extends Controller
             $badgeCounts[$key] = $this->buatQuery($key)->count();
         }
 
-        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 15;
+        $perPage = $this->getPerPage($request, 15);
 
         $items = $this->buatQuery($jenisAktif)
             ->orderBy('deleted_at', 'desc')

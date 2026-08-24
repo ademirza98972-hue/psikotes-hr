@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PerbaruiAlatTesRequest;
+use App\Http\Requests\SimpanAlatTesRequest;
+use App\Http\Requests\SimpanDimensiAlatTesRequest;
+use App\Http\Requests\SimpanLevelDimensiRequest;
 use App\Models\AlatTes;
 use App\Models\DimensiAlatTes;
 use App\Models\LevelDimensi;
@@ -15,7 +19,7 @@ class AlatTesController extends Controller
 {
     public function index(Request $request): View
     {
-        $perPage = in_array((int)$request->input('per_page'), [10, 25, 50, 100]) ? (int)$request->input('per_page') : 10;
+        $perPage = $this->getPerPage($request, 10);
 
         // Compute stats before paginating
         $totalSoal = AlatTes::withCount('soal')->get()->sum('soal_count');
@@ -42,19 +46,9 @@ class AlatTesController extends Controller
         ]);
     }
 
-    public function simpan(Request $request)
+    public function simpan(SimpanAlatTesRequest $request)
     {
-        $data = $request->validate([
-            'nama' => 'required|string|max:150',
-            'kode' => 'required|string|max:20|unique:alat_tes,kode',
-            'format_dasar' => 'required|string|max:50',
-            'pola_skoring' => 'required|string|in:kognitif,forced_choice,forced_choice_rollup,grid',
-            'jumlah_soal' => 'nullable|integer|min:0',
-            'durasi_total_menit' => 'nullable|integer|min:0',
-            'batas_waktu_per_soal_aktif' => 'boolean',
-            'batas_waktu_per_soal_detik' => 'nullable|integer|min:1',
-            'is_sensitif' => 'boolean',
-        ]);
+        $data = $request->validated();
 
         AlatTes::create([
             'nama' => $data['nama'],
@@ -84,19 +78,9 @@ class AlatTesController extends Controller
         ]);
     }
 
-    public function update(Request $request, int $id)
+    public function update(PerbaruiAlatTesRequest $request, int $id)
     {
-        $data = $request->validate([
-            'nama' => 'required|string|max:150',
-            'kode' => 'required|string|max:20|unique:alat_tes,kode,'.$id,
-            'format_dasar' => 'required|string|max:50',
-            'pola_skoring' => 'required|string|in:kognitif,forced_choice,forced_choice_rollup,grid',
-            'jumlah_soal' => 'nullable|integer|min:0',
-            'durasi_total_menit' => 'nullable|integer|min:0',
-            'batas_waktu_per_soal_aktif' => 'boolean',
-            'batas_waktu_per_soal_detik' => 'nullable|integer|min:1',
-            'is_sensitif' => 'boolean',
-        ]);
+        $data = $request->validated();
 
         $alatTes = AlatTes::findOrFail($id);
         $alatTes->update([
@@ -145,7 +129,7 @@ class AlatTesController extends Controller
             ->orderBy('urutan')->get();
         $jumlahNorma = NormaKonversi::where('alat_tes_id', $id)->count();
 
-        $perPage = in_array((int) $request->input('per_page'), [25, 50, 100, 250]) ? (int) $request->input('per_page') : 25;
+        $perPage = $this->getPerPage($request, 25, [25, 50, 100, 250]);
         $filterDimensi = $request->input('dimensi');
 
         $contohNorma = NormaKonversi::where('alat_tes_id', $id)
@@ -244,18 +228,11 @@ class AlatTesController extends Controller
         return view('admin.alat-tes.dimensi', compact('alatTes', 'dimensi'));
     }
 
-    public function simpanDimensi(Request $request, int $id)
+    public function simpanDimensi(SimpanDimensiAlatTesRequest $request, int $id)
     {
         AlatTes::findOrFail($id);
 
-        $data = $request->validate([
-            'kode_dimensi'   => 'required|string|max:50',
-            'nama_dimensi'   => 'required|string|max:150',
-            'deskripsi_aspek'=> 'nullable|string',
-            'tipe_kategori'  => 'required|in:psikogram,klinis',
-            'arah_skor'      => 'required|in:tinggi_baik,rendah_baik',
-            'urutan'         => 'nullable|integer|min:0',
-        ]);
+        $data = $request->validated();
 
         DimensiAlatTes::create(array_merge($data, [
             'alat_tes_id' => $id,
@@ -268,19 +245,12 @@ class AlatTesController extends Controller
             ->with('sukses', "Dimensi '{$data['nama_dimensi']}' berhasil ditambahkan.");
     }
 
-    public function updateDimensi(Request $request, int $id, int $dimensiId)
+    public function updateDimensi(SimpanDimensiAlatTesRequest $request, int $id, int $dimensiId)
     {
         $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
             ->findOrFail($dimensiId);
 
-        $data = $request->validate([
-            'kode_dimensi'   => 'required|string|max:50',
-            'nama_dimensi'   => 'required|string|max:150',
-            'deskripsi_aspek'=> 'nullable|string',
-            'tipe_kategori'  => 'required|in:psikogram,klinis',
-            'arah_skor'      => 'required|in:tinggi_baik,rendah_baik',
-            'urutan'         => 'nullable|integer|min:0',
-        ]);
+        $data = $request->validated();
 
         $dimensi->update($data);
 
@@ -301,18 +271,12 @@ class AlatTesController extends Controller
             ->with('sukses', "Dimensi '{$nama}' berhasil dihapus.");
     }
 
-    public function simpanLevel(Request $request, int $id, int $dimensiId)
+    public function simpanLevel(SimpanLevelDimensiRequest $request, int $id, int $dimensiId)
     {
         $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
             ->findOrFail($dimensiId);
 
-        $data = $request->validate([
-            'levels'           => 'required|array|min:1',
-            'levels.*.label'   => 'required|string|max:50',
-            'levels.*.skor_min'=> 'required|numeric',
-            'levels.*.skor_max'=> 'required|numeric',
-            'levels.*.urutan'  => 'required|integer|min:0',
-        ]);
+        $data = $request->validated();
 
         LevelDimensi::where('dimensi_id', $dimensiId)->delete();
 

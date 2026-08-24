@@ -122,7 +122,7 @@ class DataKandidatController extends Controller
 
         return redirect()
             ->route('admin.data-kandidat.index')
-            ->with('sukses', 'Akun kandidat berhasil ditambahkan.');
+            ->with($this::FLASH_SUCCESS, 'Akun kandidat berhasil ditambahkan.');
     }
 
     public function ubah(int $id): View
@@ -184,7 +184,7 @@ class DataKandidatController extends Controller
 
         return redirect()
             ->route('admin.data-kandidat.index')
-            ->with('sukses', 'Data kandidat berhasil diperbarui.');
+            ->with($this::FLASH_SUCCESS, 'Data kandidat berhasil diperbarui.');
     }
 
     public function hapus(int $id): RedirectResponse
@@ -203,7 +203,7 @@ class DataKandidatController extends Controller
 
         return redirect()
             ->route('admin.data-kandidat.index')
-            ->with('sukses', 'Akun kandidat berhasil dihapus.');
+            ->with($this::FLASH_SUCCESS, 'Akun kandidat berhasil dihapus.');
     }
 
     public function approve(int $id): RedirectResponse
@@ -220,7 +220,7 @@ class DataKandidatController extends Controller
 
         return redirect()
             ->route('admin.data-kandidat.index')
-            ->with('sukses', 'Kandidat berhasil diaktifkan.');
+            ->with($this::FLASH_SUCCESS, 'Kandidat berhasil diaktifkan.');
     }
 
     public function tolak(int $id): RedirectResponse
@@ -237,7 +237,7 @@ class DataKandidatController extends Controller
 
         return redirect()
             ->route('admin.data-kandidat.index')
-            ->with('sukses', 'Kandidat berhasil ditolak. Data tetap disimpan.');
+            ->with($this::FLASH_SUCCESS, 'Kandidat berhasil ditolak. Data tetap disimpan.');
     }
 
     public function toggleStatus(int $id): RedirectResponse
@@ -258,6 +258,6 @@ class DataKandidatController extends Controller
 
         return redirect()
             ->route('admin.data-kandidat.index')
-            ->with('sukses', $kandidat->fresh()->status === 'aktif' ? 'Kandidat berhasil diaktifkan.' : 'Kandidat berhasil dinonaktifkan.');
+            ->with($this::FLASH_SUCCESS, $kandidat->fresh()->status === 'aktif' ? 'Kandidat berhasil diaktifkan.' : 'Kandidat berhasil dinonaktifkan.');
     }
 }

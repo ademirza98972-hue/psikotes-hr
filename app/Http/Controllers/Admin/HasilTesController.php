@@ -274,7 +274,7 @@ class HasilTesController extends Controller
 
         return redirect()
             ->route('admin.hasil-tes.detail', [$sesiId, $pesertaId])
-            ->with('sukses', 'Catatan HR berhasil disimpan.');
+            ->with($this::FLASH_SUCCESS, 'Catatan HR berhasil disimpan.');
     }
 
     protected function injectHasilEpps(array $hasilAlatPeserta, int $userId, int $sesiId): array

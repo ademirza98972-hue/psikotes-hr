@@ -14,6 +14,7 @@ use App\Models\Posisi;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -84,7 +85,7 @@ class DataKaryawanController extends Controller
 
         return redirect()
             ->route('admin.data-karyawan.index')
-            ->with('sukses', 'Data karyawan berhasil ditambahkan.');
+            ->with($this::FLASH_SUCCESS, 'Data karyawan berhasil ditambahkan.');
     }
 
     public function ubah(int $data_karyawan): View
@@ -110,7 +111,7 @@ class DataKaryawanController extends Controller
 
         return redirect()
             ->route('admin.data-karyawan.index')
-            ->with('sukses', 'Data karyawan berhasil diperbarui.');
+            ->with($this::FLASH_SUCCESS, 'Data karyawan berhasil diperbarui.');
     }
 
     public function hapus(int $data_karyawan): RedirectResponse
@@ -131,7 +132,7 @@ class DataKaryawanController extends Controller
 
         return redirect()
             ->route('admin.data-karyawan.index')
-            ->with('sukses', 'Data karyawan berhasil dihapus.');
+            ->with($this::FLASH_SUCCESS, 'Data karyawan berhasil dihapus.');
     }
 
     public function import(ImportDataKaryawanRequest $request): RedirectResponse
@@ -155,17 +156,17 @@ class DataKaryawanController extends Controller
             $nikList = implode(', ', $import->duplikat);
             return redirect()
                 ->route('admin.data-karyawan.index')
-                ->with('sukses', $pesan)
+                ->with($this::FLASH_SUCCESS, $pesan)
                 ->with('duplikat_nik', $import->duplikat)
                 ->with('info', 'NIK berikut sudah terdaftar dan dilewati: ' . $nikList);
         }
 
         return redirect()
             ->route('admin.data-karyawan.index')
-            ->with('sukses', $pesan);
+            ->with($this::FLASH_SUCCESS, $pesan);
     }
 
-    public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    public function downloadTemplate(): BinaryFileResponse
     {
         return Excel::download(new DataKaryawanTemplateExport(), 'template-data-karyawan.xlsx');
     }

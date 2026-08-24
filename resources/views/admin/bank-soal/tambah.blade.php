@@ -165,47 +165,73 @@
                 </select>
             </div>
 
-            {{-- Teks Soal --}}
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Teks Soal <span class="text-rose-500">*</span></label>
-                <textarea name="teks_soal" rows="3" required
-                          class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">{{ old('teks_soal') }}</textarea>
+            {{-- Section: teks soal & gambar soal (pilihan_ganda/pilihan_gambar DAN isian) --}}
+            <div id="section_teks_soal">
+                <div class="mb-4">
+                    <label for="teks_soal" class="block text-sm font-medium text-slate-700">Teks Soal</label>
+                    <textarea id="teks_soal" name="teks_soal" rows="3"
+                              class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                              placeholder="Isi teks soal (opsional untuk soal isian)">{{ old('teks_soal') }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Gambar Soal</label>
+                    <input type="file" name="gambar_soal" accept="image/*"
+                           class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-[#234853]">
+                </div>
             </div>
 
-            {{-- Upload Gambar Soal (FA/WU) --}}
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Gambar Soal</label>
-                <input type="file" name="gambar_soal" accept="image/*"
-                       class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-[#234853]">
+            {{-- Section: kunci jawaban untuk isian --}}
+            <div id="section_kunci_isian" class="hidden">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
+                    <input type="text" name="kunci_jawaban" value="{{ old('kunci_jawaban') }}"
+                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                           placeholder="Kunci jawaban">
+                </div>
             </div>
 
-            {{-- Kunci Jawaban --}}
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
-                <input type="text" name="kunci_jawaban" value="{{ old('kunci_jawaban') }}"
-                       class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
-                       placeholder="Jawaban">
-            </div>
-
-            {{-- Opsi Jawaban (a–e) --}}
-            <div class="space-y-3">
-                <p class="text-sm font-medium text-slate-700">Opsi Jawaban (a–e)</p>
-                @foreach (['a','b','c','d','e'] as $huruf)
-                    <div class="rounded-md border border-slate-200 bg-slate-50 p-3 space-y-2">
-                        <div class="flex items-center gap-3">
-                            <input type="radio" name="kunci_jawaban" value="{{ $huruf }}" id="kunci_{{ $huruf }}"
-                                   @checked(old('kunci_jawaban') === $huruf)
-                                   class="h-4 w-4 border-slate-300 text-[#2C5F6F]">
-                            <label for="kunci_{{ $huruf }}" class="w-6 text-sm font-semibold text-slate-700">{{ strtoupper($huruf) }}.</label>
-                            <input type="text" name="opsi[{{ $huruf }}]" value="{{ old('opsi.' . $huruf) }}"
-                                   placeholder="Teks opsi {{ strtoupper($huruf) }}"
-                                   class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none">
-                            <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
-                                   class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
+            {{-- Section: opsi A-E untuk pilihan ganda/gambar --}}
+            <div id="section_opsi">
+                <div class="space-y-3 mt-4">
+                    <p class="text-sm font-medium text-slate-700">Opsi Jawaban (a–e)</p>
+                    @foreach (['a','b','c','d','e'] as $huruf)
+                        <div class="rounded-md border border-slate-200 bg-slate-50 p-3 space-y-2">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="kunci_jawaban" value="{{ $huruf }}" id="kunci_{{ $huruf }}"
+                                       @checked(old('kunci_jawaban') === $huruf)
+                                       class="h-4 w-4 border-slate-300 text-[#2C5F6F]">
+                                <label for="kunci_{{ $huruf }}" class="w-6 text-sm font-semibold text-slate-700">{{ strtoupper($huruf) }}.</label>
+                                <input type="text" name="opsi[{{ $huruf }}]" value="{{ old('opsi.' . $huruf) }}"
+                                       placeholder="Teks opsi {{ strtoupper($huruf) }}"
+                                       class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none">
+                                <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
+                                       class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
+
+            <script>
+                document.getElementById('tipe_format').addEventListener('change', function() {
+                    var val = this.value;
+                    var showTeks = true;
+                    var showKunci = (val === 'isian_teks' || val === 'isian_angka');
+                    var showOpsi = (val === 'pilihan_ganda' || val === 'pilihan_gambar');
+                    var showTeksRequired = showOpsi;
+
+                    document.getElementById('section_teks_soal').classList.toggle('hidden', !showTeks);
+                    document.getElementById('section_kunci_isian').classList.toggle('hidden', !showKunci);
+                    document.getElementById('section_opsi').classList.toggle('hidden', !showOpsi);
+
+                    // Toggle required attributes
+                    var teksSoal = document.getElementById('teks_soal');
+                    if (teksSoal) teksSoal.required = showTeksRequired;
+                });
+                // Init on load
+                document.getElementById('tipe_format').dispatchEvent(new Event('change'));
+            </script>
         @endif
 
         <div class="sticky bottom-0 -mx-6 mt-4 flex justify-end gap-2 border-t border-slate-200 bg-white px-6 py-3 shadow-[0_-2px_4px_rgba(0,0,0,0.04)]">

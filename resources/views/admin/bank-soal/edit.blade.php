@@ -170,14 +170,15 @@
             </div>
 
             {{-- Teks Soal --}}
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Teks Soal <span class="text-rose-500">*</span></label>
-                <textarea name="teks_soal" rows="3" required
-                          class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">{{ old('teks_soal', $soal->teks_soal) }}</textarea>
-            </div>
+            <div id="section_teks_soal_edit">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700">Teks Soal <span class="text-rose-500">*</span></label>
+                    <textarea id="teks_soal_edit" name="teks_soal" rows="3"
+                              class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                              placeholder="{{ $tipeFormat === 'isian_teks' || $tipeFormat === 'isian_angka' ? 'Isi teks soal (opsional untuk soal isian)' : '' }}">{{ old('teks_soal', $soal->teks_soal) }}</textarea>
+                </div>
 
-            {{-- Upload Gambar Soal (FA/WU) --}}
-            @if (in_array($tipeFormat, ['pilihan_gambar']))
+                {{-- Upload Gambar Soal --}}
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Gambar Soal</label>
                     @if ($soal->gambar_soal)
@@ -186,21 +187,21 @@
                     <input type="file" name="gambar_soal" accept="image/*"
                            class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-[#234853]">
                 </div>
-            @endif
+            </div>
 
-            {{-- Kunci Jawaban --}}
-            @if (in_array($tipeFormat, ['isian_teks', 'isian_angka']))
+            {{-- Kunci Jawaban untuk isian --}}
+            <div id="section_kunci_isian_edit" class="hidden">
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
-                    <input type="text" name="kunci_jawaban" value="{{ old('kunci_jawaban', $soal->kunci_jawaban) }}"
+                    <input type="text" id="kunci_jawaban_edit" name="kunci_jawaban" value="{{ old('kunci_jawaban', $soal->kunci_jawaban) }}"
                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
                            placeholder="{{ $tipeFormat === 'isian_angka' ? 'Jawaban angka, contoh: 35' : 'Jawaban teks, contoh: bunga' }}">
                 </div>
-            @endif
+            </div>
 
             {{-- Opsi Jawaban (pilihan_ganda dan pilihan_gambar) --}}
-            @if (in_array($tipeFormat, ['pilihan_ganda', 'pilihan_gambar']))
-                <div class="space-y-3">
+            <div id="section_opsi_edit">
+                <div class="space-y-3 mt-4">
                     <p class="text-sm font-medium text-slate-700">Opsi Jawaban (a–e)</p>
                     @foreach (['a','b','c','d','e'] as $huruf)
                         @php $idx = $loop->index; $opsi = $opsiList[$idx] ?? null; @endphp
@@ -213,18 +214,33 @@
                                 <input type="text" name="opsi[{{ $huruf }}]" value="{{ old('opsi.' . $huruf, $opsi?->teks_opsi ?? '') }}"
                                        placeholder="Teks opsi {{ strtoupper($huruf) }}"
                                        class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none">
-                                @if ($tipeFormat === 'pilihan_gambar')
-                                    @if ($opsi?->gambar_opsi)
-                                        <img src="{{ asset('storage/' . $opsi->gambar_opsi) }}" class="h-20 rounded border border-slate-200 object-contain">
-                                    @endif
-                                    <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
-                                           class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
+                                @if ($opsi?->gambar_opsi)
+                                    <img src="{{ asset('storage/' . $opsi->gambar_opsi) }}" class="h-20 rounded border border-slate-200 object-contain">
                                 @endif
+                                <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
+                                       class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
                             </div>
                         </div>
                     @endforeach
                 </div>
-            @endif
+            </div>
+
+            <script>
+                // Note: tipe_format tidak bisa diubah setelah soal dibuat (readonly display saja)
+                (function() {
+                    var tipeFormat = {{ Js::from($tipeFormat) }};
+                    var showTeks = true;
+                    var showKunci = (tipeFormat === 'isian_teks' || tipeFormat === 'isian_angka');
+                    var showOpsi = (tipeFormat === 'pilihan_ganda' || tipeFormat === 'pilihan_gambar');
+
+                    document.getElementById('section_teks_soal_edit').classList.toggle('hidden', !showTeks);
+                    document.getElementById('section_kunci_isian_edit').classList.toggle('hidden', !showKunci);
+                    document.getElementById('section_opsi_edit').classList.toggle('hidden', !showOpsi);
+
+                    var teksSoal = document.getElementById('teks_soal_edit');
+                    if (teksSoal) teksSoal.required = showOpsi;
+                })();
+            </script>
         @endif
 
         <div class="sticky bottom-0 -mx-6 mt-4 flex justify-end gap-2 border-t border-slate-200 bg-white px-6 py-3 shadow-[0_-2px_4px_rgba(0,0,0,0.04)]">

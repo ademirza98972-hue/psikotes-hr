@@ -60,7 +60,7 @@ class PeranController extends Controller
 
         return redirect()
             ->route('admin.peran.index')
-            ->with('sukses', 'Peran baru berhasil ditambahkan.');
+            ->with($this::FLASH_SUCCESS, 'Peran baru berhasil ditambahkan.');
     }
 
     public function ubah(int $peran): View
@@ -96,7 +96,7 @@ class PeranController extends Controller
 
         return redirect()
             ->route('admin.peran.index')
-            ->with('sukses', 'Peran berhasil diperbarui.');
+            ->with($this::FLASH_SUCCESS, 'Peran berhasil diperbarui.');
     }
 
     public function hapus(int $peran): RedirectResponse
@@ -115,10 +115,10 @@ class PeranController extends Controller
 
         return redirect()
             ->route('admin.peran.index')
-            ->with('sukses', 'Peran berhasil dihapus.');
+            ->with($this::FLASH_SUCCESS, 'Peran berhasil dihapus.');
     }
 
-    protected function kelompokkanIzin($izin): array
+    protected function kelompokkanIzin(mixed $izin): array
     {
         $kelompok = [];
 

@@ -57,17 +57,17 @@ class AlatTesController extends Controller
             'kode' => $data['kode'],
             'format_dasar' => $data['format_dasar'],
             'pola_skoring' => $data['pola_skoring'],
-            'jumlah_soal' => $data['jumlah_soal'] ?? null,
-            'durasi_total_menit' => $data['durasi_total_menit'] ?? null,
+            'jumlah_soal' => $data['jumlah_soal'],
+            'durasi_total_menit' => $data['durasi_total_menit'],
             'batas_waktu_per_soal_aktif' => $request->boolean('batas_waktu_per_soal_aktif'),
-            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'] ?? null,
+            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'],
             'is_sensitif' => $request->boolean('is_sensitif'),
             'is_aktif' => true,
         ]);
 
         return redirect()
             ->route('admin.alat-tes.index')
-            ->with('sukses', "Alat tes '{$data['nama']}' berhasil disimpan.");
+            ->with($this::FLASH_SUCCESS, "Alat tes '{$data['nama']}' berhasil disimpan.");
     }
 
     public function edit(int $id): View
@@ -90,16 +90,16 @@ class AlatTesController extends Controller
             'kode' => $data['kode'],
             'format_dasar' => $data['format_dasar'],
             'pola_skoring' => $data['pola_skoring'],
-            'jumlah_soal' => $data['jumlah_soal'] ?? null,
-            'durasi_total_menit' => $data['durasi_total_menit'] ?? null,
+            'jumlah_soal' => $data['jumlah_soal'],
+            'durasi_total_menit' => $data['durasi_total_menit'],
             'batas_waktu_per_soal_aktif' => $request->boolean('batas_waktu_per_soal_aktif'),
-            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'] ?? null,
+            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'],
             'is_sensitif' => $request->boolean('is_sensitif'),
         ]);
 
         return redirect()
             ->route('admin.alat-tes.index')
-            ->with('sukses', "Alat tes '{$data['nama']}' berhasil diperbarui.");
+            ->with($this::FLASH_SUCCESS, "Alat tes '{$data['nama']}' berhasil diperbarui.");
     }
 
     public function hapus(int $id): RedirectResponse
@@ -110,7 +110,7 @@ class AlatTesController extends Controller
 
         return redirect()
             ->route('admin.alat-tes.index')
-            ->with('sukses', "Alat tes '{$nama}' berhasil dihapus.");
+            ->with($this::FLASH_SUCCESS, "Alat tes '{$nama}' berhasil dihapus.");
     }
 
     public function restore(int $id): RedirectResponse
@@ -121,7 +121,7 @@ class AlatTesController extends Controller
 
         return redirect()
             ->route('admin.alat-tes.index')
-            ->with('sukses', "Alat tes '{$nama}' berhasil dipulihkan.");
+            ->with($this::FLASH_SUCCESS, "Alat tes '{$nama}' berhasil dipulihkan.");
     }
 
     public function norma(Request $request, int $id): View
@@ -211,7 +211,7 @@ class AlatTesController extends Controller
         $jumlah = count($rows);
         return redirect()
             ->route('admin.alat-tes.norma', $id)
-            ->with('sukses', "{$jumlah} baris norma berhasil diimport.");
+            ->with($this::FLASH_SUCCESS, "{$jumlah} baris norma berhasil diimport.");
     }
 
     public function dimensi(int $id): View
@@ -239,7 +239,7 @@ class AlatTesController extends Controller
 
         return redirect()
             ->route('admin.alat-tes.dimensi', $id)
-            ->with('sukses', "Dimensi '{$data['nama_dimensi']}' berhasil ditambahkan.");
+            ->with($this::FLASH_SUCCESS, "Dimensi '{$data['nama_dimensi']}' berhasil ditambahkan.");
     }
 
     public function updateDimensi(SimpanDimensiAlatTesRequest $request, int $id, int $dimensiId): RedirectResponse
@@ -253,7 +253,7 @@ class AlatTesController extends Controller
 
         return redirect()
             ->route('admin.alat-tes.dimensi', $id)
-            ->with('sukses', "Dimensi '{$data['nama_dimensi']}' berhasil diupdate.");
+            ->with($this::FLASH_SUCCESS, "Dimensi '{$data['nama_dimensi']}' berhasil diupdate.");
     }
 
     public function hapusDimensi(int $id, int $dimensiId): RedirectResponse
@@ -265,7 +265,7 @@ class AlatTesController extends Controller
 
         return redirect()
             ->route('admin.alat-tes.dimensi', $id)
-            ->with('sukses', "Dimensi '{$nama}' berhasil dihapus.");
+            ->with($this::FLASH_SUCCESS, "Dimensi '{$nama}' berhasil dihapus.");
     }
 
     public function simpanLevel(SimpanLevelDimensiRequest $request, int $id, int $dimensiId): RedirectResponse
@@ -290,6 +290,6 @@ class AlatTesController extends Controller
 
         return redirect()
             ->route('admin.alat-tes.dimensi', $id)
-            ->with('sukses', "Level dimensi '{$dimensi->nama_dimensi}' berhasil disimpan.");
+            ->with($this::FLASH_SUCCESS, "Level dimensi '{$dimensi->nama_dimensi}' berhasil disimpan.");
     }
 }

@@ -50,7 +50,7 @@ class DataTerhapusController extends Controller
         };
     }
 
-    public function index(Request $request, ?string $jenis = null): View
+    public function index(?string $jenis = null): View
     {
         $jenisAktif = $this->resolveJenis($request->query->get('jenis'));
 
@@ -75,7 +75,7 @@ class DataTerhapusController extends Controller
         ]);
     }
 
-    public function pulihkan(Request $request, string $jenis, int $id): RedirectResponse
+    public function pulihkan(string $jenis, int $id): RedirectResponse
     {
         $label = self::META[$jenis]['label'] ?? null;
         if ($label === null) {
@@ -96,10 +96,10 @@ class DataTerhapusController extends Controller
 
         return redirect()
             ->route('admin.data-terhapus.index', ['jenis' => $jenis])
-            ->with('sukses', "{$label} berhasil dipulihkan.");
+            ->with($this::FLASH_SUCCESS, "{$label} berhasil dipulihkan.");
     }
 
-    public function hapusPermanen(Request $request, string $jenis, int $id): RedirectResponse
+    public function hapusPermanen(string $jenis, int $id): RedirectResponse
     {
         $label = self::META[$jenis]['label'] ?? null;
         if ($label === null) {
@@ -111,7 +111,7 @@ class DataTerhapusController extends Controller
 
         return redirect()
             ->route('admin.data-terhapus.index', ['jenis' => $jenis])
-            ->with('sukses', "{$label} berhasil dihapus permanen.");
+            ->with($this::FLASH_SUCCESS, "{$label} berhasil dihapus permanen.");
     }
 
     private function resolveJenis(?string $jenis): string

@@ -148,7 +148,7 @@ class PenggunaController extends Controller
 
         return redirect()
             ->route('admin.akun-karyawan.index')
-            ->with('sukses', 'Akun karyawan berhasil ditambahkan.');
+            ->with($this::FLASH_SUCCESS, 'Akun karyawan berhasil ditambahkan.');
     }
 
     public function ubah(int $id): View
@@ -227,7 +227,7 @@ class PenggunaController extends Controller
 
         return redirect()
             ->route('admin.akun-karyawan.index')
-            ->with('sukses', 'Data akun karyawan berhasil diperbarui.');
+            ->with($this::FLASH_SUCCESS, 'Data akun karyawan berhasil diperbarui.');
     }
 
     public function hapus(int $id): RedirectResponse
@@ -257,7 +257,7 @@ class PenggunaController extends Controller
 
         return redirect()
             ->route('admin.akun-karyawan.index')
-            ->with('sukses', 'Akun karyawan berhasil dihapus.');
+            ->with($this::FLASH_SUCCESS, 'Akun karyawan berhasil dihapus.');
     }
 
     public function toggleStatus(int $id): RedirectResponse
@@ -274,6 +274,6 @@ class PenggunaController extends Controller
 
         return redirect()
             ->route('admin.akun-karyawan.index')
-            ->with('sukses', $pengguna->fresh()->status === 'aktif' ? 'Akun karyawan berhasil diaktifkan.' : 'Akun karyawan berhasil dinonaktifkan.');
+            ->with($this::FLASH_SUCCESS, $pengguna->fresh()->status === 'aktif' ? 'Akun karyawan berhasil diaktifkan.' : 'Akun karyawan berhasil dinonaktifkan.');
     }
 }

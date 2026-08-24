@@ -93,7 +93,7 @@ class PenggunaAdminController extends Controller
 
         return redirect()
             ->route('admin.pengguna-admin.index')
-            ->with('sukses', 'Pengguna internal berhasil ditambahkan.');
+            ->with($this::FLASH_SUCCESS, 'Pengguna internal berhasil ditambahkan.');
     }
 
     public function ubah(int $id): View
@@ -142,7 +142,7 @@ class PenggunaAdminController extends Controller
 
         return redirect()
             ->route('admin.pengguna-admin.index')
-            ->with('sukses', 'Data pengguna internal berhasil diperbarui.');
+            ->with($this::FLASH_SUCCESS, 'Data pengguna internal berhasil diperbarui.');
     }
 
     public function hapus(int $id): RedirectResponse
@@ -167,7 +167,7 @@ class PenggunaAdminController extends Controller
 
         return redirect()
             ->route('admin.pengguna-admin.index')
-            ->with('sukses', 'Pengguna internal berhasil dihapus.');
+            ->with($this::FLASH_SUCCESS, 'Pengguna internal berhasil dihapus.');
     }
 
     public function toggleStatus(int $id): RedirectResponse
@@ -193,7 +193,7 @@ class PenggunaAdminController extends Controller
 
         return redirect()
             ->route('admin.pengguna-admin.index')
-            ->with('sukses', $pengguna->fresh()->status === 'aktif' ? 'Pengguna internal berhasil diaktifkan.' : 'Pengguna internal berhasil dinonaktifkan.');
+            ->with($this::FLASH_SUCCESS, $pengguna->fresh()->status === 'aktif' ? 'Pengguna internal berhasil diaktifkan.' : 'Pengguna internal berhasil dinonaktifkan.');
     }
 
     private function cariPenggunaInternal(int $id): User

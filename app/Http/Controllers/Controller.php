@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 abstract class Controller
 {
+    protected const FLASH_SUCCESS = 'sukses';
+    protected const FLASH_ERROR   = 'error';
     protected const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
     /**

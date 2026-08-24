@@ -52,7 +52,7 @@ class PosisiController extends Controller
         );
 
         return redirect()->route('admin.posisi.index')
-            ->with('sukses', 'Data posisi berhasil ditambahkan.');
+            ->with($this::FLASH_SUCCESS, 'Data posisi berhasil ditambahkan.');
     }
 
     public function update(PerbaruiPosisiRequest $request, Posisi $posisi): RedirectResponse
@@ -60,7 +60,7 @@ class PosisiController extends Controller
         $posisi->update($request->validated());
 
         return redirect()->route('admin.posisi.index')
-            ->with('sukses', 'Data posisi berhasil diperbarui.');
+            ->with($this::FLASH_SUCCESS, 'Data posisi berhasil diperbarui.');
     }
 
     public function destroy(Posisi $posisi): RedirectResponse
@@ -72,7 +72,7 @@ class PosisiController extends Controller
         $posisi->delete();
 
         return redirect()->route('admin.posisi.index')
-            ->with('sukses', 'Data posisi berhasil dihapus.');
+            ->with($this::FLASH_SUCCESS, 'Data posisi berhasil dihapus.');
     }
 
     public function daftarByDepartemen(int $departemenId): JsonResponse

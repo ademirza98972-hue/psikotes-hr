@@ -6,10 +6,8 @@ use App\Http\Requests\PerbaruiDepartemenRequest;
 use App\Http\Requests\SimpanDepartemenRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Departemen;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DepartemenController extends Controller
@@ -41,7 +39,7 @@ class DepartemenController extends Controller
         Departemen::create($request->only('nama_departemen'));
 
         return redirect()->route('admin.departemen.index')
-            ->with('sukses', 'Data departemen berhasil ditambahkan.');
+            ->with($this::FLASH_SUCCESS, 'Data departemen berhasil ditambahkan.');
     }
 
     public function update(PerbaruiDepartemenRequest $request, Departemen $departemen): RedirectResponse
@@ -49,7 +47,7 @@ class DepartemenController extends Controller
         $departemen->update($request->validated());
 
         return redirect()->route('admin.departemen.index')
-            ->with('sukses', 'Data departemen berhasil diperbarui.');
+            ->with($this::FLASH_SUCCESS, 'Data departemen berhasil diperbarui.');
     }
 
     public function destroy(Departemen $departemen): RedirectResponse
@@ -61,6 +59,6 @@ class DepartemenController extends Controller
         $departemen->delete();
 
         return redirect()->route('admin.departemen.index')
-            ->with('sukses', 'Data departemen berhasil dihapus.');
+            ->with($this::FLASH_SUCCESS, 'Data departemen berhasil dihapus.');
     }
 }

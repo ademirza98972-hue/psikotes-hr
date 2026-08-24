@@ -77,14 +77,12 @@ class BankSoalController extends Controller
         $alatTes = AlatTes::findOrFail($alatTesId);
         $format = $alatTes->format_dasar;
 
-        $rules = match ($format) {
-            'Forced Choice' => $this->forcedChoiceRules(),
-            'Grid'          => $this->gridRules(),
-            'Mixed'         => $this->mixedRules(),
-            default         => $this->pilihanAtauLikertRules(),
-        };
-
-        $validated = $request->validate($rules);
+        $rules = $this->soalRules($format);
+        $messages = $this->soalMessages($format);
+        $attributes = $this->soalAttributes($format);
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), $rules, $messages, $attributes);
+        $validator->validate();
+        $validated = $validator->validated();
 
         DB::transaction(function () use ($alatTes, $format, $validated, $request) {
             $nomorBerikutnya = (int) (Soal::where('alat_tes_id', $alatTes->id)->max('nomor') ?? 0) + 1;
@@ -148,50 +146,47 @@ class BankSoalController extends Controller
                 return;
             }
 
+            // Mixed atau default
+            $tipeFormat = $request->input('tipe_format', 'pilihan_ganda');
             $soal = Soal::create([
                 'alat_tes_id'   => $alatTes->id,
                 'nomor'         => $nomorBerikutnya,
-                'teks_soal'     => $validated['teks_soal'],
-                'tipe_format'   => $format === 'Pilihan Ganda' ? 'pilihan_ganda' : 'skala_likert',
-                'kunci_jawaban' => $request->input('kunci'),
+                'teks_soal'     => $validated['teks_soal'] ?? null,
+                'gambar_soal'   => $request->hasFile('gambar_soal')
+                    ? $request->file('gambar_soal')->store('ist/soal', 'public')
+                    : null,
+                'tipe_format'   => $tipeFormat,
+                'kunci_jawaban' => in_array($tipeFormat, ['isian_teks', 'isian_angka'])
+                    ? $validated['kunci_jawaban'] ?? null
+                    : $request->input('kunci_jawaban'),
                 'urutan'        => $urutanBerikutnya,
             ]);
 
-            // Upload gambar soal jika ada
-            if ($request->hasFile('gambar_soal')) {
-                $soal->gambar_soal = $request->file('gambar_soal')->store('ist/soal', 'public');
-                $soal->save();
+            if ($tipeFormat === 'isian_teks' || $tipeFormat === 'isian_angka') {
+                // Tidak ada opsi jawaban
+                return;
             }
 
-            if ($format === 'Pilihan Ganda') {
-                $kunciHuruf = $request->input('kunci');
-                foreach ($validated['opsi'] as $huruf => $teks) {
-                    $opsi = OpsiJawaban::create([
-                        'soal_id'   => $soal->id,
-                        'teks_opsi' => $teks,
-                        'urutan'    => array_search($huruf, ['A','B','C','D'], true) + 1,
-                    ]);
-                    // Upload gambar opsi jika ada
-                    if ($request->hasFile("gambar_opsi.$huruf")) {
-                        $opsi->gambar_opsi = $request->file("gambar_opsi.$huruf")->store('ist/opsi', 'public');
-                        $opsi->save();
-                    }
-                }
-            } else {
-                // Skala Likert: teks_soal sudah di teks_soal; skor 1–5 mengikuti skala standar
-                for ($i = 1; $i <= 5; $i++) {
-                    OpsiJawaban::create([
-                        'soal_id'   => $soal->id,
-                        'teks_opsi' => 'Skala ' . $i,
-                        'urutan'    => $i,
-                    ]);
+            // Pilihan Ganda / Pilihan Gambar: simpan opsi
+            $hurufMap = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5];
+            foreach ($validated['opsi'] ?? [] as $huruf => $teks) {
+                $urutan = $hurufMap[$huruf] ?? 0;
+                if ($urutan === 0) continue;
+                $opsi = OpsiJawaban::create([
+                    'soal_id' => $soal->id,
+                    'teks_opsi' => $teks,
+                    'urutan' => $urutan,
+                ]);
+                if ($request->hasFile("gambar_opsi.$huruf")) {
+                    $opsi->gambar_opsi = $request->file("gambar_opsi.$huruf")->store('ist/opsi', 'public');
+                    $opsi->save();
                 }
             }
         });
 
         return redirect()
             ->route('admin.bank-soal.index', ['alat_tes_id' => $alatTes->id])
-            ->with('sukses', 'Soal berhasil ditambahkan.');
+            ->with($this::FLASH_SUCCESS, 'Soal berhasil ditambahkan.');
     }
 
     public function edit(int $id): View
@@ -213,14 +208,12 @@ class BankSoalController extends Controller
         $alatTes = $soal->alatTes;
         $format = $alatTes->format_dasar;
 
-        $rules = match ($format) {
-            'Forced Choice' => $this->forcedChoiceRules(),
-            'Grid'          => $this->gridRules(),
-            'Mixed'         => $this->mixedRules(),
-            default         => $this->pilihanAtauLikertRules(),
-        };
-
-        $validated = $request->validate($rules);
+        $rules = $this->soalRules($format);
+        $messages = $this->soalMessages($format);
+        $attributes = $this->soalAttributes($format);
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), $rules, $messages, $attributes);
+        $validator->validate();
+        $validated = $validator->validated();
 
         DB::transaction(function () use ($soal, $format, $validated, $request, $alatTes) {
             if ($format === 'Grid') {
@@ -279,15 +272,33 @@ class BankSoalController extends Controller
                 return;
             }
 
-            $soal->update([
-                'teks_soal'     => $validated['teks_soal'] ?? null,
-                'kunci_jawaban' => $validated['kunci_jawaban'] ?? $request->input('kunci_jawaban'),
-            ]);
+            if ($format === 'Mixed') {
+                $tipeFormat = $request->input('tipe_format', $soal->tipe_format);
+                $soal->update([
+                    'teks_soal'     => in_array($tipeFormat, ['isian_teks', 'isian_angka']) ? null : ($validated['teks_soal'] ?? null),
+                    'gambar_soal'   => $request->hasFile('gambar_soal')
+                        ? $request->file('gambar_soal')->store('ist/soal', 'public')
+                        : $soal->gambar_soal,
+                    'tipe_format'   => $tipeFormat,
+                    'kunci_jawaban' => in_array($tipeFormat, ['isian_teks', 'isian_angka'])
+                        ? ($validated['kunci_jawaban'] ?? null)
+                        : $request->input('kunci_jawaban'),
+                ]);
 
-            // Upload gambar soal jika ada
-            if ($request->hasFile('gambar_soal')) {
-                $soal->gambar_soal = $request->file('gambar_soal')->store('ist/soal', 'public');
-                $soal->save();
+                if (in_array($tipeFormat, ['isian_teks', 'isian_angka'])) {
+                    $soal->opsiJawaban()->delete();
+                    return;
+                }
+            } else {
+                $soal->update([
+                    'teks_soal'     => $validated['teks_soal'] ?? null,
+                    'kunci_jawaban' => $validated['kunci_jawaban'] ?? $request->input('kunci_jawaban'),
+                ]);
+
+                if ($request->hasFile('gambar_soal')) {
+                    $soal->gambar_soal = $request->file('gambar_soal')->store('ist/soal', 'public');
+                    $soal->save();
+                }
             }
 
             if ($format === 'Pilihan Ganda' || isset($validated['opsi'])) {
@@ -341,7 +352,7 @@ class BankSoalController extends Controller
 
         return redirect()
             ->route('admin.bank-soal.index', ['alat_tes_id' => $alatTes->id])
-            ->with('sukses', 'Soal berhasil diperbarui.');
+            ->with($this::FLASH_SUCCESS, 'Soal berhasil diperbarui.');
     }
 
     public function hapus(int $id): RedirectResponse
@@ -352,7 +363,7 @@ class BankSoalController extends Controller
 
         return redirect()
             ->route('admin.bank-soal.index', ['alat_tes_id' => $alatTesId])
-            ->with('sukses', 'Soal berhasil dihapus.');
+            ->with($this::FLASH_SUCCESS, 'Soal berhasil dihapus.');
     }
 
     /**
@@ -429,43 +440,87 @@ class BankSoalController extends Controller
         ];
     }
 
-    protected function forcedChoiceRules(): array
+    protected function soalRules(string $format): array
     {
-        return [
-            'pernyataan_a' => ['required', 'string'],
-            'dimensi_a'    => ['required', 'string', 'max:100'],
-            'pernyataan_b' => ['required', 'string'],
-            'dimensi_b'    => ['required', 'string', 'max:100'],
-        ];
+        return match ($format) {
+            'Grid'          => [
+                'teks_soal' => ['required', 'string'],
+            ],
+            'Forced Choice' => [
+                'pernyataan_a' => ['required', 'string'],
+                'dimensi_a'    => ['required', 'string', 'max:100'],
+                'pernyataan_b' => ['required', 'string'],
+                'dimensi_b'    => ['required', 'string', 'max:100'],
+            ],
+            'Mixed'         => [
+                'tipe_format'     => ['required', 'in:pilihan_ganda,pilihan_gambar,isian_teks,isian_angka'],
+                'teks_soal'       => ['required_if:tipe_format,pilihan_ganda,pilihan_gambar', 'nullable', 'string'],
+                'gambar_soal'     => ['nullable', 'image', 'max:2048'],
+                'kunci_jawaban'   => ['nullable', 'string', 'in:a,b,c,d,e'],
+                'opsi'            => ['nullable', 'array'],
+                'opsi.*'          => ['nullable', 'string', 'max:500'],
+                'gambar_opsi'     => ['nullable', 'array'],
+                'gambar_opsi.*'   => ['nullable', 'image', 'max:2048'],
+            ],
+            default         => [
+                'teks_soal' => ['required', 'string'],
+                'kunci'     => ['nullable', 'string', 'in:A,B,C,D'],
+                'opsi'      => ['required', 'array', 'min:2'],
+                'opsi.*'    => ['required', 'string'],
+            ],
+        };
     }
 
-    protected function gridRules(): array
+    protected function soalMessages(string $format): array
     {
-        return [
-            'teks_soal' => ['required', 'string'],
-        ];
+        $messages = match ($format) {
+            'Grid'          => ['teks_soal.required' => 'Pertanyaan wajib diisi.'],
+            'Forced Choice' => [
+                'pernyataan_a.required' => 'Pernyataan A wajib diisi.',
+                'dimensi_a.required'    => 'Dimensi A wajib dipilih.',
+                'pernyataan_b.required' => 'Pernyataan B wajib diisi.',
+                'dimensi_b.required'    => 'Dimensi B wajib dipilih.',
+            ],
+            'Mixed'         => [
+                'gambar_soal.image'     => 'File harus berupa gambar.',
+                'gambar_soal.max'       => 'Ukuran gambar maksimal 2 MB.',
+                'kunci_jawaban.in'      => 'Kunci jawaban harus a, b, c, d, atau e.',
+                'opsi.*.max'            => 'Setiap opsi maksimal 500 karakter.',
+                'gambar_opsi.*.image'   => 'File opsi harus berupa gambar.',
+                'gambar_opsi.*.max'     => 'Ukuran gambar opsi maksimal 2 MB.',
+            ],
+            default         => [
+                'teks_soal.required' => 'Pernyataan wajib diisi.',
+                'kunci.in'           => 'Kunci jawaban harus A, B, C, atau D.',
+                'opsi.required'      => 'Minimal satu opsi jawaban wajib diisi.',
+                'opsi.min'           => 'Minimal :min opsi jawaban.',
+                'opsi.*.required'    => 'Opsi jawaban wajib diisi.',
+            ],
+        };
+
+        return $messages;
     }
 
-    protected function pilihanAtauLikertRules(): array
+    protected function soalAttributes(string $format): array
     {
-        return [
-            'teks_soal' => ['required', 'string'],
-            'kunci'     => ['nullable', 'string', 'in:A,B,C,D'],
-            'opsi'      => ['required', 'array', 'min:2'],
-            'opsi.*'    => ['required', 'string'],
-        ];
-    }
+        $attributes = match ($format) {
+            'Grid'          => ['teks_soal' => 'pertanyaan'],
+            'Forced Choice' => [
+                'pernyataan_a' => 'pernyataan A',
+                'dimensi_a'    => 'dimensi A',
+                'pernyataan_b' => 'pernyataan B',
+                'dimensi_b'    => 'dimensi B',
+            ],
+            'Mixed'         => [
+                'teks_soal'     => 'pertanyaan',
+                'gambar_soal'   => 'gambar soal',
+                'kunci_jawaban' => 'kunci jawaban',
+                'opsi.*'        => 'opsi jawaban',
+                'gambar_opsi.*' => 'gambar opsi',
+            ],
+            default         => ['teks_soal' => 'pernyataan'],
+        };
 
-    protected function mixedRules(): array
-    {
-        return [
-            'teks_soal' => ['nullable', 'string'],
-            'gambar_soal' => ['nullable', 'image', 'max:2048'],
-            'kunci_jawaban' => ['nullable', 'string', 'in:a,b,c,d,e'],
-            'opsi'      => ['nullable', 'array'],
-            'opsi.*'    => ['nullable', 'string', 'max:500'],
-            'gambar_opsi' => ['nullable', 'array'],
-            'gambar_opsi.*' => ['nullable', 'image', 'max:2048'],
-        ];
+        return $attributes;
     }
 }

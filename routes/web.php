@@ -158,7 +158,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // =========================================
-    // ALAT TES (placeholder, data dummy hardcode)
+    // ALAT TES 
     // =========================================
     Route::prefix('admin/alat-tes')->name('admin.alat-tes.')->group(function () {
         Route::get('/', [AlatTesController::class, 'index'])->name('index');
@@ -176,15 +176,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/{id}/dimensi', [AlatTesController::class, 'simpanDimensi'])
             ->whereNumber('id')->name('simpanDimensi');
         Route::put('/{id}/dimensi/{dimensiId}', [AlatTesController::class, 'updateDimensi'])
-            ->whereNumber(['id','dimensiId'])->name('updateDimensi');
+            ->whereNumber(['id', 'dimensiId'])->name('updateDimensi');
         Route::delete('/{id}/dimensi/{dimensiId}', [AlatTesController::class, 'hapusDimensi'])
-            ->whereNumber(['id','dimensiId'])->name('hapusDimensi');
+            ->whereNumber(['id', 'dimensiId'])->name('hapusDimensi');
         Route::post('/{id}/dimensi/{dimensiId}/level', [AlatTesController::class, 'simpanLevel'])
-            ->whereNumber(['id','dimensiId'])->name('simpanLevel');
+            ->whereNumber(['id', 'dimensiId'])->name('simpanLevel');
     });
 
     // =========================================
-    // BANK SOAL (placeholder, data dummy hardcode)
+    // BANK SOAL
     // =========================================
     Route::prefix('admin/bank-soal')->name('admin.bank-soal.')->group(function () {
         Route::get('/', [BankSoalController::class, 'index'])->name('index');
@@ -206,7 +206,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/edit', [PenjadwalanTesController::class, 'edit'])->whereNumber('id')->name('edit');
         Route::put('/{id}', [PenjadwalanTesController::class, 'update'])->whereNumber('id')->name('update');
         Route::post('/{id}/peserta', [PenjadwalanTesController::class, 'tambahPeserta'])->whereNumber('id')->name('tambahPeserta');
-        Route::delete('/{id}/peserta/{userId}', [PenjadwalanTesController::class, 'hapusPeserta'])->whereNumber(['id','userId'])->name('hapusPeserta');
+        Route::delete('/{id}/peserta/{userId}', [PenjadwalanTesController::class, 'hapusPeserta'])->whereNumber(['id', 'userId'])->name('hapusPeserta');
         Route::delete('/{id}', [PenjadwalanTesController::class, 'hapus'])->whereNumber('id')->name('hapus');
     });
 
@@ -221,7 +221,7 @@ Route::middleware('auth')->group(function () {
 
     // =========================================
     // =========================================
-    // HASIL TES (baru)
+    // HASIL TES
     // =========================================
     Route::prefix('admin/hasil-tes')->name('admin.hasil-tes.')->group(function () {
         Route::get('/', [HasilTesController::class, 'index'])->name('index');

@@ -7,6 +7,7 @@ use App\Models\DataKaryawan;
 use App\Models\Peran;
 use App\Models\SesiTes;
 use App\Models\AlatTes;
+use App\Models\PesertaSesiTes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -229,6 +230,14 @@ class DashboardController extends Controller
 
         if (!$sesi) {
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
+        }
+
+        // Validasi: pastikan user login terdaftar sebagai peserta di sesi ini
+        $pesertaSesi = PesertaSesiTes::where('sesi_tes_id', $sesiId)
+            ->where('user_id', auth()->id())
+            ->exists();
+        if (!$pesertaSesi) {
+            return redirect()->route('peserta.dashboard')->with('error', 'Anda tidak memiliki akses ke sesi tes ini.');
         }
 
         if ($sesi->status === 'Draft') {

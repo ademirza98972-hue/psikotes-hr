@@ -14,7 +14,8 @@ class PerbaruiProfilRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'no_hp' => ['required', 'string', 'max:20'],
+            'no_hp'          => ['required', 'string', 'max:20'],
+            'tanggal_lahir'  => ['nullable', 'date'],
         ];
     }
 
@@ -29,7 +30,8 @@ class PerbaruiProfilRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'no_hp' => 'Nomor HP',
+            'no_hp'           => 'Nomor HP',
+            'tanggal_lahir'   => 'Tanggal Lahir',
         ];
     }
 }

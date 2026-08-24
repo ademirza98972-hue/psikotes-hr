@@ -180,6 +180,23 @@
                         @endif
                     @endif
 
+                    {{-- Tanggal Lahir --}}
+                    <div class="space-y-1.5">
+                        <label class="block text-[13px] font-medium text-[#191c1e] mb-1" for="tanggal_lahir">Tanggal Lahir</label>
+                        @php
+                            $profilKaryawan = $user->profilKaryawan;
+                            $profilKandidat = $user->profilKandidat;
+                            $existingTanggalLahir = $profilKaryawan?->tanggal_lahir ?? $profilKandidat?->tanggal_lahir;
+                        @endphp
+                        <input id="tanggal_lahir" name="tanggal_lahir" type="date"
+                               value="{{ old('tanggal_lahir', $existingTanggalLahir instanceof \Carbon\CarbonInterface ? $existingTanggalLahir->format('Y-m-d') : ($existingTanggalLahir ?? '')) }}"
+                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
+                        <p class="text-[11px] text-[#40484b] italic">Diperlukan untuk penentuan kelompok segmen pada tes IST.</p>
+                        @error('tanggal_lahir')
+                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     {{-- No HP - FIELD YANG BISA DIEDIT --}}
                     <div class="space-y-1.5">
                         <label class="block text-[13px] font-medium text-[#191c1e] mb-1" for="no_hp">No. HP</label>

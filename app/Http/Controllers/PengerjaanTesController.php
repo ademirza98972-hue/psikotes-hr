@@ -202,6 +202,19 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.dashboard')->with('error', 'Sesi tes tidak ditemukan.');
         }
 
+        // Validasi: tanggal_lahir wajib diisi apabila ada IST di sesi ini
+        $alatTesiAda = collect($sesi['daftar_alat_tes_ditugaskan'])->contains(fn(string $kode) => $kode === 'IST');
+        if ($alatTesiAda) {
+            $profilKaryawan = auth()->user()->profilKaryawan;
+            $profilKandidat = auth()->user()->profilKandidat;
+            $tanggalLahir   = $profilKaryawan?->tanggal_lahir ?? $profilKandidat?->tanggal_lahir;
+            if (!$tanggalLahir) {
+                return redirect()
+                    ->route('profil.index')
+                    ->with('warning', 'Tanggal lahir belum diisi. Silakan lengkapi profil terlebih dahulu sebelum mengerjakan tes IST.');
+            }
+        }
+
         $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
 

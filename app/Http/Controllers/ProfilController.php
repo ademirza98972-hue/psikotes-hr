@@ -30,6 +30,15 @@ class ProfilController extends Controller
         $user->no_hp = $request->input('no_hp');
         $user->save();
 
+        $tanggalLahir = $request->input('tanggal_lahir');
+        if ($tanggalLahir !== null) {
+            if ($user->tipe_akun === 'karyawan' && $user->profilKaryawan) {
+                $user->profilKaryawan->update(['tanggal_lahir' => $tanggalLahir]);
+            } elseif ($user->tipe_akun === 'kandidat' && $user->profilKandidat) {
+                $user->profilKandidat->update(['tanggal_lahir' => $tanggalLahir]);
+            }
+        }
+
         return redirect()
             ->route('profil.index')
             ->with('sukses', 'Data diri berhasil diperbarui.');

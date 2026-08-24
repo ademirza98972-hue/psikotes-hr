@@ -148,7 +148,8 @@ class PeranController extends Controller
             'pengguna' => 'Akun Karyawan & Kandidat',
             'pengguna_admin' => 'Admin & Staff',
             'peran' => 'Peran',
-            'soal' => 'Bank Soal & Alat Tes',
+            'soal' => 'Bank Soal, Alat Tes & Penjadwalan',
+            'master_data' => 'Data Departemen',
         ];
 
         return $peta[$prefix] ?? ucwords(str_replace('_', ' ', $prefix));

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SimpanCatatanHasilTesRequest;
 use App\Models\DimensiAlatTes;
 use App\Models\HasilKolomGrid;
 use App\Models\HasilSkorPeserta;
@@ -187,7 +188,7 @@ class HasilTesController extends Controller
         ));
     }
 
-    public function exportPdf(int $sesiId, int $pesertaId)
+    public function exportPdf(int $sesiId, int $pesertaId): \Symfony\Component\HttpFoundation\Response
     {
         extract($this->buildHasilTesData($sesiId, $pesertaId));
 
@@ -206,7 +207,7 @@ class HasilTesController extends Controller
         return $pdf->download($namaFile);
     }
 
-    public function printView(int $sesiId, int $pesertaId)
+    public function printView(int $sesiId, int $pesertaId): View
     {
         extract($this->buildHasilTesData($sesiId, $pesertaId));
         $papScores = $this->buildPapScores($hasilTes['hasil_alat_tes']);
@@ -264,11 +265,8 @@ class HasilTesController extends Controller
         return ['chart' => $chartData, 'hanker' => $hanker, 'titikTertinggi' => $titikTertinggi, 'titikTerendah' => $titikTerendah];
     }
 
-    public function simpanCatatan(Request $request, int $sesiId, int $pesertaId): RedirectResponse
+    public function simpanCatatan(SimpanCatatanHasilTesRequest $request, int $sesiId, int $pesertaId): RedirectResponse
     {
-        $request->validate([
-            'catatan_hr' => 'nullable|string|max:5000',
-        ]);
 
         PesertaSesiTes::where('sesi_tes_id', $sesiId)
             ->where('user_id', $pesertaId)

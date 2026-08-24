@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\PerbaruiPosisiRequest;
+use App\Http\Requests\SimpanPosisiRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Departemen;
 use App\Models\Posisi;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -41,13 +44,8 @@ class PosisiController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(SimpanPosisiRequest $request): RedirectResponse
     {
-        $request->validate([
-            'nama_posisi' => 'required|string|max:100',
-            'departemen_id' => 'required|exists:departemen,id',
-        ]);
-
         Posisi::updateOrCreate(
             ['nama_posisi' => $request->nama_posisi, 'departemen_id' => $request->departemen_id],
             ['nama_posisi' => $request->nama_posisi, 'departemen_id' => $request->departemen_id]
@@ -57,14 +55,9 @@ class PosisiController extends Controller
             ->with('sukses', 'Data posisi berhasil ditambahkan.');
     }
 
-    public function update(Request $request, Posisi $posisi): RedirectResponse
+    public function update(PerbaruiPosisiRequest $request, Posisi $posisi): RedirectResponse
     {
-        $request->validate([
-            'nama_posisi' => 'required|string|max:100',
-            'departemen_id' => 'required|exists:departemen,id',
-        ]);
-
-        $posisi->update($request->only('nama_posisi', 'departemen_id'));
+        $posisi->update($request->validated());
 
         return redirect()->route('admin.posisi.index')
             ->with('sukses', 'Data posisi berhasil diperbarui.');
@@ -82,7 +75,7 @@ class PosisiController extends Controller
             ->with('sukses', 'Data posisi berhasil dihapus.');
     }
 
-    public function daftarByDepartemen($departemenId)
+    public function daftarByDepartemen(int $departemenId): JsonResponse
     {
         $posisi = Posisi::where('departemen_id', $departemenId)
             ->orderBy('nama_posisi')

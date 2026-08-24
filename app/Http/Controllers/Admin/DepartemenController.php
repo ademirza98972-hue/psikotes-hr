@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\PerbaruiDepartemenRequest;
+use App\Http\Requests\SimpanDepartemenRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Departemen;
 use Illuminate\Contracts\Validation\Validator;
@@ -32,23 +34,9 @@ class DepartemenController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(SimpanDepartemenRequest $request): RedirectResponse
     {
-        $request->validate([
-            'nama_departemen' => [
-                'required',
-                'string',
-                'max:100',
-                function ($attribute, $value, $fail) {
-                    $exists = DB::table('departemen')
-                        ->where('nama_departemen', $value)
-                        ->exists();
-                    if ($exists) {
-                        $fail('Nama departemen sudah terdaftar atau pernah digunakan sebelumnya. Gunakan nama lain atau pulihkan dari Data Terhapus.');
-                    }
-                },
-            ],
-        ]);
+        Departemen::create($request->validated());
 
         Departemen::create($request->only('nama_departemen'));
 
@@ -56,27 +44,9 @@ class DepartemenController extends Controller
             ->with('sukses', 'Data departemen berhasil ditambahkan.');
     }
 
-    public function update(Request $request, Departemen $departemen): RedirectResponse
+    public function update(PerbaruiDepartemenRequest $request, Departemen $departemen): RedirectResponse
     {
-        $request->validate([
-            'nama_departemen' => [
-                'required',
-                'string',
-                'max:100',
-                function ($attribute, $value, $fail) use ($departemen) {
-                    $exists = DB::table('departemen')
-                        ->whereNull('deleted_at')
-                        ->where('nama_departemen', $value)
-                        ->where('id', '!=', $departemen->id)
-                        ->exists();
-                    if ($exists) {
-                        $fail('Nama departemen sudah terdaftar.');
-                    }
-                },
-            ],
-        ]);
-
-        $departemen->update($request->only('nama_departemen'));
+        $departemen->update($request->validated());
 
         return redirect()->route('admin.departemen.index')
             ->with('sukses', 'Data departemen berhasil diperbarui.');

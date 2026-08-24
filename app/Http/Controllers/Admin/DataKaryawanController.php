@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exports\DataKaryawanTemplateExport;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ImportDataKaryawanRequest;
 use App\Http\Requests\PerbaruiDataKaryawanRequest;
 use App\Http\Requests\SimpanDataKaryawanRequest;
 use App\Imports\DataKaryawanImport;
@@ -133,15 +134,8 @@ class DataKaryawanController extends Controller
             ->with('sukses', 'Data karyawan berhasil dihapus.');
     }
 
-    public function import(Request $request): RedirectResponse
+    public function import(ImportDataKaryawanRequest $request): RedirectResponse
     {
-        $request->validate([
-            'file_excel' => ['required', 'file', 'mimes:xlsx,xls', 'max:5120'],
-        ], [
-            'file_excel.required' => 'File Excel wajib dipilih.',
-            'file_excel.mimes'    => 'File harus berformat .xlsx atau .xls.',
-            'file_excel.max'      => 'Ukuran file maksimal 5 MB.',
-        ]);
 
         $import = new DataKaryawanImport();
 

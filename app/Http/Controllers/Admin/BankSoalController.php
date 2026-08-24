@@ -8,6 +8,7 @@ use App\Models\BobotOpsiDimensi;
 use App\Models\DimensiAlatTes;
 use App\Models\OpsiJawaban;
 use App\Models\Soal;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -71,7 +72,7 @@ class BankSoalController extends Controller
         return view('admin.bank-soal.tambah', compact('alatTes', 'dimensiList'));
     }
 
-    public function simpan(Request $request, int $alatTesId)
+    public function simpan(Request $request, int $alatTesId): RedirectResponse
     {
         $alatTes = AlatTes::findOrFail($alatTesId);
         $format = $alatTes->format_dasar;
@@ -206,7 +207,7 @@ class BankSoalController extends Controller
         return view('admin.bank-soal.edit', compact('soal', 'format', 'dimensiList'));
     }
 
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
         $soal = Soal::with('alatTes')->findOrFail($id);
         $alatTes = $soal->alatTes;
@@ -343,7 +344,7 @@ class BankSoalController extends Controller
             ->with('sukses', 'Soal berhasil diperbarui.');
     }
 
-    public function hapus(int $id)
+    public function hapus(int $id): RedirectResponse
     {
         $soal = Soal::findOrFail($id);
         $alatTesId = $soal->alat_tes_id;

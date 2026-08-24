@@ -7,10 +7,12 @@ use App\Http\Requests\PerbaruiAlatTesRequest;
 use App\Http\Requests\SimpanAlatTesRequest;
 use App\Http\Requests\SimpanDimensiAlatTesRequest;
 use App\Http\Requests\SimpanLevelDimensiRequest;
+use App\Http\Requests\UploadNormaAlatTesRequest;
 use App\Models\AlatTes;
 use App\Models\DimensiAlatTes;
 use App\Models\LevelDimensi;
 use App\Models\NormaKonversi;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -46,7 +48,7 @@ class AlatTesController extends Controller
         ]);
     }
 
-    public function simpan(SimpanAlatTesRequest $request)
+    public function simpan(SimpanAlatTesRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
@@ -78,7 +80,7 @@ class AlatTesController extends Controller
         ]);
     }
 
-    public function update(PerbaruiAlatTesRequest $request, int $id)
+    public function update(PerbaruiAlatTesRequest $request, int $id): RedirectResponse
     {
         $data = $request->validated();
 
@@ -100,7 +102,7 @@ class AlatTesController extends Controller
             ->with('sukses', "Alat tes '{$data['nama']}' berhasil diperbarui.");
     }
 
-    public function hapus(int $id)
+    public function hapus(int $id): RedirectResponse
     {
         $alatTes = AlatTes::findOrFail($id);
         $nama = $alatTes->nama;
@@ -111,7 +113,7 @@ class AlatTesController extends Controller
             ->with('sukses', "Alat tes '{$nama}' berhasil dihapus.");
     }
 
-    public function restore(int $id)
+    public function restore(int $id): RedirectResponse
     {
         $alatTes = AlatTes::withTrashed()->findOrFail($id);
         $nama = $alatTes->nama;
@@ -146,14 +148,9 @@ class AlatTesController extends Controller
         ));
     }
 
-    public function uploadNorma(Request $request, int $id)
+    public function uploadNorma(UploadNormaAlatTesRequest $request, int $id): RedirectResponse
     {
         $alatTes = AlatTes::findOrFail($id);
-
-        $request->validate([
-            'file_csv' => 'required|file|mimes:csv,txt|max:2048',
-            'hapus_lama' => 'boolean',
-        ]);
 
         $file = $request->file('file_csv');
         $baris = array_map('str_getcsv', file($file->getRealPath()));
@@ -228,7 +225,7 @@ class AlatTesController extends Controller
         return view('admin.alat-tes.dimensi', compact('alatTes', 'dimensi'));
     }
 
-    public function simpanDimensi(SimpanDimensiAlatTesRequest $request, int $id)
+    public function simpanDimensi(SimpanDimensiAlatTesRequest $request, int $id): RedirectResponse
     {
         AlatTes::findOrFail($id);
 
@@ -245,7 +242,7 @@ class AlatTesController extends Controller
             ->with('sukses', "Dimensi '{$data['nama_dimensi']}' berhasil ditambahkan.");
     }
 
-    public function updateDimensi(SimpanDimensiAlatTesRequest $request, int $id, int $dimensiId)
+    public function updateDimensi(SimpanDimensiAlatTesRequest $request, int $id, int $dimensiId): RedirectResponse
     {
         $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
             ->findOrFail($dimensiId);
@@ -259,7 +256,7 @@ class AlatTesController extends Controller
             ->with('sukses', "Dimensi '{$data['nama_dimensi']}' berhasil diupdate.");
     }
 
-    public function hapusDimensi(int $id, int $dimensiId)
+    public function hapusDimensi(int $id, int $dimensiId): RedirectResponse
     {
         $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
             ->findOrFail($dimensiId);
@@ -271,7 +268,7 @@ class AlatTesController extends Controller
             ->with('sukses', "Dimensi '{$nama}' berhasil dihapus.");
     }
 
-    public function simpanLevel(SimpanLevelDimensiRequest $request, int $id, int $dimensiId)
+    public function simpanLevel(SimpanLevelDimensiRequest $request, int $id, int $dimensiId): RedirectResponse
     {
         $dimensi = DimensiAlatTes::where('alat_tes_id', $id)
             ->findOrFail($dimensiId);

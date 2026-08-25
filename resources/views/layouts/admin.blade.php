@@ -283,11 +283,13 @@
                 @php
                     $jumlahTrash = (int) \App\Models\User::where('tipe_akun','karyawan')->onlyTrashed()->count()
                         + (int) \App\Models\User::where('tipe_akun','kandidat')->onlyTrashed()->count()
-                        + (int) \App\Models\User::where('tipe_akun','custom')->onlyTrashed()->count()
+                        + (int) \App\Models\User::where('tipe_akun','custom')->onlyTrashed()
+                            ->whereHas('peran', fn ($q) => $q->whereNotIn('nama_peran', ['Kandidat', 'Karyawan']))->count()
                         + (int) \App\Models\DataKaryawan::onlyTrashed()->count()
                         + (int) \App\Models\Departemen::onlyTrashed()->count()
                         + (int) \App\Models\Posisi::onlyTrashed()->count()
-                        + (int) \App\Models\Peran::onlyTrashed()->count();
+                        + (int) \App\Models\Peran::onlyTrashed()->count()
+                        + (int) \App\Models\AlatTes::onlyTrashed()->count();
                 @endphp
                 <a href="{{ route('admin.data-terhapus.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.data-terhapus.*') ? 'active' : '' }}">

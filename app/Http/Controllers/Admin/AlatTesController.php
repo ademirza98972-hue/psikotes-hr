@@ -14,6 +14,7 @@ use App\Models\LevelDimensi;
 use App\Models\NormaKonversi;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -106,6 +107,8 @@ class AlatTesController extends Controller
     {
         $alatTes = AlatTes::findOrFail($id);
         $nama = $alatTes->nama;
+        $alatTes->deleted_by = Auth::id();
+        $alatTes->save();
         $alatTes->delete();
 
         return redirect()

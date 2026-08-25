@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -128,6 +129,8 @@ class DataKaryawanController extends Controller
             return back()->with('error', 'NIK ini sudah dipakai untuk registrasi, tidak bisa dihapus. Hapus dulu akun user terkait jika ingin melepas NIK ini.');
         }
 
+        $data->deleted_by = Auth::id();
+        $data->save();
         $data->delete();
 
         return redirect()

@@ -252,6 +252,8 @@ class PenggunaController extends Controller
                 }
             }
 
+            $pengguna->deleted_by = Auth::id();
+            $pengguna->save();
             $pengguna->delete();
         });
 

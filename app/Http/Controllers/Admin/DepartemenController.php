@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Departemen;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class DepartemenController extends Controller
@@ -56,6 +57,8 @@ class DepartemenController extends Controller
             return redirect()->back()->with('error', 'Tidak dapat menghapus departemen yang masih memiliki posisi terkait.');
         }
 
+        $departemen->deleted_by = Auth::id();
+        $departemen->save();
         $departemen->delete();
 
         return redirect()->route('admin.departemen.index')

@@ -16,6 +16,11 @@ class Posisi extends Model
 
     protected $fillable = ['nama_posisi', 'departemen_id'];
 
+    public function deletedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+
     public function departemen(): BelongsTo
     {
         return $this->belongsTo(Departemen::class);

@@ -198,6 +198,8 @@ class DataKandidatController extends Controller
         }
 
         DB::transaction(function () use ($kandidat) {
+            $kandidat->deleted_by = Auth::id();
+            $kandidat->save();
             $kandidat->delete();
         });
 

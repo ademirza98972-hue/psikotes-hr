@@ -36,16 +36,17 @@ class DataTerhapusController extends Controller
     private function buatQuery(string $jenis): \Illuminate\Database\Eloquent\Builder
     {
         return match ($jenis) {
-            'karyawan' => User::where('tipe_akun', 'karyawan')->onlyTrashed(),
-            'kandidat' => User::where('tipe_akun', 'kandidat')->onlyTrashed(),
+            'karyawan' => User::where('tipe_akun', 'karyawan')->onlyTrashed()->with('deletedBy'),
+            'kandidat' => User::where('tipe_akun', 'kandidat')->onlyTrashed()->with('deletedBy'),
             'admin' => User::where('tipe_akun', 'custom')
                 ->onlyTrashed()
-                ->whereHas('peran', fn ($q) => $q->whereNotIn('nama_peran', ['Kandidat', 'Karyawan'])),
-            'data_karyawan' => DataKaryawan::onlyTrashed()->with(['departemen', 'posisi']),
-            'departemen' => Departemen::onlyTrashed()->withCount('posisi'),
-            'posisi' => Posisi::onlyTrashed()->with('departemen'),
-            'peran' => Peran::onlyTrashed()->withCount('pengguna'),
-            'alat_tes' => AlatTes::onlyTrashed()->orderBy('nama'),
+                ->whereHas('peran', fn ($q) => $q->whereNotIn('nama_peran', ['Kandidat', 'Karyawan']))
+                ->with('deletedBy'),
+            'data_karyawan' => DataKaryawan::onlyTrashed()->with(['departemen', 'posisi', 'deletedBy']),
+            'departemen' => Departemen::onlyTrashed()->withCount('posisi')->with('deletedBy'),
+            'posisi' => Posisi::onlyTrashed()->with(['departemen', 'deletedBy']),
+            'peran' => Peran::onlyTrashed()->withCount('pengguna')->with('deletedBy'),
+            'alat_tes' => AlatTes::onlyTrashed()->orderBy('nama')->with('deletedBy'),
             default => abort(404),
         };
     }

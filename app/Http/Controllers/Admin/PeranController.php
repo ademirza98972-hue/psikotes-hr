@@ -9,6 +9,7 @@ use App\Models\Izin;
 use App\Models\Peran;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class PeranController extends Controller
@@ -111,6 +112,8 @@ class PeranController extends Controller
             return back()->with('error', "Peran ini masih dipakai oleh {$peran->pengguna_count} pengguna, tidak dapat dihapus.");
         }
 
+        $peran->deleted_by = Auth::id();
+        $peran->save();
         $peran->delete();
 
         return redirect()

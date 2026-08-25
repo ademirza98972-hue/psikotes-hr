@@ -41,6 +41,11 @@ class User extends Authenticatable
         return $this->belongsTo(Peran::class, 'peran_id', 'id');
     }
 
+    public function deletedBy(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'deleted_by');
+    }
+
     public function profilKandidat(): HasOne
     {
         return $this->hasOne(ProfilKandidat::class, 'user_id', 'id');

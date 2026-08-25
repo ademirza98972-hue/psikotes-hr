@@ -12,6 +12,7 @@
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Nama Alat Tes</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Format Dasar</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Dihapus Pada</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Dihapus Oleh</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color: #7db8c2;">Aksi</th>
                     </tr>
                 </thead>
@@ -33,6 +34,9 @@
                                         <span class="text-label-sm text-on-surface-variant">({{ $item->deleted_at->diffForHumans() }})</span>
                                     @endif
                                 </div>
+                            </td>
+                            <td class="px-6 py-5 text-body-md text-on-surface-variant">
+                                {{ $item->deletedBy?->name ?? '-' }}
                             </td>
                             <td class="px-6 py-5 text-right">
                                 <div class="flex items-center justify-end gap-3">
@@ -56,7 +60,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-14 text-center">
+                            <td colspan="7" class="px-6 py-14 text-center">
                                 <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">delete_sweep</span>
                                 <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak Ada Data Terhapus</p>
                                 <p class="text-[12px] text-[#71787c]">Tidak ada alat tes yang dihapus.</p>

@@ -50,7 +50,7 @@ class DataTerhapusController extends Controller
         };
     }
 
-    public function index(?string $jenis = null): View
+    public function index(Request $request, ?string $jenis = null): View
     {
         $jenisAktif = $this->resolveJenis($request->query->get('jenis'));
 

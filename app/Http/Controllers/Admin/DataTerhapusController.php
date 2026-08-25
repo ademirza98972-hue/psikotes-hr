@@ -85,6 +85,15 @@ class DataTerhapusController extends Controller
         $item = $this->buatQuery($jenis)->findOrFail($id);
         $item->restore();
 
+        match ($jenis) {
+            'departemen' => $this->restoreChild(Posisi::class, 'departemen_id', $item->id),
+            'karyawan'   => $this->restoreChild(ProfilKaryawan::class, 'user_id', $item->id),
+            'admin'      => $this->restoreChild(ProfilKaryawan::class, 'user_id', $item->id),
+            'kandidat'   => $this->restoreChild(ProfilKaryawan::class, 'user_id', $item->id),
+            'peran'      => $this->restoreChild(User::class, 'peran_id', $item->id),
+            default      => null,
+        };
+
         if ($jenis === 'karyawan') {
             $profil = ProfilKaryawan::where('user_id', $item->id)->first();
             if ($profil) {
@@ -97,6 +106,14 @@ class DataTerhapusController extends Controller
         return redirect()
             ->route('admin.data-terhapus.index', ['jenis' => $jenis])
             ->with($this::FLASH_SUCCESS, "{$label} berhasil dipulihkan.");
+    }
+
+    /** Restore all soft-deleted children of the given parent record. */
+    private function restoreChild(string $model, string $fk, int $parentId): void
+    {
+        (new $model())->where($fk, $parentId)
+            ->onlyTrashed()
+            ->restore();
     }
 
     public function hapusPermanen(string $jenis, int $id): RedirectResponse

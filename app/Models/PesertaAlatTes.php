@@ -16,11 +16,15 @@ class PesertaAlatTes extends Model
         'peserta_sesi_tes_id',
         'alat_tes_id',
         'waktu_mulai_kolom',
+        'waktu_mulai_sesi',
+        'waktu_mulai_subtes',
         'kolom_ke',
     ];
 
     protected $casts = [
-        'waktu_mulai_kolom' => 'datetime',
+        'waktu_mulai_kolom'  => 'datetime',
+        'waktu_mulai_sesi'   => 'datetime',
+        'waktu_mulai_subtes' => 'datetime',
     ];
 
     public function pesertaSesiTes(): BelongsTo

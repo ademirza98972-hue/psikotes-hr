@@ -487,12 +487,35 @@ class PengerjaanTesController extends Controller
                 ->first();
             $durasiSubtes = $dimensiSubtes?->durasi_detik ?? 420;
 
+            // IST subtes timer: session is primary, DB is crash-recovery fallback only.
+            // Session is lost on refresh, so if missing we check DB timestamp.
+            // After recovery, DB record is cleared so subsequent requests create fresh.
+            $pesertaAlatTes = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
+                ->where('alat_tes_id', $alatTesSaat->id)
+                ->first();
             $timerKey = $this->sessionKey($sesiId, "timer_subtes_{$kodeSubtesTimer}");
             $waktuMulaiSubtes = Session::get($timerKey);
 
+            // Crash recovery: read from DB only when session is empty
+            $recoveredFromDb = false;
+            if (!$waktuMulaiSubtes && $pesertaAlatTes && $pesertaAlatTes->waktu_mulai_subtes) {
+                $waktuMulaiSubtes = $pesertaAlatTes->waktu_mulai_subtes->timestamp;
+                $recoveredFromDb = true;
+            }
+
+            // Fresh start: no session and no DB record
             if (!$waktuMulaiSubtes) {
-                Session::put($timerKey, now()->timestamp);
                 $waktuMulaiSubtes = now()->timestamp;
+                if ($pesertaAlatTes) {
+                    $pesertaAlatTes->update(['waktu_mulai_subtes' => now()]);
+                }
+            }
+
+            Session::put($timerKey, $waktuMulaiSubtes);
+
+            // Clear DB after recovery so next request starts fresh
+            if ($recoveredFromDb && $pesertaAlatTes) {
+                $pesertaAlatTes->update(['waktu_mulai_subtes' => null]);
             }
 
             $sisaWaktuDetik = max(0, $durasiSubtes - (now()->timestamp - $waktuMulaiSubtes));
@@ -535,12 +558,24 @@ class PengerjaanTesController extends Controller
             $durasiSesiDetik = $durasiMenit * 60;
 
             if ($durasiSesiDetik > 0) {
-                $timerSesiKey = $this->sessionKey($sesiId, 'timer_sesi_' . $kodeAlatTesAktif);
-                $waktuMulaiSesi = Session::get($timerSesiKey);
+                // Prefer DB-persisted sesi start time; fall back to session
+                $pesertaAlatTesSesi = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
+                    ->where('alat_tes_id', $alatTesAktif->id)
+                    ->first();
+                $waktuMulaiSesi = null;
 
-                if (!$waktuMulaiSesi) {
-                    Session::put($timerSesiKey, now()->timestamp);
-                    $waktuMulaiSesi = now()->timestamp;
+                if ($pesertaAlatTesSesi && $pesertaAlatTesSesi->waktu_mulai_sesi) {
+                    $waktuMulaiSesi = $pesertaAlatTesSesi->waktu_mulai_sesi->timestamp;
+                } else {
+                    $timerSesiKey = $this->sessionKey($sesiId, 'timer_sesi_' . $kodeAlatTesAktif);
+                    $waktuMulaiSesi = Session::get($timerSesiKey);
+                    if (!$waktuMulaiSesi) {
+                        $waktuMulaiSesi = now()->timestamp;
+                        Session::put($timerSesiKey, $waktuMulaiSesi);
+                        if ($pesertaAlatTesSesi) {
+                            $pesertaAlatTesSesi->update(['waktu_mulai_sesi' => now()]);
+                        }
+                    }
                 }
 
                 $sisaWaktuSesiDetik = max(0, $durasiSesiDetik - (now()->timestamp - $waktuMulaiSesi));

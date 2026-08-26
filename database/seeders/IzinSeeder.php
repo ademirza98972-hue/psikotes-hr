@@ -26,7 +26,8 @@ class IzinSeeder extends Seeder
             ['kode_izin' => 'peran.kelola', 'deskripsi' => 'Kelola Peran'],
             ['kode_izin' => 'data_karyawan.kelola', 'deskripsi' => 'Kelola Data Karyawan'],
             ['kode_izin' => 'pengguna_admin.kelola', 'deskripsi' => 'Kelola Admin & Staff'],
-            ['kode_izin' => 'master_data.kelola', 'deskripsi' => 'Kelola Master Data Departemen & Posisi'],
+            ['kode_izin' => 'departemen.kelola', 'deskripsi' => 'Kelola Data Departemen'],
+            ['kode_izin' => 'posisi.kelola',      'deskripsi' => 'Kelola Data Posisi'],
             ['kode_izin' => 'data_terhapus.kelola', 'deskripsi' => 'Kelola Data Terhapus'],
             ['kode_izin' => 'hasil_tes.lihat_sensitif', 'deskripsi' => 'Lihat Hasil Tes Sensitif (MMPI-2)'],
         ];

@@ -41,7 +41,7 @@
             </div>
 
             @auth
-                @if(auth()->user()->hasIzin('master_data.kelola'))
+                @if(auth()->user()->hasIzin('posisi.kelola'))
                     <button type="button" @click="openModal()"
                             class="self-start rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1a4550] transition whitespace-nowrap">
                         + Tambah Posisi
@@ -72,7 +72,7 @@
                             <td class="px-4 py-3 text-right">
                                 <div class="inline-flex justify-end gap-2">
                                     @auth
-                                        @if(auth()->user()->hasIzin('master_data.kelola'))
+                                        @if(auth()->user()->hasIzin('posisi.kelola'))
                                             <button type="button"
                                                     @click="openModal({{ $item->id }}, '{{ addslashes($item->nama_posisi) }}', {{ $item->departemen_id ?? 'null' }})"
                                                     class="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">Ubah</button>
@@ -100,7 +100,7 @@
                                     <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Data Posisi</p>
                                     <p class="text-[12px] text-[#71787c] mb-4">Tambahkan posisi jabatan untuk melengkapi data organisasi.</p>
                                     @auth
-                                        @if(auth()->user()->hasIzin('master_data.kelola'))
+                                        @if(auth()->user()->hasIzin('posisi.kelola'))
                                             <button type="button" @click="openModal()" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
                                                 <span class="material-symbols-outlined text-[16px]">add</span>
                                                 Tambah Posisi

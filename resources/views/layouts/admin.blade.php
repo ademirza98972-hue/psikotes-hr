@@ -249,7 +249,7 @@
             @endif
             @endif
 
-            @if(auth()->user()->hasIzin('peran.kelola') || auth()->user()->hasIzin('pengguna_admin.kelola') || auth()->user()->hasIzin('master_data.kelola') || auth()->user()->hasIzin('data_terhapus.kelola'))
+            @if(auth()->user()->hasIzin('peran.kelola') || auth()->user()->hasIzin('pengguna_admin.kelola') || auth()->user()->hasIzin('departemen.kelola') || auth()->user()->hasIzin('posisi.kelola') || auth()->user()->hasIzin('data_terhapus.kelola'))
             <div class="nav-divider"></div>
 
             {{-- SYSTEM --}}
@@ -271,13 +271,15 @@
                 </a>
             @endif
 
-            @if(auth()->user()->hasIzin('master_data.kelola'))
+            @if(auth()->user()->hasIzin('departemen.kelola'))
                 <a href="{{ route('admin.departemen.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.departemen.*') ? 'active' : '' }}">
                     <span class="material-symbols-outlined text-[20px]">apartment</span>
                     <span>Data Departemen</span>
                 </a>
+            @endif
 
+            @if(auth()->user()->hasIzin('posisi.kelola'))
                 <a href="{{ route('admin.posisi.index') }}"
                    class="sidebar-link {{ request()->routeIs('admin.posisi.*') ? 'active' : '' }}">
                     <span class="material-symbols-outlined text-[20px]">badge</span>

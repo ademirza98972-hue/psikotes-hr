@@ -193,7 +193,8 @@ class AutentikasiController extends Controller
             'hasil_tes.lihat'       => 'admin.hasil-tes.index',
             'peran.kelola'          => 'admin.peran.index',
             'pengguna_admin.kelola' => 'admin.pengguna-admin.index',
-            'master_data.kelola'    => 'admin.departemen.index',
+            'departemen.kelola'   => 'admin.departemen.index',
+            'posisi.kelola'       => 'admin.posisi.index',
             'data_terhapus.kelola'  => 'admin.data-terhapus.index',
         ];
 

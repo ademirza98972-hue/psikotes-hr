@@ -115,7 +115,7 @@ Route::middleware('auth')->group(function () {
     // =========================================
     // DEPARTEMEN (standalone)
     // =========================================
-    Route::prefix('admin/departemen')->name('admin.departemen.')->middleware('izin:master_data.kelola')->group(function () {
+    Route::prefix('admin/departemen')->name('admin.departemen.')->middleware('izin:departemen.kelola')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\DepartemenController::class, 'index'])->name('index');
         Route::post('/', [\App\Http\Controllers\Admin\DepartemenController::class, 'store'])->name('store');
         Route::patch('/{departemen}', [\App\Http\Controllers\Admin\DepartemenController::class, 'update'])->name('update');
@@ -125,7 +125,7 @@ Route::middleware('auth')->group(function () {
     // =========================================
     // POSISI (standalone)
     // =========================================
-    Route::prefix('admin/posisi')->name('admin.posisi.')->middleware('izin:master_data.kelola')->group(function () {
+    Route::prefix('admin/posisi')->name('admin.posisi.')->middleware('izin:posisi.kelola')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\PosisiController::class, 'index'])->name('index');
         Route::post('/', [\App\Http\Controllers\Admin\PosisiController::class, 'store'])->name('store');
         Route::patch('/{posisi}', [\App\Http\Controllers\Admin\PosisiController::class, 'update'])->name('update');

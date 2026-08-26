@@ -20,7 +20,7 @@
                 <p class="text-xs text-slate-500">Batas maksimal 100 karakter.</p>
             </div>
 
-            @can('master_data.kelola')
+            @can('departemen.kelola')
                 <button @click="openTambahDepartemen()"
                         class="rounded-md bg-[#2C5F6F] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#234853]">
                     + Tambah
@@ -61,7 +61,7 @@
                                 <td class="px-4 py-3">{{ $item->nama_departemen }}</td>
                                 <td class="px-4 py-3">{{ $item->posisi_count }}</td>
                                 <td class="px-4 py-3 text-right">
-                                    @can('master_data.kelola')
+                                    @can('departemen.kelola')
                                         <button type="button"
                                                 @click='openEditDepartemen({{ $item->id }})'
                                                 class="text-indigo-600 hover:text-indigo-700">Edit</button>
@@ -92,7 +92,7 @@
                 <p class="text-xs text-slate-500">Batas maksimal 100 karakter.</p>
             </div>
 
-            @can('master_data.kelola')
+            @can('posisi.kelola')
                 <button @click="openTambahPosisi()"
                         class="rounded-md bg-[#2C5F6F] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#234853]">
                     + Tambah
@@ -133,7 +133,7 @@
                                 <td class="px-4 py-3">{{ $item->nama_posisi }}</td>
                                 <td class="px-4 py-3">{{ $item->departemen->nama_departemen ?? '-' }}</td>
                                 <td class="px-4 py-3 text-right">
-                                    @can('master_data.kelola')
+                                    @can('posisi.kelola')
                                         <button type="button"
                                                 @click='openEditPosisi({{ $item->id }})'
                                                 class="text-indigo-600 hover:text-indigo-700">Edit</button>

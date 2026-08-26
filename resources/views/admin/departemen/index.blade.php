@@ -34,7 +34,7 @@
             </div>
 
             @auth
-                @if(auth()->user()->hasIzin('master_data.kelola'))
+                @if(auth()->user()->hasIzin('departemen.kelola'))
                     <button type="button" @click="openModal('tambah')"
                             class="rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap">
                         <span class="material-symbols-outlined text-[18px]">add</span>
@@ -70,7 +70,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="inline-flex justify-end gap-2">
                                     @auth
-                                        @if(auth()->user()->hasIzin('master_data.kelola'))
+                                        @if(auth()->user()->hasIzin('departemen.kelola'))
                                             <button type="button"
                                                     @click="openModal('edit', {{ $item->id }}, '{{ addslashes($item->nama_departemen) }}')"
                                                     class="inline-flex items-center gap-1 rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-all active:scale-95">
@@ -104,7 +104,7 @@
                                     <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Data Departemen</p>
                                     <p class="text-[12px] text-[#71787c] mb-4">Tambahkan departemen untuk mulai mengelola organisasi.</p>
                                     @auth
-                                        @if(auth()->user()->hasIzin('master_data.kelola'))
+                                        @if(auth()->user()->hasIzin('departemen.kelola'))
                                             <button type="button" @click="openModal('tambah')" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
                                                 <span class="material-symbols-outlined text-[16px]">add</span>
                                                 Tambah Departemen

@@ -3,6 +3,7 @@
 use App\Http\Middleware\CekIzin;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use App\Console\Commands\PurgeSoftDeletes;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -33,6 +34,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'izin' => CekIzin::class,
         ]);
+    })
+    ->withSchedule(function ($schedule): void {
+        $schedule->command(PurgeSoftDeletes::class)
+            ->dailyAt('03:00')
+            ->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

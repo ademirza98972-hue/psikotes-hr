@@ -66,10 +66,10 @@
                     </div>
                     <div>
                         <label for="posisi" class="block text-[13px] font-medium text-[#191c1e] mb-1">
-                            Jabatan <span class="text-[#40484b] font-normal">(opsional)</span>
+                            Jabatan <span class="text-rose-500 font-normal">*</span>
                         </label>
-                        <select id="posisi" name="posisi_id"
-                                class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                        <select id="posisi" name="posisi_id" required
+                                class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer @error('posisi_id') border-rose-400 @enderror">
                             <option value="">-- Pilih Jabatan --</option>
                             @foreach($posisi as $item)
                                 <option value="{{ $item->id }}" @if(old('posisi_id', $data->posisi_id) == $item->id) selected @endif>{{ $item->nama_posisi }}</option>

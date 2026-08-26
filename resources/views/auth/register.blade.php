@@ -282,13 +282,14 @@
             </div>
 
             <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="posisi_karyawan">Posisi</label>
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="posisi_karyawan">Posisi <span class="text-rose-600">*</span></label>
                 <div class="relative">
                     <select
                         id="posisi_karyawan"
                         name="posisi_karyawan"
                         :disabled="tipe !== 'karyawan' || departemenId === ''"
-                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none"
+                        :required="tipe === 'karyawan'"
+                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none @error('posisi_karyawan') border-rose-500 @else border-surface-variant @enderror"
                     >
                         <option value="">-- Pilih Posisi --</option>
                         <template x-for="p in karyawanPosisi" :key="p.id">
@@ -298,6 +299,9 @@
                     <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
                 </div>
                 <p class="font-body text-xs text-on-surface-variant mt-1" x-show="departemenId === ''">Pilih departemen terlebih dahulu untuk melihat posisi.</p>
+                @error('posisi_karyawan')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="space-y-1.5">

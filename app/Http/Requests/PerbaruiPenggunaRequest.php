@@ -45,7 +45,7 @@ class PerbaruiPenggunaRequest extends FormRequest
         } elseif ($tipe === 'karyawan') {
             $aturan['nama_karyawan'] = ['required', 'string', 'max:255'];
             $aturan['departemen'] = ['required', 'integer', 'exists:departemen,id'];
-            $aturan['jabatan'] = ['nullable', 'integer', 'exists:posisi,id'];
+            $aturan['jabatan'] = ['required', 'integer', 'exists:posisi,id'];
             $aturan['tanggal_lahir'] = ['nullable', 'date'];
         }
 

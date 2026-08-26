@@ -23,7 +23,10 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
             $nama = trim((string) ($row['nama_karyawan'] ?? ''));
             $namaDept = trim((string) ($row['departemen'] ?? ''));
 
-            if ($nik === '' || $nama === '' || $namaDept === '') {
+            $jenisKelamin = $this->normalizeJenisKelamin($row['jenis_kelamin'] ?? null);
+            $namaJabatan = trim((string) ($row['jabatan'] ?? ''));
+
+            if ($nik === '' || $nama === '' || $namaDept === '' || $namaJabatan === '') {
                 $this->dilewati++;
                 continue;
             }
@@ -32,9 +35,6 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
                 $this->duplikat[] = $nik;
                 continue;
             }
-
-            $jenisKelamin = $this->normalizeJenisKelamin($row['jenis_kelamin'] ?? null);
-            $namaJabatan = trim((string) ($row['jabatan'] ?? ''));
 
             $departemen = Departemen::firstOrCreate(
                 ['nama_departemen' => $namaDept]
@@ -52,7 +52,7 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
                 'nama_karyawan' => $nama,
                 'jenis_kelamin' => $jenisKelamin,
                 'departemen'    => $namaDept,
-                'jabatan'       => $namaJabatan ?: null,
+                'jabatan'       => $namaJabatan,
                 'departemen_id' => $departemen->id,
                 'posisi_id'     => $posisi?->id,
                 'status'        => 'belum_terpakai',

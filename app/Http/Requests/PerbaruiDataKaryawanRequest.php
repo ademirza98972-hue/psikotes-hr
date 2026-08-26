@@ -41,7 +41,7 @@ class PerbaruiDataKaryawanRequest extends FormRequest
                 },
             ],
             'posisi_id' => [
-                'nullable',
+                'required',
                 'integer',
                 function ($attribute, $value, $fail) {
                     if (! DB::table('posisi')
@@ -53,7 +53,7 @@ class PerbaruiDataKaryawanRequest extends FormRequest
                 },
             ],
             'departemen' => ['required', 'string', 'max:255'],
-            'jabatan' => ['nullable', 'string', 'max:255'],
+            'jabatan' => ['required', 'string', 'max:255'],
         ];
     }
 

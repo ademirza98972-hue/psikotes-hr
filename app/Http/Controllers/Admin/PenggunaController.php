@@ -110,11 +110,8 @@ class PenggunaController extends Controller
                 ]);
 
                 $departemen = Departemen::findOrFail($data['departemen']);
-                $jabatanNama = null;
-                if (!empty($data['jabatan'])) {
-                    $jabatan = Posisi::find($data['jabatan']);
-                    $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
-                }
+                $jabatan = Posisi::find($data['jabatan']);
+                $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
 
                 $dataMaster = DataKaryawan::where('nik_karyawan', $data['nik_karyawan'])
                     ->lockForUpdate()
@@ -203,13 +200,8 @@ class PenggunaController extends Controller
                 $departemenId = $data['departemen']
                     ?? Departemen::where('nama_departemen', $profil->departemen)->value('id');
                 $departemen = Departemen::findOrFail($departemenId);
-                $jabatanNama = null;
-                if (!empty($data['jabatan'])) {
-                    $jabatan = Posisi::find($data['jabatan']);
-                    $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
-                } elseif ($profil->jabatan) {
-                    $jabatanNama = $profil->jabatan;
-                }
+                $jabatan = Posisi::find($data['jabatan']);
+                $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
 
                 $profil->update([
                     'nama_karyawan' => $data['nama_karyawan'] ?? $pengguna->name,

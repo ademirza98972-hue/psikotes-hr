@@ -55,14 +55,13 @@ class SimpanPenggunaRequest extends FormRequest
                 },
             ],
             'jabatan' => [
-                'nullable',
+                'required',
                 'integer',
                 function ($attribute, $value, $fail) {
-                    if (null !== $value
-                        && ! DB::table('posisi')
-                            ->whereNull('deleted_at')
-                            ->where('id', $value)
-                            ->exists()) {
+                    if (! DB::table('posisi')
+                        ->whereNull('deleted_at')
+                        ->where('id', $value)
+                        ->exists()) {
                         $fail(':attribute tidak valid.');
                     }
                 },

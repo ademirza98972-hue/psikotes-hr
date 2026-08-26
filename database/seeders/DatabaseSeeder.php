@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             KraepelinSeeder::class,
             KraepelinSoalSeeder::class,
             KraepelinLevelSeeder::class,
+            ISTSeeder::class,
         ]);
     }
 }

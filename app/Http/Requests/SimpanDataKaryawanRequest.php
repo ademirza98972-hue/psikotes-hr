@@ -35,7 +35,7 @@ class SimpanDataKaryawanRequest extends FormRequest
                 },
             ],
             'posisi_id' => [
-                'nullable',
+                'required',
                 'integer',
                 function ($attribute, $value, $fail) {
                     if (!\Illuminate\Support\Facades\DB::table('posisi')
@@ -47,7 +47,7 @@ class SimpanDataKaryawanRequest extends FormRequest
                 },
             ],
             'departemen' => ['required', 'string', 'max:255'],
-            'jabatan' => ['nullable', 'string', 'max:255'],
+            'jabatan' => ['required', 'string', 'max:255'],
         ];
     }
 

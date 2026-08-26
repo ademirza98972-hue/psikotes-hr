@@ -37,8 +37,6 @@ class DepartemenController extends Controller
     {
         Departemen::create($request->validated());
 
-        Departemen::create($request->only('nama_departemen'));
-
         return redirect()->route('admin.departemen.index')
             ->with($this::FLASH_SUCCESS, 'Data departemen berhasil ditambahkan.');
     }

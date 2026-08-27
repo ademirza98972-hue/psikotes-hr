@@ -22,6 +22,7 @@ class SimpanDataKaryawanRequest extends FormRequest
             ],
             'nama_karyawan' => ['required', 'string', 'max:255'],
             'jenis_kelamin' => ['required', 'in:L,P'],
+            'tanggal_lahir' => ['required', 'date'],
             'departemen_id' => [
                 'required',
                 'integer',
@@ -68,6 +69,7 @@ class SimpanDataKaryawanRequest extends FormRequest
             'nik_karyawan' => 'NIK',
             'nama_karyawan' => 'nama karyawan',
             'jenis_kelamin' => 'jenis kelamin',
+            'tanggal_lahir' => 'tanggal lahir',
             'departemen_id' => 'departemen',
             'posisi_id' => 'jabatan',
             'departemen' => 'departemen',

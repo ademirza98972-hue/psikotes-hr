@@ -151,7 +151,7 @@ class AutentikasiController extends Controller
                     'nik_karyawan' => $dataMaster->nik_karyawan,
                     'departemen' => $dataMaster->departemen,
                     'jabatan' => $dataMaster->jabatan,
-                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
+                    'tanggal_lahir' => $dataMaster->tanggal_lahir,
                 ]);
 
                 $dataMaster->update(['status' => 'sudah_terpakai']);

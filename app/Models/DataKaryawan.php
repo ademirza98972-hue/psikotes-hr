@@ -18,6 +18,7 @@ class DataKaryawan extends Model
         'nik_karyawan',
         'nama_karyawan',
         'jenis_kelamin',
+        'tanggal_lahir',
         'departemen',
         'jabatan',
         'status',

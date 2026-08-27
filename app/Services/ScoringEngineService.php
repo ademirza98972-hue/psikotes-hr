@@ -142,7 +142,13 @@ class ScoringEngineService
                         }
                     } elseif (in_array($soal->tipe_format, ['isian_teks', 'isian_angka'])) {
                         $jawabanPeserta = strtolower(trim($jaw->jawaban_teks ?? ''));
-                        if ($jawabanPeserta === $kunciJawaban) {
+                        $kunciArr = json_decode($soal->kunci_jawaban ?? '', true);
+                        if (is_array($kunciArr)) {
+                            $semua = array_map('strtolower', array_merge($kunciArr['2'] ?? [], $kunciArr['1'] ?? []));
+                            if (in_array($jawabanPeserta, $semua)) {
+                                $benar++;
+                            }
+                        } elseif ($jawabanPeserta === $kunciJawaban) {
                             $benar++;
                         }
                     }

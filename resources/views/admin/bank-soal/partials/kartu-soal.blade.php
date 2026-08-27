@@ -157,8 +157,18 @@
                 @endforeach
             </ul>
         @elseif (in_array($tipeFormat, ['isian_teks', 'isian_angka']))
-            <div class="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-sm text-slate-600">
-                Jawaban: <strong>{{ $soal['kunci_jawaban'] ?? '-' }}</strong>
+            @php
+                $kunciRaw = $soal['kunci_jawaban'] ?? '-';
+                $isGEKartu = isset($soal['nomor']) && $soal['nomor'] >= 61 && $soal['nomor'] <= 76;
+                $geKunci = $isGEKartu ? json_decode($kunciRaw, true) : null;
+            @endphp
+            <div class="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-sm text-slate-600 space-y-1">
+                @if($isGEKartu && is_array($geKunci))
+                    <div><span class="text-slate-400">2 poin:</span> <strong>{{ implode(', ', $geKunci['2'] ?? []) ?: '-' }}</strong></div>
+                    <div><span class="text-slate-400">1 poin:</span> <strong>{{ implode(', ', $geKunci['1'] ?? []) ?: '-' }}</strong></div>
+                @else
+                    Jawaban: <strong>{{ $kunciRaw }}</strong>
+                @endif
             </div>
         @endif
     @endif

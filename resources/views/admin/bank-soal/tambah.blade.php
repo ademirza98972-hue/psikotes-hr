@@ -183,11 +183,25 @@
 
             {{-- Section: kunci jawaban untuk isian --}}
             <div id="section_kunci_isian" class="hidden">
-                <div>
+                <div id="section_kunci_teks" class="hidden space-y-3">
+                    <p class="text-xs text-slate-500">Pisahkan beberapa jawaban dengan koma. Isi 1 poin jika ada jawaban yang kurang tepat tapi masih diterima.</p>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Jawaban benar (2 poin)</label>
+                        <input type="text" id="ge_2poin" placeholder="simbol, lambang, tanda"
+                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Jawaban kurang tepat (1 poin) <span class="text-slate-400 font-normal">— opsional</span></label>
+                        <input type="text" id="ge_1poin" placeholder="nama, tanda pengenal"
+                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                    </div>
+                    <input type="hidden" name="kunci_jawaban" id="ge_kunci_hidden">
+                </div>
+                <div id="section_kunci_angka" class="hidden">
                     <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
-                    <input type="text" name="kunci_jawaban" value="{{ old('kunci_jawaban') }}"
+                    <input type="text" id="kunci_jawaban_input" name="kunci_jawaban" value="{{ old('kunci_jawaban') }}"
                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
-                           placeholder="Kunci jawaban">
+                           placeholder="Jawaban angka, contoh: 35">
                 </div>
             </div>
 
@@ -233,6 +247,12 @@
 
                     var teksSoal = document.getElementById('teks_soal');
                     if (teksSoal) teksSoal.required = showOpsi;
+
+                    if (showKunci) {
+                        var isTeks = (val === 'isian_teks');
+                        document.getElementById('section_kunci_teks').classList.toggle('hidden', !isTeks);
+                        document.getElementById('section_kunci_angka').classList.toggle('hidden', isTeks);
+                    }
                 });
                 document.getElementById('tipe_format').dispatchEvent(new Event('change'));
             </script>
@@ -242,6 +262,16 @@
             <a href="{{ route('admin.bank-soal.index', ['alat_tes_id' => $alatTes->id]) }}" class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</a>
             <button type="submit" class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853]">Simpan</button>
         </div>
+
+        <script>
+        document.querySelector('form').addEventListener('submit', function() {
+            var hidden = document.getElementById('ge_kunci_hidden');
+            if (hidden && !document.getElementById('section_kunci_teks').classList.contains('hidden')) {
+                var split = function(v) { return v.split(',').map(s => s.trim()).filter(Boolean); };
+                hidden.value = JSON.stringify({'2': split(document.getElementById('ge_2poin').value), '1': split(document.getElementById('ge_1poin').value)});
+            }
+        });
+        </script>
     </form>
 </div>
 @endsection

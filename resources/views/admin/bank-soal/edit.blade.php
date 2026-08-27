@@ -178,7 +178,8 @@
                               placeholder="{{ $tipeFormat === 'isian_teks' || $tipeFormat === 'isian_angka' ? 'Isi teks soal (opsional untuk soal isian)' : '' }}">{{ old('teks_soal', $soal->teks_soal) }}</textarea>
                 </div>
 
-                {{-- Upload Gambar Soal --}}
+                {{-- Upload Gambar Soal: hanya untuk pilihan_gambar --}}
+                @if ($tipeFormat === 'pilihan_gambar')
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Gambar Soal</label>
                     @if ($soal->gambar_soal)
@@ -187,16 +188,41 @@
                     <input type="file" name="gambar_soal" accept="image/*"
                            class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-[#234853]">
                 </div>
+                @endif
             </div>
 
             {{-- Kunci Jawaban untuk isian --}}
+            @php
+                $kunciDecoded = json_decode($soal->kunci_jawaban ?? '', true);
+                $val2 = old('ge_2poin', implode(', ', $kunciDecoded['2'] ?? (is_array($kunciDecoded) ? [] : [$soal->kunci_jawaban ?? ''])));
+                $val1 = old('ge_1poin', implode(', ', $kunciDecoded['1'] ?? []));
+            @endphp
             <div id="section_kunci_isian_edit" class="hidden">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
-                    <input type="text" id="kunci_jawaban_edit" name="kunci_jawaban" value="{{ old('kunci_jawaban', $soal->kunci_jawaban) }}"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
-                           placeholder="{{ $tipeFormat === 'isian_angka' ? 'Jawaban angka, contoh: 35' : 'Jawaban teks, contoh: bunga' }}">
-                </div>
+                @if($tipeFormat === 'isian_teks')
+                    <div class="space-y-3">
+                        <p class="text-xs text-slate-500">Pisahkan beberapa jawaban dengan koma. Isi 1 poin jika ada jawaban yang kurang tepat tapi masih diterima.</p>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700">Jawaban benar (2 poin)</label>
+                            <input type="text" id="ge_2poin_edit" value="{{ $val2 }}"
+                                   placeholder="simbol, lambang, tanda"
+                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700">Jawaban kurang tepat (1 poin) <span class="text-slate-400 font-normal">— opsional</span></label>
+                            <input type="text" id="ge_1poin_edit" value="{{ $val1 }}"
+                                   placeholder="nama, tanda pengenal"
+                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        </div>
+                        <input type="hidden" name="kunci_jawaban" id="ge_kunci_hidden_edit">
+                    </div>
+                @else
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
+                        <input type="text" name="kunci_jawaban" value="{{ old('kunci_jawaban', $soal->kunci_jawaban) }}"
+                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                               placeholder="Jawaban angka, contoh: 35">
+                    </div>
+                @endif
             </div>
 
             {{-- Opsi Jawaban (pilihan_ganda dan pilihan_gambar) --}}
@@ -249,4 +275,14 @@
         </div>
     </form>
 </div>
+
+@if($tipeFormat === 'isian_teks')
+<script>
+document.querySelector('form').addEventListener('submit', function() {
+    var split = function(v) { return v.split(',').map(s => s.trim()).filter(Boolean); };
+    var obj = {'2': split(document.getElementById('ge_2poin_edit').value), '1': split(document.getElementById('ge_1poin_edit').value)};
+    document.getElementById('ge_kunci_hidden_edit').value = JSON.stringify(obj);
+});
+</script>
+@endif
 @endsection

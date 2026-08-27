@@ -68,8 +68,9 @@ class BankSoalController extends Controller
         $dimensiList = DimensiAlatTes::where('alat_tes_id', $alatTes->id)
             ->orderBy('urutan')
             ->get(['id', 'kode_dimensi', 'nama_dimensi']);
+        $nomorBerikutnya = (int) (Soal::where('alat_tes_id', $alatTes->id)->max('nomor') ?? 0) + 1;
 
-        return view('admin.bank-soal.tambah', compact('alatTes', 'dimensiList'));
+        return view('admin.bank-soal.tambah', compact('alatTes', 'dimensiList', 'nomorBerikutnya'));
     }
 
     public function simpan(Request $request, int $alatTesId): RedirectResponse

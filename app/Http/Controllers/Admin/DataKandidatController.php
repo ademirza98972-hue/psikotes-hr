@@ -64,6 +64,9 @@ class DataKandidatController extends Controller
             ->withQueryString();
 
         $semuaPosisi = Posisi::orderBy('nama_posisi')->get();
+        $daftarDepartemen = Departemen::orderBy('nama_departemen')->get();
+        $departemenMap = Departemen::pluck('id', 'nama_departemen');
+        $posisiMap = Posisi::pluck('id', 'nama_posisi');
 
         return view('admin.data-kandidat.index', [
             'kandidat' => $kandidat,
@@ -71,6 +74,9 @@ class DataKandidatController extends Controller
             'semuaPosisi' => $semuaPosisi,
             'filterStatus' => $filterStatus,
             'filterPosisi' => $filterPosisiId,
+            'daftarDepartemen' => $daftarDepartemen,
+            'departemenMap' => $departemenMap,
+            'posisiMap' => $posisiMap,
         ]);
     }
 

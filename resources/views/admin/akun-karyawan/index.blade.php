@@ -1,7 +1,20 @@
 @extends('layouts.admin', ['judulHalaman' => 'Akun Karyawan'])
 
 @section('content')
-<div x-data="{ modalHapus: false, idHapus: null, namaHapus: '' }">
+<div x-data="{
+    modalHapus: false, idHapus: null, namaHapus: '',
+    modalTambah: false,
+    modalUbah: false,
+    ubah: { id: '', nama: '', nik: '', email: '', no_hp: '' },
+    openUbah(id, nama, nik, email, no_hp) {
+        this.ubah = { id: String(id), nama, nik, email, no_hp };
+        this.modalUbah = true;
+    }
+}"
+x-init="
+    @if(old('_form') === 'tambah') $nextTick(() => { modalTambah = true; }); @endif
+    @if(old('_form') === 'ubah') $nextTick(() => { openUbah({{ (int)old('id',0) }}, '', '', @js(old('email','')), @js(old('no_hp',''))); }); @endif
+">
 
     {{-- STICKY HEADER --}}
     <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
@@ -14,11 +27,11 @@
         </div>
         @auth
             @if(auth()->user()->hasIzin('pengguna.tambah'))
-                <a href="{{ route('admin.akun-karyawan.tambah') }}"
+                <button type="button" @click="modalTambah = true"
                    class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors active:scale-[0.98]">
                     <span class="material-symbols-outlined text-[18px]">person_add</span>
                     Tambah Akun Karyawan
-                </a>
+                </button>
             @endif
         @endauth
     </div>
@@ -63,7 +76,6 @@
                     <span class="material-symbols-outlined text-[18px]">expand_more</span>
                 </span>
             </div>
-
 
             @if($kataKunci || $filterDepartemen || $filterPosisi)
                 <a href="{{ route('admin.akun-karyawan.index') }}"
@@ -154,11 +166,12 @@
                                 <div class="flex items-center justify-end gap-1">
                                     @auth
                                         @if(auth()->user()->hasIzin('pengguna.edit'))
-                                            <a href="{{ route('admin.akun-karyawan.ubah', $u->id) }}"
-                                               class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
-                                               title="Edit">
+                                            <button type="button"
+                                                    @click="openUbah({{ $u->id }}, @js($u->name), @js($u->profilKaryawan?->nik_karyawan ?? ''), @js($u->email), @js($u->no_hp ?? ''))"
+                                                    class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
+                                                    title="Edit">
                                                 <span class="material-symbols-outlined text-[18px]">edit</span>
-                                            </a>
+                                            </button>
                                         @endif
                                         @if(auth()->user()->hasIzin('pengguna.edit'))
                                             @if ($u->id !== auth()->id())
@@ -206,10 +219,10 @@
                                     <p class="text-[12px] text-[#71787c] mb-4">Tambahkan akun karyawan untuk mulai mengelola data.</p>
                                     @auth
                                         @if(auth()->user()->hasIzin('pengguna.tambah'))
-                                            <a href="{{ route('admin.akun-karyawan.tambah') }}" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                            <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
                                                 <span class="material-symbols-outlined text-[16px]">add</span>
                                                 Tambah Karyawan
-                                            </a>
+                                            </button>
                                         @endif
                                     @endauth
                                 @endif
@@ -233,26 +246,174 @@
         </div>
     </div>
 
-    {{-- Modal Konfirmasi Hapus --}}
-    <div x-show="modalHapus" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-[#191c1e]/50 px-4">
-        <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" @click.outside="modalHapus = false">
-            <h3 class="text-base font-semibold text-[#191c1e]">Hapus Akun Karyawan</h3>
-            <p class="mt-2 text-sm text-[#40484b]">
-                Apakah Anda yakin ingin menghapus akun <span class="font-semibold text-[#191c1e]" x-text="namaHapus"></span>?
-                Tindakan ini tidak dapat dibatalkan.
-            </p>
-            <div class="mt-6 flex justify-end gap-2">
-                <button type="button" @click="modalHapus = false"
-                        class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
-                <form :action="`{{ url('admin/akun-karyawan') }}/${idHapus}`" method="POST">
+    {{-- MODAL TAMBAH --}}
+    <template x-teleport="body">
+        <div x-show="modalTambah" x-cloak
+             style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)"
+             class="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden" @click.outside="modalTambah = false">
+                <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#e0e3e5]">
+                    <h3 class="text-sm font-semibold text-[#191c1e]">Tambah Akun Karyawan</h3>
+                    <button type="button" @click="modalTambah = false" class="text-[#71787c] hover:text-[#191c1e]">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+                <form id="form-tambah-karyawan" method="POST" action="{{ route('admin.akun-karyawan.simpan') }}">
                     @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                            class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 transition-colors">Hapus</button>
+                    <input type="hidden" name="_form" value="tambah">
+                    <div class="px-5 py-4 space-y-3">
+                        {{-- Nama + NIK --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">Nama Lengkap <span class="text-rose-500">*</span></label>
+                                <input name="nama_karyawan" type="text" required value="{{ old('nama_karyawan') }}"
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('nama_karyawan') border-rose-400 @enderror">
+                                @error('nama_karyawan')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">NIK Karyawan <span class="text-rose-500">*</span></label>
+                                <input name="nik_karyawan" type="text" required value="{{ old('nik_karyawan') }}"
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('nik_karyawan') border-rose-400 @enderror">
+                                @error('nik_karyawan')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+                        {{-- Email + No HP --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">Email <span class="text-rose-500">*</span></label>
+                                <input name="email" type="email" required value="{{ old('email') }}"
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('email') border-rose-400 @enderror">
+                                @error('email')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">No. HP <span class="text-rose-500">*</span></label>
+                                <input name="no_hp" type="text" required value="{{ old('no_hp') }}"
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
+                                @error('no_hp')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+                        {{-- Password --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">Password <span class="text-rose-500">*</span></label>
+                                <input name="password" type="password" required
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('password') border-rose-400 @enderror">
+                                @error('password')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">Konfirmasi Password <span class="text-rose-500">*</span></label>
+                                <input name="password_confirmation" type="password" required
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 px-5 py-3 bg-[#f7f9fb] border-t border-[#e0e3e5]">
+                        <button type="button" @click="modalTambah = false"
+                                class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
+                        <button type="submit"
+                                class="rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">Simpan</button>
+                    </div>
                 </form>
             </div>
         </div>
-    </div>
+    </template>
+
+    {{-- MODAL UBAH --}}
+    <template x-teleport="body">
+        <div x-show="modalUbah" x-cloak
+             style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)"
+             class="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden" @click.outside="modalUbah = false">
+                <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#e0e3e5]">
+                    <h3 class="text-sm font-semibold text-[#191c1e]">Edit Akun Karyawan</h3>
+                    <button type="button" @click="modalUbah = false" class="text-[#71787c] hover:text-[#191c1e]">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+                <form id="form-ubah-karyawan" method="POST" :action="`{{ url('admin/akun-karyawan') }}/${ubah.id}`">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="_form" value="ubah">
+                    <input type="hidden" name="id" :value="ubah.id">
+                    <div class="px-5 py-4 space-y-3">
+                        {{-- Nama + NIK (readonly display) --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">Nama</label>
+                                <input type="text" :value="ubah.nama" disabled
+                                       class="w-full rounded-lg border border-[#e0e3e5] bg-[#f7f9fb] px-3 py-2 text-sm text-[#71787c] cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">NIK</label>
+                                <input type="text" :value="ubah.nik" disabled
+                                       class="w-full rounded-lg border border-[#e0e3e5] bg-[#f7f9fb] px-3 py-2 text-sm text-[#71787c] cursor-not-allowed">
+                            </div>
+                        </div>
+                        {{-- Email + No HP --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">Email <span class="text-rose-500">*</span></label>
+                                <input name="email" type="email" required :value="ubah.email"
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('email') border-rose-400 @enderror">
+                                @error('email')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">No. HP <span class="text-rose-500">*</span></label>
+                                <input name="no_hp" type="text" required :value="ubah.no_hp"
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
+                                @error('no_hp')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+                        {{-- Password (opsional) --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">Password Baru <span class="text-[#71787c] font-normal">(opsional)</span></label>
+                                <input name="password" type="password"
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('password') border-rose-400 @enderror">
+                                @error('password')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-[#40484b] mb-1">Konfirmasi Password</label>
+                                <input name="password_confirmation" type="password"
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 px-5 py-3 bg-[#f7f9fb] border-t border-[#e0e3e5]">
+                        <button type="button" @click="modalUbah = false"
+                                class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
+                        <button type="submit"
+                                class="rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </template>
+
+    {{-- MODAL HAPUS --}}
+    <template x-teleport="body">
+        <div x-show="modalHapus" x-cloak
+             style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)"
+             class="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" @click.outside="modalHapus = false">
+                <h3 class="text-base font-semibold text-[#191c1e]">Hapus Akun Karyawan</h3>
+                <p class="mt-2 text-sm text-[#40484b]">
+                    Apakah Anda yakin ingin menghapus akun <span class="font-semibold text-[#191c1e]" x-text="namaHapus"></span>?
+                    Tindakan ini tidak dapat dibatalkan.
+                </p>
+                <div class="mt-6 flex justify-end gap-2">
+                    <button type="button" @click="modalHapus = false"
+                            class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
+                    <form :action="`{{ url('admin/akun-karyawan') }}/${idHapus}`" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                                class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 transition-colors">Hapus</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </template>
 </div>
 
 <style>[x-cloak] { display: none !important; }</style>

@@ -559,19 +559,20 @@
 <style>[x-cloak] { display: none !important; }</style>
 
 <script>
-// Sync hidden departemen/jabatan text fields before form submit (required by validation)
-document.getElementById('form-tambah').addEventListener('submit', function () {
-    var dSel = document.getElementById('tambah-dept-sel');
-    var pSel = document.getElementById('tambah-posisi-sel');
-    document.getElementById('hid_tambah_dept').value    = dSel.options[dSel.selectedIndex]?.text || '';
-    document.getElementById('hid_tambah_jabatan').value = pSel.options[pSel.selectedIndex]?.text || '';
-});
-
-document.getElementById('form-ubah').addEventListener('submit', function () {
-    var dSel = document.getElementById('ubah-dept-sel');
-    var pSel = document.getElementById('ubah-posisi-sel');
-    document.getElementById('hid_ubah_dept').value    = dSel.options[dSel.selectedIndex]?.text || '';
-    document.getElementById('hid_ubah_jabatan').value = pSel.options[pSel.selectedIndex]?.text || '';
+// Event delegation — forms are teleported to body by Alpine, so getElementById at load time returns null
+document.addEventListener('submit', function (e) {
+    if (e.target.id === 'form-tambah') {
+        var dSel = document.getElementById('tambah-dept-sel');
+        var pSel = document.getElementById('tambah-posisi-sel');
+        document.getElementById('hid_tambah_dept').value    = dSel?.options[dSel.selectedIndex]?.text || '';
+        document.getElementById('hid_tambah_jabatan').value = pSel?.options[pSel.selectedIndex]?.text || '';
+    }
+    if (e.target.id === 'form-ubah') {
+        var dSel = document.getElementById('ubah-dept-sel');
+        var pSel = document.getElementById('ubah-posisi-sel');
+        document.getElementById('hid_ubah_dept').value    = dSel?.options[dSel.selectedIndex]?.text || '';
+        document.getElementById('hid_ubah_jabatan').value = pSel?.options[pSel.selectedIndex]?.text || '';
+    }
 });
 </script>
 

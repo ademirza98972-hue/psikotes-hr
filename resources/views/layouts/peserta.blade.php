@@ -73,6 +73,23 @@
             margin: 6px 22px;
         }
 
+        /* Sidebar text elements — fade on collapse */
+        .sidebar-link > span:not(.material-symbols-outlined),
+        .sidebar-link .ml-auto,
+        .link-text,
+        .sb-logo-text,
+        .user-card-actions {
+            transition: opacity 0.15s ease;
+        }
+        .section-label {
+            transition: opacity 0.15s ease, max-height 0.2s ease, padding-top 0.2s ease, padding-bottom 0.2s ease;
+            max-height: 40px;
+            overflow: hidden;
+        }
+        .nav-divider {
+            transition: margin 0.2s ease;
+        }
+
         /* Collapsed sidebar */
         aside.collapsed .sidebar-link {
             justify-content: center;
@@ -115,23 +132,15 @@
             pointer-events: none;
             z-index: 2;
         }
-        aside.collapsed .sidebar-link > span:not(.material-symbols-outlined) { display: none; }
-        aside.collapsed .sidebar-link .ml-auto { display: none; }
-        aside.collapsed .section-label { display: none; }
+        aside.collapsed .sidebar-link > span:not(.material-symbols-outlined) { opacity: 0; pointer-events: none; }
+        aside.collapsed .sidebar-link .ml-auto { opacity: 0; pointer-events: none; }
+        aside.collapsed .section-label { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
         aside.collapsed .nav-divider { margin: 6px 8px; }
-        aside.collapsed .link-text { display: none; }
-        aside.collapsed .sb-logo-text { display: none; }
-        aside.collapsed .user-card-actions { display: none; }
+        aside.collapsed .link-text { opacity: 0; pointer-events: none; }
+        aside.collapsed .sb-logo-text { opacity: 0; pointer-events: none; }
+        aside.collapsed .user-card-actions { opacity: 0; pointer-events: none; }
         aside.collapsed .sb-header-expanded { display: none !important; }
         aside:not(.collapsed) .sb-header-collapsed { display: none !important; }
-        /* Page enter animation */
-        @keyframes pageEnter {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        main > * {
-            animation: pageEnter 0.22s ease-out both;
-        }
     </style>
 </head>
 <body class="min-h-screen bg-[#f7f9fb] font-body antialiased">

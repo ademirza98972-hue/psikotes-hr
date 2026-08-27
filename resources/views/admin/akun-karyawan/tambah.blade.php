@@ -1,3 +1,4 @@
+
 @extends('layouts.admin', ['judulHalaman' => 'Tambah Akun Karyawan'])
 
 @section('content')
@@ -16,11 +17,42 @@
         </a>
     </div>
 
+    @if ($errors->any())
+    <div class="rounded-xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <ul class="list-disc space-y-1 pl-4">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <form method="POST" action="{{ route('admin.akun-karyawan.simpan') }}">
         @csrf
 
-        {{-- SECTION: Akun --}}
+        {{-- SECTION: Data Karyawan --}}
         <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
+            <div class="border-b border-[#e0e3e5] px-6 py-4">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Data Karyawan</p>
+            </div>
+            <div class="space-y-5 px-6 py-5">
+                <div>
+                    <label for="nama_karyawan" class="block text-[13px] font-medium text-[#191c1e] mb-1">Nama Karyawan</label>
+                    <input id="nama_karyawan" name="nama_karyawan" type="text" value="{{ old('nama_karyawan') }}" required
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nama_karyawan') border-rose-400 @enderror">
+                    <p class="mt-1.5 text-[11px] text-[#40484b]">Nama harus cocok dengan data HR.</p>
+                </div>
+                <div>
+                    <label for="nik_karyawan" class="block text-[13px] font-medium text-[#191c1e] mb-1">NIK</label>
+                    <input id="nik_karyawan" name="nik_karyawan" type="text" value="{{ old('nik_karyawan') }}" required
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm font-mono text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nik_karyawan') border-rose-400 @enderror">
+                    <p class="mt-1.5 text-[11px] text-[#40484b]">NIK harus cocok dengan data karyawan yang ada di sistem.</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- SECTION: Akun --}}
+        <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm mt-4">
             <div class="border-b border-[#e0e3e5] px-6 py-4">
                 <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Informasi Akun</p>
             </div>
@@ -34,62 +66,6 @@
                     <label for="no_hp" class="block text-[13px] font-medium text-[#191c1e] mb-1">No HP</label>
                     <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp') }}" required
                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
-                </div>
-                <div>
-                    <label for="jenis_kelamin" class="block text-[13px] font-medium text-[#191c1e] mb-1">Jenis Kelamin</label>
-                    <select id="jenis_kelamin" name="jenis_kelamin" required
-                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
-                        <option value="">-- Pilih --</option>
-                        <option value="L" @selected(old('jenis_kelamin') == 'L')>Laki-laki</option>
-                        <option value="P" @selected(old('jenis_kelamin') == 'P')>Perempuan</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        {{-- SECTION: Data Karyawan --}}
-        <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm mt-4">
-            <div class="border-b border-[#e0e3e5] px-6 py-4">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Data Karyawan</p>
-            </div>
-            <div class="space-y-5 px-6 py-5">
-                <div>
-                    <label for="nik_karyawan" class="block text-[13px] font-medium text-[#191c1e] mb-1">NIK</label>
-                    <input id="nik_karyawan" name="nik_karyawan" type="text" value="{{ old('nik_karyawan') }}" required
-                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm font-mono text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nik_karyawan') border-rose-400 @enderror">
-                    <p class="mt-1.5 text-[11px] text-[#40484b]">NIK harus cocok dengan data karyawan yang ada di sistem.</p>
-                </div>
-                <div>
-                    <label for="nama_karyawan" class="block text-[13px] font-medium text-[#191c1e] mb-1">Nama Karyawan</label>
-                    <input id="nama_karyawan" name="nama_karyawan" type="text" value="{{ old('nama_karyawan') }}" required
-                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nama_karyawan') border-rose-400 @enderror">
-                    <p class="mt-1.5 text-[11px] text-[#40484b]">Nama akan menjadi nama tampilan akun dan data profil karyawan.</p>
-                </div>
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div>
-                        <label for="departemen" class="block text-[13px] font-medium text-[#191c1e] mb-1">Departemen</label>
-                        <select id="departemen" name="departemen" required
-                                class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
-                            <option value="">-- Pilih Departemen --</option>
-                            @foreach($departemen as $item)
-                                <option value="{{ $item->id }}" @selected(old('departemen') == $item->id)>{{ $item->nama_departemen }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="posisi" class="block text-[13px] font-medium text-[#191c1e] mb-1">
-                            Jabatan <span class="text-rose-500 font-normal">*</span>
-                        </label>
-                        <select id="posisi" name="jabatan" required
-                                class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer @error('jabatan') border-rose-400 @enderror">
-                            <option value="">-- Pilih Jabatan --</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label for="tanggal_lahir" class="block text-[13px] font-medium text-[#191c1e] mb-1">Tanggal Lahir <span class="text-slate-400 font-normal">(untuk norma IST)</span></label>
-                    <input id="tanggal_lahir" name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir') }}"
-                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
                 </div>
             </div>
         </div>
@@ -128,26 +104,4 @@
         </div>
     </form>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const departemenSelect = document.getElementById('departemen');
-    const posisiSelect = document.getElementById('posisi');
-    const posisiUrl = '{{ str_replace("__DEPT_ID__", "{departemenId}", route("api.posisi.daftar", ["departemen" => "__DEPT_ID__"])) }}';
-
-    departemenSelect.addEventListener('change', function () {
-        const deptId = this.value;
-        posisiSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
-        if (!deptId) return;
-        fetch(posisiUrl.replace('{departemenId}', deptId))
-            .then(r => r.json())
-            .then(data => data.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.textContent = p.nama_posisi;
-                posisiSelect.appendChild(opt);
-            }));
-    });
-});
-</script>
 @endsection

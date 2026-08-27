@@ -10,6 +10,7 @@ use App\Models\Departemen;
 use App\Models\Peran;
 use App\Models\Posisi;
 use App\Models\ProfilKaryawan;
+
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -76,12 +77,7 @@ class PenggunaController extends Controller
 
     public function tambah(): View
     {
-        $departemen = Departemen::orderBy('nama_departemen')->get();
-
-        return view('admin.akun-karyawan.tambah', [
-            'departemen' => $departemen,
-            'posisi' => collect(),
-        ]);
+        return view('admin.akun-karyawan.tambah');
     }
 
     public function simpan(SimpanPenggunaRequest $request): RedirectResponse
@@ -98,21 +94,6 @@ class PenggunaController extends Controller
 
         try {
             DB::transaction(function () use ($data, $peran) {
-                $user = User::create([
-                    'name' => $data['nama_karyawan'],
-                    'email' => $data['email'],
-                    'password' => Hash::make($data['password']),
-                    'no_hp' => $data['no_hp'],
-                    'jenis_kelamin' => $data['jenis_kelamin'],
-                    'tipe_akun' => 'karyawan',
-                    'peran_id' => $peran->id,
-                    'status' => 'aktif',
-                ]);
-
-                $departemen = Departemen::findOrFail($data['departemen']);
-                $jabatan = Posisi::find($data['jabatan']);
-                $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
-
                 $dataMaster = DataKaryawan::where('nik_karyawan', $data['nik_karyawan'])
                     ->lockForUpdate()
                     ->first();
@@ -125,17 +106,27 @@ class PenggunaController extends Controller
                     throw new \RuntimeException('NIK ini sudah terpakai oleh akun lain.');
                 }
 
+                $user = User::create([
+                    'name' => $dataMaster->nama_karyawan,
+                    'email' => $data['email'],
+                    'password' => Hash::make($data['password']),
+                    'no_hp' => $data['no_hp'],
+                    'tipe_akun' => 'karyawan',
+                    'peran_id' => $peran->id,
+                    'status' => 'aktif',
+                ]);
+
                 ProfilKaryawan::create([
                     'user_id' => $user->id,
                     'data_karyawan_id' => $dataMaster->id,
-                    'nama_karyawan' => $data['nama_karyawan'],
+                    'nama_karyawan' => $dataMaster->nama_karyawan,
                     'nik_karyawan' => $dataMaster->nik_karyawan,
-                    'departemen' => $departemen->nama_departemen,
-                    'jabatan' => $jabatanNama,
-                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
+                    'departemen' => $dataMaster->departemen,
+                    'jabatan' => $dataMaster->jabatan,
+                    'tanggal_lahir' => $dataMaster->tanggal_lahir,
                 ]);
 
-                $dataMaster->update(['status' => 'sudah_terpakai', 'jenis_kelamin' => $data['jenis_kelamin']]);
+                $dataMaster->update(['status' => 'sudah_terpakai']);
             });
         } catch (\RuntimeException $e) {
             return back()
@@ -154,24 +145,7 @@ class PenggunaController extends Controller
 
         abort_unless($pengguna->tipe_akun === 'karyawan', 404);
 
-        $departemen = Departemen::orderBy('nama_departemen')->get();
-
-        $departemenId = Departemen::where('nama_departemen', optional($pengguna->profilKaryawan)->departemen)->value('id');
-        $posisi = $departemenId
-            ? Posisi::where('departemen_id', $departemenId)->orderBy('nama_posisi')->get()
-            : collect();
-
-        $currentPosisiId = $pengguna->profilKaryawan?->jabatan
-            ? Posisi::where('nama_posisi', $pengguna->profilKaryawan->jabatan)->value('id')
-            : null;
-
-        return view('admin.akun-karyawan.ubah', [
-            'pengguna' => $pengguna,
-            'departemen' => $departemen,
-            'posisi' => $posisi,
-            'currentPosisiId' => $currentPosisiId,
-            'currentDepartemenId' => $departemenId,
-        ]);
+        return view('admin.akun-karyawan.ubah', compact('pengguna'));
     }
 
     public function perbarui(PerbaruiPenggunaRequest $request, int $id): RedirectResponse
@@ -183,10 +157,8 @@ class PenggunaController extends Controller
 
         DB::transaction(function () use ($pengguna, $data) {
             $payload = [
-                'name' => $data['nama_karyawan'] ?? $pengguna->name,
                 'email' => $data['email'],
                 'no_hp' => $data['no_hp'],
-                'jenis_kelamin' => $data['jenis_kelamin'],
             ];
 
             if (! empty($data['password'])) {
@@ -194,27 +166,6 @@ class PenggunaController extends Controller
             }
 
             $pengguna->update($payload);
-
-            $profil = $pengguna->profilKaryawan;
-            if ($profil) {
-                $departemenId = $data['departemen']
-                    ?? Departemen::where('nama_departemen', $profil->departemen)->value('id');
-                $departemen = Departemen::findOrFail($departemenId);
-                $jabatan = Posisi::find($data['jabatan']);
-                $jabatanNama = $jabatan ? $jabatan->nama_posisi : null;
-
-                $profil->update([
-                    'nama_karyawan' => $data['nama_karyawan'] ?? $pengguna->name,
-                    'departemen' => $departemen->nama_departemen,
-                    'jabatan' => $jabatanNama,
-                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
-                ]);
-
-                $dataMaster = DataKaryawan::where('nik_karyawan', $profil->nik_karyawan)->first();
-                if ($dataMaster) {
-                    $dataMaster->update(['jenis_kelamin' => $data['jenis_kelamin']]);
-                }
-            }
         });
 
         return redirect()

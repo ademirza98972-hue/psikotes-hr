@@ -110,6 +110,18 @@ class DataKaryawanController extends Controller
         $data = DataKaryawan::findOrFail($data_karyawan);
         $data->update($request->validated());
 
+        $data->pengguna()->update([
+            'nama_karyawan' => $data->nama_karyawan,
+            'departemen'    => $data->departemen,
+            'jabatan'       => $data->jabatan,
+            'tanggal_lahir' => $data->tanggal_lahir,
+        ]);
+
+        \App\Models\User::whereIn('id', $data->pengguna()->pluck('user_id'))->update([
+            'name'          => $data->nama_karyawan,
+            'jenis_kelamin' => $data->jenis_kelamin,
+        ]);
+
         return redirect()
             ->route('admin.data-karyawan.index')
             ->with($this::FLASH_SUCCESS, 'Data karyawan berhasil diperbarui.');

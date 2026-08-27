@@ -35,10 +35,11 @@ class AlatTesController extends Controller
             ->withQueryString();
 
         return view('admin.alat-tes.index', [
-            'alatTes'    => $alatTes,
-            'totalSoal'  => $totalSoal,
-            'totalAlat'  => $totalAlat,
-            'alatPopuler' => $alatPopuler,
+            'alatTes'       => $alatTes,
+            'totalSoal'     => $totalSoal,
+            'totalAlat'     => $totalAlat,
+            'alatPopuler'   => $alatPopuler,
+            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid', 'Mixed'],
         ]);
     }
 

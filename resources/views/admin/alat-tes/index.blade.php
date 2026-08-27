@@ -10,7 +10,23 @@
     // totalAlat, totalSoal, alatPopuler dikirim dari controller
 @endphp
 
-<div class="space-y-6">
+<div class="space-y-6"
+     x-data="{
+         modalTambah: false,
+         batasAktif: {{ old('batas_waktu_per_soal_aktif') ? 'true' : 'false' }},
+         modalUbah: false,
+         ubah: { id:'', kode:'', nama:'', formatDasar:'Pilihan Ganda', polaSkoring:'kognitif', durasi:'', deskripsi:'', batasAktif:false, batasDet:'', isSensitif:false },
+         openUbah(id, kode, nama, formatDasar, polaSkoring, durasi, deskripsi, batasAktif, batasDet, isSensitif) {
+             this.ubah = { id: String(id), kode, nama, formatDasar, polaSkoring,
+                           durasi: String(durasi ?? ''), deskripsi,
+                           batasAktif: Boolean(batasAktif), batasDet: String(batasDet ?? ''), isSensitif: Boolean(isSensitif) };
+             this.modalUbah = true;
+         }
+     }"
+     x-init="
+         @if(old('_form') === 'tambah') $nextTick(() => { modalTambah = true; }); @endif
+         @if(old('_form') === 'ubah') $nextTick(() => { openUbah({{ (int)old('id',0) }}, @js(old('kode','')), @js(old('nama','')), @js(old('format_dasar','Pilihan Ganda')), @js(old('pola_skoring','kognitif')), @js(old('durasi_total_menit','')), @js(old('deskripsi','')), {{ old('batas_waktu_per_soal_aktif') ? 'true' : 'false' }}, @js(old('batas_waktu_per_soal_detik','')), {{ old('is_sensitif') ? 'true' : 'false' }}); }); @endif
+     ">
 
     {{-- STICKY HEADER --}}
     <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
@@ -21,11 +37,11 @@
             <p class="mt-0.5 text-[14px] text-[#40484b]">Kelola jenis instrumen tes psikometri yang tersedia dalam sistem.</p>
         </div>
         @if(auth()->user()->hasIzin('kategori_tes.kelola'))
-        <a href="{{ route('admin.alat-tes.tambah') }}"
+        <button type="button" @click="modalTambah = true"
            class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
             <span class="material-symbols-outlined text-[18px]">add</span>
             Tambah Alat Tes
-        </a>
+        </button>
         @endif
     </div>
     </div>{{-- /STICKY HEADER --}}
@@ -132,11 +148,12 @@
                             <td class="px-5 py-3.5 text-right">
                                 @if(auth()->user()->hasIzin('kategori_tes.kelola'))
                                     <div class="flex items-center justify-end gap-1">
-                                        <a href="{{ route('admin.alat-tes.edit', $alat['id']) }}"
-                                           class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
-                                           title="Edit">
+                                        <button type="button"
+                                                @click="openUbah({{ $alat['id'] }}, @js($alat['kode']), @js($alat['nama']), @js($alat['format_dasar']), @js($alat['pola_skoring']), @js($alat['durasi_total_menit']), @js($alat['deskripsi'] ?? ''), {{ $alat['batas_waktu_per_soal_aktif'] ? 'true' : 'false' }}, @js($alat['batas_waktu_per_soal_detik']), {{ $alat['is_sensitif'] ? 'true' : 'false' }})"
+                                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                                title="Edit">
                                             <span class="material-symbols-outlined text-[18px]">edit</span>
-                                        </a>
+                                        </button>
                                         <a href="{{ route('admin.alat-tes.norma', $alat['id']) }}"
                                            class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
                                            title="Kelola Norma">
@@ -164,10 +181,10 @@
                                 <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Alat Tes</p>
                                 <p class="text-[12px] text-[#71787c] mb-4">Tambahkan instrumen tes psikometri untuk digunakan dalam sesi.</p>
                                 @if(auth()->user()->hasIzin('kategori_tes.kelola'))
-                                    <a href="{{ route('admin.alat-tes.tambah') }}" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                    <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
                                         <span class="material-symbols-outlined text-[16px]">add</span>
                                         Tambah Alat Tes
-                                    </a>
+                                    </button>
                                 @endif
                             </td>
                         </tr>
@@ -203,7 +220,240 @@
         </div>
     </div>
 
-</div>
+{{-- MODAL TAMBAH ALAT TES --}}
+<template x-teleport="body">
+    <div x-show="modalTambah" x-cloak
+         style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         @click.self="modalTambah = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full" style="max-width:500px" @click.stop>
+            <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#e0e3e5]">
+                <h3 class="text-[15px] font-semibold text-[#191c1e]">Tambah Alat Tes</h3>
+                <button type="button" @click="modalTambah = false"
+                        class="p-1 rounded-lg text-[#71787c] hover:bg-[#f2f4f6] transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+            </div>
+            <form method="POST" action="{{ route('admin.alat-tes.simpan') }}" class="px-5 py-4 space-y-3">
+                @csrf
+                <input type="hidden" name="_form" value="tambah">
+                {{-- Kode + Nama --}}
+                <div class="flex gap-3">
+                    <div class="w-28 shrink-0">
+                        <label class="block text-[12px] font-medium text-[#40484b] mb-1">Kode</label>
+                        <input name="kode" type="text" value="{{ old('kode') }}" required maxlength="20" placeholder="DISC"
+                               class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm font-semibold text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-[12px] font-medium text-[#40484b] mb-1">Nama Lengkap</label>
+                        <input name="nama" type="text" value="{{ old('nama') }}" maxlength="150" placeholder="Nama lengkap alat tes"
+                               class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none">
+                    </div>
+                </div>
+                {{-- Format + Pola --}}
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[12px] font-medium text-[#40484b] mb-1">Format Soal</label>
+                        <div class="relative">
+                            <select name="format_dasar" required
+                                    class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none cursor-pointer">
+                                @foreach ($pilihanFormat as $format)
+                                    <option value="{{ $format }}" @selected(old('format_dasar') === $format)>{{ $format }}</option>
+                                @endforeach
+                            </select>
+                            <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#40484b] text-[18px]">expand_more</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[12px] font-medium text-[#40484b] mb-1">Pola Skoring</label>
+                        <div class="relative">
+                            <select name="pola_skoring" required
+                                    class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none cursor-pointer">
+                                <option value="kognitif" @selected(old('pola_skoring') === 'kognitif')>Kognitif</option>
+                                <option value="forced_choice" @selected(old('pola_skoring') === 'forced_choice')>Forced Choice</option>
+                                <option value="forced_choice_rollup" @selected(old('pola_skoring') === 'forced_choice_rollup')>Forced Choice Rollup</option>
+                                <option value="grid" @selected(old('pola_skoring') === 'grid')>Grid</option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#40484b] text-[18px]">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+                {{-- Durasi --}}
+                <div>
+                    <label class="block text-[12px] font-medium text-[#40484b] mb-1">Durasi Total (menit)</label>
+                    <input name="durasi_total_menit" type="number" min="0" value="{{ old('durasi_total_menit') }}"
+                           class="w-36 bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none">
+                </div>
+                {{-- Deskripsi --}}
+                <div>
+                    <label class="block text-[12px] font-medium text-[#40484b] mb-1">Deskripsi</label>
+                    <textarea name="deskripsi" rows="2" placeholder="Jelaskan tujuan dan fungsi alat tes ini..."
+                              class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none resize-none">{{ old('deskripsi') }}</textarea>
+                </div>
+                {{-- Batas Waktu --}}
+                <div class="p-3 bg-[#f2f4f6] rounded-xl border border-[#e0e3e5]">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="hidden" name="batas_waktu_per_soal_aktif" value="0">
+                        <input type="checkbox" name="batas_waktu_per_soal_aktif" value="1" x-model="batasAktif"
+                               {{ old('batas_waktu_per_soal_aktif') ? 'checked' : '' }}
+                               class="h-4 w-4 rounded border-[#c0c8cb] text-[#2C5F6F] focus:ring-[#2C5F6F] cursor-pointer">
+                        <span class="text-[13px] font-medium text-[#191c1e]">Aktifkan Batas Waktu per Soal</span>
+                    </label>
+                    <div x-show="batasAktif" x-cloak class="mt-2 flex items-center gap-2">
+                        <input name="batas_waktu_per_soal_detik" type="number" min="1" placeholder="30"
+                               value="{{ old('batas_waktu_per_soal_detik') }}"
+                               class="w-24 bg-white border border-[#e0e3e5] rounded-lg px-3 py-1.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none">
+                        <span class="text-[12px] text-[#40484b]">detik per soal</span>
+                    </div>
+                </div>
+                {{-- Sensitif --}}
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                    <label class="flex items-start gap-2.5 cursor-pointer">
+                        <input type="hidden" name="is_sensitif" value="0">
+                        <input type="checkbox" name="is_sensitif" value="1" {{ old('is_sensitif') ? 'checked' : '' }}
+                               class="mt-0.5 h-4 w-4 rounded border-amber-400 text-amber-600 focus:ring-amber-600 cursor-pointer">
+                        <div>
+                            <p class="text-[13px] font-medium text-[#191c1e]">Kategori Sensitif</p>
+                            <p class="text-[11px] text-[#854d0e] mt-0.5">Akses terbatas untuk psikolog terverifikasi.</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="flex justify-end gap-2 pt-1">
+                    <button type="button" @click="modalTambah = false"
+                            class="rounded-xl border border-[#e0e3e5] px-4 py-2 text-[13px] font-semibold text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 rounded-xl bg-[#2C5F6F] px-5 py-2 text-[13px] font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[15px]">save</span>
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+
+{{-- MODAL EDIT ALAT TES --}}
+<template x-teleport="body">
+    <div x-show="modalUbah" x-cloak
+         style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         @click.self="modalUbah = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full" style="max-width:500px" @click.stop>
+            <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#e0e3e5]">
+                <h3 class="text-[15px] font-semibold text-[#191c1e]">Edit Alat Tes</h3>
+
+                <button type="button" @click="modalUbah = false"
+                        class="p-1 rounded-lg text-[#71787c] hover:bg-[#f2f4f6] transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+            </div>
+            <form method="POST" :action="'{{ url('admin/alat-tes') }}/' + ubah.id" class="px-5 py-4 space-y-3">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="_form" value="ubah">
+                <input type="hidden" name="id" :value="ubah.id">
+                {{-- Kode + Nama --}}
+                <div class="flex gap-3">
+                    <div class="w-28 shrink-0">
+                        <label class="block text-[12px] font-medium text-[#40484b] mb-1">Kode</label>
+                        <input name="kode" type="text" :value="ubah.kode" required maxlength="20"
+                               class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm font-semibold text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-[12px] font-medium text-[#40484b] mb-1">Nama Lengkap</label>
+                        <input name="nama" type="text" :value="ubah.nama" maxlength="150"
+                               class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none">
+                    </div>
+                </div>
+                {{-- Format + Pola --}}
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[12px] font-medium text-[#40484b] mb-1">Format Soal</label>
+                        <div class="relative">
+                            <select name="format_dasar" required
+                                    class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none cursor-pointer">
+                                @foreach ($pilihanFormat as $format)
+                                    <option value="{{ $format }}" :selected="ubah.formatDasar === '{{ $format }}'">{{ $format }}</option>
+                                @endforeach
+                            </select>
+                            <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#40484b] text-[18px]">expand_more</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[12px] font-medium text-[#40484b] mb-1">Pola Skoring</label>
+                        <div class="relative">
+                            <select name="pola_skoring" required
+                                    class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none cursor-pointer">
+                                <option value="kognitif" :selected="ubah.polaSkoring === 'kognitif'">Kognitif</option>
+                                <option value="forced_choice" :selected="ubah.polaSkoring === 'forced_choice'">Forced Choice</option>
+                                <option value="forced_choice_rollup" :selected="ubah.polaSkoring === 'forced_choice_rollup'">Forced Choice Rollup</option>
+                                <option value="grid" :selected="ubah.polaSkoring === 'grid'">Grid</option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#40484b] text-[18px]">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+                {{-- Durasi --}}
+                <div>
+                    <label class="block text-[12px] font-medium text-[#40484b] mb-1">Durasi Total (menit)</label>
+                    <input name="durasi_total_menit" type="number" min="0" :value="ubah.durasi"
+                           class="w-36 bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none">
+                </div>
+                {{-- Deskripsi --}}
+                <div>
+                    <label class="block text-[12px] font-medium text-[#40484b] mb-1">Deskripsi</label>
+                    <textarea name="deskripsi" rows="2" placeholder="Jelaskan tujuan dan fungsi alat tes ini..."
+                              class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none resize-none"
+                              x-model="ubah.deskripsi"></textarea>
+                </div>
+                {{-- Batas Waktu --}}
+                <div class="p-3 bg-[#f2f4f6] rounded-xl border border-[#e0e3e5]">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="hidden" name="batas_waktu_per_soal_aktif" value="0">
+                        <input type="checkbox" name="batas_waktu_per_soal_aktif" value="1" x-model="ubah.batasAktif"
+                               class="h-4 w-4 rounded border-[#c0c8cb] text-[#2C5F6F] focus:ring-[#2C5F6F] cursor-pointer">
+                        <span class="text-[13px] font-medium text-[#191c1e]">Aktifkan Batas Waktu per Soal</span>
+                    </label>
+                    <div x-show="ubah.batasAktif" x-cloak class="mt-2 flex items-center gap-2">
+                        <input name="batas_waktu_per_soal_detik" type="number" min="1" placeholder="30"
+                               :value="ubah.batasDet"
+                               class="w-24 bg-white border border-[#e0e3e5] rounded-lg px-3 py-1.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] outline-none">
+                        <span class="text-[12px] text-[#40484b]">detik per soal</span>
+                    </div>
+                </div>
+                {{-- Sensitif --}}
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                    <label class="flex items-start gap-2.5 cursor-pointer">
+                        <input type="hidden" name="is_sensitif" value="0">
+                        <input type="checkbox" name="is_sensitif" value="1" x-model="ubah.isSensitif"
+                               class="mt-0.5 h-4 w-4 rounded border-amber-400 text-amber-600 focus:ring-amber-600 cursor-pointer">
+                        <div>
+                            <p class="text-[13px] font-medium text-[#191c1e]">Kategori Sensitif</p>
+                            <p class="text-[11px] text-[#854d0e] mt-0.5">Akses terbatas untuk psikolog terverifikasi.</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="flex justify-end gap-2 pt-1">
+                    <button type="button" @click="modalUbah = false"
+                            class="rounded-xl border border-[#e0e3e5] px-4 py-2 text-[13px] font-semibold text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 rounded-xl bg-[#2C5F6F] px-5 py-2 text-[13px] font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[15px]">save</span>
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+
+</div>{{-- /x-data --}}
+
+<style>[x-cloak] { display: none !important; }</style>
 
 @push('scripts')
 <script>

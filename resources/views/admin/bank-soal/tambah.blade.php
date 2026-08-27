@@ -174,7 +174,7 @@
                               placeholder="Isi teks soal (opsional untuk soal isian)">{{ old('teks_soal') }}</textarea>
                 </div>
 
-                <div>
+                <div id="section_gambar_soal">
                     <label class="block text-sm font-medium text-slate-700">Gambar Soal</label>
                     <input type="file" name="gambar_soal" accept="image/*"
                            class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-[#234853]">
@@ -205,8 +205,10 @@
                                 <input type="text" name="opsi[{{ $huruf }}]" value="{{ old('opsi.' . $huruf) }}"
                                        placeholder="Teks opsi {{ strtoupper($huruf) }}"
                                        class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none">
-                                <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
-                                       class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
+                                <div class="gambar-opsi-wrapper">
+                                    <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
+                                           class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -216,20 +218,22 @@
             <script>
                 document.getElementById('tipe_format').addEventListener('change', function() {
                     var val = this.value;
-                    var showTeks = true;
                     var showKunci = (val === 'isian_teks' || val === 'isian_angka');
                     var showOpsi = (val === 'pilihan_ganda' || val === 'pilihan_gambar');
-                    var showTeksRequired = showOpsi;
+                    var showGambar = (val === 'pilihan_gambar');
 
-                    document.getElementById('section_teks_soal').classList.toggle('hidden', !showTeks);
+                    document.getElementById('section_teks_soal').classList.toggle('hidden', false);
+                    document.getElementById('section_gambar_soal').classList.toggle('hidden', !showGambar);
                     document.getElementById('section_kunci_isian').classList.toggle('hidden', !showKunci);
                     document.getElementById('section_opsi').classList.toggle('hidden', !showOpsi);
 
-                    // Toggle required attributes
+                    document.querySelectorAll('.gambar-opsi-wrapper').forEach(function(el) {
+                        el.classList.toggle('hidden', !showGambar);
+                    });
+
                     var teksSoal = document.getElementById('teks_soal');
-                    if (teksSoal) teksSoal.required = showTeksRequired;
+                    if (teksSoal) teksSoal.required = showOpsi;
                 });
-                // Init on load
                 document.getElementById('tipe_format').dispatchEvent(new Event('change'));
             </script>
         @endif

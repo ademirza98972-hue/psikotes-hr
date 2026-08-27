@@ -99,7 +99,7 @@
                         <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">NIK</th>
                         <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">Nama Karyawan</th>
                         <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">Departemen</th>
-                        <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">Jabatan</th>
+                        <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-left" style="color: #7db8c2;">Posisi</th>
                         <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color: #7db8c2;">Status</th>
                         <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-right" style="color: #7db8c2;">Aksi</th>
                     </tr>

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $judulHalaman ?? 'Dashboard Admin' }} — Sistem Psikotes HR</title>
+    <link rel="preload" href="/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2" crossorigin>
+    <script>document.documentElement.style.setProperty('--sb-ml',localStorage.getItem('sidebarOpen')==='false'?'64px':'280px')</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
@@ -352,7 +354,7 @@
 
     {{-- MAIN AREA --}}
     <div class="flex-1 flex flex-col min-h-screen overflow-hidden"
-         style="transition: margin-left 0.2s ease;"
+         style="margin-left: var(--sb-ml, 280px); transition: margin-left 0.2s ease;"
          :style="{ marginLeft: sidebarOpen ? '280px' : '64px' }">
 
         {{-- HEADER --}}

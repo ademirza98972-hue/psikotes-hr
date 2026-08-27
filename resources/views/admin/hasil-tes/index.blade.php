@@ -98,7 +98,7 @@
         }
         this.checkedIds.forEach(id => {
             const [sesiId, pesertaId] = id.split('-');
-            window.open(`/admin/hasil-tes/${sesiId}/${pesertaId}/print`, '_blank');
+            window.open(`/admin/hasil-tes/${sesiId}/${pesertaId}/pdf`, '_blank');
         });
     }
 }" x-init=""

@@ -16,21 +16,26 @@
         </a>
     </div>
 
+    @if ($errors->any())
+    <div class="rounded-xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <ul class="list-disc space-y-1 pl-4">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <form method="POST" action="{{ route('admin.data-kandidat.perbarui', $kandidat->id) }}">
         @csrf
         @method('PUT')
 
-        {{-- SECTION: Akun --}}
+        {{-- SECTION: Informasi Akun --}}
         <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
             <div class="border-b border-[#e0e3e5] px-6 py-4">
                 <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Informasi Akun</p>
             </div>
             <div class="space-y-5 px-6 py-5">
-                <div>
-                    <label for="nama_kandidat" class="block text-[13px] font-medium text-[#191c1e] mb-1">Nama Kandidat</label>
-                    <input id="nama_kandidat" name="nama_kandidat" type="text" value="{{ old('nama_kandidat', $profilKandidat->nama_kandidat ?? $kandidat->name) }}" required
-                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nama_kandidat') border-rose-400 @enderror">
-                </div>
                 <div>
                     <label for="email" class="block text-[13px] font-medium text-[#191c1e] mb-1">Email</label>
                     <input id="email" name="email" type="email" value="{{ old('email', $kandidat->email) }}" required
@@ -41,15 +46,6 @@
                     <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp', $kandidat->no_hp) }}" required
                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
                 </div>
-                <div>
-                    <label for="jenis_kelamin" class="block text-[13px] font-medium text-[#191c1e] mb-1">Jenis Kelamin</label>
-                    <select id="jenis_kelamin" name="jenis_kelamin" required
-                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
-                        <option value="">-- Pilih --</option>
-                        <option value="L" @if(old('jenis_kelamin', $kandidat->jenis_kelamin) == 'L') selected @endif>Laki-laki</option>
-                        <option value="P" @if(old('jenis_kelamin', $kandidat->jenis_kelamin) == 'P') selected @endif>Perempuan</option>
-                    </select>
-                </div>
             </div>
         </div>
 
@@ -59,6 +55,30 @@
                 <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Profil Kandidat</p>
             </div>
             <div class="space-y-5 px-6 py-5">
+                <div>
+                    <label for="nama_kandidat" class="block text-[13px] font-medium text-[#191c1e] mb-1">Nama Kandidat</label>
+                    <input id="nama_kandidat" name="nama_kandidat" type="text" value="{{ old('nama_kandidat', $profilKandidat->nama_kandidat ?? $kandidat->name) }}" required
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nama_kandidat') border-rose-400 @enderror">
+                </div>
+                <div>
+                    <label for="nik_kandidat" class="block text-[13px] font-medium text-[#191c1e] mb-1">NIK KTP <span class="text-rose-600">*</span></label>
+                    <input id="nik_kandidat" name="nik_kandidat" type="text" value="{{ old('nik_kandidat', $profilKandidat->nik_kandidat ?? '') }}" maxlength="16" required
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm font-mono text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nik_kandidat') border-rose-400 @enderror">
+                </div>
+                <div>
+                    <label for="tanggal_lahir" class="block text-[13px] font-medium text-[#191c1e] mb-1">Tanggal Lahir</label>
+                    <input id="tanggal_lahir" name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir', $profilKandidat->tanggal_lahir ?? '') }}"
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
+                </div>
+                <div>
+                    <label for="jenis_kelamin" class="block text-[13px] font-medium text-[#191c1e] mb-1">Jenis Kelamin</label>
+                    <select id="jenis_kelamin" name="jenis_kelamin" required
+                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                        <option value="">-- Pilih --</option>
+                        <option value="L" @if(old('jenis_kelamin', $kandidat->jenis_kelamin) == 'L') selected @endif>Laki-laki</option>
+                        <option value="P" @if(old('jenis_kelamin', $kandidat->jenis_kelamin) == 'P') selected @endif>Perempuan</option>
+                    </select>
+                </div>
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label for="departemen" class="block text-[13px] font-medium text-[#191c1e] mb-1">Departemen</label>
@@ -82,16 +102,6 @@
                     <label for="pendidikan_terakhir" class="block text-[13px] font-medium text-[#191c1e] mb-1">Pendidikan Terakhir</label>
                     <input id="pendidikan_terakhir" name="pendidikan_terakhir" type="text" value="{{ old('pendidikan_terakhir', $profilKandidat->pendidikan_terakhir ?? '') }}" required
                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('pendidikan_terakhir') border-rose-400 @enderror">
-                </div>
-                <div>
-                    <label for="tanggal_lahir" class="block text-[13px] font-medium text-[#191c1e] mb-1">Tanggal Lahir <span class="text-slate-400 font-normal">(untuk norma IST)</span></label>
-                    <input id="tanggal_lahir" name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir', $profilKandidat->tanggal_lahir ?? '') }}"
-                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
-                </div>
-                <div>
-                    <label for="nik_kandidat" class="block text-[13px] font-medium text-[#191c1e] mb-1">NIK KTP <span class="text-rose-600">*</span></label>
-                    <input id="nik_kandidat" name="nik_kandidat" type="text" value="{{ old('nik_kandidat', $profilKandidat->nik_kandidat ?? '') }}" maxlength="16" required
-                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nik_kandidat') border-rose-400 @enderror">
                 </div>
             </div>
         </div>
@@ -136,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const posisiUrl = '{{ str_replace("__DEPT_ID__", "{departemenId}", route("api.posisi.daftar", ["departemen" => "__DEPT_ID__"])) }}';
 
-    // Load posisi when a departemen is selected
     departemenSelect.addEventListener('change', function () {
         const deptId = this.value;
         posisiSelect.innerHTML = '<option value="">-- Pilih Posisi --</option>';
@@ -152,7 +161,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     posisiSelect.appendChild(opt);
                 });
 
-                // Re-select saved posisi by text match (since old posisi_dilamar is stored as string)
                 const savedName = '{{ old("posisi_dilamar", $profilKandidat->posisi_dilamar ?? "") }}';
                 if (savedName) {
                     for (let i = 0; i < posisiSelect.options.length; i++) {
@@ -165,7 +173,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // Auto-trigger if a departemen is already selected
     if (departemenSelect.value) {
         departemenSelect.dispatchEvent(new Event('change'));
     }

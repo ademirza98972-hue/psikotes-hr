@@ -125,6 +125,7 @@ class AutentikasiController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'no_hp' => $data['no_hp'],
+                'jenis_kelamin' => $data['jenis_kelamin'] ?? null,
                 'tipe_akun' => $tipeAkun,
                 'peran_id' => $peran->id,
                 'status' => $statusUser,

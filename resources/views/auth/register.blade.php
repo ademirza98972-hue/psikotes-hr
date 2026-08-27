@@ -162,6 +162,27 @@
             </div>
 
             <div class="space-y-1.5">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="jenis_kelamin_kandidat">Jenis Kelamin</label>
+                <div class="relative">
+                    <select
+                        id="jenis_kelamin_kandidat"
+                        name="jenis_kelamin"
+                        :disabled="tipe !== 'kandidat'"
+                        :required="tipe === 'kandidat'"
+                        class="w-full px-4 py-3 pr-10 bg-white border rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none @error('jenis_kelamin') border-rose-500 @else border-surface-variant @enderror"
+                    >
+                        <option value="">-- Pilih --</option>
+                        <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
+                </div>
+                @error('jenis_kelamin')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="space-y-1.5">
                 <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email_kandidat">Email</label>
                 <div class="relative focused-input group">
                     <input

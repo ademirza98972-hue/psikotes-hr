@@ -19,33 +19,16 @@ class PeranController extends Controller
 
     public function index(Request $request): View
     {
-        $kataKunci = $request->input('cari');
-
-        $query = Peran::withCount(['izin', 'pengguna'])->orderBy('nama_peran');
-
-        $query->when($kataKunci, function ($q) use ($kataKunci) {
-            $q->where('nama_peran', 'like', '%' . $kataKunci . '%');
-        });
-
-        $perPage = $this->getPerPage($request, 15);
-
-        $peran = $query->paginate($perPage)->withQueryString();
-
-        return view('admin.peran.index', [
-            'peran' => $peran,
-            'kataKunci' => $kataKunci,
-        ]);
+        return view('admin.peran.index', $this->indexViewData($request));
     }
 
-    public function tambah(): View
+    public function tambah(Request $request): View
     {
-        $semuaIzin = Izin::orderBy('kode_izin')->get();
-
-        return view('admin.peran.tambah', [
-            'daftarIzin' => $semuaIzin,
-            'kelompokIzin' => $this->kelompokkanIzin($semuaIzin),
+        return view('admin.peran.index', array_merge($this->indexViewData($request), [
+            'openModal'    => 'tambah',
+            'editPeran'    => null,
             'izinTerpilih' => [],
-        ]);
+        ]));
     }
 
     public function simpan(SimpanPeranRequest $request): RedirectResponse
@@ -64,17 +47,15 @@ class PeranController extends Controller
             ->with($this::FLASH_SUCCESS, 'Peran baru berhasil ditambahkan.');
     }
 
-    public function ubah(int $peran): View
+    public function ubah(Request $request, int $peran): View
     {
-        $peran = Peran::with('izin')->findOrFail($peran);
-        $semuaIzin = Izin::orderBy('kode_izin')->get();
+        $editPeran = Peran::with('izin')->findOrFail($peran);
 
-        return view('admin.peran.ubah', [
-            'peran' => $peran,
-            'daftarIzin' => $semuaIzin,
-            'kelompokIzin' => $this->kelompokkanIzin($semuaIzin),
-            'izinTerpilih' => $peran->izin->pluck('id')->all(),
-        ]);
+        return view('admin.peran.index', array_merge($this->indexViewData($request), [
+            'openModal'    => 'ubah',
+            'editPeran'    => $editPeran,
+            'izinTerpilih' => $editPeran->izin->pluck('id')->all(),
+        ]));
     }
 
     public function perbarui(PerbaruiPeranRequest $request, int $peran): RedirectResponse
@@ -119,6 +100,21 @@ class PeranController extends Controller
         return redirect()
             ->route('admin.peran.index')
             ->with($this::FLASH_SUCCESS, 'Peran berhasil dihapus.');
+    }
+
+    private function indexViewData(Request $request): array
+    {
+        $kataKunci = $request->input('cari');
+        $semuaIzin = Izin::orderBy('kode_izin')->get();
+
+        $query = Peran::withCount(['izin', 'pengguna'])->with('izin:id')->orderBy('nama_peran');
+        $query->when($kataKunci, fn($q) => $q->where('nama_peran', 'like', "%$kataKunci%"));
+
+        return [
+            'peran'       => $query->paginate($this->getPerPage($request, 15))->withQueryString(),
+            'kataKunci'   => $kataKunci,
+            'kelompokIzin' => $this->kelompokkanIzin($semuaIzin),
+        ];
     }
 
     protected function kelompokkanIzin(mixed $izin): array

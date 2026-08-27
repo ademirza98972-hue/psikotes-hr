@@ -20,54 +20,15 @@ class PenggunaAdminController extends Controller
 
     public function index(Request $request): View
     {
-        $kataKunci = $request->input('cari');
-        $filterPeran = $request->input('peran');
-        $filterStatus = $request->input('status');
-
-        $validStatus = ['aktif', 'nonaktif'];
-        if ($filterStatus !== null && $filterStatus !== '' && ! in_array($filterStatus, $validStatus, true)) {
-            $filterStatus = null;
-        }
-
-        $pengguna = User::with('peran')
-            ->where('tipe_akun', 'custom')
-            ->whereHas('peran', function ($q) {
-                $q->whereNotIn('nama_peran', self::PERAN_DIKECUALIKAN);
-            })
-            ->when($kataKunci, function ($query, $kataKunci) {
-                $query->where(function ($q) use ($kataKunci) {
-                    $q->where('name', 'like', '%' . $kataKunci . '%')
-                        ->orWhere('email', 'like', '%' . $kataKunci . '%');
-                });
-            })
-            ->when($filterPeran, function ($query, $filterPeran) {
-                $query->where('peran_id', (int) $filterPeran);
-            })
-            ->when($filterStatus, function ($query, $filterStatus) {
-                $query->where('status', $filterStatus);
-            })
-            ->orderBy('name')
-            ->paginate($this->getPerPage($request, 15))
-            ->withQueryString();
-
-        $semuaPeran = Peran::whereNotIn('nama_peran', self::PERAN_DIKECUALIKAN)
-            ->orderBy('nama_peran')
-            ->get();
-
-        return view('admin.pengguna-admin.index', [
-            'pengguna' => $pengguna,
-            'kataKunci' => $kataKunci,
-            'filterPeran' => $filterPeran,
-            'filterStatus' => $filterStatus,
-            'semuaPeran' => $semuaPeran,
-        ]);
+        return view('admin.pengguna-admin.index', $this->indexViewData($request));
     }
 
-    public function tambah(): View
+    public function tambah(Request $request): View
     {
-        return view('admin.pengguna-admin.tambah', [
-            'daftarPeran' => Peran::whereNotIn('nama_peran', self::PERAN_DIKECUALIKAN)->orderBy('nama_peran')->get(),
-        ]);
+        return view('admin.pengguna-admin.index', array_merge(
+            $this->indexViewData($request),
+            ['openModal' => 'tambah']
+        ));
     }
 
     public function simpan(SimpanPenggunaAdminRequest $request): RedirectResponse
@@ -96,14 +57,12 @@ class PenggunaAdminController extends Controller
             ->with($this::FLASH_SUCCESS, 'Pengguna internal berhasil ditambahkan.');
     }
 
-    public function ubah(int $id): View
+    public function ubah(Request $request, int $id): View
     {
-        $pengguna = $this->cariPenggunaInternal($id);
-
-        return view('admin.pengguna-admin.ubah', [
-            'pengguna' => $pengguna,
-            'daftarPeran' => Peran::whereNotIn('nama_peran', self::PERAN_DIKECUALIKAN)->orderBy('nama_peran')->get(),
-        ]);
+        return view('admin.pengguna-admin.index', array_merge(
+            $this->indexViewData($request),
+            ['openModal' => 'ubah', 'editPengguna' => $this->cariPenggunaInternal($id)]
+        ));
     }
 
     public function perbarui(PerbaruiPenggunaAdminRequest $request, int $id): RedirectResponse
@@ -194,6 +153,36 @@ class PenggunaAdminController extends Controller
         return redirect()
             ->route('admin.pengguna-admin.index')
             ->with($this::FLASH_SUCCESS, $pengguna->fresh()->status === 'aktif' ? 'Pengguna internal berhasil diaktifkan.' : 'Pengguna internal berhasil dinonaktifkan.');
+    }
+
+    private function indexViewData(Request $request): array
+    {
+        $kataKunci  = $request->input('cari');
+        $filterPeran  = $request->input('peran');
+        $filterStatus = $request->input('status');
+
+        $validStatus = ['aktif', 'nonaktif'];
+        if ($filterStatus !== null && $filterStatus !== '' && !in_array($filterStatus, $validStatus, true)) {
+            $filterStatus = null;
+        }
+
+        $pengguna = User::with('peran')
+            ->where('tipe_akun', 'custom')
+            ->whereHas('peran', fn($q) => $q->whereNotIn('nama_peran', self::PERAN_DIKECUALIKAN))
+            ->when($kataKunci, fn($q, $v) => $q->where(fn($q2) => $q2->where('name', 'like', "%$v%")->orWhere('email', 'like', "%$v%")))
+            ->when($filterPeran, fn($q, $v) => $q->where('peran_id', (int) $v))
+            ->when($filterStatus, fn($q, $v) => $q->where('status', $v))
+            ->orderBy('name')
+            ->paginate($this->getPerPage($request, 15))
+            ->withQueryString();
+
+        return [
+            'pengguna'     => $pengguna,
+            'kataKunci'    => $kataKunci,
+            'filterPeran'  => $filterPeran,
+            'filterStatus' => $filterStatus,
+            'semuaPeran'   => Peran::whereNotIn('nama_peran', self::PERAN_DIKECUALIKAN)->orderBy('nama_peran')->get(),
+        ];
     }
 
     private function cariPenggunaInternal(int $id): User

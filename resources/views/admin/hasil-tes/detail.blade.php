@@ -66,7 +66,7 @@
 @endphp
 <style>
     .header-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 14px; }
-    .company-logo { width: 36px; height: 36px; background: #0f6e56; border-radius: 0; }
+    .company-logo { width: 36px; height: 36px; border-radius: 0; }
     .company-name { font-weight: 700; font-size: 15px; margin: 0; }
     .company-sub { font-size: 10px; color: #444; margin: 2px 0 0 0; }
     .rahasia-badge { border: 1px solid #b91c1c; color: #b91c1c; font-size: 9px; font-weight: 700; padding: 3px 8px; letter-spacing: 0.5px; display: inline-block; white-space: nowrap; }
@@ -76,7 +76,7 @@
     .sub-title { font-weight: 700; font-size: 10.5px; margin: 10px 0 4px 0; color: #333; }
     table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 6px; }
     td, th { border: 1px solid #000; padding: 3px 5px; vertical-align: middle; }
-    .th-row td, .th-row th { background: #000; color: #fff; font-weight: 700; }
+    .th-row td, .th-row th { background: #4b5563; color: #fff; font-weight: 700; }
     .th-row th { text-align: left; }
     .label-cell { background: #f2f2f2; font-weight: 700; width: 110px; }
     .bidang-row td { background: #d9d9d9; font-weight: 700; }
@@ -293,7 +293,7 @@
                     @endphp
 
                     @foreach ($eppsKelompok as $_kelompokNama => $_dimensiPeta)
-                        <div style="background:#000; color:#fff; font-weight:700; font-size:10.5px; padding:4px 8px; margin-top:8px; letter-spacing:0.5px;">{{ $_kelompokNama }}</div>
+                        <div style="background:#4b5563; color:#fff; font-weight:700; font-size:10.5px; padding:4px 8px; margin-top:8px; letter-spacing:0.5px;">{{ $_kelompokNama }}</div>
                         <table>
                             <thead class="th-row">
                                 <tr>
@@ -324,7 +324,7 @@
                     @endforeach
 
                     @if (isset($eppsScores['con']))
-                        <div style="background:#1a1a1a; color:#fff; font-weight:700; font-size:10px; padding:3px 8px; margin-top:8px; letter-spacing:0.5px;">CATATAN VALIDITAS</div>
+                        <div style="background:#4b5563; color:#fff; font-weight:700; font-size:10px; padding:3px 8px; margin-top:8px; letter-spacing:0.5px;">CATATAN VALIDITAS</div>
                         <table>
                             <thead class="th-row">
                                 <tr>
@@ -562,7 +562,7 @@
                     @endphp
                     <p style="margin:6px 0 10px 0; color:#666;font-size:10px;">Format: Self-Report &ndash; Skor Mentah (0-9), Kategori: R = Rendah, K = Kurang, C = Cukup, B = Baik, T = Tinggi</p>
                     @foreach ($papKelompok as $_kelompokNama => $_dimensiKode)
-                        <div style="background:#000; color:#fff; font-weight:700; font-size:10.5px; padding:4px 8px; margin-top:8px; letter-spacing:0.5px;">{{ $_kelompokNama }}</div>
+                        <div style="background:#4b5563; color:#fff; font-weight:700; font-size:10.5px; padding:4px 8px; margin-top:8px; letter-spacing:0.5px;">{{ $_kelompokNama }}</div>
                         <table>
                             <thead class="th-row">
                                 <tr>
@@ -761,15 +761,15 @@
                         <table style="width:100%;border-collapse:collapse;font-size:11px;">
                             <thead>
                                 <tr>
-                                    <th colspan="2" style="background:#2d7a2d;color:#fff;padding:8px 10px;text-align:left;border:1px solid #ccc;" rowspan="2">ASPEK-ASPEK PSIKOLOGIS</th>
-                                    <th colspan="5" style="background:#2d7a2d;color:#fff;padding:6px;text-align:center;border:1px solid #ccc;">KATEGORI</th>
+                                    <th colspan="2" style="background:#4b5563;color:#fff;padding:8px 10px;text-align:left;border:1px solid #ccc;" rowspan="2">ASPEK-ASPEK PSIKOLOGIS</th>
+                                    <th colspan="5" style="background:#4b5563;color:#fff;padding:6px;text-align:center;border:1px solid #ccc;">KATEGORI</th>
                                 </tr>
                                 <tr>
-                                    <th style="background:#c0392b;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">SR<br><span style="font-weight:400;font-size:9px;">Sangat Rendah</span></th>
-                                    <th style="background:#e67e22;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">R<br><span style="font-weight:400;font-size:9px;">Rendah</span></th>
-                                    <th style="background:#27ae60;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">C<br><span style="font-weight:400;font-size:9px;">Cukup</span></th>
-                                    <th style="background:#2980b9;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">T<br><span style="font-weight:400;font-size:9px;">Tinggi</span></th>
-                                    <th style="background:#8e44ad;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">ST<br><span style="font-weight:400;font-size:9px;">Sangat Tinggi</span></th>
+                                    <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">SR<br><span style="font-weight:400;font-size:9px;">Sangat Rendah</span></th>
+                                    <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">R<br><span style="font-weight:400;font-size:9px;">Rendah</span></th>
+                                    <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">C<br><span style="font-weight:400;font-size:9px;">Cukup</span></th>
+                                    <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">T<br><span style="font-weight:400;font-size:9px;">Tinggi</span></th>
+                                    <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">ST<br><span style="font-weight:400;font-size:9px;">Sangat Tinggi</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -802,8 +802,8 @@
                         <table style="border-collapse:collapse;font-size:11px;flex:1;">
                             <thead>
                                 <tr>
-                                    <th style="background:#2d7a2d;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">IQ</th>
-                                    <th style="background:#2d7a2d;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">KLASIFIKASI KECERDASAN</th>
+                                    <th style="background:#4b5563;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">IQ</th>
+                                    <th style="background:#4b5563;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">KLASIFIKASI KECERDASAN</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -815,7 +815,7 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <div style="flex:1;border:2px solid #2d7a2d;border-radius:6px;padding:16px;display:flex;align-items:center;justify-content:center;">
+                        <div style="flex:1;border:2px solid #9ca3af;border-radius:6px;padding:16px;display:flex;align-items:center;justify-content:center;">
                             <p style="font-size:13px;font-weight:700;color:#1a1a1a;text-align:center;line-height:1.6;">
                                 Kecerdasan Umum peserta diperkirakan berada pada taraf<br>
                                 <span style="color:#c0392b;">{{ $klasifikasiIQ }}</span><br>
@@ -826,8 +826,8 @@
                     </div>
 
                     {{-- KESIMPULAN OTOMATIS --}}
-                    <div style="border:1px solid #2d7a2d;border-radius:4px;padding:14px 16px;margin-bottom:16px;">
-                        <div style="font-size:13px;font-weight:800;color:#2d7a2d;text-decoration:underline;margin-bottom:8px;">KESIMPULAN</div>
+                    <div style="border:1px solid #9ca3af;border-radius:4px;padding:14px 16px;margin-bottom:16px;">
+                        <div style="font-size:13px;font-weight:800;color:#4b5563;text-decoration:underline;margin-bottom:8px;">KESIMPULAN</div>
                         <p style="font-size:11px;line-height:1.8;color:#1a1a1a;text-align:justify;">
                             @if($iqSkor > 0)
                                 Hasil pemeriksaan psikologis menunjukkan bahwa peserta memiliki tingkat kecerdasan umum yang tergolong <strong>{{ $klasifikasiIQ }}</strong> dengan skor IQ {{ number_format($iqSkor, 0) }}.
@@ -848,7 +848,7 @@
                         <summary style="font-size:11px;color:#64748b;cursor:pointer;padding:4px 0;">Lihat skor detail per subtes</summary>
                         <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;">
                             <thead>
-                                <tr style="background:#404040;color:#fff;">
+                                <tr style="background:#4b5563;color:#fff;">
                                     <th style="padding:6px 10px;text-align:left;">Subtes</th>
                                     <th style="padding:6px 10px;text-align:center;">Skor Mentah</th>
                                     <th style="padding:6px 10px;text-align:center;">Skor Standar</th>

@@ -63,9 +63,9 @@
         }
         .section-title {
             font-weight: 700; font-size: 10px; letter-spacing: .8px;
-            text-transform: uppercase; color: #2C5F6F;
+            text-transform: uppercase; color: #4b5563;
             margin: 18px 0 8px 0; padding-bottom: 4px;
-            border-bottom: 1.5px solid #2C5F6F;
+            border-bottom: 1.5px solid #9ca3af;
         }
         .sub-title {
             font-weight: 700; font-size: 10.5px; margin: 12px 0 5px 0;
@@ -79,10 +79,10 @@
             vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word;
         }
         .th-row th {
-            background: #2C5F6F; color: #fff; font-weight: 700;
+            background: #4b5563; color: #fff; font-weight: 700;
             text-align: left; font-size: 9px; letter-spacing: .4px;
         }
-        .th-row td { background: #2C5F6F; color: #fff; font-weight: 700; }
+        .th-row td { background: #4b5563; color: #fff; font-weight: 700; }
         .label-cell {
             background: #f1f5f9; font-weight: 700; width: 130px;
             font-size: 9.5px; color: #334155;
@@ -143,12 +143,12 @@
         }
         .pap-chart-title {
             font-weight: 700; font-size: 10px; letter-spacing: .6px;
-            margin-bottom: 10px; text-transform: uppercase; color: #2C5F6F;
+            margin-bottom: 10px; text-transform: uppercase; color: #4b5563;
         }
 
         /* ── PAP section header ── */
         .kelompok-header {
-            background: #1e293b; color: #fff; font-weight: 700;
+            background: #4b5563; color: #fff; font-weight: 700;
             font-size: 9.5px; padding: 3px 8px; margin-top: 8px;
             letter-spacing: .5px;
         }
@@ -498,7 +498,7 @@
             @endforeach
             @if (isset($eppsScores['con']))
                 @php $_con = $eppsScores['con']; $_conKat = $katMap[$_con['kategori']] ?? ''; @endphp
-                <div style="background:#1a1a1a; color:#fff; font-weight:700; font-size:10px; padding:3px 8px; margin-top:8px; letter-spacing:0.5px;">CATATAN VALIDITAS</div>
+                <div style="background:#4b5563; color:#fff; font-weight:700; font-size:10px; padding:3px 8px; margin-top:8px; letter-spacing:0.5px;">CATATAN VALIDITAS</div>
                 <table>
                     <thead class="th-row">
                         <tr>
@@ -872,15 +872,15 @@
                     <table style="width:100%;border-collapse:collapse;font-size:11px;">
                         <thead>
                             <tr>
-                                <th colspan="2" style="background:#2d7a2d;color:#fff;padding:8px 10px;text-align:left;border:1px solid #ccc;" rowspan="2">ASPEK-ASPEK PSIKOLOGIS</th>
-                                <th colspan="5" style="background:#2d7a2d;color:#fff;padding:6px;text-align:center;border:1px solid #ccc;">KATEGORI</th>
+                                <th colspan="2" style="background:#4b5563;color:#fff;padding:8px 10px;text-align:left;border:1px solid #ccc;" rowspan="2">ASPEK-ASPEK PSIKOLOGIS</th>
+                                <th colspan="5" style="background:#4b5563;color:#fff;padding:6px;text-align:center;border:1px solid #ccc;">KATEGORI</th>
                             </tr>
                             <tr>
-                                <th style="background:#c0392b;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">SR<br><span style="font-weight:400;font-size:9px;">Sangat Rendah</span></th>
-                                <th style="background:#e67e22;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">R<br><span style="font-weight:400;font-size:9px;">Rendah</span></th>
-                                <th style="background:#27ae60;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">C<br><span style="font-weight:400;font-size:9px;">Cukup</span></th>
-                                <th style="background:#2980b9;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">T<br><span style="font-weight:400;font-size:9px;">Tinggi</span></th>
-                                <th style="background:#8e44ad;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">ST<br><span style="font-weight:400;font-size:9px;">Sangat Tinggi</span></th>
+                                <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">SR<br><span style="font-weight:400;font-size:9px;">Sangat Rendah</span></th>
+                                <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">R<br><span style="font-weight:400;font-size:9px;">Rendah</span></th>
+                                <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">C<br><span style="font-weight:400;font-size:9px;">Cukup</span></th>
+                                <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">T<br><span style="font-weight:400;font-size:9px;">Tinggi</span></th>
+                                <th style="background:#6b7280;color:#fff;padding:5px 8px;text-align:center;border:1px solid #ccc;width:8%;">ST<br><span style="font-weight:400;font-size:9px;">Sangat Tinggi</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -912,8 +912,8 @@
                     <table style="border-collapse:collapse;font-size:11px;flex:1;">
                         <thead>
                             <tr>
-                                <th style="background:#2d7a2d;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">IQ</th>
-                                <th style="background:#2d7a2d;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">Klasifikasi</th>
+                                <th style="background:#4b5563;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">IQ</th>
+                                <th style="background:#4b5563;color:#fff;padding:7px 10px;border:1px solid #ccc;text-align:center;">Klasifikasi</th>
                             </tr>
                         </thead>
                         <tbody>

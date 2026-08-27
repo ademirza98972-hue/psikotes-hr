@@ -14,7 +14,7 @@ class PerbaruiAlatTesRequest extends FormRequest
 
     public function rules(): array
     {
-        $id = $this->route('alat_tes');
+        $id = $this->route('id');
 
         return [
             'nama' => 'required|string|max:150',

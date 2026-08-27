@@ -90,7 +90,10 @@ class PenjadwalanTesController extends Controller
             'pesertaSesiTesRecords.alatTes',
         ])->findOrFail($id);
 
+        $sudahPeserta = $sesi->pesertaSesiTesRecords->pluck('user_id');
+
         $daftarUser = User::whereIn('tipe_akun', ['karyawan', 'kandidat'])
+            ->whereNotIn('id', $sudahPeserta)
             ->orderBy('name')
             ->get();
 

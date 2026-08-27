@@ -65,7 +65,7 @@
     }
 @endphp
 
-<div x-data="{
+<div id="hasil-tes-root" x-data="{
     tab: 'sesi',
     sesiTerpilih: '{{ $selectedSesiId ?? '' }}',
     hasilTes: @js($hasilTes),
@@ -151,18 +151,12 @@ class="w-full">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
             <div class="lg:col-span-1">
                 <label class="block text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)] mb-2">PILIH SESI PENJADWALAN</label>
-                <div class="relative">
-                    <select x-model="sesiTerpilih"
-                            class="w-full bg-white border border-[var(--color-outline-variant)] rounded-xl py-3 pl-4 pr-10 appearance-none text-sm font-medium focus:ring-2 focus:ring-[var(--color-psikotes)] focus:border-transparent outline-none cursor-pointer">
-                        <option value="">-- Pilih Sesi --</option>
-                        @foreach ($penjadwalan as $sesi)
-                            <option value="{{ $sesi['id'] }}">{{ $sesi['nama_sesi'] }}</option>
-                        @endforeach
-                    </select>
-                    <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[var(--color-on-surface-variant)]">
-                        <span class="material-symbols-outlined">expand_more</span>
-                    </span>
-                </div>
+                <select id="select-sesi" name="sesi_id">
+                    <option value="">-- Pilih Sesi --</option>
+                    @foreach ($penjadwalan as $sesi)
+                        <option value="{{ $sesi['id'] }}" @selected(($selectedSesiId ?? '') == $sesi['id'])>{{ $sesi['nama_sesi'] }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="lg:col-span-2">
@@ -509,5 +503,99 @@ class="w-full">
     [x-cloak] { display: none !important; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 </style>
+
+@push('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<style>
+    /* Select2 — sesuaikan tampilan dengan desain project */
+    .select2-container { width: 100% !important; }
+    .select2-container--default .select2-selection--single {
+        background: white;
+        border: 1px solid var(--color-outline-variant, #e0e3e5);
+        border-radius: 0.75rem;
+        height: auto;
+        padding: 0.625rem 1rem;
+        transition: border-color .15s, box-shadow .15s;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #191c1e;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.5;
+        padding: 0;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #71787c;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%;
+        top: 0;
+        right: 10px;
+    }
+    .select2-container--default.select2-container--open .select2-selection--single,
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #2C5F6F;
+        box-shadow: 0 0 0 2px rgba(44,95,111,0.2);
+        outline: none;
+    }
+    .select2-dropdown {
+        border: 1px solid #e0e3e5;
+        border-radius: 0.75rem;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 4px;
+    }
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #e0e3e5;
+        border-radius: 0.5rem;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.875rem;
+        outline: none;
+    }
+    .select2-container--default .select2-results__option {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        color: #40484b;
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #2C5F6F;
+        color: white;
+    }
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: #f2f4f6;
+        color: #2C5F6F;
+        font-weight: 600;
+    }
+    .select2-selection__clear {
+        font-size: 1.1rem;
+        color: #71787c;
+        margin-right: 4px;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(function () {
+    const rootEl = document.getElementById('hasil-tes-root');
+
+    $('#select-sesi').select2({
+        placeholder: '-- Pilih Sesi --',
+        allowClear: true,
+        width: '100%',
+    });
+
+    // Sinkronkan Select2 → Alpine
+    $('#select-sesi').on('change', function () {
+        Alpine.$data(rootEl).sesiTerpilih = this.value || '';
+    });
+
+    // Sinkronkan nilai awal jika sudah ada (dari server)
+    const initVal = Alpine.$data(rootEl).sesiTerpilih;
+    if (initVal) {
+        $('#select-sesi').val(initVal).trigger('change.select2');
+    }
+});
+</script>
+@endpush
 
 @endsection

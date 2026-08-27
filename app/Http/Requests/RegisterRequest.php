@@ -35,8 +35,6 @@ class RegisterRequest extends FormRequest
             $aturan['tanggal_lahir'] = ['nullable', 'date'];
         } elseif ($this->input('tipe_akun') === 'karyawan') {
             $aturan['nik_karyawan'] = ['required', 'string', 'max:30'];
-            $aturan['posisi_karyawan'] = ['required', 'string', 'max:255'];
-            $aturan['tanggal_lahir'] = ['nullable', 'date'];
         }
 
         return $aturan;
@@ -67,7 +65,6 @@ class RegisterRequest extends FormRequest
             'pendidikan_terakhir' => 'pendidikan terakhir',
             'nik_kandidat' => 'nik KTP',
             'nik_karyawan' => 'NIK',
-            'posisi_karyawan' => 'posisi',
         ];
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\DataKaryawan;
-use App\Models\Departemen;
 use App\Models\Peran;
 use App\Models\ProfilKandidat;
 use App\Models\ProfilKaryawan;
@@ -85,9 +84,8 @@ class AutentikasiController extends Controller
 
     public function tampilkanRegister(): View
     {
-        $departemen = Departemen::orderBy('nama_departemen')->get();
         $posisi = Posisi::with('departemen')->orderBy('departemen_id')->orderBy('nama_posisi')->get();
-        return view('auth.register', compact('departemen', 'posisi'));
+        return view('auth.register', compact('posisi'));
     }
 
     public function register(RegisterRequest $request): RedirectResponse

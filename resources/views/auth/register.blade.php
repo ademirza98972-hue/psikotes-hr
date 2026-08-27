@@ -3,22 +3,8 @@
 @section('content')
 <div x-data="{
     tipe: '{{ old('tipe_akun', 'kandidat') }}',
-    departemenId: '',
-    karyawanPosisi: [],
     showPwd: false,
     showPwdConfirm: false,
-    async muatPosisi() {
-        if (! this.departemenId) {
-            this.karyawanPosisi = [];
-            return;
-        }
-        try {
-            const r = await fetch('{{ str_replace("__DEPT_ID__", "' + this.departemenId + '", route('api.posisi.daftar', ['departemen' => '__DEPT_ID__'])) }}');
-            this.karyawanPosisi = await r.json();
-        } catch (e) {
-            this.karyawanPosisi = [];
-        }
-    }
 }" class="space-y-6">
 
     <div class="space-y-1">
@@ -54,48 +40,6 @@
                     Karyawan
                 </label>
             </div>
-        </div>
-
-        {{-- Email --}}
-        <div class="space-y-1.5">
-            <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email">Email</label>
-            <div class="relative focused-input group">
-                <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value="{{ old('email') }}"
-                    required
-                    autocomplete="email"
-                    placeholder="nama@perusahaan.com"
-                    class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @else border-surface-variant @enderror"
-                >
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
-            </div>
-            @error('email')
-                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- No HP --}}
-        <div class="space-y-1.5">
-            <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="no_hp">No HP</label>
-            <div class="relative focused-input group">
-                <input
-                    id="no_hp"
-                    name="no_hp"
-                    type="text"
-                    value="{{ old('no_hp') }}"
-                    required
-                    autocomplete="tel"
-                    placeholder="08xxxxxxxxxx"
-                    class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('no_hp') border-rose-500 @else border-surface-variant @enderror"
-                >
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">smartphone</span>
-            </div>
-            @error('no_hp')
-                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-            @enderror
         </div>
 
         {{-- Field Kandidat --}}
@@ -217,6 +161,48 @@
                 @enderror
             </div>
 
+            <div class="space-y-1.5">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email_kandidat">Email</label>
+                <div class="relative focused-input group">
+                    <input
+                        id="email_kandidat"
+                        name="email"
+                        type="email"
+                        value="{{ old('email') }}"
+                        :disabled="tipe !== 'kandidat'"
+                        :required="tipe === 'kandidat'"
+                        autocomplete="email"
+                        placeholder="nama@email.com"
+                        class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @else border-surface-variant @enderror"
+                    >
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
+                </div>
+                @error('email')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="no_hp_kandidat">No HP</label>
+                <div class="relative focused-input group">
+                    <input
+                        id="no_hp_kandidat"
+                        name="no_hp"
+                        type="text"
+                        value="{{ old('no_hp') }}"
+                        :disabled="tipe !== 'kandidat'"
+                        :required="tipe === 'kandidat'"
+                        autocomplete="tel"
+                        placeholder="08xxxxxxxxxx"
+                        class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('no_hp') border-rose-500 @else border-surface-variant @enderror"
+                    >
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">smartphone</span>
+                </div>
+                @error('no_hp')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
         </div>
 
         {{-- Field Karyawan --}}
@@ -264,58 +250,45 @@
             </div>
 
             <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="departemen_karyawan">Departemen</label>
-                <div class="relative">
-                    <select
-                        id="departemen_karyawan"
-                        x-model="departemenId"
-                        @change="muatPosisi()"
-                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none"
-                    >
-                        <option value="">-- Pilih Departemen --</option>
-                        @foreach($departemen as $dept)
-                            <option value="{{ $dept->id }}">{{ $dept->nama_departemen }}</option>
-                        @endforeach
-                    </select>
-                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
-                </div>
-            </div>
-
-            <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="posisi_karyawan">Posisi <span class="text-rose-600">*</span></label>
-                <div class="relative">
-                    <select
-                        id="posisi_karyawan"
-                        name="posisi_karyawan"
-                        :disabled="tipe !== 'karyawan' || departemenId === ''"
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email_karyawan">Email</label>
+                <div class="relative focused-input group">
+                    <input
+                        id="email_karyawan"
+                        name="email"
+                        type="email"
+                        value="{{ old('email') }}"
+                        :disabled="tipe !== 'karyawan'"
                         :required="tipe === 'karyawan'"
-                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none @error('posisi_karyawan') border-rose-500 @else border-surface-variant @enderror"
+                        autocomplete="email"
+                        placeholder="nama@perusahaan.com"
+                        class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @else border-surface-variant @enderror"
                     >
-                        <option value="">-- Pilih Posisi --</option>
-                        <template x-for="p in karyawanPosisi" :key="p.id">
-                            <option :value="p.nama_posisi" x-text="p.nama_posisi"></option>
-                        </template>
-                    </select>
-                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
                 </div>
-                <p class="font-body text-xs text-on-surface-variant mt-1" x-show="departemenId === ''">Pilih departemen terlebih dahulu untuk melihat posisi.</p>
-                @error('posisi_karyawan')
+                @error('email')
                     <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="tanggal_lahir_karyawan">Tanggal Lahir</label>
+                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="no_hp_karyawan">No HP</label>
                 <div class="relative focused-input group">
                     <input
-                        id="tanggal_lahir_karyawan"
-                        name="tanggal_lahir"
-                        type="date"
-                        value="{{ old('tanggal_lahir') }}"
+                        id="no_hp_karyawan"
+                        name="no_hp"
+                        type="text"
+                        value="{{ old('no_hp') }}"
                         :disabled="tipe !== 'karyawan'"
-                        class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors"
+                        :required="tipe === 'karyawan'"
+                        autocomplete="tel"
+                        placeholder="08xxxxxxxxxx"
+                        class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('no_hp') border-rose-500 @else border-surface-variant @enderror"
                     >
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">smartphone</span>
                 </div>
+                @error('no_hp')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
         </div>

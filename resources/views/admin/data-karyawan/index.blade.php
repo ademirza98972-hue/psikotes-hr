@@ -1,7 +1,70 @@
 @extends('layouts.admin', ['judulHalaman' => 'Data Karyawan'])
 
 @section('content')
-<div x-data="{ modalHapus: false, idHapus: null, namaHapus: '', modalImport: false }">
+@php
+    $openModal = '';
+    if ($errors->any()) {
+        if (old('_form') === 'tambah') $openModal = 'tambah';
+        if (old('_form') === 'ubah')   $openModal = 'ubah';
+    }
+    $posisiUrlTemplate = str_replace('__ID__', '{id}', route('api.posisi.daftar', ['departemen' => '__ID__']));
+@endphp
+
+<div
+    x-data="{
+        modalHapus: false, idHapus: null, namaHapus: '',
+        modalImport: false,
+        modalTambah: false,
+        tambahDeptId: '{{ old('departemen_id', '') }}',
+        tambahPosisiId: '{{ old('posisi_id', '') }}',
+        posisiTambah: [],
+        modalUbah: false,
+        ubah: { id: null, nik: '', nama: '', jenis_kelamin: '', tanggal_lahir: '', departemen_id: '', posisi_id: '', nikReadonly: false },
+        posisiUbah: [],
+        posisiUrl: '{{ $posisiUrlTemplate }}',
+        loadPosisi(target, deptId, selectedId) {
+            if (!deptId) { this[target] = []; return; }
+            const self = this;
+            fetch(this.posisiUrl.replace('{id}', deptId))
+                .then(r => r.json())
+                .then(data => {
+                    self[target] = data;
+                    if (selectedId) {
+                        self.$nextTick(() => {
+                            if (target === 'posisiUbah') self.ubah.posisi_id = String(selectedId);
+                            if (target === 'posisiTambah') self.tambahPosisiId = String(selectedId);
+                        });
+                    }
+                });
+        },
+        openUbah(id, nik, nama, jk, tgl, deptId, posisiId, nikReadonly) {
+            this.ubah = { id: id, nik: nik, nama: nama, jenis_kelamin: jk, tanggal_lahir: tgl, departemen_id: String(deptId || ''), posisi_id: String(posisiId || ''), nikReadonly: nikReadonly };
+            this.posisiUbah = [];
+            if (deptId) this.loadPosisi('posisiUbah', deptId, posisiId);
+            this.modalUbah = true;
+        }
+    }"
+    x-init="$nextTick(() => {
+        @if($openModal === 'tambah')
+            modalTambah = true;
+            @if(old('departemen_id'))
+            loadPosisi('posisiTambah', '{{ old('departemen_id') }}', '{{ old('posisi_id') }}');
+            @endif
+        @endif
+        @if($openModal === 'ubah')
+            openUbah(
+                {{ (int) old('_edit_id', 0) }},
+                '{{ addslashes(old('nik_karyawan', '')) }}',
+                '{{ addslashes(old('nama_karyawan', '')) }}',
+                '{{ old('jenis_kelamin', '') }}',
+                '{{ old('tanggal_lahir', '') }}',
+                '{{ old('departemen_id', '') }}',
+                '{{ old('posisi_id', '') }}',
+                {{ old('_nik_readonly') === '1' ? 'true' : 'false' }}
+            );
+        @endif
+    })"
+>
 
     {{-- STICKY HEADER --}}
     <div data-sticky-bar class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
@@ -25,11 +88,11 @@
                         <span class="material-symbols-outlined text-[18px]">upload_file</span>
                         Import Excel
                     </button>
-                    <a href="{{ route('admin.data-karyawan.tambah') }}"
+                    <button type="button" @click="modalTambah = true"
                        class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors active:scale-[0.98]">
                         <span class="material-symbols-outlined text-[18px]">person_add</span>
                         Tambah Data Karyawan
-                    </a>
+                    </button>
                 </div>
             @endif
         @endauth
@@ -74,7 +137,6 @@
                     <span class="material-symbols-outlined text-[18px]">expand_more</span>
                 </span>
             </div>
-
 
             @if ($kataKunci || $filterDepartemen || $filterStatus)
                 <a href="{{ route('admin.data-karyawan.index') }}"
@@ -122,23 +184,15 @@
                         @endphp
                         <tr class="transition-colors group" style="border-bottom: 1px solid #f1f5f9;" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background=''">
                             <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
-                            <td class="px-6 py-4 text-sm font-mono text-[#40484b]">
-                                {{ $row->nik_karyawan }}
-                            </td>
+                            <td class="px-6 py-4 text-sm font-mono text-[#40484b]">{{ $row->nik_karyawan }}</td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold {{ $avatarBg }}">
-                                        {{ $inisial }}
-                                    </div>
+                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold {{ $avatarBg }}">{{ $inisial }}</div>
                                     <p class="text-sm font-semibold text-[#191c1e]">{{ $row->nama_karyawan }}</p>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-sm text-[#40484b]">
-                                {{ $row->departemen?->nama_departemen ?? $row->getRawOriginal('departemen') ?? '-' }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-[#40484b]">
-                                {{ $row->posisi?->nama_posisi ?? $row->jabatan ?? '-' }}
-                            </td>
+                            <td class="px-6 py-4 text-sm text-[#40484b]">{{ $row->departemen?->nama_departemen ?? $row->getRawOriginal('departemen') ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-[#40484b]">{{ $row->posisi?->nama_posisi ?? $row->jabatan ?? '-' }}</td>
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $warnaStatus }}">
                                     <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }} mr-1.5"></span>
@@ -149,11 +203,12 @@
                                 <div class="flex items-center justify-end gap-1">
                                     @auth
                                         @if(auth()->user()->hasIzin('data_karyawan.kelola'))
-                                            <a href="{{ route('admin.data-karyawan.ubah', $row->id) }}"
-                                               class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
-                                               title="Edit">
+                                            <button type="button"
+                                                    @click="openUbah({{ $row->id }}, '{{ addslashes($row->nik_karyawan) }}', '{{ addslashes($row->nama_karyawan) }}', '{{ $row->jenis_kelamin }}', '{{ $row->tanggal_lahir }}', '{{ $row->departemen_id }}', '{{ $row->posisi_id }}', {{ $row->status === 'sudah_terpakai' ? 'true' : 'false' }})"
+                                                    class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
+                                                    title="Edit">
                                                 <span class="material-symbols-outlined text-[18px]">edit</span>
-                                            </a>
+                                            </button>
                                             @if ($row->memiliki_akun)
                                                 <button type="button" disabled
                                                         title="NIK ini sudah dipakai untuk registrasi, tidak bisa dihapus."
@@ -191,10 +246,10 @@
                                     <p class="text-[12px] text-[#71787c] mb-4">Import atau tambahkan data karyawan untuk memulai.</p>
                                     @auth
                                         @if(auth()->user()->hasIzin('data_karyawan.kelola'))
-                                            <a href="{{ route('admin.data-karyawan.tambah') }}" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                            <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
                                                 <span class="material-symbols-outlined text-[16px]">add</span>
                                                 Tambah Data Karyawan
-                                            </a>
+                                            </button>
                                         @endif
                                     @endauth
                                 @endif
@@ -219,10 +274,9 @@
     </div>
 
     {{-- MODAL IMPORT --}}
-    <div x-show="modalImport" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-[#191c1e]/50 px-4">
+    <template x-teleport="body">
+    <div x-show="modalImport" x-cloak class="fixed inset-0 z-50 flex items-center justify-center px-4" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)">
         <div class="w-full max-w-md rounded-xl bg-white shadow-xl" @click.outside="modalImport = false">
-
-            {{-- Header --}}
             <div class="flex items-center justify-between px-5 py-4 border-b border-[#e0e3e5]">
                 <div class="flex items-center gap-3">
                     <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2C5F6F]/10">
@@ -238,13 +292,9 @@
                     <span class="material-symbols-outlined text-[18px]">close</span>
                 </button>
             </div>
-
-            {{-- Body --}}
             <form method="POST" action="{{ route('admin.data-karyawan.import') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="px-5 py-4 space-y-4">
-
-                    {{-- File input --}}
                     <div>
                         <label class="block text-xs font-semibold text-[#40484b] mb-1.5">File Excel</label>
                         <input id="file_excel" name="file_excel" type="file" accept=".xlsx,.xls"
@@ -255,8 +305,6 @@
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                         @enderror
                     </div>
-
-                    {{-- Ketentuan --}}
                     <div class="rounded-lg bg-[#f0f7f9] border border-[#c0d8e0] px-3 py-2.5 text-xs text-[#40484b] space-y-1">
                         <p class="font-semibold text-[#2C5F6F] mb-1">Ketentuan:</p>
                         <p>• Kolom <strong>NIK</strong>, <strong>Nama Karyawan</strong>, <strong>Departemen</strong> wajib diisi</p>
@@ -264,15 +312,10 @@
                         <p>• Departemen/Jabatan baru otomatis dibuat</p>
                         <p>• Jenis Kelamin: <strong>L</strong> (Laki-laki) atau <strong>P</strong> (Perempuan)</p>
                     </div>
-
                 </div>
-
-                {{-- Footer --}}
                 <div class="flex justify-end gap-2 px-5 py-4 border-t border-[#e0e3e5]">
                     <button type="button" @click="modalImport = false"
-                            class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">
-                        Batal
-                    </button>
+                            class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
                     <button type="submit"
                             class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">
                         <span class="material-symbols-outlined text-[16px]">upload</span>
@@ -282,9 +325,11 @@
             </form>
         </div>
     </div>
+    </template>
 
     {{-- MODAL HAPUS --}}
-    <div x-show="modalHapus" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-[#191c1e]/50 px-4">
+    <template x-teleport="body">
+    <div x-show="modalHapus" x-cloak class="fixed inset-0 z-50 flex items-center justify-center px-4" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)">
         <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" @click.outside="modalHapus = false">
             <h3 class="text-base font-semibold text-[#191c1e]">Hapus Data Karyawan</h3>
             <p class="mt-2 text-sm text-[#40484b]">
@@ -303,9 +348,231 @@
             </div>
         </div>
     </div>
+    </template>
+
+    {{-- MODAL TAMBAH --}}
+    <template x-teleport="body">
+    <div x-show="modalTambah" x-cloak class="fixed inset-0 z-50 flex items-center justify-center px-4" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)">
+        <div class="w-full max-w-md rounded-xl bg-white shadow-xl flex flex-col" style="max-height:88vh" @click.outside="modalTambah = false">
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-4 py-3 border-b border-[#e0e3e5] shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">person_add</span>
+                    <h3 class="text-sm font-semibold text-[#191c1e]">Tambah Data Karyawan</h3>
+                </div>
+                <button type="button" @click="modalTambah = false"
+                        class="text-[#71787c] hover:text-[#191c1e] transition-colors p-1 rounded-md hover:bg-[#f2f4f6]">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <form id="form-tambah" method="POST" action="{{ route('admin.data-karyawan.simpan') }}" class="flex flex-col overflow-hidden">
+                @csrf
+                <input type="hidden" name="_form" value="tambah">
+                <input type="hidden" name="departemen" id="hid_tambah_dept">
+                <input type="hidden" name="jabatan" id="hid_tambah_jabatan">
+
+                <div class="px-4 py-3 space-y-3 overflow-y-auto">
+                    {{-- NIK + Nama --}}
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">NIK <span class="text-rose-500">*</span></label>
+                            <input name="nik_karyawan" type="text" value="{{ old('nik_karyawan') }}" required maxlength="30"
+                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm font-mono text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nik_karyawan') border-rose-400 @enderror">
+                            @error('nik_karyawan')<p class="mt-0.5 text-[11px] text-rose-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Nama Karyawan <span class="text-rose-500">*</span></label>
+                            <input name="nama_karyawan" type="text" value="{{ old('nama_karyawan') }}" required maxlength="255"
+                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nama_karyawan') border-rose-400 @enderror">
+                            @error('nama_karyawan')<p class="mt-0.5 text-[11px] text-rose-600">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                    {{-- Jenis Kelamin + Tanggal Lahir --}}
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                            <select name="jenis_kelamin" required
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                                <option value="">-- Pilih --</option>
+                                <option value="L" @if(old('jenis_kelamin') == 'L') selected @endif>Laki-laki</option>
+                                <option value="P" @if(old('jenis_kelamin') == 'P') selected @endif>Perempuan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Tanggal Lahir <span class="text-rose-500">*</span></label>
+                            <input name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir') }}" required
+                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
+                            @error('tanggal_lahir')<p class="mt-0.5 text-[11px] text-rose-600">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                    {{-- Departemen + Posisi --}}
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Departemen <span class="text-rose-500">*</span></label>
+                            <select id="tambah-dept-sel" name="departemen_id" required x-model="tambahDeptId"
+                                    @change="posisiTambah = []; tambahPosisiId = ''; if (tambahDeptId) loadPosisi('posisiTambah', tambahDeptId)"
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                                <option value="">-- Pilih --</option>
+                                @foreach($semuaDepartemen as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_departemen }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Jabatan <span class="text-rose-500">*</span></label>
+                            <select id="tambah-posisi-sel" name="posisi_id" required
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer @error('posisi_id') border-rose-400 @enderror">
+                                <option value="">-- Pilih --</option>
+                                <template x-for="p in posisiTambah" :key="p.id">
+                                    <option :value="String(p.id)" x-text="p.nama_posisi" :selected="String(p.id) === tambahPosisiId"></option>
+                                </template>
+                            </select>
+                            @error('posisi_id')<p class="mt-0.5 text-[11px] text-rose-600">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer --}}
+                <div class="flex justify-end gap-2 px-4 py-3 border-t border-[#e0e3e5] shrink-0">
+                    <button type="button" @click="modalTambah = false"
+                            class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">save</span>
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </template>
+
+    {{-- MODAL UBAH --}}
+    <template x-teleport="body">
+    <div x-show="modalUbah" x-cloak class="fixed inset-0 z-50 flex items-center justify-center px-4" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)">
+        <div class="w-full max-w-md rounded-xl bg-white shadow-xl flex flex-col" style="max-height:88vh" @click.outside="modalUbah = false">
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-4 py-3 border-b border-[#e0e3e5] shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">edit</span>
+                    <h3 class="text-sm font-semibold text-[#191c1e]">Ubah Data Karyawan</h3>
+                </div>
+                <button type="button" @click="modalUbah = false"
+                        class="text-[#71787c] hover:text-[#191c1e] transition-colors p-1 rounded-md hover:bg-[#f2f4f6]">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <form id="form-ubah" :action="`{{ url('admin/data-karyawan') }}/${ubah.id}`" method="POST" class="flex flex-col overflow-hidden">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="_form" value="ubah">
+                <input type="hidden" name="_edit_id" :value="ubah.id">
+                <input type="hidden" name="_nik_readonly" :value="ubah.nikReadonly ? '1' : '0'">
+                <input type="hidden" name="departemen" id="hid_ubah_dept">
+                <input type="hidden" name="jabatan" id="hid_ubah_jabatan">
+                <template x-if="ubah.nikReadonly">
+                    <input type="hidden" name="nik_karyawan" :value="ubah.nik">
+                </template>
+
+                <div class="px-4 py-3 space-y-3 overflow-y-auto">
+                    {{-- NIK + Nama --}}
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">
+                                NIK
+                                <span x-show="ubah.nikReadonly" class="font-normal text-[#71787c]">(terkunci)</span>
+                            </label>
+                            <input name="nik_karyawan" type="text" x-model="ubah.nik" required maxlength="30"
+                                   :disabled="ubah.nikReadonly"
+                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm font-mono text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 disabled:cursor-not-allowed disabled:bg-[#f2f4f6] disabled:text-[#40484b]">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Nama Karyawan <span class="text-rose-500">*</span></label>
+                            <input name="nama_karyawan" type="text" x-model="ubah.nama" required maxlength="255"
+                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                        </div>
+                    </div>
+                    {{-- Jenis Kelamin + Tanggal Lahir --}}
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                            <select name="jenis_kelamin" required x-model="ubah.jenis_kelamin"
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                                <option value="">-- Pilih --</option>
+                                <option value="L">Laki-laki</option>
+                                <option value="P">Perempuan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Tanggal Lahir <span class="text-rose-500">*</span></label>
+                            <input name="tanggal_lahir" type="date" x-model="ubah.tanggal_lahir" required
+                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                        </div>
+                    </div>
+                    {{-- Departemen + Posisi --}}
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Departemen <span class="text-rose-500">*</span></label>
+                            <select id="ubah-dept-sel" name="departemen_id" required x-model="ubah.departemen_id"
+                                    @change="posisiUbah = []; ubah.posisi_id = ''; if (ubah.departemen_id) loadPosisi('posisiUbah', ubah.departemen_id)"
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                                <option value="">-- Pilih --</option>
+                                @foreach($semuaDepartemen as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_departemen }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-[#40484b] mb-1">Jabatan <span class="text-rose-500">*</span></label>
+                            <select id="ubah-posisi-sel" name="posisi_id" required
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                                <option value="">-- Pilih --</option>
+                                <template x-for="p in posisiUbah" :key="p.id">
+                                    <option :value="String(p.id)" x-text="p.nama_posisi" :selected="String(p.id) === ubah.posisi_id"></option>
+                                </template>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer --}}
+                <div class="flex justify-end gap-2 px-4 py-3 border-t border-[#e0e3e5] shrink-0">
+                    <button type="button" @click="modalUbah = false"
+                            class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">save</span>
+                        Perbarui
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </template>
 
 </div>
 
 <style>[x-cloak] { display: none !important; }</style>
+
+<script>
+// Sync hidden departemen/jabatan text fields before form submit (required by validation)
+document.getElementById('form-tambah').addEventListener('submit', function () {
+    var dSel = document.getElementById('tambah-dept-sel');
+    var pSel = document.getElementById('tambah-posisi-sel');
+    document.getElementById('hid_tambah_dept').value    = dSel.options[dSel.selectedIndex]?.text || '';
+    document.getElementById('hid_tambah_jabatan').value = pSel.options[pSel.selectedIndex]?.text || '';
+});
+
+document.getElementById('form-ubah').addEventListener('submit', function () {
+    var dSel = document.getElementById('ubah-dept-sel');
+    var pSel = document.getElementById('ubah-posisi-sel');
+    document.getElementById('hid_ubah_dept').value    = dSel.options[dSel.selectedIndex]?.text || '';
+    document.getElementById('hid_ubah_jabatan').value = pSel.options[pSel.selectedIndex]?.text || '';
+});
+</script>
 
 @endsection

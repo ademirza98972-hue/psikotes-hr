@@ -96,7 +96,10 @@
             Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih minimal satu peserta untuk cetak PDF.', confirmButtonColor: '#2C5F6F' });
             return;
         }
-        Swal.fire({ icon: 'info', title: 'Info', text: 'Fitur cetak PDF terpilih akan aktif setelah backend selesai dibangun.', confirmButtonColor: '#2C5F6F' });
+        this.checkedIds.forEach(id => {
+            const [sesiId, pesertaId] = id.split('-');
+            window.open(`/admin/hasil-tes/${sesiId}/${pesertaId}/print`, '_blank');
+        });
     }
 }" x-init=""
 class="w-full">

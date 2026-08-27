@@ -21,6 +21,8 @@ class DimensiAlatTes extends Model
         'tipe_kategori',
         'arah_skor',
         'urutan',
+        'durasi_detik',
+        'instruksi_subtes',
     ];
 
     public function alatTes(): BelongsTo

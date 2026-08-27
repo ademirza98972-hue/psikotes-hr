@@ -1,4 +1,4 @@
-# Memory - Psikotes HR Project (Updated 2026-07-24 14:30)
+# Memory - Psikotes HR Project (Updated 2026-08-26)
 
 ## Data Terhapus - FIXED (Final Verification)
 - Route name typo fix: changed `hapus-permanent` to `hapus-permanen` in all 7 partial views. Test passed: data-terhapus page renders correctly with HTTP 200, shows "Menampilkan 1 dari 2 departemen".
@@ -27,3 +27,16 @@
 
 ## Integration Tests Must Hit Real Server
 - Integration tests MUST hit a real running server (port 8000) via `curl`, not mock requests.
+
+## DummyHasilTesSeeder (Completed 2026-08-26)
+- Lokasi: `database/seeders/DummyHasilTesSeeder.php`
+- Status: ✅ Berjalan sukses
+- Menghasilkan: 956 jawaban dummy untuk 8 peserta
+- FK kunci: gunakan `$ps->sesi_tes_id` (bukan `$ps->id`) untuk foreign key ke tabel `sesi_tes`
+- Table truncation: jawaban_peserta, grid_input_peserta, hasil_kolom_grid, hasil_skor_peserta
+- Scoring methods yang dipanggil: scoreIST, scoreForcedChoice, scoreConsistency, scoreRollup, scoreGrid
+- Output record counts:
+  - jawaban_peserta: 852
+  - grid_input_peserta: 104
+  - hasil_kolom_grid: 8
+  - hasil_skor_peserta: 114

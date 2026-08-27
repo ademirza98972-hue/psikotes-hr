@@ -20,6 +20,8 @@ class SimpanDimensiAlatTesRequest extends FormRequest
             'tipe_kategori'  => 'required|in:psikogram,klinis',
             'arah_skor'      => 'required|in:tinggi_baik,rendah_baik',
             'urutan'         => 'nullable|integer|min:0',
+            'durasi_detik'   => 'nullable|integer|min:0',
+            'instruksi_subtes' => 'nullable|string',
         ];
     }
 
@@ -39,7 +41,8 @@ class SimpanDimensiAlatTesRequest extends FormRequest
             'deskripsi_aspek' => 'deskripsi aspek',
             'tipe_kategori' => 'tipe kategori',
             'arah_skor' => 'arah skor',
-            'urutan' => 'urutan',
+            'urutan'       => 'urutan',
+            'durasi_detik' => 'durasi (detik)',
         ];
     }
 }

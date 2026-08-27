@@ -62,6 +62,11 @@
                     <input type="number" name="urutan" min="0" value="0"
                            class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
                 </div>
+                <div>
+                    <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Durasi (detik) — hanya untuk IST</label>
+                    <input type="number" name="durasi_detik" min="0" placeholder="kosongkan = pakai default 420"
+                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                </div>
             </div>
             <div>
                 <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Deskripsi Aspek</label>

@@ -112,9 +112,11 @@ class DataTerhapusController extends Controller
     /** Restore all soft-deleted children of the given parent record. */
     private function restoreChild(string $model, string $fk, int $parentId): void
     {
-        (new $model())->where($fk, $parentId)
-            ->onlyTrashed()
-            ->restore();
+        if (!in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive($model))) {
+            return;
+        }
+
+        $model::onlyTrashed()->where($fk, $parentId)->restore();
     }
 
     public function hapusPermanen(string $jenis, int $id): RedirectResponse

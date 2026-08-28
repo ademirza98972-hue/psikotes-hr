@@ -75,7 +75,12 @@
 
         /* Sidebar text elements — fade on collapse */
         .sidebar-link > span:not(.material-symbols-outlined),
-        .sidebar-link .ml-auto,
+        .sidebar-link .ml-auto {
+            transition: opacity 0.15s ease, max-width 0.2s ease;
+            max-width: 200px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
         .link-text,
         .sb-logo-text,
         .user-card-actions {
@@ -106,7 +111,7 @@
         aside.collapsed .sidebar-link.active {
             background: var(--sb-active-bg);
             border-radius: 10px 0 0 10px;
-            margin: 1px 0 1px 8px;
+            margin: 1px 0;
             position: relative;
             overflow: visible;
         }
@@ -132,8 +137,8 @@
             pointer-events: none;
             z-index: 2;
         }
-        aside.collapsed .sidebar-link > span:not(.material-symbols-outlined) { opacity: 0; pointer-events: none; }
-        aside.collapsed .sidebar-link .ml-auto { opacity: 0; pointer-events: none; }
+        aside.collapsed .sidebar-link > span:not(.material-symbols-outlined) { opacity: 0; pointer-events: none; max-width: 0; }
+        aside.collapsed .sidebar-link .ml-auto { display: none; }
         aside.collapsed .section-label { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
         aside.collapsed .nav-divider { margin: 6px 8px; }
         aside.collapsed .link-text { opacity: 0; pointer-events: none; }

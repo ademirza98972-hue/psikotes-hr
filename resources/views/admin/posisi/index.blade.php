@@ -75,10 +75,16 @@
                                         @if(auth()->user()->hasIzin('posisi.kelola'))
                                             <button type="button"
                                                     @click="openModal({{ $item->id }}, '{{ addslashes($item->nama_posisi) }}', {{ $item->departemen_id ?? 'null' }})"
-                                                    class="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">Ubah</button>
+                                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    title="Edit">
+                                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
+                                            </button>
                                             <button type="button"
                                                     onclick="confirmHapus('{{ $item->id }}', '{{ addslashes($item->nama_posisi) }}')"
-                                                    class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-red-700">Hapus</button>
+                                                    class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors"
+                                                    title="Hapus">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                            </button>
                                         @endif
                                     @endauth
                                 </div>

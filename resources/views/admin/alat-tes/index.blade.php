@@ -150,9 +150,9 @@
                                     <div class="flex items-center justify-end gap-1">
                                         <button type="button"
                                                 @click="openUbah({{ $alat['id'] }}, @js($alat['kode']), @js($alat['nama']), @js($alat['format_dasar']), @js($alat['pola_skoring']), @js($alat['durasi_total_menit']), @js($alat['deskripsi'] ?? ''), {{ $alat['batas_waktu_per_soal_aktif'] ? 'true' : 'false' }}, @js($alat['batas_waktu_per_soal_detik']), {{ $alat['is_sensitif'] ? 'true' : 'false' }})"
-                                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                                class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="Edit">
-                                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                                            <span class="material-symbols-outlined text-[20px]">edit_square</span>
                                         </button>
                                         <a href="{{ route('admin.alat-tes.norma', $alat['id']) }}"
                                            class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
@@ -165,10 +165,10 @@
                                             <span class="material-symbols-outlined text-[18px]">psychology</span>
                                         </a>
                                         <button type="button"
-                                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                                                class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors"
                                                 title="Hapus"
                                                 onclick="confirmHapusAlatTes({{ $alat['id'] }}, '{{ addslashes($alat['nama']) }}')">
-                                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                                            <span class="material-symbols-outlined text-[20px]">delete</span>
                                         </button>
                                     </div>
                                 @endif

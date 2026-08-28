@@ -128,16 +128,17 @@
                         Detail
                     </a>
                     <a href="{{ route('admin.penjadwalan-tes.edit', $sesi->id) }}"
-                       class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[12px] font-semibold text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">
-                        <span class="material-symbols-outlined text-[14px]">edit</span>
-                        Ubah
+                       class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                       title="Edit">
+                        <span class="material-symbols-outlined text-[20px]">edit_square</span>
                     </a>
                     <form method="POST" action="{{ route('admin.penjadwalan-tes.hapus', $sesi->id) }}"
                           onsubmit="return confirm('Hapus sesi {{ addslashes($sesi->nama_sesi) }}?')" class="ml-auto">
                         @csrf @method('DELETE')
                         <button type="submit"
-                                class="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-[12px] font-semibold text-rose-400 transition hover:bg-rose-50 hover:text-rose-600">
-                            <span class="material-symbols-outlined text-[14px]">delete</span>
+                                class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors"
+                                title="Hapus">
+                            <span class="material-symbols-outlined text-[20px]">delete</span>
                         </button>
                     </form>
                 </div>

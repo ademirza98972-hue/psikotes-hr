@@ -130,7 +130,9 @@
                                         @if($bisaEdit)
                                             <button type="button"
                                                     @click="openEdit({ id: {{ $u->id }}, name: @js($u->name), email: @js($u->email), no_hp: @js($u->no_hp ?? ''), peran_id: @js((string)$u->peran_id), status: @js($u->status), peranNama: @js($u->peran->nama_peran ?? ''), isSuperAdmin: {{ $u->peran && $u->peran->nama_peran === 'Super Admin' ? 'true' : 'false' }} })"
-                                                    class="px-3 py-1.5 bg-[#0D47A1] text-white rounded-lg text-[12px] font-medium hover:opacity-90 transition-opacity">Edit</button>
+                                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
+                                            </button>
                                             @if ($u->status !== 'aktif' && !$isSuperAdmin)
                                                 @if ($u->status === 'aktif')
                                                     <form method="POST" action="{{ route('admin.pengguna-admin.toggle-status', $u->id) }}" class="inline">
@@ -152,7 +154,9 @@
                                         @if($bisaHapus && $u->id !== auth()->id())
                                             <button type="button"
                                                     @click="modalHapus = true; idHapus = {{ $u->id }}; namaHapus = '{{ addslashes($u->name) }}'"
-                                                    class="px-3 py-1.5 bg-[#B71C1C] text-white rounded-lg text-[12px] font-medium hover:opacity-90 transition-opacity">Hapus</button>
+                                                    class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors" title="Hapus">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                            </button>
                                         @endif
                                     @endauth
                                 </div>

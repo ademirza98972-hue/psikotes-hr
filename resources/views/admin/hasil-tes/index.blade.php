@@ -195,9 +195,9 @@ class="w-full">
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button type="button" class="p-2 text-[var(--color-psikotes)] hover:bg-[var(--color-surface-container-low)] rounded-lg transition-colors"
+                            <button type="button" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit"
                                 onclick="window.location='{{ route('admin.penjadwalan-tes.edit', $sesi['id']) }}'">
-                                <span class="material-symbols-outlined">edit</span>
+                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
                             </button>
                             <div x-data="{ open: false }" class="relative">
                                 <button type="button" class="p-2 text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] rounded-lg transition-colors"

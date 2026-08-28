@@ -205,23 +205,23 @@
                                         @if(auth()->user()->hasIzin('data_karyawan.kelola'))
                                             <button type="button"
                                                     @click="openUbah({{ $row->id }}, '{{ addslashes($row->nik_karyawan) }}', '{{ addslashes($row->nama_karyawan) }}', '{{ $row->jenis_kelamin }}', '{{ $row->tanggal_lahir }}', '{{ $row->departemen_id }}', '{{ $row->posisi_id }}', {{ $row->status === 'sudah_terpakai' ? 'true' : 'false' }})"
-                                                    class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
+                                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit">
-                                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
                                             </button>
                                             @if ($row->memiliki_akun)
                                                 <button type="button" disabled
                                                         title="NIK ini sudah dipakai untuk registrasi, tidak bisa dihapus."
-                                                        class="p-2 rounded-lg text-[#40484b] opacity-40 cursor-not-allowed"
+                                                        class="p-2 text-[#40484b] opacity-40 cursor-not-allowed"
                                                         aria-disabled="true">
-                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                    <span class="material-symbols-outlined text-[20px]">delete</span>
                                                 </button>
                                             @else
                                                 <button type="button"
                                                         @click="modalHapus = true; idHapus = {{ $row->id }}; namaHapus = '{{ addslashes($row->nama_karyawan) }}'"
-                                                        class="p-2 rounded-lg text-[#40484b] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                                        class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors"
                                                         title="Hapus">
-                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                    <span class="material-symbols-outlined text-[20px]">delete</span>
                                                 </button>
                                             @endif
                                         @endif

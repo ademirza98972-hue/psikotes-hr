@@ -234,16 +234,16 @@ x-init="
                                             </form>
                                             <button type="button"
                                                     @click="openUbah({{ $item->id }}, @js($namaTampil), @js($profil->nik_kandidat ?? ''), @js($item->email), @js($item->no_hp ?? ''), @js((string)($profil->tanggal_lahir ?? '')), @js($item->jenis_kelamin ?? ''), {{ $profilDeptId }}, {{ $profilPosisiId }}, @js($profil->pendidikan_terakhir ?? ''))"
-                                                    class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
+                                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit">
-                                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
                                             </button>
                                         @elseif ($status === 'ditolak')
                                             <button type="button"
                                                     @click="openUbah({{ $item->id }}, @js($namaTampil), @js($profil->nik_kandidat ?? ''), @js($item->email), @js($item->no_hp ?? ''), @js((string)($profil->tanggal_lahir ?? '')), @js($item->jenis_kelamin ?? ''), {{ $profilDeptId }}, {{ $profilPosisiId }}, @js($profil->pendidikan_terakhir ?? ''))"
-                                                    class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
+                                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit">
-                                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
                                             </button>
                                         @endif
                                     @endif
@@ -251,9 +251,9 @@ x-init="
                                     @if (auth()->user()->hasIzin('pengguna.hapus'))
                                         <button type="button"
                                                 @click="bukaHapus({{ $item->id }}, @js($namaTampil))"
-                                                class="p-2 rounded-lg text-[#40484b] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                                class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors"
                                                 title="Hapus">
-                                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                                            <span class="material-symbols-outlined text-[20px]">delete</span>
                                         </button>
                                     @endif
                                 </div>

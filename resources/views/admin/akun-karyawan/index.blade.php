@@ -168,9 +168,9 @@ x-init="
                                         @if(auth()->user()->hasIzin('pengguna.edit'))
                                             <button type="button"
                                                     @click="openUbah({{ $u->id }}, @js($u->name), @js($u->profilKaryawan?->nik_karyawan ?? ''), @js($u->email), @js($u->no_hp ?? ''))"
-                                                    class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
+                                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit">
-                                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
                                             </button>
                                         @endif
                                         @if(auth()->user()->hasIzin('pengguna.edit'))
@@ -192,9 +192,9 @@ x-init="
                                             @if ($u->id !== auth()->id())
                                                 <button type="button"
                                                         @click="modalHapus = true; idHapus = {{ $u->id }}; namaHapus = '{{ addslashes($u->name) }}'"
-                                                        class="p-2 rounded-lg text-[#40484b] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                                        class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors"
                                                         title="Hapus">
-                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                    <span class="material-symbols-outlined text-[20px]">delete</span>
                                                 </button>
                                             @endif
                                         @endif

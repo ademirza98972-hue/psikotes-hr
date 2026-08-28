@@ -73,15 +73,15 @@
                                         @if(auth()->user()->hasIzin('departemen.kelola'))
                                             <button type="button"
                                                     @click="openModal('edit', {{ $item->id }}, '{{ addslashes($item->nama_departemen) }}')"
-                                                    class="inline-flex items-center gap-1 rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-all active:scale-95">
-                                                <span class="material-symbols-outlined text-[16px]">edit</span>
-                                                Ubah
+                                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    title="Edit">
+                                                <span class="material-symbols-outlined text-[20px]">edit_square</span>
                                             </button>
                                             <button type="button"
                                                     onclick="confirmHapus('{{ $item->id }}', '{{ addslashes($item->nama_departemen) }}')"
-                                                    class="inline-flex items-center gap-1 rounded-lg bg-[#ba1a1a] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-all active:scale-95">
-                                                <span class="material-symbols-outlined text-[16px]">delete</span>
-                                                Hapus
+                                                    class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors"
+                                                    title="Hapus">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
                                             </button>
                                         @endif
                                     @endauth

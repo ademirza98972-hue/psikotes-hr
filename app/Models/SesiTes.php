@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -17,7 +16,6 @@ class SesiTes extends Model
 
     protected $fillable = [
         'nama_sesi',
-        'departemen_terkait_id',
         'tanggal_mulai',
         'tanggal_selesai',
         'status',
@@ -42,9 +40,9 @@ class SesiTes extends Model
         });
     }
 
-    public function departemenTerkait(): BelongsTo
+    public function departemen(): BelongsToMany
     {
-        return $this->belongsTo(Departemen::class, 'departemen_terkait_id');
+        return $this->belongsToMany(Departemen::class, 'departemen_sesi_tes', 'sesi_tes_id', 'departemen_id');
     }
 
     public function alatTes(): BelongsToMany

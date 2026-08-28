@@ -33,14 +33,28 @@
                                placeholder="mis. Rekrutmen Staff Finance Batch 1"
                                class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
                     </div>
-                    <div>
-                        <label for="departemen_terkait" class="block text-[12px] font-medium text-[#41484b] mb-1.5">Departemen Terkait <span class="text-[#919eab]">(opsional)</span></label>
+                    @php
+                        $allDeptIds = $daftarDepartemen->pluck('id')->map(fn($id) => (string)$id)->values()->toArray();
+                        $selectedIds = array_map('strval', (array) old('departemen_ids', []));
+                    @endphp
+                    <div x-data="{ ids: {{ json_encode($selectedIds) }}, all: {{ json_encode($allDeptIds) }} }">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-[12px] font-medium text-[#41484b]">Departemen Terkait <span class="text-[#919eab]">(opsional)</span></label>
+                            <label class="flex items-center gap-1.5 cursor-pointer text-[11px] text-[#2C5F6F] font-medium select-none">
+                                <input type="checkbox"
+                                       :checked="ids.length > 0 && ids.length === all.length"
+                                       :indeterminate="ids.length > 0 && ids.length < all.length"
+                                       @change="ids = $event.target.checked ? [...all] : []"
+                                       class="h-3.5 w-3.5 rounded border-[#c1c7cb] text-[#2C5F6F] focus:ring-[#2C5F6F]">
+                                Lintas Departemen
+                            </label>
+                        </div>
                         <div class="space-y-2">
                             @foreach ($daftarDepartemen as $dept)
                                 <label class="flex items-center gap-3 p-3 rounded-xl border border-[#e0e3e5] bg-[#f2f4f6] cursor-pointer hover:border-[#2C5F6F]/40 transition-colors">
                                     <input type="checkbox" name="departemen_ids[]"
                                            value="{{ $dept->id }}"
-                                           {{ is_array(old('departemen_ids')) && in_array($dept->id, old('departemen_ids')) ? 'checked' : '' }}
+                                           x-model="ids"
                                            class="h-4 w-4 rounded border-[#c1c7cb] text-[#2C5F6F] focus:ring-[#2C5F6F]">
                                     <span class="text-sm font-medium text-[#191c1e]">{{ $dept->nama_departemen }}</span>
                                 </label>

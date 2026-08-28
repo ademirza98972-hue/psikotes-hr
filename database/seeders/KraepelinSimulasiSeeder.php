@@ -37,7 +37,6 @@ class KraepelinSimulasiSeeder extends Seeder
         $sesi = SesiTes::updateOrCreate(
             ['nama_sesi' => 'Pilot Validasi Kraepelin'],
             [
-                'departemen_terkait_id' => $departemen->id,
                 'tanggal_mulai' => Carbon::today(),
                 'tanggal_selesai' => Carbon::today(),
                 'status' => 'Aktif',
@@ -45,6 +44,7 @@ class KraepelinSimulasiSeeder extends Seeder
                 'jumlah_selesai' => 1,
             ]
         );
+        $sesi->departemen()->syncWithoutDetaching([$departemen->id]);
 
         AlatTesSesiTes::updateOrCreate(
             ['sesi_tes_id' => $sesi->id, 'alat_tes_id' => $alatTesKrp->id],

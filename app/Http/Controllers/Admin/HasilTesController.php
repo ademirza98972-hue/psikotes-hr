@@ -24,7 +24,7 @@ class HasilTesController extends Controller
         $selectedSesiId = $request->integer('sesi');
 
         $sesiList = SesiTes::with([
-            'departemenTerkait',
+            'departemen',
             'alatTes',
             'pesertaSesiTesRecords.user.profilKaryawan.dataKaryawan',
             'pesertaSesiTesRecords.user.profilKandidat',
@@ -38,7 +38,7 @@ class HasilTesController extends Controller
             'nama_sesi'          => $sesi->nama_sesi,
             'status'             => $sesi->status,
             'status_display'     => $sesi->status_display,
-            'departemen_terkait' => $sesi->departemenTerkait?->nama_departemen ?? '—',
+            'departemen_terkait' => $sesi->departemen->pluck('nama_departemen')->join(', ') ?: '—',
             'tanggal_mulai'      => $sesi->tanggal_mulai,
             'tanggal_selesai'    => $sesi->tanggal_selesai,
             'jumlah_peserta'     => $sesi->jumlah_peserta,
@@ -98,7 +98,7 @@ class HasilTesController extends Controller
 
     private function buildHasilTesData(int $sesiId, int $pesertaId): array
     {
-        $sesi = SesiTes::with('departemenTerkait')->findOrFail($sesiId);
+        $sesi = SesiTes::with('departemen')->findOrFail($sesiId);
         $user = \App\Models\User::findOrFail($pesertaId);
 
         $pesertaSesi = PesertaSesiTes::where('user_id', $pesertaId)

@@ -62,7 +62,7 @@
                 <div class="space-y-3 mb-5">
                     <div class="flex items-center gap-2 text-[#41484b] text-sm">
                         <span class="material-symbols-outlined text-[18px]">business</span>
-                        <span>Departemen: <strong class="text-[#191c1e]">{{ $sesi->departemenTerkait?->nama_departemen ?? '—' }}</strong></span>
+                        <span>Departemen: <strong class="text-[#191c1e]">{{ $sesi->departemen->pluck('nama_departemen')->join(', ') ?: '—' }}</strong></span>
                     </div>
                     <div class="flex items-center gap-2 text-[#41484b] text-sm">
                         <span class="material-symbols-outlined text-[18px]">calendar_today</span>

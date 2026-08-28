@@ -86,7 +86,7 @@
                     <div class="flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-slate-500">
                         <span class="flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-[14px] text-slate-400">business</span>
-                            {{ $sesi->departemenTerkait?->nama_departemen ?? 'Semua departemen' }}
+                            {{ $sesi->departemen->pluck('nama_departemen')->join(', ') ?: 'Semua departemen' }}
                         </span>
                         <span class="flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-[14px] text-slate-400">date_range</span>

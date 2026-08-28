@@ -38,13 +38,13 @@ class EppsSimulasiSeeder extends Seeder
 
         $sesi = SesiTes::create([
             'nama_sesi' => 'Pilot Validasi EPPS',
-            'departemen_terkait_id' => $departemen->id,
             'tanggal_mulai' => Carbon::today(),
             'tanggal_selesai' => Carbon::today(),
             'status' => 'Aktif',
             'jumlah_peserta' => 1,
             'jumlah_selesai' => 1,
         ]);
+        $sesi->departemen()->attach($departemen->id);
 
         AlatTesSesiTes::create([
             'sesi_tes_id' => $sesi->id,

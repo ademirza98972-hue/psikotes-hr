@@ -28,7 +28,7 @@ class PenjadwalanTesController extends Controller
             'pesertaSesiTes as jumlah_selesai_count' => function ($q) {
                 $q->where('status_pengerjaan', 'Selesai');
             }
-        ])->with(['departemenTerkait', 'alatTes'])
+        ])->with(['departemen', 'alatTes'])
             ->orderByDesc('tanggal_mulai')
             ->paginate($perPage)
             ->withQueryString();
@@ -54,17 +54,15 @@ class PenjadwalanTesController extends Controller
         $validated = $request->validated();
 
         $sesi = SesiTes::create([
-            'nama_sesi'             => $validated['nama_sesi'],
-            'departemen_terkait_id' => !empty($validated['departemen_ids'])
-                                        ? $validated['departemen_ids'][0]
-                                        : null,
-            'tanggal_mulai'         => $validated['tanggal_mulai'],
-            'tanggal_selesai'       => $validated['tanggal_selesai'],
-            'status'                => $validated['status'],
-            'jumlah_peserta'        => 0,
-            'jumlah_selesai'        => 0,
+            'nama_sesi'       => $validated['nama_sesi'],
+            'tanggal_mulai'   => $validated['tanggal_mulai'],
+            'tanggal_selesai' => $validated['tanggal_selesai'],
+            'status'          => $validated['status'],
+            'jumlah_peserta'  => 0,
+            'jumlah_selesai'  => 0,
         ]);
 
+        $sesi->departemen()->sync($validated['departemen_ids'] ?? []);
         $sesi->alatTes()->sync($validated['alat_tes_ids']);
 
         return redirect()
@@ -84,7 +82,7 @@ class PenjadwalanTesController extends Controller
     public function detail(int $id): View
     {
         $sesi = SesiTes::with([
-            'departemenTerkait',
+            'departemen',
             'alatTes',
             'pesertaSesiTesRecords.user',
             'pesertaSesiTesRecords.alatTes',
@@ -102,7 +100,7 @@ class PenjadwalanTesController extends Controller
 
     public function edit(int $id): View
     {
-        $sesi = SesiTes::with('alatTes')->findOrFail($id);
+        $sesi = SesiTes::with(['alatTes', 'departemen'])->findOrFail($id);
         $daftarAlatTes = AlatTes::where('is_aktif', true)->orderBy('nama')->get();
         $daftarDepartemen = Departemen::orderBy('nama_departemen')->get();
 
@@ -115,14 +113,12 @@ class PenjadwalanTesController extends Controller
 
         $sesi = SesiTes::findOrFail($id);
         $sesi->update([
-            'nama_sesi'             => $validated['nama_sesi'],
-            'departemen_terkait_id' => !empty($validated['departemen_ids'])
-                ? $validated['departemen_ids'][0]
-                : null,
+            'nama_sesi'       => $validated['nama_sesi'],
             'tanggal_mulai'   => $validated['tanggal_mulai'],
             'tanggal_selesai' => $validated['tanggal_selesai'],
             'status'          => $validated['status'],
         ]);
+        $sesi->departemen()->sync($validated['departemen_ids'] ?? []);
         $sesi->alatTes()->sync($validated['alat_tes_ids'] ?? []);
 
         return redirect()

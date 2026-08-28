@@ -36,7 +36,6 @@ class EppsSimulasiBaruSeeder extends Seeder
         $sesi = SesiTes::updateOrCreate(
             ['nama_sesi' => 'Test Pengerjaan EPPS'],
             [
-                'departemen_terkait_id' => $departemen->id,
                 'tanggal_mulai' => Carbon::today(),
                 'tanggal_selesai' => Carbon::today()->addDays(7),
                 'status' => 'Aktif',
@@ -44,6 +43,7 @@ class EppsSimulasiBaruSeeder extends Seeder
                 'jumlah_selesai' => 0,
             ]
         );
+        $sesi->departemen()->syncWithoutDetaching([$departemen->id]);
 
         AlatTesSesiTes::updateOrCreate(
             ['sesi_tes_id' => $sesi->id, 'alat_tes_id' => $alatTesEpps->id],

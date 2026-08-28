@@ -64,7 +64,7 @@ class DashboardController extends Controller
             $query->where('user_id', $user->id);
         })
             ->where('status', '!=', 'Draft')
-            ->with(['departemenTerkait', 'alatTes' => function ($q) {
+            ->with(['departemen', 'alatTes' => function ($q) {
                 $q->select('alat_tes.id', 'alat_tes.kode');
             }, 'pesertaSesiTesRecords'])
             ->orderBy('tanggal_mulai', 'desc')
@@ -93,7 +93,7 @@ class DashboardController extends Controller
             return [
                 'id' => $sesi->id,
                 'nama_sesi' => $sesi->nama_sesi,
-                'departemen_terkait' => $sesi->departemenTerkait?->nama_departemen ?? '',
+                'departemen_terkait' => $sesi->departemen->pluck('nama_departemen')->join(', '),
                 'tanggal_mulai' => $sesi->tanggal_mulai,
                 'tanggal_selesai' => $sesi->tanggal_selesai,
                 'daftar_alat_tes_ditugaskan' => $sesi->alatTes->pluck('kode')->toArray(),
@@ -225,7 +225,7 @@ class DashboardController extends Controller
      */
     public function instruksi(int $sesiId)
     {
-        $sesi = SesiTes::with(['departemenTerkait', 'alatTes'])
+        $sesi = SesiTes::with(['departemen', 'alatTes'])
             ->find($sesiId);
 
         if (!$sesi) {
@@ -274,7 +274,7 @@ class DashboardController extends Controller
             'nama_sesi' => $sesi->nama_sesi,
             'daftar_alat_tes_ditugaskan' => $kodeAlatTes,
             'daftarAlatTesDenganDetail' => $daftarAlatTesDenganDetail,
-            'departemen_terkait' => $sesi->departemenTerkait?->nama_departemen ?? '',
+            'departemen_terkait' => $sesi->departemen->pluck('nama_departemen')->join(', '),
             'sesiId' => $sesi->id,
         ]);
     }

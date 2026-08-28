@@ -140,4 +140,9 @@
 .focused-input { position: relative; }
 .focused-input :focus-within { border-color: var(--color-psikotes) !important; box-shadow: 0 0 0 1px var(--color-psikotes); }
 
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: none; }
+::view-transition-new(root) { animation: 180ms ease both page-in; }
+@keyframes page-in { from { opacity: 0; } }
+
 

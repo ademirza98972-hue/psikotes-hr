@@ -496,11 +496,17 @@ class PengerjaanTesController extends Controller
             $timerKey = $this->sessionKey($sesiId, "timer_subtes_{$kodeSubtesTimer}");
             $waktuMulaiSubtes = Session::get($timerKey);
 
-            // Crash recovery: read from DB only when session is empty
+            // Crash recovery: only use DB if session is entirely empty (no subtest timers at all).
+            // If any subtest timer key exists in session, the session is alive and the DB value is
+            // stale — left over from a previous subtest's fresh-start write.
             $recoveredFromDb = false;
             if (!$waktuMulaiSubtes && $pesertaAlatTes && $pesertaAlatTes->waktu_mulai_subtes) {
-                $waktuMulaiSubtes = $pesertaAlatTes->waktu_mulai_subtes->timestamp;
-                $recoveredFromDb = true;
+                $anyTimerInSession = collect(['SE','WA','AN','GE','RA','ZR','FA','WU','ME'])
+                    ->contains(fn($k) => Session::has($this->sessionKey($sesiId, "timer_subtes_{$k}")));
+                if (!$anyTimerInSession) {
+                    $waktuMulaiSubtes = $pesertaAlatTes->waktu_mulai_subtes->timestamp;
+                    $recoveredFromDb = true;
+                }
             }
 
             // Fresh start: no session and no DB record
@@ -521,6 +527,13 @@ class PengerjaanTesController extends Controller
             $sisaWaktuDetik = max(0, $durasiSubtes - (now()->timestamp - $waktuMulaiSubtes));
 
             if ($sisaWaktuDetik <= 0) {
+                // Clear DB timer so the next subtest always starts fresh.
+                // Without this, a browser crash between subtests would make crash-recovery
+                // read this subtest's (expired) timestamp for the next one.
+                if ($pesertaAlatTes) {
+                    $pesertaAlatTes->update(['waktu_mulai_subtes' => null]);
+                }
+
                 $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
                 $idxSubtesSaat = array_search($kodeSubtesTimer, $subtesUrutan);
                 $kodeSubtesBerikutnya = $subtesUrutan[$idxSubtesSaat + 1] ?? null;

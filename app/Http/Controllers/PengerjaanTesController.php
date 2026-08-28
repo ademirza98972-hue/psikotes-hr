@@ -24,7 +24,7 @@ class PengerjaanTesController extends Controller
      */
     private function getSesiPeserta(): array
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
         if (!$userId) return [];
 
         $pesertaSesiList = PesertaSesiTes::where('user_id', $userId)
@@ -43,7 +43,7 @@ class PengerjaanTesController extends Controller
 
     private function getSesiById(int $sesiId): ?array
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
         if (!$userId) return null;
 
         $pesertaSesi = PesertaSesiTes::where('sesi_tes_id', $sesiId)
@@ -76,7 +76,7 @@ class PengerjaanTesController extends Controller
      */
     private function getSoalPeserta(): array
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
         if (!$userId) return [];
 
         $pesertaSesiList = PesertaSesiTes::where('user_id', $userId)
@@ -205,8 +205,8 @@ class PengerjaanTesController extends Controller
         // Validasi: tanggal_lahir wajib diisi apabila ada IST di sesi ini
         $alatTesiAda = collect($sesi['daftar_alat_tes_ditugaskan'])->contains(fn(string $kode) => $kode === 'IST');
         if ($alatTesiAda) {
-            $profilKaryawan = auth()->user()->profilKaryawan;
-            $profilKandidat = auth()->user()->profilKandidat;
+            $profilKaryawan = Auth::user()->profilKaryawan;
+            $profilKandidat = Auth::user()->profilKandidat;
             $tanggalLahir   = $profilKaryawan?->tanggal_lahir ?? $profilKandidat?->tanggal_lahir;
             if (!$tanggalLahir) {
                 return redirect()
@@ -229,7 +229,7 @@ class PengerjaanTesController extends Controller
             ->map(fn ($a) => $a->id);
 
         // Hitung jumlah soal yang sudah dijawab per alat tes
-        $userId = auth()->id();
+        $userId = Auth::id();
         $alatTesSudahSelesai = \App\Models\JawabanPeserta::where('user_id', $userId)
             ->where('sesi_tes_id', $sesiId)
             ->whereHas('soal', function($q) use ($alatTesByKode) {
@@ -482,7 +482,7 @@ class PengerjaanTesController extends Controller
                 default           => 'ME',
             };
 
-            $dimensiSubtes = \App\Models\DimensiAlatTes::where('alat_tes_id', $alatTesSaat->id)
+            $dimensiSubtes = \App\Models\DimensiAlatTes::where('alat_tes_id', $alatTesSaat?->id)
                 ->where('kode_dimensi', $kodeSubtesTimer)
                 ->first();
             $durasiSubtes = $dimensiSubtes?->durasi_detik ?? 420;
@@ -573,7 +573,7 @@ class PengerjaanTesController extends Controller
             if ($durasiSesiDetik > 0) {
                 // Prefer DB-persisted sesi start time; fall back to session
                 $pesertaAlatTesSesi = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
-                    ->where('alat_tes_id', $alatTesAktif->id)
+                    ->where('alat_tes_id', $alatTesAktif?->id)
                     ->first();
                 $waktuMulaiSesi = null;
 
@@ -617,7 +617,7 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        $jawabanRecord = JawabanPeserta::where('user_id', auth()->id())
+        $jawabanRecord = JawabanPeserta::where('user_id', Auth::id())
             ->where('sesi_tes_id', $sesiId)
             ->where('soal_id', $soal['id'])
             ->first();
@@ -626,7 +626,7 @@ class PengerjaanTesController extends Controller
 
         // Bangun daftar nomor soal untuk navigasi sidebar
         $soalIds = collect($daftarSoalFlat)->pluck('soal.id')->filter()->values();
-        $sudahDijawabIds = JawabanPeserta::where('user_id', auth()->id())
+        $sudahDijawabIds = JawabanPeserta::where('user_id', Auth::id())
             ->where('sesi_tes_id', $sesiId)
             ->whereIn('soal_id', $soalIds)
             ->where(function($q) {
@@ -779,7 +779,7 @@ class PengerjaanTesController extends Controller
 
         $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
-        $userId        = auth()->id();
+        $userId        = Auth::id();
 
         $pesertaSesiTesId = $sesi['peserta_sesi_tes_id'];
         $alatTesByKode = \App\Models\PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
@@ -902,7 +902,7 @@ class PengerjaanTesController extends Controller
             }
             if ($jawabanTeks !== null && $jawabanTeks !== '') {
                 JawabanPeserta::updateOrCreate(
-                    ['user_id' => auth()->id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
+                    ['user_id' => Auth::id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
                     ['jawaban_teks' => $jawabanTeks, 'opsi_dipilih_id' => null, 'waktu_jawab' => now()]
                 );
             }
@@ -913,7 +913,7 @@ class PengerjaanTesController extends Controller
             }
             if ($opsiId !== null && $opsiId !== '') {
                 JawabanPeserta::updateOrCreate(
-                    ['user_id' => auth()->id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
+                    ['user_id' => Auth::id(), 'sesi_tes_id' => $sesiId, 'soal_id' => $soalId],
                     ['opsi_dipilih_id' => (int) $opsiId, 'jawaban_teks' => null, 'waktu_jawab' => now()]
                 );
             }
@@ -941,7 +941,7 @@ class PengerjaanTesController extends Controller
 
         $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
-        $userId        = auth()->id();
+        $userId        = Auth::id();
 
         // Muat alat_tes_id untuk setiap kode alat tes yang ditugaskan
         $pesertaSesiTesId = $sesi['peserta_sesi_tes_id'];
@@ -1000,7 +1000,7 @@ class PengerjaanTesController extends Controller
             );
         }
 
-        PesertaSesiTes::where('user_id', auth()->id())
+        PesertaSesiTes::where('user_id', Auth::id())
             ->where('sesi_tes_id', $sesiId)
             ->update([
                 'status_pengerjaan' => 'Selesai',
@@ -1047,7 +1047,7 @@ class PengerjaanTesController extends Controller
         $alatTesId = \App\Models\AlatTes::where('kode', $kodeGrid)->value('id');
 
         // Persistent countdown: set waktu_mulai saat pertama kali masuk
-        $pesertaSesi = PesertaSesiTes::where('user_id', auth()->id())
+        $pesertaSesi = PesertaSesiTes::where('user_id', Auth::id())
             ->where('sesi_tes_id', $sesiId)
             ->first();
 
@@ -1062,7 +1062,7 @@ class PengerjaanTesController extends Controller
         // Hitung sisa waktu dari durasi alat tes
         $alatTesModel = \App\Models\AlatTes::find($alatTesId);
         $durasiDetik  = ($alatTesModel?->durasi_total_menit ?? 60) * 60;
-        $detikBerjalan = (int) $pesertaSesi?->waktu_mulai->diffInSeconds(now());
+        $detikBerjalan = (int) $pesertaSesi?->waktu_mulai?->diffInSeconds(now());
         $sisaDetik = (int) max(0, $durasiDetik - $detikBerjalan);
 
         // Kalau waktu habis, langsung selesai
@@ -1070,7 +1070,7 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
 
-        $sudahDikerjakan = \App\Models\GridInputPeserta::where('user_id', auth()->id())
+        $sudahDikerjakan = \App\Models\GridInputPeserta::where('user_id', Auth::id())
             ->where('sesi_tes_id', $sesiId)
             ->where('alat_tes_id', $alatTesId)
             ->select('kolom_ke')
@@ -1123,7 +1123,7 @@ class PengerjaanTesController extends Controller
                     $sisaDetikPerKolom = (int) max(0, $detikPerKolom - $pesertaAlatTes->waktu_mulai_kolom->diffInSeconds(now()));
                     if ($sisaDetikPerKolom <= 0) {
                         // Kasus 4: waktu habis → simpan jawaban kosong, redirect ke kolom berikutnya
-                        $sudahAda = \App\Models\GridInputPeserta::where('user_id', auth()->id())
+                        $sudahAda = \App\Models\GridInputPeserta::where('user_id', Auth::id())
                             ->where('sesi_tes_id', $sesiId)
                             ->where('alat_tes_id', $alatTesId)
                             ->where('kolom_ke', $kolomAktifNomor)
@@ -1133,7 +1133,7 @@ class PengerjaanTesController extends Controller
                             $barisPertama = $kolomAktif['angka'][0] ?? null;
                             if ($barisPertama !== null) {
                                 \App\Models\GridInputPeserta::create([
-                                    'user_id'          => auth()->id(),
+                                    'user_id'          => Auth::id(),
                                     'sesi_tes_id'      => $sesiId,
                                     'alat_tes_id'      => $alatTesId,
                                     'kolom_ke'         => $kolomAktifNomor,
@@ -1189,7 +1189,7 @@ class PengerjaanTesController extends Controller
             'angka'       => 'required|array',
         ]);
 
-        $userId = auth()->id();
+        $userId = Auth::id();
         $alatTesId = $request->input('alat_tes_id');
         $kolomKe = $request->input('kolom_ke');
         $jawaban = $request->input('jawaban');

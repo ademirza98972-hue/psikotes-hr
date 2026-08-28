@@ -85,6 +85,7 @@
     @forelse ($dimensi as $dim)
         <div class="bg-white border border-[#e0e3e5] rounded-xl p-6"
              x-data="{
+                 editing: false,
                  tipe: '{{ $dim->tipe_kategori }}',
                  levels: @js($dim->levelDimensi->sortBy('urutan')->values()->map(fn($l) => [
                      'label' => $l->label,
@@ -127,48 +128,125 @@
              }">
 
             {{-- Header Dimensi --}}
-            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5 pb-4 border-b border-[#e0e3e5]">
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="inline-block px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#e8f0f2] text-[#2C5F6F] border border-[#4A8A9B]/30">
-                        {{ $dim->kode_dimensi }}
-                    </span>
-                    <h3 class="text-[15px] font-bold text-[#00303c]">{{ $dim->nama_dimensi }}</h3>
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold
-                        {{ $dim->tipe_kategori === 'psikogram'
-                            ? 'bg-violet-100 text-violet-700 border border-violet-200'
-                            : 'bg-amber-100 text-amber-700 border border-amber-200' }}">
-                        {{ $dim->tipe_kategori === 'psikogram' ? 'Psikogram' : 'Klinis' }}
-                    </span>
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold
-                        {{ $dim->arah_skor === 'tinggi_baik'
-                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                            : 'bg-rose-100 text-rose-700 border border-rose-200' }}">
-                        {{ $dim->arah_skor === 'tinggi_baik' ? 'Tinggi = Baik' : 'Rendah = Baik' }}
-                    </span>
-                </div>
-                <div class="flex items-center gap-1 shrink-0">
-                    <button type="button"
-                            @click="applyDefaults()"
-                            class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
-                            title="Reset ke default">
-                        <span class="material-symbols-outlined text-[18px]">restart_alt</span>
-                    </button>
-                    <form action="{{ route('admin.alat-tes.hapusDimensi', [$alatTes->id, $dim->id]) }}"
-                          method="POST" onsubmit="return confirm('Hapus dimensi \'{{ addslashes($dim->nama_dimensi) }}\'? Semua level terkait akan ikut terhapus.')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
-                                title="Hapus dimensi">
-                            <span class="material-symbols-outlined text-[18px]">delete</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
+            <div class="mb-5 pb-4 border-b border-[#e0e3e5]">
 
-            @if ($dim->deskripsi_aspek)
-                <p class="text-[13px] text-[#40484b] mb-4">{{ $dim->deskripsi_aspek }}</p>
-            @endif
+                {{-- VIEW MODE --}}
+                <div x-show="!editing" class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="inline-block px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#e8f0f2] text-[#2C5F6F] border border-[#4A8A9B]/30">
+                            {{ $dim->kode_dimensi }}
+                        </span>
+                        <h3 class="text-[15px] font-bold text-[#00303c]">{{ $dim->nama_dimensi }}</h3>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold
+                            {{ $dim->tipe_kategori === 'psikogram'
+                                ? 'bg-violet-100 text-violet-700 border border-violet-200'
+                                : 'bg-amber-100 text-amber-700 border border-amber-200' }}">
+                            {{ $dim->tipe_kategori === 'psikogram' ? 'Psikogram' : 'Klinis' }}
+                        </span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold
+                            {{ $dim->arah_skor === 'tinggi_baik'
+                                ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                                : 'bg-rose-100 text-rose-700 border border-rose-200' }}">
+                            {{ $dim->arah_skor === 'tinggi_baik' ? 'Tinggi = Baik' : 'Rendah = Baik' }}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button"
+                                @click="editing = true"
+                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                title="Edit dimensi">
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button type="button"
+                                @click="applyDefaults()"
+                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                title="Reset level ke default">
+                            <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+                        </button>
+                        <form action="{{ route('admin.alat-tes.hapusDimensi', [$alatTes->id, $dim->id]) }}"
+                              method="POST" onsubmit="return confirm('Hapus dimensi \'{{ addslashes($dim->nama_dimensi) }}\'? Semua level terkait akan ikut terhapus.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                                    title="Hapus dimensi">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                @if ($dim->deskripsi_aspek)
+                    <p x-show="!editing" class="text-[13px] text-[#40484b] mt-3">{{ $dim->deskripsi_aspek }}</p>
+                @endif
+
+                {{-- EDIT MODE --}}
+                <form x-show="editing" x-cloak
+                      action="{{ route('admin.alat-tes.updateDimensi', [$alatTes->id, $dim->id]) }}"
+                      method="POST" class="space-y-4 pt-1">
+                    @csrf
+                    @method('PUT')
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Kode Dimensi *</label>
+                            <input type="text" name="kode_dimensi" required maxlength="50"
+                                   value="{{ old('kode_dimensi', $dim->kode_dimensi) }}"
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Nama Dimensi *</label>
+                            <input type="text" name="nama_dimensi" required maxlength="150"
+                                   value="{{ old('nama_dimensi', $dim->nama_dimensi) }}"
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Tipe Kategori *</label>
+                            <select name="tipe_kategori" required @change="tipe = $event.target.value"
+                                    class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors bg-white">
+                                <option value="psikogram" @selected($dim->tipe_kategori === 'psikogram')>Psikogram</option>
+                                <option value="klinis" @selected($dim->tipe_kategori === 'klinis')>Klinis</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Arah Skor *</label>
+                            <select name="arah_skor" required
+                                    class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors bg-white">
+                                <option value="tinggi_baik" @selected($dim->arah_skor === 'tinggi_baik')>Tinggi = Baik</option>
+                                <option value="rendah_baik" @selected($dim->arah_skor === 'rendah_baik')>Rendah = Baik</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Urutan</label>
+                            <input type="number" name="urutan" min="0"
+                                   value="{{ old('urutan', $dim->urutan) }}"
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Durasi (detik) — hanya untuk IST</label>
+                            <input type="number" name="durasi_detik" min="0" placeholder="kosongkan = pakai default 420"
+                                   value="{{ old('durasi_detik', $dim->durasi_detik) }}"
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Deskripsi Aspek</label>
+                        <textarea name="deskripsi_aspek" rows="2"
+                                  class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors resize-none">{{ old('deskripsi_aspek', $dim->deskripsi_aspek) }}</textarea>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-[18px]">save</span>
+                            Simpan
+                        </button>
+                        <button type="button" @click="editing = false"
+                                class="px-5 py-2.5 rounded-xl border border-[#c0c8cb] text-[#40484b] text-sm font-medium hover:bg-[#f2f4f6] transition-colors">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+
+            </div>
 
             {{-- Sub-section: Level Dimensi --}}
             <div>

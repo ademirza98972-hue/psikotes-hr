@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $judulHalaman ?? 'Dashboard Peserta' }} — Sistem Psikotes HR</title>
     <link rel="preload" href="/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2" crossorigin>
+    <style>html,body{background:#f7f9fb}</style>
     <script>document.documentElement.style.setProperty('--sb-ml',localStorage.getItem('sidebarOpenPeserta')==='false'?'64px':'280px')</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>

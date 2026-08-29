@@ -279,18 +279,24 @@ class AlatTesController extends Controller
 
         $data = $request->validated();
 
-        LevelDimensi::where('dimensi_id', $dimensiId)->delete();
+        DB::transaction(function () use ($id, $dimensiId, $data) {
+            $levelIds = LevelDimensi::where('dimensi_id', $dimensiId)->pluck('id');
+            if ($levelIds->isNotEmpty()) {
+                DB::table('hasil_skor_peserta')->whereIn('level_id', $levelIds)->update(['level_id' => null]);
+            }
+            LevelDimensi::where('dimensi_id', $dimensiId)->delete();
 
-        foreach ($data['levels'] as $level) {
-            LevelDimensi::create([
-                'alat_tes_id' => $id,
-                'dimensi_id'  => $dimensiId,
-                'label'       => $level['label'],
-                'skor_min'    => $level['skor_min'],
-                'skor_max'    => $level['skor_max'],
-                'urutan'      => $level['urutan'],
-            ]);
-        }
+            foreach ($data['levels'] as $level) {
+                LevelDimensi::create([
+                    'alat_tes_id' => $id,
+                    'dimensi_id'  => $dimensiId,
+                    'label'       => $level['label'],
+                    'skor_min'    => $level['skor_min'],
+                    'skor_max'    => $level['skor_max'],
+                    'urutan'      => $level['urutan'],
+                ]);
+            }
+        });
 
         return redirect()
             ->route('admin.alat-tes.dimensi', $id)

@@ -122,8 +122,17 @@
                  },
                  removeLevel(idx) {
                      if (this.levels.length <= 1) return;
-                     this.levels.splice(idx, 1);
-                     this.levels.forEach((l, i) => l.urutan = i);
+                     Swal.fire({
+                         icon: 'warning', title: 'Hapus Level?',
+                         text: `Hapus level '${this.levels[idx].label || 'ini'}'?`,
+                         showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6b7280',
+                         confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
+                     }).then(r => {
+                         if (r.isConfirmed) {
+                             this.levels.splice(idx, 1);
+                             this.levels.forEach((l, i) => l.urutan = i);
+                         }
+                     });
                  }
              }">
 

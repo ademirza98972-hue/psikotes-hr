@@ -180,10 +180,7 @@ x-init="
                                     <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold {{ $avatarBg }}">
                                         {{ $inisial }}
                                     </div>
-                                    <div>
-                                        <p class="text-sm font-semibold text-[#191c1e]">{{ $namaTampil }}</p>
-                                        <p class="text-[11px] text-[#40484b]">{{ $item->email }}</p>
-                                    </div>
+                                    <span class="text-sm font-semibold text-[#191c1e]">{{ $namaTampil }}</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-[#40484b]">

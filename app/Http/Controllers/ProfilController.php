@@ -16,7 +16,7 @@ class ProfilController extends Controller
 {
     public function index(): View
     {
-        $user = Auth::user()->load(['profilKaryawan.dataKaryawan', 'profilKandidat']);
+        $user = Auth::user()->load(['dataKaryawan.departemen', 'dataKaryawan.posisi', 'profilKandidat']);
 
         return view('profil.index', [
             'judulHalaman' => 'Edit Profil',
@@ -32,8 +32,8 @@ class ProfilController extends Controller
 
         $tanggalLahir = $request->input('tanggal_lahir');
         if ($tanggalLahir !== null) {
-            if ($user->tipe_akun === 'karyawan' && $user->profilKaryawan) {
-                $user->profilKaryawan->update(['tanggal_lahir' => $tanggalLahir]);
+            if ($user->tipe_akun === 'karyawan' && $user->dataKaryawan) {
+                $user->dataKaryawan->update(['tanggal_lahir' => $tanggalLahir]);
             } elseif ($user->tipe_akun === 'kandidat' && $user->profilKandidat) {
                 $user->profilKandidat->update(['tanggal_lahir' => $tanggalLahir]);
             }
@@ -60,7 +60,8 @@ class ProfilController extends Controller
             ]);
         }
 
-        $user->password = Hash::make($request->input('password_baru'));
+        $user->password             = Hash::make($request->input('password_baru'));
+        $user->must_change_password = false;
         $user->save();
 
         return redirect()

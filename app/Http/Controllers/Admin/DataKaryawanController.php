@@ -10,149 +10,201 @@ use App\Http\Requests\SimpanDataKaryawanRequest;
 use App\Imports\DataKaryawanImport;
 use App\Models\DataKaryawan;
 use App\Models\Departemen;
+use App\Models\Peran;
 use App\Models\Posisi;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DataKaryawanController extends Controller
 {
-    private function subqueryMemilikiAkun(): string
+    private function generateIdKaryawan(): string
     {
-        return 'EXISTS(
-            SELECT 1 FROM profil_karyawan pk
-            JOIN users u ON u.id = pk.user_id AND u.deleted_at IS NULL
-            WHERE pk.nik_karyawan = data_karyawan.nik_karyawan
-        )';
+        $year = date('Y');
+        $last = User::where('id_karyawan', 'like', "{$year}%")
+            ->orderBy('id_karyawan', 'desc')
+            ->value('id_karyawan');
+
+        $seq = $last ? (int) substr($last, 4) + 1 : 1;
+
+        return $year . str_pad($seq, 3, '0', STR_PAD_LEFT);
     }
 
     public function index(Request $request): View
     {
-        $kataKunci = $request->input('cari');
+        $kataKunci       = $request->input('cari');
         $filterDepartemen = $request->input('departemen');
-        $filterStatus = $request->input('status');
+        $filterPosisi    = $request->input('posisi');
+        $perPage         = $this->getPerPage($request, 15);
 
-        $validStatus = ['belum_terpakai', 'sudah_terpakai'];
-        if ($filterStatus !== null && $filterStatus !== '' && ! in_array($filterStatus, $validStatus, true)) {
-            $filterStatus = null;
-        }
-
-        $subquery = $this->subqueryMemilikiAkun();
-
-        $perPage = $this->getPerPage($request, 15);
-
-        $data = DataKaryawan::query()
-            ->with(['departemen', 'posisi'])
-            ->selectRaw("data_karyawan.*, ({$subquery}) as memiliki_akun")
-            ->when($kataKunci, function ($query, $kataKunci) {
-                $query->where(function ($q) use ($kataKunci) {
-                    $q->where('nik_karyawan', 'like', '%' . $kataKunci . '%')
-                        ->orWhere('nama_karyawan', 'like', '%' . $kataKunci . '%');
+        $data = DataKaryawan::with(['departemen', 'posisi', 'user'])
+            ->when($kataKunci, function ($q) use ($kataKunci) {
+                $q->where(function ($inner) use ($kataKunci) {
+                    $inner->where('nik_karyawan', 'like', "%{$kataKunci}%")
+                        ->orWhereHas('user', fn ($uq) => $uq->where('name', 'like', "%{$kataKunci}%"));
                 });
             })
-            ->when($filterDepartemen, function ($query, $filterDepartemen) {
-                $query->where('departemen_id', (int) $filterDepartemen);
-            })
-            ->when($filterStatus === 'sudah_terpakai', fn ($q) => $q->whereRaw($subquery))
-            ->when($filterStatus === 'belum_terpakai', fn ($q) => $q->whereRaw("NOT ({$subquery})"))
-            ->orderBy('nama_karyawan')
+            ->when($filterDepartemen, fn ($q) => $q->where('departemen_id', (int) $filterDepartemen))
+            ->when($filterPosisi,    fn ($q) => $q->where('posisi_id', (int) $filterPosisi))
+            ->orderBy(
+                \App\Models\User::select('name')
+                    ->whereColumn('users.id', 'data_karyawan.user_id')
+                    ->limit(1)
+            )
             ->paginate($perPage)
             ->withQueryString();
 
-        $semuaDepartemen = Departemen::orderBy('nama_departemen')->get();
-
-        return view('admin.data-karyawan.index', [
-            'data' => $data,
-            'kataKunci' => $kataKunci,
+        return view('admin.akun-karyawan.index', [
+            'data'            => $data,
+            'kataKunci'       => $kataKunci,
             'filterDepartemen' => $filterDepartemen,
-            'filterStatus' => $filterStatus,
-            'semuaDepartemen' => $semuaDepartemen,
+            'filterPosisi'    => $filterPosisi,
+            'semuaDepartemen' => Departemen::orderBy('nama_departemen')->get(),
+            'semuaPosisi'     => Posisi::when($filterDepartemen, fn ($q) => $q->where('departemen_id', $filterDepartemen))->orderBy('nama_posisi')->get(),
         ]);
-    }
-
-    public function tambah(): View
-    {
-        $departemen = Departemen::orderBy('nama_departemen')->get();
-        return view('admin.data-karyawan.tambah', compact('departemen'));
     }
 
     public function simpan(SimpanDataKaryawanRequest $request): RedirectResponse
     {
-        DataKaryawan::create($request->validated());
+        $validated = $request->validated();
+
+        $peran = Peran::where('nama_peran', 'Karyawan')->first();
+        if (! $peran) {
+            return back()->withInput()->withErrors(['nama_karyawan' => 'Peran Karyawan belum tersedia di sistem.']);
+        }
+
+        DB::transaction(function () use ($validated, $peran) {
+            $idKaryawan = $this->generateIdKaryawan();
+
+            $user = User::create([
+                'name'                 => $validated['nama_karyawan'],
+                'email'                => $validated['email'] ?: null,
+                'id_karyawan'          => $idKaryawan,
+                'password'             => Hash::make($idKaryawan),
+                'jenis_kelamin'        => $validated['jenis_kelamin'],
+                'no_hp'                => $validated['no_hp'] ?? null,
+                'tipe_akun'            => 'karyawan',
+                'peran_id'             => $peran->id,
+                'status'               => 'aktif',
+                'must_change_password' => true,
+            ]);
+
+            DataKaryawan::create([
+                'nik_karyawan'        => $validated['nik_karyawan'],
+                'tanggal_lahir'       => $validated['tanggal_lahir'],
+                'pendidikan_terakhir' => $validated['pendidikan_terakhir'] ?? null,
+                'departemen_id'       => $validated['departemen_id'],
+                'posisi_id'           => $validated['posisi_id'],
+                'user_id'             => $user->id,
+            ]);
+        });
 
         return redirect()
-            ->route('admin.data-karyawan.index')
-            ->with($this::FLASH_SUCCESS, 'Data karyawan berhasil ditambahkan.');
-    }
-
-    public function ubah(int $data_karyawan): View
-    {
-        $data = DataKaryawan::with(['departemen', 'posisi'])->findOrFail($data_karyawan);
-        $departemen = Departemen::orderBy('nama_departemen')->get();
-        $posisi = Posisi::query()
-            ->when($data->departemen_id, fn ($q) => $q->where('departemen_id', $data->departemen_id))
-            ->orderBy('nama_posisi')
-            ->get();
-
-        return view('admin.data-karyawan.ubah', [
-            'data' => $data,
-            'departemen' => $departemen,
-            'posisi' => $posisi,
-        ]);
+            ->route('admin.akun-karyawan.index')
+            ->with($this::FLASH_SUCCESS, 'Karyawan berhasil ditambahkan. ID Karyawan telah dibuat otomatis.');
     }
 
     public function perbarui(PerbaruiDataKaryawanRequest $request, int $data_karyawan): RedirectResponse
     {
-        $data = DataKaryawan::findOrFail($data_karyawan);
-        $data->update($request->validated());
+        $data      = DataKaryawan::with('user')->findOrFail($data_karyawan);
+        $validated = $request->validated();
 
-        $data->pengguna()->update([
-            'nama_karyawan' => $data->nama_karyawan,
-            'departemen'    => $data->departemen,
-            'jabatan'       => $data->jabatan,
-            'tanggal_lahir' => $data->tanggal_lahir,
-        ]);
+        DB::transaction(function () use ($data, $validated) {
+            $data->update([
+                'nik_karyawan'        => $validated['nik_karyawan'],
+                'tanggal_lahir'       => $validated['tanggal_lahir'],
+                'pendidikan_terakhir' => $validated['pendidikan_terakhir'] ?? null,
+                'departemen_id'       => $validated['departemen_id'],
+                'posisi_id'           => $validated['posisi_id'],
+            ]);
 
-        \App\Models\User::whereIn('id', $data->pengguna()->pluck('user_id'))->update([
-            'name'          => $data->nama_karyawan,
-            'jenis_kelamin' => $data->jenis_kelamin,
-        ]);
+            if ($data->user) {
+                $data->user->update([
+                    'name'         => $validated['nama_karyawan'],
+                    'jenis_kelamin' => $validated['jenis_kelamin'],
+                    'email'        => $validated['email'] ?: null,
+                    'no_hp'        => $validated['no_hp'] ?? null,
+                ]);
+            }
+        });
 
         return redirect()
-            ->route('admin.data-karyawan.index')
+            ->route('admin.akun-karyawan.index')
             ->with($this::FLASH_SUCCESS, 'Data karyawan berhasil diperbarui.');
     }
 
     public function hapus(int $data_karyawan): RedirectResponse
     {
-        $data = DataKaryawan::findOrFail($data_karyawan);
+        $data = DataKaryawan::with('user')->findOrFail($data_karyawan);
 
-        $memilikiAkun = DB::table('profil_karyawan')
-            ->join('users', 'profil_karyawan.user_id', '=', 'users.id')
-            ->whereNull('users.deleted_at')
-            ->where('profil_karyawan.nik_karyawan', $data->nik_karyawan)
-            ->exists();
+        DB::transaction(function () use ($data) {
+            if ($data->user) {
+                if ($data->user->id === Auth::id()) {
+                    throw new \RuntimeException('Tidak dapat menghapus akun Anda sendiri.');
+                }
+                $data->user->deleted_by = Auth::id();
+                $data->user->save();
+                $data->user->delete();
+            }
 
-        if ($memilikiAkun) {
-            return back()->with('error', 'NIK ini sudah dipakai untuk registrasi, tidak bisa dihapus. Hapus dulu akun user terkait jika ingin melepas NIK ini.');
-        }
-
-        $data->deleted_by = Auth::id();
-        $data->save();
-        $data->delete();
+            $data->deleted_by = Auth::id();
+            $data->save();
+            $data->delete();
+        });
 
         return redirect()
-            ->route('admin.data-karyawan.index')
+            ->route('admin.akun-karyawan.index')
             ->with($this::FLASH_SUCCESS, 'Data karyawan berhasil dihapus.');
+    }
+
+    public function toggleStatus(int $data_karyawan): RedirectResponse
+    {
+        $data = DataKaryawan::with('user')->findOrFail($data_karyawan);
+
+        if (! $data->user) {
+            return back()->with('error', 'Karyawan ini belum memiliki akun.');
+        }
+
+        if ($data->user->id === Auth::id()) {
+            return back()->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+        }
+
+        $statusBaru = $data->user->status === 'aktif' ? 'nonaktif' : 'aktif';
+        $data->user->update(['status' => $statusBaru]);
+
+        $pesan = $statusBaru === 'aktif' ? 'Akun karyawan berhasil diaktifkan.' : 'Akun karyawan berhasil dinonaktifkan.';
+
+        return redirect()
+            ->route('admin.akun-karyawan.index')
+            ->with($this::FLASH_SUCCESS, $pesan);
+    }
+
+    public function resetPassword(int $data_karyawan): RedirectResponse
+    {
+        $data = DataKaryawan::with('user')->findOrFail($data_karyawan);
+
+        if (! $data->user || ! $data->user->id_karyawan) {
+            return back()->with('error', 'Tidak dapat mereset password.');
+        }
+
+        $data->user->update([
+            'password'             => Hash::make($data->user->id_karyawan),
+            'must_change_password' => true,
+        ]);
+
+        return redirect()
+            ->route('admin.akun-karyawan.index')
+            ->with($this::FLASH_SUCCESS, "Password direset ke ID Karyawan ({$data->user->id_karyawan}). Karyawan wajib ganti password saat login.");
     }
 
     public function import(ImportDataKaryawanRequest $request): RedirectResponse
     {
-
         $import = new DataKaryawanImport();
 
         try {
@@ -170,14 +222,14 @@ class DataKaryawanController extends Controller
         if (count($import->duplikat) > 0) {
             $nikList = implode(', ', $import->duplikat);
             return redirect()
-                ->route('admin.data-karyawan.index')
+                ->route('admin.akun-karyawan.index')
                 ->with($this::FLASH_SUCCESS, $pesan)
                 ->with('duplikat_nik', $import->duplikat)
                 ->with('info', 'NIK berikut sudah terdaftar dan dilewati: ' . $nikList);
         }
 
         return redirect()
-            ->route('admin.data-karyawan.index')
+            ->route('admin.akun-karyawan.index')
             ->with($this::FLASH_SUCCESS, $pesan);
     }
 
@@ -185,5 +237,4 @@ class DataKaryawanController extends Controller
     {
         return Excel::download(new DataKaryawanTemplateExport(), 'template-data-karyawan.xlsx');
     }
-
 }

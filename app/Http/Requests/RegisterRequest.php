@@ -29,7 +29,7 @@ class RegisterRequest extends FormRequest
         ];
 
         if ($this->input('tipe_akun') === 'kandidat') {
-            $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
+            $aturan['posisi_dilamar'] = ['required', 'integer', 'exists:posisi,id'];
             $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
             $aturan['nik_kandidat'] = ['required', 'string', 'digits:16'];
             $aturan['tanggal_lahir'] = ['nullable', 'date'];

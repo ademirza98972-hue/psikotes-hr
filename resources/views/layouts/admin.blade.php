@@ -195,7 +195,7 @@
             @auth
 
             {{-- MENU UTAMA --}}
-            @if(auth()->user()->hasIzin('dashboard.lihat') || auth()->user()->hasIzin('data_karyawan.kelola') || auth()->user()->hasIzin('pengguna.lihat'))
+            @if(auth()->user()->hasIzin('dashboard.lihat') || auth()->user()->hasIzin('pengguna.lihat'))
             <div class="section-label">Menu Utama</div>
             @endif
 
@@ -204,14 +204,6 @@
                    class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <span class="material-symbols-outlined text-[20px]">dashboard</span>
                     <span>Dashboard</span>
-                </a>
-            @endif
-
-            @if(auth()->user()->hasIzin('data_karyawan.kelola'))
-                <a href="{{ route('admin.data-karyawan.index') }}"
-                   class="sidebar-link {{ request()->routeIs('admin.data-karyawan.*') ? 'active' : '' }}">
-                    <span class="material-symbols-outlined text-[20px]">group</span>
-                    <span>Data Karyawan</span>
                 </a>
             @endif
 

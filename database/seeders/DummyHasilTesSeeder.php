@@ -110,7 +110,7 @@ class DummyHasilTesSeeder extends Seeder
 
     private function getKelompok($u): string
     {
-        $pk = $u->profilKandidat ?? $u->profilKaryawan;
+        $pk = $u->profilKandidat ?? $u->dataKaryawan;
         if (!$pk || !$pk->tanggal_lahir) return 'USIA_21_25';
         $umur = now()->diffInYears($pk->tanggal_lahir);
         return match (true) {

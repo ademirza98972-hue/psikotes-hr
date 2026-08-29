@@ -35,7 +35,7 @@ class PerbaruiPenggunaRequest extends FormRequest
 
         if ($tipe === 'kandidat') {
             $aturan['nama_kandidat'] = ['required', 'string', 'max:255'];
-            $aturan['posisi_dilamar'] = ['required', 'string', 'max:255'];
+            $aturan['posisi_dilamar'] = ['required', 'integer', 'exists:posisi,id'];
             $aturan['pendidikan_terakhir'] = ['required', 'string', 'max:255'];
             $aturan['nik_kandidat'] = [
                 'required', 'string', 'digits:16',

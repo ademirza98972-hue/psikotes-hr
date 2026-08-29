@@ -30,9 +30,7 @@ class DataKandidatController extends Controller
             $filterStatus = null;
         }
 
-        $filterPosisiNama = $filterPosisiId
-            ? Posisi::whereKey($filterPosisiId)->value('nama_posisi')
-            : null;
+        $filterPosisiNama = $filterPosisiId ?: null;
 
         $query = User::with(['profilKandidat'])
             ->where('tipe_akun', 'kandidat');
@@ -42,8 +40,7 @@ class DataKandidatController extends Controller
                 $inner->where('name', 'like', '%' . $kataKunci . '%')
                     ->orWhere('email', 'like', '%' . $kataKunci . '%')
                     ->orWhereHas('profilKandidat', function ($pk) use ($kataKunci) {
-                        $pk->where('nama_kandidat', 'like', '%' . $kataKunci . '%')
-                            ->orWhere('nik_kandidat', 'like', '%' . $kataKunci . '%');
+                        $pk->where('nik_kandidat', 'like', '%' . $kataKunci . '%');
                     });
             });
         });
@@ -53,7 +50,7 @@ class DataKandidatController extends Controller
         });
 
         $query->when($filterPosisiNama, function ($q) use ($filterPosisiNama) {
-            $q->whereHas('profilKandidat', fn ($pk) => $pk->where('posisi_dilamar', $filterPosisiNama));
+            $q->whereHas('profilKandidat', fn ($pk) => $pk->where('posisi_id', $filterPosisiNama));
         });
 
         $perPage = $this->getPerPage($request, 15);
@@ -66,7 +63,6 @@ class DataKandidatController extends Controller
         $semuaPosisi = Posisi::orderBy('nama_posisi')->get();
         $daftarDepartemen = Departemen::orderBy('nama_departemen')->get();
         $departemenMap = Departemen::pluck('id', 'nama_departemen');
-        $posisiMap = Posisi::pluck('id', 'nama_posisi');
 
         return view('admin.data-kandidat.index', [
             'kandidat' => $kandidat,
@@ -76,7 +72,6 @@ class DataKandidatController extends Controller
             'filterPosisi' => $filterPosisiId,
             'daftarDepartemen' => $daftarDepartemen,
             'departemenMap' => $departemenMap,
-            'posisiMap' => $posisiMap,
         ]);
     }
 
@@ -99,9 +94,7 @@ class DataKandidatController extends Controller
                 ->withErrors(['tipe_akun' => 'Peran Kandidat belum tersedia di sistem. Jalankan seeder terlebih dahulu.']);
         }
 
-        $namaPosisi = Posisi::whereKey($data['posisi_dilamar'])->value('nama_posisi');
-
-        DB::transaction(function () use ($data, $peran, $namaPosisi) {
+        DB::transaction(function () use ($data, $peran) {
             $user = User::create([
                 'name' => $data['nama_kandidat'],
                 'email' => $data['email'],
@@ -118,8 +111,7 @@ class DataKandidatController extends Controller
             ProfilKandidat::create([
                 'user_id' => $user->id,
                 'departemen' => $departemen->nama_departemen,
-                'nama_kandidat' => $data['nama_kandidat'],
-                'posisi_dilamar' => $namaPosisi,
+                'posisi_id' => $data['posisi_dilamar'],
                 'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                 'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
                 'nik_kandidat' => $data['nik_kandidat'] ?? null,
@@ -157,9 +149,7 @@ class DataKandidatController extends Controller
 
         $data = $request->validated();
 
-        $namaPosisi = Posisi::whereKey($data['posisi_dilamar'])->value('nama_posisi');
-
-        DB::transaction(function () use ($kandidat, $data, $namaPosisi) {
+        DB::transaction(function () use ($kandidat, $data) {
             $payload = [
                 'name' => $data['nama_kandidat'],
                 'email' => $data['email'],
@@ -179,8 +169,7 @@ class DataKandidatController extends Controller
             if ($profil) {
                 $profil->update([
                     'departemen' => $departemen->nama_departemen,
-                    'nama_kandidat' => $data['nama_kandidat'],
-                    'posisi_dilamar' => $namaPosisi,
+                    'posisi_id' => $data['posisi_dilamar'],
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                     'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
                     'nik_kandidat' => $data['nik_kandidat'] ?? null,

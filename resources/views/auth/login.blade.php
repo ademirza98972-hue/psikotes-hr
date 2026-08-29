@@ -4,7 +4,7 @@
 <div x-data="{ showPwd: false }" class="space-y-6">
     <div class="space-y-1">
         <h2 class="font-body font-semibold text-2xl text-on-surface">Masuk sebagai Peserta</h2>
-        <p class="font-body text-sm text-on-surface-variant">Silakan masukkan email dan kata sandi Anda untuk melanjutkan.</p>
+        <p class="font-body text-sm text-on-surface-variant">Masukkan email (untuk kandidat) atau ID Karyawan dan kata sandi Anda.</p>
     </div>
 
     @if ($errors->any())
@@ -21,21 +21,24 @@
         @csrf
 
         <div class="space-y-1.5">
-            <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email">Alamat Email</label>
+            <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="identifier">Email / ID Karyawan</label>
             <div class="relative focused-input group">
                 <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value="{{ old('email') }}"
+                    id="identifier"
+                    name="identifier"
+                    type="text"
+                    value="{{ old('identifier') }}"
                     required
                     autofocus
-                    autocomplete="email"
-                    placeholder="nama@perusahaan.com"
-                    class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @enderror"
+                    autocomplete="username"
+                    placeholder="nama@perusahaan.com atau 2026001"
+                    class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('identifier') border-rose-500 @enderror"
                 >
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">badge</span>
             </div>
+            @error('identifier')
+                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="space-y-1.5">

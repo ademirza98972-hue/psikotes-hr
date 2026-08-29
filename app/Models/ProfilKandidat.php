@@ -15,8 +15,7 @@ class ProfilKandidat extends Model
     protected $fillable = [
         'user_id',
         'departemen',
-        'nama_kandidat',
-        'posisi_dilamar',
+        'posisi_id',
         'pendidikan_terakhir',
         'nik_kandidat',
         'tanggal_lahir',
@@ -29,6 +28,6 @@ class ProfilKandidat extends Model
 
     public function posisi(): BelongsTo
     {
-        return $this->belongsTo(Posisi::class, 'posisi_dilamar', 'id');
+        return $this->belongsTo(Posisi::class, 'posisi_id');
     }
 }

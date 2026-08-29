@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class PerbaruiDataKaryawanRequest extends FormRequest
@@ -18,43 +17,15 @@ class PerbaruiDataKaryawanRequest extends FormRequest
         $id = $this->route('data_karyawan');
 
         return [
-            'nik_karyawan' => [
-                'required',
-                'string',
-                'max:30',
-                Rule::unique('data_karyawan', 'nik_karyawan')
-                    ->ignore($id)
-                    ->whereNull('deleted_at'),
-            ],
-            'nama_karyawan' => ['required', 'string', 'max:255'],
-            'jenis_kelamin' => ['required', 'in:L,P'],
-            'tanggal_lahir' => ['required', 'date'],
-            'departemen_id' => [
-                'required',
-                'integer',
-                function ($attribute, $value, $fail) {
-                    if (! DB::table('departemen')
-                        ->whereNull('deleted_at')
-                        ->where('id', $value)
-                        ->exists()) {
-                        $fail(':attribute tidak valid.');
-                    }
-                },
-            ],
-            'posisi_id' => [
-                'required',
-                'integer',
-                function ($attribute, $value, $fail) {
-                    if (! DB::table('posisi')
-                        ->whereNull('deleted_at')
-                        ->where('id', $value)
-                        ->exists()) {
-                        $fail(':attribute tidak valid.');
-                    }
-                },
-            ],
-            'departemen' => ['required', 'string', 'max:255'],
-            'jabatan' => ['required', 'string', 'max:255'],
+            'nik_karyawan'        => ['required', 'string', 'max:30', Rule::unique('data_karyawan', 'nik_karyawan')->ignore($id)->whereNull('deleted_at')],
+            'nama_karyawan'       => ['required', 'string', 'max:255'],
+            'jenis_kelamin'       => ['required', 'in:L,P'],
+            'tanggal_lahir'       => ['required', 'date'],
+            'pendidikan_terakhir' => ['nullable', 'string', 'max:255'],
+            'departemen_id'       => ['required', 'integer', 'exists:departemen,id'],
+            'posisi_id'           => ['required', 'integer', 'exists:posisi,id'],
+            'email'               => ['nullable', 'email', 'max:255'],
+            'no_hp'               => ['nullable', 'string', 'max:30'],
         ];
     }
 
@@ -62,24 +33,26 @@ class PerbaruiDataKaryawanRequest extends FormRequest
     {
         return [
             'required' => ':attribute wajib diisi.',
-            'unique' => ':attribute sudah terdaftar.',
-            'exists' => ':attribute tidak valid.',
-            'max' => ':attribute maksimal :max karakter.',
-            'integer' => ':attribute harus berupa angka.',
+            'unique'   => ':attribute sudah terdaftar.',
+            'exists'   => ':attribute tidak valid.',
+            'max'      => ':attribute maksimal :max karakter.',
+            'integer'  => ':attribute harus berupa angka.',
+            'email'    => 'Format :attribute tidak valid.',
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'nik_karyawan' => 'NIK',
-            'nama_karyawan' => 'nama karyawan',
-            'jenis_kelamin' => 'jenis kelamin',
-            'tanggal_lahir' => 'tanggal lahir',
-            'departemen_id' => 'departemen',
-            'posisi_id' => 'jabatan',
-            'departemen' => 'departemen',
-            'jabatan' => 'jabatan',
+            'nik_karyawan'        => 'NIK',
+            'nama_karyawan'       => 'nama karyawan',
+            'jenis_kelamin'       => 'jenis kelamin',
+            'tanggal_lahir'       => 'tanggal lahir',
+            'pendidikan_terakhir' => 'pendidikan terakhir',
+            'departemen_id'       => 'departemen',
+            'posisi_id'           => 'posisi',
+            'email'               => 'email',
+            'no_hp'               => 'nomor HP',
         ];
     }
 }

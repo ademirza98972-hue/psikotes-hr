@@ -21,7 +21,7 @@
             <div class="flex flex-wrap gap-2">
                 @auth
                     @if(auth()->user()->hasIzin('pengguna.tambah'))
-                        <a href="{{ route('admin.akun-karyawan.tambah') }}"
+                        <a href="{{ route('admin.akun-karyawan.index') }}"
                            class="inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/25">
                             <span class="material-symbols-outlined text-[15px]">add</span>
                             Karyawan
@@ -188,7 +188,7 @@
                         @php
                             $lama = $k->created_at->diffForHumans(null, true);
                             $profil = $k->profilKandidat;
-                            $posisi = $profil ? $profil->posisi_dilamar : '-';
+                            $posisi = $profil?->posisi?->nama_posisi ?? '-';
                             $inisial = mb_strtoupper(mb_substr($k->name, 0, 1, 'UTF-8'), 'UTF-8');
                         @endphp
                         <div class="px-5 py-4">

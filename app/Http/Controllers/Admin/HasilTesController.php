@@ -26,8 +26,9 @@ class HasilTesController extends Controller
         $sesiList = SesiTes::with([
             'departemen',
             'alatTes',
-            'pesertaSesiTesRecords.user.profilKaryawan.dataKaryawan',
-            'pesertaSesiTesRecords.user.profilKandidat',
+            'pesertaSesiTesRecords.user.dataKaryawan.departemen',
+            'pesertaSesiTesRecords.user.dataKaryawan.posisi',
+            'pesertaSesiTesRecords.user.profilKandidat.posisi',
             'pesertaSesiTesRecords.alatTes',
         ])
             ->orderByDesc('tanggal_mulai')
@@ -64,15 +65,15 @@ class HasilTesController extends Controller
 
                 $departemen = '—';
                 $posisi = '—';
-                $karyawan = $user->profilKaryawan;
-                if ($karyawan && $karyawan->dataKaryawan) {
-                    $departemen = $karyawan->dataKaryawan->departemen?->nama_departemen ?? ($karyawan->departemen ?? '—');
-                    $posisi = $karyawan->dataKaryawan->posisi?->nama_posisi ?? '—';
+                $dk = $user->dataKaryawan;
+                if ($dk) {
+                    $departemen = $dk->departemen?->nama_departemen ?? '—';
+                    $posisi = $dk->posisi?->nama_posisi ?? '—';
                 } else {
                     $kandidat = $user->profilKandidat;
                     if ($kandidat) {
                         $departemen = $kandidat->departemen ?? '—';
-                        $posisi = $kandidat->posisi_dilamar?->nama_posisi ?? '—';
+                        $posisi = $kandidat->posisi?->nama_posisi ?? '—';
                     }
                 }
 

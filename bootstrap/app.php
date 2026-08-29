@@ -32,7 +32,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'izin' => CekIzin::class,
+            'izin'              => CekIzin::class,
+            'paksa-ganti-password' => \App\Http\Middleware\PaksaGantiPassword::class,
         ]);
     })
     ->withSchedule(function ($schedule): void {

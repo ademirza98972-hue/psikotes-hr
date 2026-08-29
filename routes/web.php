@@ -9,7 +9,6 @@ use App\Http\Controllers\Admin\HasilTesController;
 use App\Http\Controllers\Admin\PeranController;
 use App\Http\Controllers\Admin\PenjadwalanTesController;
 use App\Http\Controllers\Admin\PenggunaAdminController;
-use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\AutentikasiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengerjaanTesController;
@@ -25,7 +24,7 @@ Route::get('api/posisi/daftar/{departemen}', [\App\Http\Controllers\Admin\Posisi
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AutentikasiController::class, 'tampilkanLoginPeserta'])->name('login');
-    Route::post('/login', [AutentikasiController::class, 'loginPeserta']);
+    Route::post('/login', [AutentikasiController::class, 'loginPeserta'])->withoutMiddleware(['throttle:6,1']);
 
     Route::get('/admin/login', [AutentikasiController::class, 'tampilkanLoginAdmin'])->name('login.admin');
     Route::post('/admin/login', [AutentikasiController::class, 'loginAdmin']);
@@ -45,7 +44,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->middleware('izin:dashboard.lihat')->name('admin.dashboard');
     Route::get('/admin/aktivitas', [DashboardController::class, 'aktivitas'])->name('admin.aktivitas.index');
-    Route::get('/peserta/dashboard', [DashboardController::class, 'peserta'])->name('peserta.dashboard');
+    Route::get('/peserta/dashboard', [DashboardController::class, 'peserta'])->middleware('paksa-ganti-password')->name('peserta.dashboard');
     Route::get('/peserta/panduan', [DashboardController::class, 'panduan'])->name('peserta.panduan');
 
     // Route untuk instruksi tes (baru)
@@ -70,14 +69,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/peserta/tes/{sesiId}/panduan-papi/mulai', [PengerjaanTesController::class, 'panduanPapiMulai'])->name('peserta.tes.panduan-papi-mulai');
 
     Route::prefix('admin/akun-karyawan')->name('admin.akun-karyawan.')->group(function () {
-        Route::get('/', [PenggunaController::class, 'index'])->middleware('izin:pengguna.lihat')->name('index');
-        Route::get('/tambah', [PenggunaController::class, 'tambah'])->middleware('izin:pengguna.tambah')->name('tambah');
-        Route::post('/', [PenggunaController::class, 'simpan'])->middleware('izin:pengguna.tambah')->name('simpan');
-        Route::get('/{pengguna}/ubah', [PenggunaController::class, 'ubah'])->middleware('izin:pengguna.edit')->whereNumber('pengguna')->name('ubah');
-        Route::put('/{pengguna}', [PenggunaController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('pengguna')->name('perbarui');
-        Route::patch('/{pengguna}', [PenggunaController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('pengguna')->name('perbarui');
-        Route::delete('/{pengguna}', [PenggunaController::class, 'hapus'])->middleware('izin:pengguna.hapus')->whereNumber('pengguna')->name('hapus');
-        Route::patch('/{pengguna}/toggle-status', [PenggunaController::class, 'toggleStatus'])->middleware('izin:pengguna.edit')->whereNumber('pengguna')->name('toggle-status');
+        Route::get('/', [DataKaryawanController::class, 'index'])->middleware('izin:pengguna.lihat')->name('index');
+        Route::post('/', [DataKaryawanController::class, 'simpan'])->middleware('izin:pengguna.tambah')->name('simpan');
+        Route::put('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('data_karyawan')->name('perbarui');
+        Route::patch('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('data_karyawan')->name('perbarui');
+        Route::delete('/{data_karyawan}', [DataKaryawanController::class, 'hapus'])->middleware('izin:pengguna.hapus')->whereNumber('data_karyawan')->name('hapus');
+        Route::patch('/{data_karyawan}/toggle-status', [DataKaryawanController::class, 'toggleStatus'])->middleware('izin:pengguna.edit')->whereNumber('data_karyawan')->name('toggle-status');
+        Route::post('/{data_karyawan}/reset-password', [DataKaryawanController::class, 'resetPassword'])->middleware('izin:pengguna.edit')->whereNumber('data_karyawan')->name('reset-password');
+        Route::get('/template', [DataKaryawanController::class, 'downloadTemplate'])->middleware('izin:pengguna.tambah')->name('template');
+        Route::post('/import', [DataKaryawanController::class, 'import'])->middleware('izin:pengguna.tambah')->name('import');
     });
 
     Route::prefix('admin/pengguna-admin')->name('admin.pengguna-admin.')->middleware('izin:pengguna_admin.kelola')->group(function () {
@@ -132,20 +132,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{posisi}', [\App\Http\Controllers\Admin\PosisiController::class, 'destroy'])->name('destroy');
     });
 
-    // =========================================
-    // DATA KARYAWAN
-    // =========================================
-    Route::prefix('admin/data-karyawan')->name('admin.data-karyawan.')->group(function () {
-        Route::get('/', [DataKaryawanController::class, 'index'])->middleware('izin:data_karyawan.kelola')->name('index');
-        Route::get('/tambah', [DataKaryawanController::class, 'tambah'])->middleware('izin:data_karyawan.kelola')->name('tambah');
-        Route::post('/', [DataKaryawanController::class, 'simpan'])->middleware('izin:data_karyawan.kelola')->name('simpan');
-        Route::get('/template', [DataKaryawanController::class, 'downloadTemplate'])->middleware('izin:data_karyawan.kelola')->name('template');
-        Route::post('/import', [DataKaryawanController::class, 'import'])->middleware('izin:data_karyawan.kelola')->name('import');
-        Route::get('/{data_karyawan}/ubah', [DataKaryawanController::class, 'ubah'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('ubah');
-        Route::put('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('perbarui');
-        Route::patch('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('perbarui');
-        Route::delete('/{data_karyawan}', [DataKaryawanController::class, 'hapus'])->middleware('izin:data_karyawan.kelola')->whereNumber('data_karyawan')->name('hapus');
-    });
 
     Route::prefix('admin/peran')->name('admin.peran.')->group(function () {
         Route::get('/', [PeranController::class, 'index'])->middleware('izin:peran.kelola')->name('index');

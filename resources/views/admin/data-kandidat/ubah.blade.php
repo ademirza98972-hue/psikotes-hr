@@ -62,7 +62,7 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label for="nama_kandidat" class="block text-[13px] font-medium text-[#191c1e] mb-1">Nama Kandidat <span class="text-rose-500">*</span></label>
-                        <input id="nama_kandidat" name="nama_kandidat" type="text" value="{{ old('nama_kandidat', $profilKandidat->nama_kandidat ?? $kandidat->name) }}" required
+                        <input id="nama_kandidat" name="nama_kandidat" type="text" value="{{ old('nama_kandidat', $kandidat->name) }}" required
                                class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nama_kandidat') border-rose-400 @enderror">
                         @error('nama_kandidat')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                     </div>
@@ -214,10 +214,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     posisiSelect.appendChild(opt);
                 });
 
-                const savedName = '{{ old("posisi_dilamar", $profilKandidat->posisi_dilamar ?? "") }}';
-                if (savedName) {
+                const savedId = '{{ old("posisi_dilamar", $profilKandidat->posisi_id ?? "") }}';
+                if (savedId) {
                     for (let i = 0; i < posisiSelect.options.length; i++) {
-                        if (posisiSelect.options[i].textContent === savedName) {
+                        if (String(posisiSelect.options[i].value) === String(savedId)) {
                             posisiSelect.selectedIndex = i;
                             break;
                         }

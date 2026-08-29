@@ -8,7 +8,6 @@ use App\Models\DataKaryawan;
 use App\Models\Departemen;
 use App\Models\Peran;
 use App\Models\Posisi;
-use App\Models\ProfilKaryawan;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -87,36 +86,31 @@ class DataTerhapusController extends Controller
         $item->restore();
 
         match ($jenis) {
-            'departemen' => $this->restoreChild(Posisi::class, 'departemen_id', $item->id),
-            'karyawan'   => $this->restoreChild(ProfilKaryawan::class, 'user_id', $item->id),
-            'admin'      => $this->restoreChild(ProfilKaryawan::class, 'user_id', $item->id),
-            'kandidat'   => $this->restoreChild(ProfilKaryawan::class, 'user_id', $item->id),
-            'peran'      => $this->restoreChild(User::class, 'peran_id', $item->id),
-            default      => null,
+            'departemen'    => $this->restoreChild(Posisi::class, 'departemen_id', $item->id),
+            'peran'         => $this->restoreChild(User::class, 'peran_id', $item->id),
+            'karyawan'      => $this->restoreChild(DataKaryawan::class, 'user_id', $item->id),
+            'data_karyawan' => $this->restoreLinkedUser($item),
+            default         => null,
         };
-
-        if ($jenis === 'karyawan') {
-            $profil = ProfilKaryawan::where('user_id', $item->id)->first();
-            if ($profil) {
-                DataKaryawan::where('nik_karyawan', $profil->nik_karyawan)
-                    ->where('status', 'belum_terpakai')
-                    ->update(['status' => 'sudah_terpakai']);
-            }
-        }
 
         return redirect()
             ->route('admin.data-terhapus.index', ['jenis' => $jenis])
             ->with($this::FLASH_SUCCESS, "{$label} berhasil dipulihkan.");
     }
 
-    /** Restore all soft-deleted children of the given parent record. */
     private function restoreChild(string $model, string $fk, int $parentId): void
     {
-        if (!in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive($model))) {
+        if (! in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive($model))) {
             return;
         }
-
         $model::onlyTrashed()->where($fk, $parentId)->restore();
+    }
+
+    private function restoreLinkedUser(DataKaryawan $item): void
+    {
+        if ($item->user_id) {
+            User::onlyTrashed()->where('id', $item->user_id)->restore();
+        }
     }
 
     public function hapusPermanen(string $jenis, int $id): RedirectResponse

@@ -11,12 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'no_hp', 'jenis_kelamin', 'tipe_akun', 'peran_id', 'status'])]
+#[Fillable(['name', 'email', 'id_karyawan', 'password', 'no_hp', 'jenis_kelamin', 'tipe_akun', 'peran_id', 'status', 'must_change_password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -51,14 +50,9 @@ class User extends Authenticatable
         return $this->hasOne(ProfilKandidat::class, 'user_id', 'id');
     }
 
-    public function profilKaryawan(): HasOne
+    public function dataKaryawan(): HasOne
     {
-        return $this->hasOne(ProfilKaryawan::class, 'user_id', 'id');
-    }
-
-    public function dataKaryawan(): HasOneThrough
-    {
-        return $this->hasOneThrough(DataKaryawan::class, ProfilKaryawan::class, 'user_id', 'id', 'id', 'data_karyawan_id');
+        return $this->hasOne(DataKaryawan::class, 'user_id', 'id');
     }
 
     public function hasIzin(string $kodeIzin): bool

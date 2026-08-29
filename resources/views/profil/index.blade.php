@@ -3,9 +3,8 @@
 @section('content')
     @php
         $tipe = auth()->user()->tipe_akun ?? null;
-        $profilKaryawan = $user->profilKaryawan;
+        $dataKaryawan = $user->dataKaryawan;
         $profilKandidat = $user->profilKandidat;
-        $dataKaryawan = $profilKaryawan?->dataKaryawan;
         $inisial = mb_substr(explode(' ', $user->name)[0], 0, 1);
     @endphp
 
@@ -107,12 +106,17 @@
                     </div>
 
                     {{-- Field khusus karyawan --}}
-                    @if($tipe === 'karyawan' || $profilKaryawan)
-                        @if($profilKaryawan)
+                    @if($tipe === 'karyawan')
+                        @if($dataKaryawan)
+                            <div class="space-y-1.5">
+                                <label class="block text-[13px] font-medium text-[#191c1e] mb-1">ID Karyawan</label>
+                                <input class="block w-full rounded-lg border border-[#c0c8cb] bg-[#f2f4f6] px-3 py-2.5 text-sm text-[#40484b] cursor-not-allowed font-mono"
+                                       disabled readonly type="text" value="{{ $user->id_karyawan ?? '-' }}">
+                            </div>
                             <div class="space-y-1.5">
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1">NIK Karyawan</label>
                                 <input class="block w-full rounded-lg border border-[#c0c8cb] bg-[#f2f4f6] px-3 py-2.5 text-sm text-[#40484b] cursor-not-allowed"
-                                       disabled readonly type="text" value="{{ $profilKaryawan->nik_karyawan ?? '-' }}">
+                                       disabled readonly type="text" value="{{ $dataKaryawan->nik_karyawan ?? '-' }}">
                                 <p class="mt-1.5 text-[11px] text-[#40484b] flex items-center gap-1">
                                     <span class="material-symbols-outlined text-[13px]">info</span>
                                     Untuk mengubah data ini, hubungi Admin/HR.
@@ -121,16 +125,16 @@
                             <div class="space-y-1.5">
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1">Departemen</label>
                                 <input class="block w-full rounded-lg border border-[#c0c8cb] bg-[#f2f4f6] px-3 py-2.5 text-sm text-[#40484b] cursor-not-allowed"
-                                       disabled readonly type="text" value="{{ $dataKaryawan->departemen ?? $profilKaryawan->departemen ?? '-' }}">
+                                       disabled readonly type="text" value="{{ $dataKaryawan->departemen?->nama_departemen ?? '-' }}">
                                 <p class="mt-1.5 text-[11px] text-[#40484b] flex items-center gap-1">
                                     <span class="material-symbols-outlined text-[13px]">info</span>
                                     Untuk mengubah data ini, hubungi Admin/HR.
                                 </p>
                             </div>
                             <div class="space-y-1.5">
-                                <label class="block text-[13px] font-medium text-[#191c1e] mb-1">Jabatan</label>
+                                <label class="block text-[13px] font-medium text-[#191c1e] mb-1">Posisi</label>
                                 <input class="block w-full rounded-lg border border-[#c0c8cb] bg-[#f2f4f6] px-3 py-2.5 text-sm text-[#40484b] cursor-not-allowed"
-                                       disabled readonly type="text" value="{{ $dataKaryawan->jabatan ?? $profilKaryawan->jabatan ?? '-' }}">
+                                       disabled readonly type="text" value="{{ $dataKaryawan->posisi?->nama_posisi ?? '-' }}">
                                 <p class="mt-1.5 text-[11px] text-[#40484b] flex items-center gap-1">
                                     <span class="material-symbols-outlined text-[13px]">info</span>
                                     Untuk mengubah data ini, hubungi Admin/HR.
@@ -138,7 +142,7 @@
                             </div>
                         @else
                             <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-                                Profil karyawan belum tersedia. Hubungi Admin/HR.
+                                Data karyawan belum tersedia. Hubungi Admin/HR.
                             </div>
                         @endif
                     @endif
@@ -158,7 +162,7 @@
                             <div class="space-y-1.5">
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1">Posisi Dilamar</label>
                                 <input class="block w-full rounded-lg border border-[#c0c8cb] bg-[#f2f4f6] px-3 py-2.5 text-sm text-[#40484b] cursor-not-allowed"
-                                       disabled readonly type="text" value="{{ $profilKandidat->posisi_dilamar ?? '-' }}">
+                                       disabled readonly type="text" value="{{ $profilKandidat->posisi?->nama_posisi ?? '-' }}">
                                 <p class="mt-1.5 text-[11px] text-[#40484b] flex items-center gap-1">
                                     <span class="material-symbols-outlined text-[13px]">info</span>
                                     Untuk mengubah data ini, hubungi Admin/HR.
@@ -184,9 +188,7 @@
                     <div class="space-y-1.5">
                         <label class="block text-[13px] font-medium text-[#191c1e] mb-1" for="tanggal_lahir">Tanggal Lahir</label>
                         @php
-                            $profilKaryawan = $user->profilKaryawan;
-                            $profilKandidat = $user->profilKandidat;
-                            $existingTanggalLahir = $profilKaryawan?->tanggal_lahir ?? $profilKandidat?->tanggal_lahir;
+                            $existingTanggalLahir = $dataKaryawan?->tanggal_lahir ?? $profilKandidat?->tanggal_lahir;
                         @endphp
                         <input id="tanggal_lahir" name="tanggal_lahir" type="date"
                                value="{{ old('tanggal_lahir', $existingTanggalLahir instanceof \Carbon\CarbonInterface ? $existingTanggalLahir->format('Y-m-d') : ($existingTanggalLahir ?? '')) }}"

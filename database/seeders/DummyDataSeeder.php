@@ -224,8 +224,7 @@ class DummyDataSeeder extends Seeder
 
             ProfilKandidat::create([
                 'user_id' => $user->id,
-                'nama_kandidat' => $nama,
-                'posisi_dilamar' => $posisi->nama_posisi,
+                'posisi_id' => $posisi->id,
                 'pendidikan_terakhir' => $listPendidikan[$index],
                 'nik_kandidat' => $nik,
             ]);

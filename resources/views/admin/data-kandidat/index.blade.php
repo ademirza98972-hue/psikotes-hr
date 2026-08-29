@@ -139,8 +139,8 @@ x-init="
                         @php
                             $profil = $item->profilKandidat;
                             $profilDeptId = $profil ? ($departemenMap[$profil->departemen] ?? 0) : 0;
-                            $profilPosisiId = $profil ? ($posisiMap[$profil->posisi_dilamar] ?? 0) : 0;
-                            $namaTampil = $profil->nama_kandidat ?? $item->name;
+                            $profilPosisiId = $profil ? ($profil->posisi_id ?? 0) : 0;
+                            $namaTampil = $item->name;
                             $status = $item->status;
                             $inisial = strtoupper(mb_substr(explode(' ', $namaTampil)[0], 0, 2));
                             $avatarBg = match(hexdec(substr(substr(md5($namaTampil), 0, 6), 0, 6)) % 4) {
@@ -190,7 +190,7 @@ x-init="
                                 {{ $item->email }}
                             </td>
                             <td class="px-6 py-4 text-sm text-[#40484b]">
-                                {{ $profil->posisi->nama_posisi ?? $profil->posisi_dilamar ?? '—' }}
+                                {{ $profil->posisi?->nama_posisi ?? '—' }}
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $warnaBadge }}">

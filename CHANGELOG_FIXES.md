@@ -4,6 +4,52 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #3 — Sisa referensi `profilKaryawan` setelah refactor: 500 error di Hasil Tes & Pengerjaan Tes
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-08-29 |
+| File | `HasilTesController.php`, `PengerjaanTesController.php`, `DummyHasilTesSeeder.php` |
+| Masalah | `RelationNotFoundException: profilKaryawan` saat buka halaman Hasil Tes dan saat peserta mengerjakan tes IST |
+| Akar | Relasi `profilKaryawan` (ke tabel `profil_karyawan`) sudah dihapus di Fix #1, tapi tiga file tidak ikut diupdate |
+| Fix | Ganti semua `->profilKaryawan` → `->dataKaryawan`, update eager-load di HasilTesController |
+| Verifikasi | Halaman `/admin/hasil-tes` terbuka, departemen & posisi peserta tampil benar |
+| Pelajaran | Setelah hapus relasi Eloquent, wajib scan seluruh codebase (`grep profilKaryawan`) — jangan hanya update file yang sudah diketahui |
+| Log Keyword | `RelationNotFoundException`, `profilKaryawan` |
+
+---
+
+### Fix #2 — Refactor `posisi_dilamar` varchar → FK `posisi_id` di profil_kandidat
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-08-29 |
+| File | Migration, `ProfilKandidat.php`, semua view data-kandidat, `DataKandidatController`, `AutentikasiController`, `HasilTesController`, `DummyDataSeeder` |
+| Masalah | Posisi kandidat disimpan sebagai teks (`posisi_dilamar = "Staff Keuangan"`), tidak konsisten dengan tabel `posisi` |
+| Akar | Desain awal pakai string, bukan FK — rentan inkonsistensi kalau nama posisi berubah |
+| Fix | Migration: tambah `posisi_id` FK, copy data via JOIN, hapus `posisi_dilamar`. Update semua controller & view untuk pakai relasi `posisi()` |
+| Verifikasi | Filter posisi kandidat by ID bekerja, modal ubah auto-select posisi yang benar, display via `->posisi->nama_posisi` OK |
+| Pelajaran | Hindari simpan nama entitas sebagai string kalau ada tabel master-nya — pakai FK sejak awal |
+| Log Keyword | `posisi_dilamar`, `posisi_id` |
+
+---
+
+### Fix #1 — Refactor Double Database Karyawan: Hapus profil_karyawan, gabung Data + Akun Karyawan
+
+| Field | Detail |
+|---|---|
+| **Tanggal** | 2026-08-29 |
+| **Files** | migration `2026_08_29_000001_refactor_karyawan_schema.php`, `User.php`, `DataKaryawan.php`, `DataKaryawanController.php`, `AutentikasiController.php`, `ProfilController.php`, `DataTerhapusController.php`, `DataKaryawanImport.php`, `SimpanDataKaryawanRequest.php`, `PerbaruiDataKaryawanRequest.php`, `LoginPesertaRequest.php`, `PaksaGantiPassword.php` (new), `bootstrap/app.php`, `routes/web.php`, views: `admin/akun-karyawan/index.blade.php`, `profil/index.blade.php`, `auth/login.blade.php`, `admin/dashboard.blade.php`, `layouts/admin.blade.php` |
+| **Masalah** | Pembimbing menemukan double database: `profil_karyawan` duplikasi data dari `data_karyawan`. Plus `data_karyawan` punya kolom string lama (departemen, jabatan) sekaligus FK baru (departemen_id, posisi_id). Menu "Data Karyawan" dan "Akun Karyawan" terpisah padahal satu entitas. |
+| **Akar** | Arsitektur dua tahap (HR input data dulu, lalu karyawan daftar sendiri) menyebabkan profil_karyawan dibuat sebagai jembatan, padahal data_karyawan sudah ada. |
+| **Fix** | Drop `profil_karyawan`. Tambah `user_id` FK ke `data_karyawan`. Tambah `id_karyawan` (format: tahun+urut, contoh 2026001) dan `must_change_password` ke `users`. Email jadi nullable. Login karyawan pakai `id_karyawan` bukan email. Auto-create user saat HR tambah karyawan. Hapus menu "Data Karyawan" di sidebar, gabung ke "Akun Karyawan". Password default = id_karyawan, wajib ganti saat login pertama. |
+| **Verifikasi** | Migration berhasil (3 detik). `php artisan tinker` render view OK. Halaman `/admin/akun-karyawan` tampil dengan tabel ID Karyawan, NIK, nama, departemen/posisi, status. |
+| **Pelajaran** | `orderByHas()` tidak ada di Laravel 13 — pakai subquery `orderBy(Model::select(...)->whereColumn(...)->limit(1))`. `tanggal_lahir` perlu cast `'date'` di model agar bisa `->format()`. Route lama yang direferensi di view lain (dashboard, sidebar) harus dicek setelah route group dihapus. |
+| **Log Keyword** | `double database`, `profil_karyawan`, `id_karyawan`, `must_change_password`, `orderByHas` |
+| **Deploy** | Local only, belum push |
+
+---
+
 ### Fix #2 — Scoring IST salah: berbasis pendidikan, kunci jawaban keliru, GE tidak 0/1/2, norma tidak per usia
 
 | Field | Detail |

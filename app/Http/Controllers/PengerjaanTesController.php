@@ -205,9 +205,8 @@ class PengerjaanTesController extends Controller
         // Validasi: tanggal_lahir wajib diisi apabila ada IST di sesi ini
         $alatTesiAda = collect($sesi['daftar_alat_tes_ditugaskan'])->contains(fn(string $kode) => $kode === 'IST');
         if ($alatTesiAda) {
-            $profilKaryawan = Auth::user()->profilKaryawan;
             $profilKandidat = Auth::user()->profilKandidat;
-            $tanggalLahir   = $profilKaryawan?->tanggal_lahir ?? $profilKandidat?->tanggal_lahir;
+            $tanggalLahir   = Auth::user()->dataKaryawan?->tanggal_lahir ?? $profilKandidat?->tanggal_lahir;
             if (!$tanggalLahir) {
                 return redirect()
                     ->route('profil.index')
@@ -975,7 +974,7 @@ class PengerjaanTesController extends Controller
                 };
             } elseif ($kodeAlat === 'IST') {
                 $user = Auth::user();
-                $tanggalLahir = $user->profilKaryawan?->tanggal_lahir
+                $tanggalLahir = $user->dataKaryawan?->tanggal_lahir
                     ?? $user->profilKandidat?->tanggal_lahir;
                 $usia = $tanggalLahir
                     ? (int) \Carbon\Carbon::parse($tanggalLahir)->diffInYears(now())

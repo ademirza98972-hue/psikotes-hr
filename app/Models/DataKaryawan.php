@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DataKaryawan extends Model
 {
@@ -16,14 +15,15 @@ class DataKaryawan extends Model
 
     protected $fillable = [
         'nik_karyawan',
-        'nama_karyawan',
-        'jenis_kelamin',
         'tanggal_lahir',
-        'departemen',
-        'jabatan',
-        'status',
+        'pendidikan_terakhir',
         'departemen_id',
         'posisi_id',
+        'user_id',
+    ];
+
+    protected $casts = [
+        'tanggal_lahir' => 'date',
     ];
 
     public function deletedBy(): BelongsTo
@@ -41,8 +41,8 @@ class DataKaryawan extends Model
         return $this->belongsTo(Posisi::class);
     }
 
-    public function pengguna(): HasMany
+    public function user(): BelongsTo
     {
-        return $this->hasMany(ProfilKaryawan::class, 'data_karyawan_id', 'id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

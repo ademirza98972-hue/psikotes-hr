@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginPesertaRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Models\DataKaryawan;
 use App\Models\Peran;
 use App\Models\ProfilKandidat;
-use App\Models\ProfilKaryawan;
 use App\Models\User;
 use App\Models\Posisi;
 use Illuminate\Http\RedirectResponse;
@@ -29,17 +28,48 @@ class AutentikasiController extends Controller
         return view('auth.login-admin');
     }
 
-    public function loginPeserta(LoginRequest $request): RedirectResponse
+    public function loginPeserta(LoginPesertaRequest $request): RedirectResponse
     {
-        return $this->prosesLogin($request, tipeYangDiizinkan: ['kandidat', 'karyawan'], routeGagal: 'login');
+        $identifier = $request->input('identifier');
+        $password   = $request->input('password');
+
+        // Cari user berdasarkan email atau id_karyawan
+        $user = User::where('email', $identifier)
+            ->orWhere('id_karyawan', $identifier)
+            ->whereIn('tipe_akun', ['kandidat', 'karyawan'])
+            ->first();
+
+        if (! $user) {
+            return back()
+                ->withInput($request->only('identifier', 'ingat_saya'))
+                ->withErrors(['identifier' => 'Email/ID Karyawan atau password salah, atau akun belum aktif.']);
+        }
+
+        if ($user->status === 'nonaktif') {
+            return back()
+                ->withInput($request->only('identifier', 'ingat_saya'))
+                ->withErrors(['identifier' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Admin/HR.']);
+        }
+
+        if ($user->status !== 'aktif') {
+            return back()
+                ->withInput($request->only('identifier', 'ingat_saya'))
+                ->withErrors(['identifier' => 'Email/ID Karyawan atau password salah, atau akun belum aktif.']);
+        }
+
+        if (! Hash::check($password, $user->password)) {
+            return back()
+                ->withInput($request->only('identifier', 'ingat_saya'))
+                ->withErrors(['identifier' => 'Email/ID Karyawan atau password salah, atau akun belum aktif.']);
+        }
+
+        Auth::login($user, $request->boolean('ingat_saya'));
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('peserta.dashboard'));
     }
 
     public function loginAdmin(LoginRequest $request): RedirectResponse
-    {
-        return $this->prosesLogin($request, tipeYangDiizinkan: null, routeGagal: 'login.admin');
-    }
-
-    private function prosesLogin(LoginRequest $request, ?array $tipeYangDiizinkan, string $routeGagal): RedirectResponse
     {
         $kredensial = $request->only('email', 'password');
 
@@ -61,15 +91,7 @@ class AutentikasiController extends Controller
 
         $user = Auth::user();
 
-        if ($tipeYangDiizinkan !== null && ! in_array($user->tipe_akun, $tipeYangDiizinkan, true)) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-            return redirect()->route('login.admin')
-                ->withErrors(['email' => 'Akun ini adalah akun admin. Silakan login melalui portal admin.']);
-        }
-
-        if ($tipeYangDiizinkan === null && in_array($user->tipe_akun, ['kandidat', 'karyawan'], true)) {
+        if (in_array($user->tipe_akun, ['kandidat', 'karyawan'], true)) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -90,26 +112,17 @@ class AutentikasiController extends Controller
 
     public function register(RegisterRequest $request): RedirectResponse
     {
-        $data = $request->validated();
+        $data    = $request->validated();
         $tipeAkun = $data['tipe_akun'];
 
+        // Karyawan tidak bisa self-register lagi — akun dibuat otomatis oleh HR
         if ($tipeAkun === 'karyawan') {
-            $dataMaster = DataKaryawan::where('nik_karyawan', $data['nik_karyawan'])->first();
-
-            if (! $dataMaster || strcasecmp($dataMaster->nama_karyawan, $data['name']) !== 0) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['nik_karyawan' => 'NIK dan nama tidak ditemukan pada data karyawan terdaftar. Silakan hubungi HR.']);
-            }
-
-            if ($dataMaster->status === 'sudah_terpakai') {
-                return back()
-                    ->withInput()
-                    ->withErrors(['nik_karyawan' => 'NIK ini sudah terdaftar sebelumnya.']);
-            }
+            return back()
+                ->withInput()
+                ->withErrors(['tipe_akun' => 'Akun karyawan dibuat oleh HR. Silakan hubungi HR untuk mendapatkan ID Karyawan Anda.']);
         }
 
-        $peran = Peran::where('nama_peran', ucfirst($tipeAkun))->first();
+        $peran = Peran::where('nama_peran', 'Kandidat')->first();
 
         if (! $peran) {
             return back()
@@ -117,51 +130,30 @@ class AutentikasiController extends Controller
                 ->withErrors(['tipe_akun' => 'Peran untuk tipe akun ini belum tersedia di sistem.']);
         }
 
-        DB::transaction(function () use ($data, $peran, $tipeAkun) {
-            $statusUser = $tipeAkun === 'karyawan' ? 'aktif' : 'menunggu_verifikasi';
-
+        DB::transaction(function () use ($data, $peran) {
             $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'no_hp' => $data['no_hp'],
+                'name'         => $data['name'],
+                'email'        => $data['email'],
+                'password'     => Hash::make($data['password']),
+                'no_hp'        => $data['no_hp'],
                 'jenis_kelamin' => $data['jenis_kelamin'] ?? null,
-                'tipe_akun' => $tipeAkun,
-                'peran_id' => $peran->id,
-                'status' => $statusUser,
+                'tipe_akun'    => 'kandidat',
+                'peran_id'     => $peran->id,
+                'status'       => 'menunggu_verifikasi',
             ]);
 
-            if ($tipeAkun === 'kandidat') {
-                ProfilKandidat::create([
-                    'user_id' => $user->id,
-                    'nama_kandidat' => $data['name'],
-                    'posisi_dilamar' => $data['posisi_dilamar'],
-                    'pendidikan_terakhir' => $data['pendidikan_terakhir'],
-                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
-                    'nik_kandidat' => $data['nik_kandidat'] ?? null,
-                ]);
-            } elseif ($tipeAkun === 'karyawan') {
-                $dataMaster = DataKaryawan::where('nik_karyawan', $data['nik_karyawan'])
-                    ->lockForUpdate()
-                    ->first();
-
-                ProfilKaryawan::create([
-                    'user_id' => $user->id,
-                    'data_karyawan_id' => $dataMaster->id,
-                    'nama_karyawan' => $dataMaster->nama_karyawan,
-                    'nik_karyawan' => $dataMaster->nik_karyawan,
-                    'departemen' => $dataMaster->departemen,
-                    'jabatan' => $dataMaster->jabatan,
-                    'tanggal_lahir' => $dataMaster->tanggal_lahir,
-                ]);
-
-                $dataMaster->update(['status' => 'sudah_terpakai']);
-            }
+            ProfilKandidat::create([
+                'user_id'             => $user->id,
+                'posisi_id'           => $data['posisi_dilamar'],
+                'pendidikan_terakhir' => $data['pendidikan_terakhir'],
+                'tanggal_lahir'       => $data['tanggal_lahir'] ?? null,
+                'nik_kandidat'        => $data['nik_kandidat'] ?? null,
+            ]);
         });
 
         return redirect()
             ->route('login')
-            ->with('sukses', 'Registrasi berhasil, silakan login');
+            ->with('sukses', 'Registrasi berhasil. Akun Anda sedang menunggu verifikasi dari HR.');
     }
 
     public function logout(Request $request): RedirectResponse
@@ -185,15 +177,14 @@ class AutentikasiController extends Controller
 
         $peta = [
             'dashboard.lihat'       => 'admin.dashboard',
-            'data_karyawan.kelola'  => 'admin.data-karyawan.index',
             'pengguna.lihat'        => 'admin.akun-karyawan.index',
             'soal.lihat'            => 'admin.alat-tes.index',
             'kategori_tes.kelola'   => 'admin.alat-tes.index',
             'hasil_tes.lihat'       => 'admin.hasil-tes.index',
             'peran.kelola'          => 'admin.peran.index',
             'pengguna_admin.kelola' => 'admin.pengguna-admin.index',
-            'departemen.kelola'   => 'admin.departemen.index',
-            'posisi.kelola'       => 'admin.posisi.index',
+            'departemen.kelola'     => 'admin.departemen.index',
+            'posisi.kelola'         => 'admin.posisi.index',
             'data_terhapus.kelola'  => 'admin.data-terhapus.index',
         ];
 

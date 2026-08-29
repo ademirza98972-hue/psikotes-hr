@@ -4,27 +4,36 @@ namespace App\Imports;
 
 use App\Models\DataKaryawan;
 use App\Models\Departemen;
+use App\Models\Peran;
 use App\Models\Posisi;
+use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
 
 class DataKaryawanImport implements ToCollection, WithHeadingRow
 {
     public array $duplikat = [];
-    public int $berhasil = 0;
-    public int $dilewati = 0;
+    public int   $berhasil = 0;
+    public int   $dilewati = 0;
+
+    private ?int $peranId = null;
+
+    public function __construct()
+    {
+        $this->peranId = Peran::where('nama_peran', 'Karyawan')->value('id');
+    }
 
     public function collection(Collection $rows): void
     {
         foreach ($rows as $row) {
-            $nik = trim((string) ($row['nik'] ?? ''));
-            $nama = trim((string) ($row['nama_karyawan'] ?? ''));
-            $namaDept = trim((string) ($row['departemen'] ?? ''));
-
-            $jenisKelamin = $this->normalizeJenisKelamin($row['jenis_kelamin'] ?? null);
+            $nik        = trim((string) ($row['nik'] ?? ''));
+            $nama       = trim((string) ($row['nama_karyawan'] ?? ''));
+            $namaDept   = trim((string) ($row['departemen'] ?? ''));
             $namaJabatan = trim((string) ($row['jabatan'] ?? ''));
+            $jenisKelamin = $this->normalizeJenisKelamin($row['jenis_kelamin'] ?? null);
 
             if ($nik === '' || $nama === '' || $namaDept === '' || $namaJabatan === '') {
                 $this->dilewati++;
@@ -36,30 +45,46 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-            $departemen = Departemen::firstOrCreate(
-                ['nama_departemen' => $namaDept]
-            );
+            DB::transaction(function () use ($nik, $nama, $namaDept, $namaJabatan, $jenisKelamin) {
+                $departemen = Departemen::firstOrCreate(['nama_departemen' => $namaDept]);
+                $posisi     = Posisi::firstOrCreate(['nama_posisi' => $namaJabatan, 'departemen_id' => $departemen->id]);
 
-            $posisi = null;
-            if ($namaJabatan !== '') {
-                $posisi = Posisi::firstOrCreate(
-                    ['nama_posisi' => $namaJabatan, 'departemen_id' => $departemen->id]
-                );
-            }
+                $idKaryawan = $this->generateIdKaryawan();
 
-            DataKaryawan::create([
-                'nik_karyawan'  => $nik,
-                'nama_karyawan' => $nama,
-                'jenis_kelamin' => $jenisKelamin,
-                'departemen'    => $namaDept,
-                'jabatan'       => $namaJabatan,
-                'departemen_id' => $departemen->id,
-                'posisi_id'     => $posisi?->id,
-                'status'        => 'belum_terpakai',
-            ]);
+                $user = User::create([
+                    'name'                 => $nama,
+                    'email'                => null,
+                    'id_karyawan'          => $idKaryawan,
+                    'password'             => Hash::make($idKaryawan),
+                    'jenis_kelamin'        => $jenisKelamin,
+                    'tipe_akun'            => 'karyawan',
+                    'peran_id'             => $this->peranId,
+                    'status'               => 'aktif',
+                    'must_change_password' => true,
+                ]);
+
+                DataKaryawan::create([
+                    'nik_karyawan'  => $nik,
+                    'departemen_id' => $departemen->id,
+                    'posisi_id'     => $posisi->id,
+                    'user_id'       => $user->id,
+                ]);
+            });
 
             $this->berhasil++;
         }
+    }
+
+    private function generateIdKaryawan(): string
+    {
+        $year = date('Y');
+        $last = User::where('id_karyawan', 'like', "{$year}%")
+            ->orderBy('id_karyawan', 'desc')
+            ->value('id_karyawan');
+
+        $seq = $last ? (int) substr($last, 4) + 1 : 1;
+
+        return $year . str_pad($seq, 3, '0', STR_PAD_LEFT);
     }
 
     private function normalizeJenisKelamin(mixed $nilai): ?string

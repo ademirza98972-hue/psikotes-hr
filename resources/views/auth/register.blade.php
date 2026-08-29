@@ -7,11 +7,7 @@
 @endsection
 
 @section('content')
-<div x-data="{
-    tipe: '{{ old('tipe_akun', 'kandidat') }}',
-    showPwd: false,
-    showPwdConfirm: false,
-}" class="space-y-6">
+<div x-data="{ showPwd: false, showPwdConfirm: false }" class="space-y-6">
 
     <div class="space-y-1">
         <h2 class="font-body font-semibold text-2xl text-on-surface">Buat Akun Baru</h2>
@@ -31,26 +27,11 @@
     <form method="POST" action="{{ route('register') }}" class="space-y-5">
         @csrf
 
-        {{-- Tipe Akun --}}
-        <div class="space-y-2">
-            <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant">Tipe Akun</label>
-            <div class="grid grid-cols-2 gap-2">
-                <label class="flex cursor-pointer items-center justify-center rounded-sm border px-3 py-3 text-sm font-body font-medium transition-colors"
-                    :class="tipe === 'kandidat' ? 'border-psikotes bg-psikotes text-white' : 'border-surface-variant text-on-surface-variant hover:border-psikotes'">
-                    <input type="radio" name="tipe_akun" value="kandidat" x-model="tipe" class="sr-only">
-                    Kandidat
-                </label>
-                <label class="flex cursor-pointer items-center justify-center rounded-sm border px-3 py-3 text-sm font-body font-medium transition-colors"
-                    :class="tipe === 'karyawan' ? 'border-psikotes bg-psikotes text-white' : 'border-surface-variant text-on-surface-variant hover:border-psikotes'">
-                    <input type="radio" name="tipe_akun" value="karyawan" x-model="tipe" class="sr-only">
-                    Karyawan
-                </label>
-            </div>
-        </div>
+        <input type="hidden" name="tipe_akun" value="kandidat">
 
         {{-- Field Kandidat --}}
-        <div x-show="tipe === 'kandidat'" x-cloak class="space-y-4 border-t border-surface-variant pt-4">
-            <p class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant">Data Kandidat</p>
+        <div class="space-y-4 border-t border-surface-variant pt-4">
+            <p class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant">Data Diri</p>
 
             {{-- Nama + NIK --}}
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -62,8 +43,6 @@
                             name="name"
                             type="text"
                             value="{{ old('name') }}"
-                            :disabled="tipe !== 'kandidat'"
-                            :required="tipe === 'kandidat'"
                             placeholder="Nama lengkap sesuai KTP"
                             class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors"
                         >
@@ -79,8 +58,6 @@
                             name="nik_kandidat"
                             type="text"
                             value="{{ old('nik_kandidat') }}"
-                            :disabled="tipe !== 'kandidat'"
-                            :required="tipe === 'kandidat'"
                             maxlength="16"
                             inputmode="numeric"
                             pattern="[0-9]{16}"
@@ -103,7 +80,6 @@
                             name="tanggal_lahir"
                             type="date"
                             value="{{ old('tanggal_lahir') }}"
-                            :disabled="tipe !== 'kandidat'"
                             class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors"
                         >
                     </div>
@@ -115,8 +91,6 @@
                         <select
                             id="jenis_kelamin_kandidat"
                             name="jenis_kelamin"
-                            :disabled="tipe !== 'kandidat'"
-                            :required="tipe === 'kandidat'"
                             class="w-full px-4 py-3 pr-10 bg-white border rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none @error('jenis_kelamin') border-rose-500 @else border-surface-variant @enderror"
                         >
                             <option value="">-- Pilih --</option>
@@ -139,8 +113,6 @@
                             name="email"
                             type="email"
                             value="{{ old('email') }}"
-                            :disabled="tipe !== 'kandidat'"
-                            :required="tipe === 'kandidat'"
                             autocomplete="email"
                             placeholder="nama@email.com"
                             class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @else border-surface-variant @enderror"
@@ -157,8 +129,6 @@
                             name="no_hp"
                             type="text"
                             value="{{ old('no_hp') }}"
-                            :disabled="tipe !== 'kandidat'"
-                            :required="tipe === 'kandidat'"
                             autocomplete="tel"
                             placeholder="08xxxxxxxxxx"
                             class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('no_hp') border-rose-500 @else border-surface-variant @enderror"
@@ -176,8 +146,6 @@
                     <select
                         id="posisi_dilamar"
                         name="posisi_dilamar"
-                        :disabled="tipe !== 'kandidat'"
-                        :required="tipe === 'kandidat'"
                         class="w-full px-4 py-3 pr-10 bg-white border rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none @error('posisi_dilamar') border-rose-500 @else border-surface-variant @enderror"
                     >
                         <option value="">-- Pilih Posisi --</option>
@@ -187,7 +155,7 @@
                                 @php $currentDept = $p->departemen->id; @endphp
                                 <optgroup label="{{ $p->departemen->nama_departemen }}">
                             @endif
-                                <option value="{{ $p->nama_posisi }}" {{ old('posisi_dilamar') == $p->nama_posisi ? 'selected' : '' }}>
+                                <option value="{{ $p->id }}" {{ old('posisi_dilamar') == $p->id ? 'selected' : '' }}>
                                     {{ $p->nama_posisi }}
                                 </option>
                             @if(!$loop->last && (!$posisi[$loop->index + 1]->departemen || $posisi[$loop->index + 1]->departemen->id !== $currentDept))
@@ -216,101 +184,12 @@
                         name="pendidikan_terakhir"
                         type="text"
                         value="{{ old('pendidikan_terakhir') }}"
-                        :disabled="tipe !== 'kandidat'"
-                        :required="tipe === 'kandidat'"
                         placeholder="Contoh: S1 Teknik Informatika"
                         class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors"
                     >
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">school</span>
                 </div>
                 @error('pendidikan_terakhir')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
-            </div>
-        </div>
-
-        {{-- Field Karyawan --}}
-        <div x-show="tipe === 'karyawan'" x-cloak class="space-y-4 border-t border-surface-variant pt-4">
-            <p class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant">Data Karyawan</p>
-
-            {{-- Nama + NIK --}}
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="name_karyawan">Nama Lengkap</label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="name_karyawan"
-                            name="name"
-                            type="text"
-                            value="{{ old('name') }}"
-                            :disabled="tipe !== 'karyawan'"
-                            :required="tipe === 'karyawan'"
-                            placeholder="Isi sesuai data karyawan resmi"
-                            class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors"
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">person</span>
-                    </div>
-                    <p class="font-body text-xs text-on-surface-variant mt-1">Nama harus cocok dengan data karyawan resmi.</p>
-                </div>
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="nik_karyawan">NIK</label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="nik_karyawan"
-                            name="nik_karyawan"
-                            type="text"
-                            value="{{ old('nik_karyawan') }}"
-                            :disabled="tipe !== 'karyawan'"
-                            :required="tipe === 'karyawan'"
-                            placeholder="Isi sesuai data karyawan resmi"
-                            class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('nik_karyawan') border-rose-500 @else border-surface-variant @enderror"
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">badge</span>
-                    </div>
-                    @error('nik_karyawan')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @else
-                        <p class="font-body text-xs text-on-surface-variant mt-1">Isi NIK sesuai data karyawan resmi.</p>
-                    @enderror
-                </div>
-            </div>
-
-            {{-- Email + No HP --}}
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email_karyawan">Email</label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="email_karyawan"
-                            name="email"
-                            type="email"
-                            value="{{ old('email') }}"
-                            :disabled="tipe !== 'karyawan'"
-                            :required="tipe === 'karyawan'"
-                            autocomplete="email"
-                            placeholder="nama@perusahaan.com"
-                            class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @else border-surface-variant @enderror"
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
-                    </div>
-                    @error('email')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
-                </div>
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="no_hp_karyawan">No HP</label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="no_hp_karyawan"
-                            name="no_hp"
-                            type="text"
-                            value="{{ old('no_hp') }}"
-                            :disabled="tipe !== 'karyawan'"
-                            :required="tipe === 'karyawan'"
-                            autocomplete="tel"
-                            placeholder="08xxxxxxxxxx"
-                            class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('no_hp') border-rose-500 @else border-surface-variant @enderror"
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">smartphone</span>
-                    </div>
-                    @error('no_hp')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
-                </div>
             </div>
         </div>
 

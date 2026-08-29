@@ -111,9 +111,9 @@ class DashboardController extends Controller
         $kandidatAktif = User::where('tipe_akun', 'kandidat')->where('status', 'aktif')->count();
         $kandidatDitolak = User::where('tipe_akun', 'kandidat')->where('status', 'ditolak')->count();
         $totalAdminStaff = User::where('tipe_akun', 'custom')->count();
-        $nikBelumTerpakai = DataKaryawan::where('status', 'belum_terpakai')->count();
-        $totalPeran = Peran::count();
         $totalDataKaryawan = DataKaryawan::count();
+        $nikBelumTerpakai = $totalDataKaryawan - $totalKaryawan;
+        $totalPeran = Peran::count();
 
         // Kandidat menunggu (max 2, oldest first)
         $kandidatMenungguList = User::where('tipe_akun', 'kandidat')

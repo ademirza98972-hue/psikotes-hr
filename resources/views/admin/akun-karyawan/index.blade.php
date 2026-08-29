@@ -104,7 +104,8 @@ x-init="
                         <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">ID Karyawan</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">NIK</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Nama Karyawan</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Departemen / Posisi</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Departemen</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Posisi</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;">Status Akun</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color:#7db8c2;">Aksi</th>
                     </tr>
@@ -155,19 +156,14 @@ x-init="
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-sm text-[#40484b]">
-                                <p>{{ $dk->departemen?->nama_departemen ?? '—' }}</p>
-                                <p class="text-[11px] text-[#71787c]">{{ $dk->posisi?->nama_posisi ?? '—' }}</p>
-                            </td>
+                            <td class="px-6 py-4 text-sm text-[#40484b]">{{ $dk->departemen?->nama_departemen ?? '—' }}</td>
+                            <td class="px-6 py-4 text-sm text-[#40484b]">{{ $dk->posisi?->nama_posisi ?? '—' }}</td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex flex-col items-center gap-1">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $warnaStatus }}">
                                         <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }} mr-1.5"></span>
                                         {{ $labelStatus }}
                                     </span>
-                                    @if($u?->must_change_password)
-                                        <span class="text-[10px] text-amber-600 font-medium">Wajib ganti password</span>
-                                    @endif
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right">
@@ -223,7 +219,7 @@ x-init="
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-14 text-center">
+                            <td colspan="8" class="px-6 py-14 text-center">
                                 @if($kataKunci || $filterDepartemen || $filterPosisi)
                                     <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
                                     <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>

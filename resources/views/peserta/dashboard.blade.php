@@ -14,8 +14,8 @@
     $today   = \Carbon\Carbon::today();
     $allSesi = collect($sesiTes);
 
-    $sesiAktif   = $allSesi->filter(fn($s) => $s['status_pengerjaan'] !== 'Selesai' && $s['status_sesi'] !== 'Kedaluwarsa');
-    $sesiRiwayat = $allSesi->filter(fn($s) => $s['status_pengerjaan'] === 'Selesai'  || $s['status_sesi'] === 'Kedaluwarsa');
+    $sesiAktif   = $allSesi->filter(fn($s) => $s['status_pengerjaan'] !== 'Selesai' && $s['status_sesi'] !== 'Selesai');
+    $sesiRiwayat = $allSesi->filter(fn($s) => $s['status_pengerjaan'] === 'Selesai'  || $s['status_sesi'] === 'Selesai');
 
     $sesiMendesak = $sesiAktif->filter(function ($s) use ($today) {
         if ($s['status_sesi'] !== 'Aktif') return false;

@@ -83,7 +83,7 @@ class DashboardController extends Controller
             }
 
             if ($today > $endDate) {
-                $statusSesi = 'Kedaluwarsa';
+                $statusSesi = 'Selesai';
             } elseif ($today >= $startDate) {
                 $statusSesi = 'Aktif';
             } else {

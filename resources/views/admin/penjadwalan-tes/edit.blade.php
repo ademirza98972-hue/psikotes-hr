@@ -100,9 +100,8 @@
                         <label for="status" class="block text-[12px] font-medium text-[#41484b] mb-1.5">Status <span class="text-rose-500">*</span></label>
                         <select id="status" name="status" required
                                 class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
-                            <option value="Draft" @selected(old('status', $sesi->status) === 'Draft')">Draft</option>
-                            <option value="Aktif" @selected(old('status', $sesi->status) === 'Aktif')">Aktif</option>
-                            <option value="Selesai" @selected(old('status', $sesi->status) === 'Selesai')">Selesai</option>
+                            <option value="Draft" @selected(old('status', $sesi->status) === 'Draft')>Draft</option>
+                            <option value="Aktif" @selected(old('status', $sesi->status) !== 'Draft')>Aktif</option>
                         </select>
                     </div>
                 </div>

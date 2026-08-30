@@ -32,9 +32,8 @@ class SesiTes extends Model
     {
         return Attribute::make(get: function () {
             if ($this->status === 'Draft') return 'Draft';
-            if ($this->status === 'Selesai') return 'Selesai';
             $today = now()->toDateString();
-            if ($today > $this->tanggal_selesai?->toDateString()) return 'Kedaluwarsa';
+            if ($today > $this->tanggal_selesai?->toDateString()) return 'Selesai';
             if ($today >= $this->tanggal_mulai?->toDateString()) return 'Aktif';
             return 'Belum Dimulai';
         });

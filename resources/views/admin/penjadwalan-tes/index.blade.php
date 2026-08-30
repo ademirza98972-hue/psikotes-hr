@@ -5,8 +5,7 @@
     $warnaStatus = [
         'Draft'         => 'bg-slate-100 text-slate-600 border border-slate-200',
         'Aktif'         => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-        'Selesai'       => 'bg-slate-100 text-slate-600 border border-slate-200',
-        'Kedaluwarsa'   => 'bg-rose-50 text-rose-700 border border-rose-200',
+        'Selesai'       => 'bg-blue-50 text-blue-700 border border-blue-200',
         'Belum Dimulai' => 'bg-amber-50 text-amber-700 border border-amber-200',
     ];
     $warnaAlatTes = [
@@ -52,9 +51,9 @@
                 <select name="status" onchange="this.form.submit()"
                     class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-9 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
                     <option value="">Semua Status</option>
-                    <option value="Draft"       @selected($filterStatus === 'Draft')>Draft</option>
-                    <option value="Aktif"       @selected($filterStatus === 'Aktif')>Aktif</option>
-                    <option value="Kedaluwarsa" @selected($filterStatus === 'Kedaluwarsa')>Kedaluwarsa</option>
+                    <option value="Draft"   @selected($filterStatus === 'Draft')>Draft</option>
+                    <option value="Aktif"   @selected($filterStatus === 'Aktif')>Aktif</option>
+                    <option value="Selesai" @selected($filterStatus === 'Selesai')>Selesai</option>
                 </select>
                 <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#71787c]">
                     <span class="material-symbols-outlined text-[18px]">expand_more</span>
@@ -71,11 +70,10 @@
 
     @php
         $temaStatus = [
-            'Draft'         => ['header_bg' => '#f1f5f9', 'header_text' => '#64748b', 'badge' => '#94a3b8',  'bar' => '#94a3b8',  'icon' => 'draft'],
-            'Aktif'         => ['header_bg' => '#ecfdf5', 'header_text' => '#065f46', 'badge' => '#10b981',  'bar' => '#10b981',  'icon' => 'play_circle'],
-            'Selesai'       => ['header_bg' => '#f8fafc', 'header_text' => '#475569', 'badge' => '#64748b',  'bar' => '#64748b',  'icon' => 'check_circle'],
-            'Kedaluwarsa'   => ['header_bg' => '#fff1f2', 'header_text' => '#9f1239', 'badge' => '#f43f5e',  'bar' => '#f43f5e',  'icon' => 'timer_off'],
-            'Belum Dimulai' => ['header_bg' => '#fffbeb', 'header_text' => '#92400e', 'badge' => '#f59e0b',  'bar' => '#f59e0b',  'icon' => 'schedule'],
+            'Draft'         => ['header_bg' => '#f1f5f9', 'header_text' => '#64748b', 'badge' => '#94a3b8', 'bar' => '#94a3b8', 'icon' => 'draft'],
+            'Aktif'         => ['header_bg' => '#ecfdf5', 'header_text' => '#065f46', 'badge' => '#10b981', 'bar' => '#10b981', 'icon' => 'play_circle'],
+            'Selesai'       => ['header_bg' => '#eff6ff', 'header_text' => '#1e40af', 'badge' => '#3b82f6', 'bar' => '#3b82f6', 'icon' => 'check_circle'],
+            'Belum Dimulai' => ['header_bg' => '#fffbeb', 'header_text' => '#92400e', 'badge' => '#f59e0b', 'bar' => '#f59e0b', 'icon' => 'schedule'],
         ];
         $defaultTema = ['header_bg' => '#f1f5f9', 'header_text' => '#64748b', 'badge' => '#94a3b8', 'bar' => '#94a3b8', 'icon' => 'help'];
     @endphp

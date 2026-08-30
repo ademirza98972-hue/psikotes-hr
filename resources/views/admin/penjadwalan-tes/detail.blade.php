@@ -3,9 +3,10 @@
 @section('content')
 @php
     $warnaStatus = [
-        'Draft'   => 'bg-slate-100 text-slate-600 border border-slate-200',
-        'Aktif'   => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-        'Selesai' => 'bg-slate-100 text-slate-600 border border-slate-200',
+        'Draft'         => 'bg-slate-100 text-slate-600 border border-slate-200',
+        'Aktif'         => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+        'Selesai'       => 'bg-blue-50 text-blue-700 border border-blue-200',
+        'Belum Dimulai' => 'bg-amber-50 text-amber-700 border border-amber-200',
     ];
     $warnaStatusPengerjaan = [
         'Belum Mengerjakan' => 'bg-slate-100 text-slate-600 border border-slate-200',

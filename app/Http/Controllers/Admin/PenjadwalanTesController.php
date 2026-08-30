@@ -34,13 +34,13 @@ class PenjadwalanTesController extends Controller
         $query->when($cari, fn($q) => $q->where('nama_sesi', 'like', '%' . $cari . '%'));
 
         match ($filterStatus) {
-            'Draft'       => $query->where('status', 'Draft'),
-            'Aktif'       => $query->whereNotIn('status', ['Draft', 'Selesai'])
-                                   ->where('tanggal_mulai', '<=', $today)
-                                   ->where('tanggal_selesai', '>=', $today),
-            'Kedaluwarsa' => $query->whereNotIn('status', ['Draft', 'Selesai'])
-                                   ->where('tanggal_selesai', '<', $today),
-            default       => null,
+            'Draft'    => $query->where('status', 'Draft'),
+            'Aktif'    => $query->where('status', '!=', 'Draft')
+                                ->where('tanggal_mulai', '<=', $today)
+                                ->where('tanggal_selesai', '>=', $today),
+            'Selesai'  => $query->where('status', '!=', 'Draft')
+                                ->where('tanggal_selesai', '<', $today),
+            default    => null,
         };
 
         $penjadwalan = $query->orderByDesc('tanggal_mulai')

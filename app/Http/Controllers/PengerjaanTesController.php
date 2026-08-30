@@ -55,6 +55,15 @@ class PengerjaanTesController extends Controller
         $sesi = SesiTes::find($sesiId);
         if (!$sesi) return null;
 
+        $today = now()->toDateString();
+        if (
+            $sesi->status === 'Draft' ||
+            $sesi->tanggal_mulai?->toDateString() > $today ||
+            $sesi->tanggal_selesai?->toDateString() < $today
+        ) {
+            return null;
+        }
+
         $alatTesPeserta = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesi->id)
             ->with('alatTes:id,kode,nama,format_dasar')
             ->get()

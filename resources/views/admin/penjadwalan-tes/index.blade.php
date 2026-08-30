@@ -28,17 +28,45 @@
 
     {{-- STICKY HEADER --}}
     <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-4 px-4 pt-6 pb-4 border-b border-[#e0e3e5]">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">Daftar Penjadwalan Tes</h2>
-            <p class="mt-0.5 text-[14px] text-[#40484b]">Sesi tes yang dijadwalkan untuk kandidat dan karyawan.</p>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div>
+                <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">Daftar Penjadwalan Tes</h2>
+                <p class="mt-0.5 text-[14px] text-[#40484b]">Sesi tes yang dijadwalkan untuk kandidat dan karyawan.</p>
+            </div>
+            <a href="{{ route('admin.penjadwalan-tes.tambah') }}"
+               class="self-start inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors whitespace-nowrap">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Tambah Penjadwalan
+            </a>
         </div>
-        <a href="{{ route('admin.penjadwalan-tes.tambah') }}"
-           class="self-start inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors whitespace-nowrap">
-            <span class="material-symbols-outlined text-[18px]">add</span>
-            Tambah Penjadwalan
-        </a>
-    </div>
+        <form method="GET" action="{{ route('admin.penjadwalan-tes.index') }}" class="flex flex-wrap items-center gap-2">
+            <div class="relative flex-1 min-w-[200px]">
+                <span class="absolute inset-y-0 left-3 flex items-center text-[#71787c]">
+                    <span class="material-symbols-outlined text-[18px]">search</span>
+                </span>
+                <input type="text" name="cari" value="{{ $cari }}"
+                    placeholder="Cari nama sesi..."
+                    class="w-full rounded-lg border border-[#c0c8cb] py-2 pl-9 pr-4 text-sm text-[#191c1e] placeholder-[#71787c] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all bg-white">
+            </div>
+            <div class="relative min-w-[160px]">
+                <select name="status" onchange="this.form.submit()"
+                    class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-9 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
+                    <option value="">Semua Status</option>
+                    <option value="Draft"       @selected($filterStatus === 'Draft')>Draft</option>
+                    <option value="Aktif"       @selected($filterStatus === 'Aktif')>Aktif</option>
+                    <option value="Kedaluwarsa" @selected($filterStatus === 'Kedaluwarsa')>Kedaluwarsa</option>
+                </select>
+                <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#71787c]">
+                    <span class="material-symbols-outlined text-[18px]">expand_more</span>
+                </span>
+            </div>
+            @if($cari || $filterStatus)
+                <a href="{{ route('admin.penjadwalan-tes.index') }}"
+                   class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors whitespace-nowrap">
+                    Reset Filter
+                </a>
+            @endif
+        </form>
     </div>{{-- /STICKY HEADER --}}
 
     @php

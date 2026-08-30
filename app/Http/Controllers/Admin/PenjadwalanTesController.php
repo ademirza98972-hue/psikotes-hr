@@ -22,19 +22,35 @@ class PenjadwalanTesController extends Controller
     public function index(Request $request): View
     {
         $perPage = $this->getPerPage($request, 10);
+        $cari = $request->input('cari');
+        $filterStatus = $request->input('status');
+        $today = now()->toDateString();
 
-        $penjadwalan = SesiTes::withCount([
+        $query = SesiTes::withCount([
             'pesertaSesiTes as jumlah_peserta_count',
-            'pesertaSesiTes as jumlah_selesai_count' => function ($q) {
-                $q->where('status_pengerjaan', 'Selesai');
-            }
-        ])->with(['departemen', 'alatTes'])
-            ->orderByDesc('tanggal_mulai')
+            'pesertaSesiTes as jumlah_selesai_count' => fn($q) => $q->where('status_pengerjaan', 'Selesai'),
+        ])->with(['departemen', 'alatTes']);
+
+        $query->when($cari, fn($q) => $q->where('nama_sesi', 'like', '%' . $cari . '%'));
+
+        match ($filterStatus) {
+            'Draft'       => $query->where('status', 'Draft'),
+            'Aktif'       => $query->whereNotIn('status', ['Draft', 'Selesai'])
+                                   ->where('tanggal_mulai', '<=', $today)
+                                   ->where('tanggal_selesai', '>=', $today),
+            'Kedaluwarsa' => $query->whereNotIn('status', ['Draft', 'Selesai'])
+                                   ->where('tanggal_selesai', '<', $today),
+            default       => null,
+        };
+
+        $penjadwalan = $query->orderByDesc('tanggal_mulai')
             ->paginate($perPage)
             ->withQueryString();
 
         return view('admin.penjadwalan-tes.index', [
-            'penjadwalan' => $penjadwalan,
+            'penjadwalan'  => $penjadwalan,
+            'cari'         => $cari,
+            'filterStatus' => $filterStatus,
         ]);
     }
 

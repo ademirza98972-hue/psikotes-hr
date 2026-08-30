@@ -108,10 +108,7 @@
                         @php
                             $kode = $alat['kode'];
 
-                            $warnaKode = [
-                                'EPPS' => 'bg-emerald-100 text-emerald-700',
-                            ];
-                            $badgeKode = $warnaKode[$kode] ?? 'bg-slate-100 text-slate-700';
+                            $badgeKode = kode_badge_class($kode);
                         @endphp
                         <tr class="hover:bg-[#f2f4f6] transition-colors group">
                             <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($alatTes->currentPage() - 1) * $alatTes->perPage() + $loop->iteration }}</td>

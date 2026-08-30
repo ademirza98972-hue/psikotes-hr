@@ -3,7 +3,7 @@
 
     <div class="flex justify-between items-start mb-4">
         <div class="flex items-center gap-3">
-            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $warnaKode[$kodeAlat] ?? 'bg-slate-100 text-slate-700' }}">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ kode_badge_class($kodeAlat) }}">
                 {{ $kodeAlat ?? '?' }}
             </span>
             <span class="text-[12px] text-[#40484b]">No. {{ str_pad($nomor, 3, '0', STR_PAD_LEFT) }}</span>

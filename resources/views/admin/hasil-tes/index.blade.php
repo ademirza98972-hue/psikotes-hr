@@ -10,9 +10,6 @@
         'Belum Dimulai' => ['bg' => 'bg-slate-50',  'text' => 'text-slate-400',  'border' => 'border-slate-200'],
     ];
 
-    $badgeAlatTes = [
-        'EPPS'  => ['bg' => 'bg-emerald-50','text' => 'text-emerald-600','border' => 'border-emerald-100'],
-    ];
 
     $pesertaBySesi = [];
     foreach ($hasilTes as $row) {

@@ -13,9 +13,6 @@
         'Sedang Berjalan'   => 'bg-amber-50 text-amber-700 border border-amber-200',
         'Selesai'           => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
     ];
-    $warnaAlatTes = [
-        'EPPS'   => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    ];
     $bulanId = [
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
         5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
@@ -75,7 +72,7 @@
                     <p class="text-[11px] font-semibold uppercase tracking-wider text-[#41484b] mb-2">ALAT TES:</p>
                     <div class="flex flex-wrap gap-2">
                         @forelse ($sesi->alatTes as $alat)
-                            <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $warnaAlatTes[$alat->kode] ?? 'bg-slate-50 text-slate-600 border border-slate-200' }}">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ kode_badge_class($alat->kode, 'soft') }}">
                                 {{ $alat->kode ?? $alat->nama }}
                             </span>
                         @empty
@@ -265,7 +262,7 @@
                                         <td class="px-3 py-3">
                                             <div class="flex flex-wrap gap-1.5">
                                                 @forelse ($peserta->alatTes as $alat)
-                                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $warnaAlatTes[$alat->kode] ?? 'bg-slate-50 text-slate-600 border border-slate-200' }}">
+                                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ kode_badge_class($alat->kode, 'soft') }}">
                                                         {{ $alat->kode ?? $alat->nama }}
                                                     </span>
                                                 @empty

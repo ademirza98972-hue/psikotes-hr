@@ -2,10 +2,7 @@
 
 @section('content')
 @php
-    // Mapping kode alat tes → warna badge (konsisten dengan halaman Alat Tes)
-    $warnaKode = [
-        'EPPS'   => 'bg-emerald-100 text-emerald-700',
-    ];
+    $warnaKode = [];
 @endphp
 
 <div class="space-y-6">
@@ -98,7 +95,7 @@
                         ? 'Instrument ' . $kodeAlat
                         : $alatTesTerpilih->nama;
                 @endphp
-                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $warnaKode[$kodeAlat] ?? 'bg-slate-100 text-slate-700' }}">
+                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ kode_badge_class($kodeAlat) }}">
                     {{ $kodeAlat }}
                 </span>
                 <h2 class="text-base font-semibold text-[#191c1e]">{{ $namaTampil }}</h2>
@@ -121,7 +118,6 @@
                         'soal'        => $soal,
                         'format'      => $alatTesTerpilih->format_dasar,
                         'kodeAlat'    => $kodeAlat,
-                        'warnaKode'   => $warnaKode,
                     ])
                 @endforeach
             </div>
@@ -149,7 +145,7 @@
                     <a href="{{ route('admin.bank-soal.index', ['alat_tes_id' => $alatId]) }}"
                        class="flex items-center justify-between rounded-xl border border-[#e0e3e5] bg-white px-5 py-4 shadow-sm hover:shadow-md hover:border-[#2C5F6F]/40 transition-all group">
                         <div class="flex items-center gap-3 min-w-0">
-                            <span class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $warnaKode[$kodeAlat] ?? 'bg-slate-100 text-slate-700' }}">
+                            <span class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-bold {{ kode_badge_class($kodeAlat) }}">
                                 {{ $kodeAlat ?: '?' }}
                             </span>
                             <div class="min-w-0">

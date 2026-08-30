@@ -8,9 +8,6 @@
         'Selesai'       => 'bg-blue-50 text-blue-700 border border-blue-200',
         'Belum Dimulai' => 'bg-amber-50 text-amber-700 border border-amber-200',
     ];
-    $warnaAlatTes = [
-        'EPPS'   => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    ];
     $bulanId = [
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
         5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
@@ -123,7 +120,7 @@
                     {{-- Alat tes --}}
                     <div class="flex flex-wrap gap-1.5">
                         @forelse ($sesi->alatTes as $alat)
-                            <span class="rounded-lg border border-[#2C5F6F]/20 bg-[#2C5F6F]/5 px-2.5 py-0.5 text-[11px] font-bold text-[#2C5F6F] tracking-wide">
+                            <span class="rounded-lg px-2.5 py-0.5 text-[11px] font-bold tracking-wide {{ kode_badge_class($alat->kode, 'soft') }}">
                                 {{ $alat->kode }}
                             </span>
                         @empty

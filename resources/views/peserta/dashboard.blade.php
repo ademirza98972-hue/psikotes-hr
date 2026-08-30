@@ -179,7 +179,7 @@
                         {{-- Alat Tes Chips --}}
                         <div class="flex flex-wrap gap-2 mb-5">
                             @foreach ($sesi['daftar_alat_tes_ditugaskan'] as $alat)
-                                <span class="inline-flex items-center rounded-md bg-[#f2f4f6] px-2.5 py-1 text-[11px] font-medium text-[#40484b] border border-[#e0e3e5]">
+                                <span class="inline-flex items-center rounded-md px-2.5 py-1 text-[11px] font-semibold {{ kode_badge_class($alat, 'soft') }}">
                                     {{ $alat }}
                                 </span>
                             @endforeach
@@ -244,9 +244,11 @@
                                         &ndash;
                                         {{ \Carbon\Carbon::parse($sesi['tanggal_selesai'])->translatedFormat('d M Y') }}
                                     </span>
-                                    <span class="flex items-center gap-1">
+                                    <span class="flex items-center gap-1 flex-wrap">
                                         <span class="material-symbols-outlined text-[12px]">quiz</span>
-                                        {{ implode(', ', $sesi['daftar_alat_tes_ditugaskan'] ?? []) }}
+                                        @foreach ($sesi['daftar_alat_tes_ditugaskan'] ?? [] as $alat)
+                                            <span class="rounded px-1.5 py-0.5 text-[10px] font-semibold {{ kode_badge_class($alat, 'soft') }}">{{ $alat }}</span>
+                                        @endforeach
                                     </span>
                                 </div>
                             </div>

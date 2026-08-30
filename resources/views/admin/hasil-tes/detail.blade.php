@@ -155,20 +155,6 @@
             </table>
         </div>
 
-        {{-- RINGKASAN ALAT TES --}}
-        <div class="container-formal">
-            <div class="section-title">RINGKASAN ALAT TES</div>
-            <table>
-                <thead class="th-row"><tr class="text-left"><th>Alat Tes</th><th>Format Dasar</th><th>Durasi Aktual</th></tr></thead>
-                <tbody>
-                    @forelse ($hasilTes['hasil_alat_tes'] as $alat)
-                    <tr><td>{{ $alat['nama_alat_tes'] }}</td><td>{{ $alat['format_dasar'] }}</td><td>{{ $alat['durasi_pengerjaan_aktual'] }}</td></tr>
-                    @empty
-                    <tr><td colspan="3" style="color:#999; font-style:italic;">Belum ada hasil tes</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
 
         {{-- PSIKOGRAM --}}
         @if (!empty($psikogram))
@@ -311,12 +297,13 @@
                                     @php $_skor = $eppsScores[$_kode] ?? null; @endphp
                                     <tr>
                                         <td style="padding:3px 6px;"><strong>{{ $_namaAspek }}</strong></td>
-                                        <td class="mark" style="font-size:12px;">{!! $_skor && $katMap[$_skor['kategori']] === 'R' ? '&check;' : '&bull;' !!}</td>
-                                        <td class="mark" style="font-size:12px;">{!! $_skor && $katMap[$_skor['kategori']] === 'K' ? '&check;' : '&bull;' !!}</td>
-                                        <td class="mark" style="font-size:12px;">{!! $_skor && $katMap[$_skor['kategori']] === 'C' ? '&check;' : '&bull;' !!}</td>
-                                        <td class="mark" style="font-size:12px;">{!! $_skor && $katMap[$_skor['kategori']] === 'B' ? '&check;' : '&bull;' !!}</td>
-                                        <td class="mark" style="font-size:12px;">{!! $_skor && $katMap[$_skor['kategori']] === 'T' ? '&check;' : '&bull;' !!}</td>
-                                        <td style="font-size:9px;color:#333;line-height:1.4;">{{ $_skor ? ($eppsDesc[$_kode][$katMap[$_skor['kategori']]] ?? '-') : '-' }}</td>
+                                        @php $_kat = $_skor ? ($katMap[$_skor['kategori']] ?? null) : null; @endphp
+                                        <td class="mark" style="font-size:12px;">{!! $_kat === 'R' ? '&check;' : '&bull;' !!}</td>
+                                        <td class="mark" style="font-size:12px;">{!! $_kat === 'K' ? '&check;' : '&bull;' !!}</td>
+                                        <td class="mark" style="font-size:12px;">{!! $_kat === 'C' ? '&check;' : '&bull;' !!}</td>
+                                        <td class="mark" style="font-size:12px;">{!! $_kat === 'B' ? '&check;' : '&bull;' !!}</td>
+                                        <td class="mark" style="font-size:12px;">{!! $_kat === 'T' ? '&check;' : '&bull;' !!}</td>
+                                        <td style="font-size:9px;color:#333;line-height:1.4;">{{ $_kat ? ($eppsDesc[$_kode][$_kat] ?? '-') : '-' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -338,15 +325,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php $_con = $eppsScores['con']; @endphp
+                                @php $_con = $eppsScores['con']; $_conKat = $katMap[$_con['kategori']] ?? null; @endphp
                                 <tr>
                                     <td style="padding:3px 6px;"><strong>Validitas</strong></td>
-                                    <td class="mark" style="font-size:12px;">{!! $katMap[$_con['kategori']] === 'R' ? '&check;' : '&bull;' !!}</td>
-                                    <td class="mark" style="font-size:12px;">{!! $katMap[$_con['kategori']] === 'K' ? '&check;' : '&bull;' !!}</td>
-                                    <td class="mark" style="font-size:12px;">{!! $katMap[$_con['kategori']] === 'C' ? '&check;' : '&bull;' !!}</td>
-                                    <td class="mark" style="font-size:12px;">{!! $katMap[$_con['kategori']] === 'B' ? '&check;' : '&bull;' !!}</td>
-                                    <td class="mark" style="font-size:12px;">{!! $katMap[$_con['kategori']] === 'T' ? '&check;' : '&bull;' !!}</td>
-                                    <td style="font-size:9px;color:#333;line-height:1.4;">{{ $eppsDesc['con'][$katMap[$_con['kategori']]] ?? '-' }}</td>
+                                    <td class="mark" style="font-size:12px;">{!! $_conKat === 'R' ? '&check;' : '&bull;' !!}</td>
+                                    <td class="mark" style="font-size:12px;">{!! $_conKat === 'K' ? '&check;' : '&bull;' !!}</td>
+                                    <td class="mark" style="font-size:12px;">{!! $_conKat === 'C' ? '&check;' : '&bull;' !!}</td>
+                                    <td class="mark" style="font-size:12px;">{!! $_conKat === 'B' ? '&check;' : '&bull;' !!}</td>
+                                    <td class="mark" style="font-size:12px;">{!! $_conKat === 'T' ? '&check;' : '&bull;' !!}</td>
+                                    <td style="font-size:9px;color:#333;line-height:1.4;">{{ $_conKat ? ($eppsDesc['con'][$_conKat] ?? '-') : '-' }}</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -132,6 +132,7 @@
         .numpad-btn:active { transform: scale(0.93); background: #e2e8f0; }
         .numpad-btn.del { background: #fee2e2; border-color: #fca5a5; color: #ef4444; }
         .numpad-btn.del:active { background: #fca5a5; }
+        .numpad-btn.wide { grid-column: span 2; }
     </style>
     <meta name="debug-sisa" content="{{ $sisaDetikPerKolom ?? 'null' }} / detikPerKolom={{ $detikPerKolom ?? 'null' }}">
 </head>
@@ -209,7 +210,7 @@
         <button type="button" class="numpad-btn" onclick="numpadClick(1)">1</button>
         <button type="button" class="numpad-btn" onclick="numpadClick(2)">2</button>
         <button type="button" class="numpad-btn" onclick="numpadClick(3)">3</button>
-        <button type="button" class="numpad-btn" onclick="numpadClick(0)">0</button>
+        <button type="button" class="numpad-btn wide" onclick="numpadClick(0)">0</button>
         @if ($adaTimerPerKolom)
         <button type="button" class="numpad-btn del"
                 style="opacity:0.3; cursor:not-allowed;" disabled>←</button>
@@ -217,9 +218,6 @@
         <button type="button" class="numpad-btn del"
                 onclick="numpadBack()">←</button>
         @endif
-        <button type="button" class="numpad-btn confirm"
-                onclick="submitForm()"
-                style="background:#2C5F6F;color:white;border-color:#2C5F6F;">✓</button>
     </div>
 </div>
 

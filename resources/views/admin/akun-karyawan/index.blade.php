@@ -5,7 +5,7 @@
     modalHapus: false, idHapus: null, namaHapus: '',
     modalTambah: false,
     modalUbah: false,
-    ubah: { id: '', nik: '', nama: '', jenis_kelamin: '', tanggal_lahir: '', pendidikan_terakhir: '', departemen_id: '', posisi_id: '', email: '', no_hp: '' },
+    ubah: { id: '', id_karyawan: '', nik: '', nama: '', jenis_kelamin: '', tanggal_lahir: '', pendidikan_terakhir: '', departemen_id: '', posisi_id: '', email: '', no_hp: '' },
     openUbah(data) {
         this.ubah = data;
         this.modalUbah = true;
@@ -22,6 +22,7 @@ x-init="
     @if(old('_form') === 'tambah') $nextTick(() => { modalTambah = true; }); @endif
     @if(old('_form') === 'ubah') $nextTick(() => { openUbah({
         id: '{{ (int)old('id',0) }}',
+        id_karyawan: @js(old('id_karyawan','')),
         nik: @js(old('nik_karyawan','')),
         nama: @js(old('nama_karyawan','')),
         jenis_kelamin: @js(old('jenis_kelamin','')),
@@ -172,6 +173,7 @@ x-init="
                                         <button type="button"
                                                 @click="openUbah({
                                                     id: '{{ $dk->id }}',
+                                                    id_karyawan: @js($u?->id_karyawan ?? ''),
                                                     nik: @js($dk->nik_karyawan),
                                                     nama: @js($u?->name ?? ''),
                                                     jenis_kelamin: @js($dk->jenis_kelamin ?? ''),
@@ -262,7 +264,7 @@ x-init="
                 <div class="flex items-center justify-between px-4 py-2.5 border-b border-[#e0e3e5]">
                     <div>
                         <h3 class="text-sm font-semibold text-[#191c1e]">Tambah Karyawan</h3>
-                        <p class="text-[11px] text-[#71787c]">ID Karyawan & password dibuat otomatis.</p>
+                        <p class="text-[11px] text-[#71787c]">ID Karyawan digunakan sebagai password awal.</p>
                     </div>
                     <button type="button" @click="modalTambah = false" class="text-[#71787c] hover:text-[#191c1e] p-1">
                         <span class="material-symbols-outlined text-[18px]">close</span>
@@ -281,10 +283,15 @@ x-init="
                                 @error('nama_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
-                                <label class="{{ $lbl }}">NIK Karyawan <span class="text-rose-500">*</span></label>
-                                <input name="nik_karyawan" type="text" required value="{{ old('nik_karyawan') }}" class="{{ $inp }} @error('nik_karyawan') border-rose-400 @enderror">
-                                @error('nik_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
+                                <label class="{{ $lbl }}">ID Karyawan <span class="text-rose-500">*</span></label>
+                                <input name="id_karyawan" type="text" required value="{{ old('id_karyawan') }}" placeholder="Contoh: KRY-001" class="{{ $inp }} @error('id_karyawan') border-rose-400 @enderror">
+                                @error('id_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
+                        </div>
+                        <div>
+                            <label class="{{ $lbl }}">NIK Karyawan <span class="text-rose-500">*</span></label>
+                            <input name="nik_karyawan" type="text" required value="{{ old('nik_karyawan') }}" class="{{ $inp }} @error('nik_karyawan') border-rose-400 @enderror">
+                            @error('nik_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
@@ -341,7 +348,7 @@ x-init="
                         </div>
                         <div class="flex items-start gap-2 rounded-md bg-blue-50 border border-blue-200 px-3 py-2 text-[11px] text-blue-700">
                             <span class="material-symbols-outlined text-[13px] mt-0.5 shrink-0">info</span>
-                            <span>ID Karyawan & password awal dibuat otomatis (contoh: <strong>2026001</strong>). Karyawan wajib ganti password saat login pertama.</span>
+                            <span>ID Karyawan digunakan sebagai password awal. Karyawan wajib ganti password saat login pertama.</span>
                         </div>
                     </div>
                     <div class="flex justify-end gap-2 px-4 py-2.5 bg-[#f7f9fb] border-t border-[#e0e3e5]">
@@ -381,10 +388,15 @@ x-init="
                                 @error('nama_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
-                                <label class="{{ $lbl }}">NIK Karyawan <span class="text-rose-500">*</span></label>
-                                <input name="nik_karyawan" type="text" required :value="ubah.nik" class="{{ $inp }}">
-                                @error('nik_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
+                                <label class="{{ $lbl }}">ID Karyawan <span class="text-rose-500">*</span></label>
+                                <input name="id_karyawan" type="text" required :value="ubah.id_karyawan" class="{{ $inp }}">
+                                @error('id_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
+                        </div>
+                        <div>
+                            <label class="{{ $lbl }}">NIK Karyawan <span class="text-rose-500">*</span></label>
+                            <input name="nik_karyawan" type="text" required :value="ubah.nik" class="{{ $inp }}">
+                            @error('nik_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>

@@ -24,18 +24,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DataKaryawanController extends Controller
 {
-    private function generateIdKaryawan(): string
-    {
-        $year = date('Y');
-        $last = User::where('id_karyawan', 'like', "{$year}%")
-            ->orderBy('id_karyawan', 'desc')
-            ->value('id_karyawan');
-
-        $seq = $last ? (int) substr($last, 4) + 1 : 1;
-
-        return $year . str_pad($seq, 3, '0', STR_PAD_LEFT);
-    }
-
     public function index(Request $request): View
     {
         $kataKunci       = $request->input('cari');
@@ -80,13 +68,11 @@ class DataKaryawanController extends Controller
         }
 
         DB::transaction(function () use ($validated, $peran) {
-            $idKaryawan = $this->generateIdKaryawan();
-
             $user = User::create([
                 'name'                 => $validated['nama_karyawan'],
                 'email'                => $validated['email'] ?: null,
-                'id_karyawan'          => $idKaryawan,
-                'password'             => Hash::make($idKaryawan),
+                'id_karyawan'          => $validated['id_karyawan'],
+                'password'             => Hash::make($validated['id_karyawan']),
                 'tipe_akun'            => 'karyawan',
                 'peran_id'             => $peran->id,
                 'status'               => 'aktif',
@@ -107,7 +93,7 @@ class DataKaryawanController extends Controller
 
         return redirect()
             ->route('admin.akun-karyawan.index')
-            ->with($this::FLASH_SUCCESS, 'Karyawan berhasil ditambahkan. ID Karyawan telah dibuat otomatis.');
+            ->with($this::FLASH_SUCCESS, 'Karyawan berhasil ditambahkan.');
     }
 
     public function perbarui(PerbaruiDataKaryawanRequest $request, int $data_karyawan): RedirectResponse
@@ -128,8 +114,9 @@ class DataKaryawanController extends Controller
 
             if ($data->user) {
                 $data->user->update([
-                    'name'  => $validated['nama_karyawan'],
-                    'email' => $validated['email'] ?: null,
+                    'name'        => $validated['nama_karyawan'],
+                    'email'       => $validated['email'] ?: null,
+                    'id_karyawan' => $validated['id_karyawan'],
                 ]);
             }
         });

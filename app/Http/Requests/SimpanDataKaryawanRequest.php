@@ -15,6 +15,7 @@ class SimpanDataKaryawanRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id_karyawan'         => ['required', 'string', 'max:30', Rule::unique('users', 'id_karyawan')->whereNull('deleted_at')],
             'nik_karyawan'        => ['required', 'string', 'max:30', Rule::unique('data_karyawan', 'nik_karyawan')->whereNull('deleted_at')],
             'nama_karyawan'       => ['required', 'string', 'max:255'],
             'jenis_kelamin'       => ['required', 'in:L,P'],
@@ -42,6 +43,7 @@ class SimpanDataKaryawanRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'id_karyawan'         => 'ID karyawan',
             'nik_karyawan'        => 'NIK',
             'nama_karyawan'       => 'nama karyawan',
             'jenis_kelamin'       => 'jenis kelamin',

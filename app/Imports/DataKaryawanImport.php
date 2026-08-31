@@ -29,13 +29,14 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows): void
     {
         foreach ($rows as $row) {
-            $nik        = trim((string) ($row['nik'] ?? ''));
-            $nama       = trim((string) ($row['nama_karyawan'] ?? ''));
-            $namaDept   = trim((string) ($row['departemen'] ?? ''));
+            $idKaryawan  = trim((string) ($row['id_karyawan'] ?? ''));
+            $nik         = trim((string) ($row['nik'] ?? ''));
+            $nama        = trim((string) ($row['nama_karyawan'] ?? ''));
+            $namaDept    = trim((string) ($row['departemen'] ?? ''));
             $namaJabatan = trim((string) ($row['jabatan'] ?? ''));
             $jenisKelamin = $this->normalizeJenisKelamin($row['jenis_kelamin'] ?? null);
 
-            if ($nik === '' || $nama === '' || $namaDept === '' || $namaJabatan === '') {
+            if ($idKaryawan === '' || $nik === '' || $nama === '' || $namaDept === '' || $namaJabatan === '') {
                 $this->dilewati++;
                 continue;
             }
@@ -45,11 +46,9 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-            DB::transaction(function () use ($nik, $nama, $namaDept, $namaJabatan, $jenisKelamin) {
+            DB::transaction(function () use ($idKaryawan, $nik, $nama, $namaDept, $namaJabatan, $jenisKelamin) {
                 $departemen = Departemen::firstOrCreate(['nama_departemen' => $namaDept]);
                 $posisi     = Posisi::firstOrCreate(['nama_posisi' => $namaJabatan, 'departemen_id' => $departemen->id]);
-
-                $idKaryawan = $this->generateIdKaryawan();
 
                 $user = User::create([
                     'name'                 => $nama,
@@ -73,18 +72,6 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
 
             $this->berhasil++;
         }
-    }
-
-    private function generateIdKaryawan(): string
-    {
-        $year = date('Y');
-        $last = User::where('id_karyawan', 'like', "{$year}%")
-            ->orderBy('id_karyawan', 'desc')
-            ->value('id_karyawan');
-
-        $seq = $last ? (int) substr($last, 4) + 1 : 1;
-
-        return $year . str_pad($seq, 3, '0', STR_PAD_LEFT);
     }
 
     private function normalizeJenisKelamin(mixed $nilai): ?string

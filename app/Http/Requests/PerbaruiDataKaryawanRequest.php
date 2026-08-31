@@ -15,8 +15,10 @@ class PerbaruiDataKaryawanRequest extends FormRequest
     public function rules(): array
     {
         $id = $this->route('data_karyawan');
+        $userId = \App\Models\DataKaryawan::find($id)?->user_id;
 
         return [
+            'id_karyawan'         => ['required', 'string', 'max:30', Rule::unique('users', 'id_karyawan')->ignore($userId)->whereNull('deleted_at')],
             'nik_karyawan'        => ['required', 'string', 'max:30', Rule::unique('data_karyawan', 'nik_karyawan')->ignore($id)->whereNull('deleted_at')],
             'nama_karyawan'       => ['required', 'string', 'max:255'],
             'jenis_kelamin'       => ['required', 'in:L,P'],
@@ -44,6 +46,7 @@ class PerbaruiDataKaryawanRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'id_karyawan'         => 'ID karyawan',
             'nik_karyawan'        => 'NIK',
             'nama_karyawan'       => 'nama karyawan',
             'jenis_kelamin'       => 'jenis kelamin',

@@ -674,6 +674,12 @@ class PengerjaanTesController extends Controller
         $is_first_soal        = $currentStep === 0;
         $is_last_soal         = $currentStep === count($daftarSoalFlat) - 1;
 
+        $subtesUrutanIst = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
+        $kode_subtes_index = $kodeSubtesTimer
+            ? (array_search($kodeSubtesTimer, $subtesUrutanIst) + 1)
+            : null;
+        $kode_subtes_total = count($subtesUrutanIst);
+
         $is_last_soal_subtes = false;
         if ($kodeAlatTes === 'IST' && !$is_last_soal) {
             $nextIdx = $currentStep + 1;
@@ -710,6 +716,8 @@ class PengerjaanTesController extends Controller
             'detik_per_soal'        => $detikPerSoal ?? null,
             'sisa_detik_per_soal'   => $sisaDetikPerSoal ?? null,
             'is_last_soal_subtes'   => $is_last_soal_subtes,
+            'kode_subtes_index'     => $kode_subtes_index,
+            'kode_subtes_total'     => $kode_subtes_total,
         ]);
     }
 

@@ -64,6 +64,9 @@
                     </h2>
                     <p class="text-xs text-slate-500 mt-0.5">
                         {{ $alat_tes_index + 1 }} dari {{ $total_alat_tes }} alat tes
+                        @if($is_ist && $kode_subtes_index)
+                            &mdash; Subtes {{ $kode_subtes_index }} dari {{ $kode_subtes_total }} ({{ $kode_subtes_timer }})
+                        @endif
                     </p>
                 </div>
                 <div class="flex items-center gap-4">

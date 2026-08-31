@@ -367,6 +367,9 @@
         @if(session('error'))
         Swal.fire({ icon: 'error', title: 'Perhatian', text: @json(session('error')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
         @endif
+        @if(session('info'))
+        Swal.fire({ icon: 'warning', title: 'Perhatian', html: @json(session('info')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        @endif
         @if(session('warning'))
         Swal.fire({ icon: 'warning', title: 'Perhatian', text: @json(session('warning')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
         @endif

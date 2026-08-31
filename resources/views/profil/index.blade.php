@@ -8,6 +8,20 @@
         $inisial = mb_substr(explode(' ', $user->name)[0], 0, 1);
     @endphp
 
+    @if(auth()->user()->must_change_password)
+    <div class="max-w-[800px] w-full rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 flex gap-3 items-start">
+        <span class="material-symbols-outlined text-amber-500 shrink-0 mt-0.5">warning</span>
+        <div>
+            <p class="text-sm font-semibold text-amber-800">Anda menggunakan password sementara</p>
+            <p class="text-[13px] text-amber-700 mt-0.5">
+                Akun Anda dibuat oleh admin menggunakan password default. Demi keamanan,
+                <strong>harap ganti password Anda sekarang</strong> sebelum menggunakan aplikasi.
+                Gulir ke bawah ke bagian <em>Ganti Password</em>.
+            </p>
+        </div>
+    </div>
+    @endif
+
     <div class="max-w-[800px] w-full space-y-8">
 
         {{-- ============================================================ --}}

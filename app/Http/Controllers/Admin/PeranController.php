@@ -141,14 +141,15 @@ class PeranController extends Controller
     protected function labelKelompok(string $prefix): string
     {
         $peta = [
-            'dashboard' => 'Dashboard',
-            'data_karyawan' => 'Data Karyawan',
-            'hasil_tes' => 'Hasil Tes',
-            'pengguna' => 'Akun Karyawan & Kandidat',
+            'dashboard'      => 'Dashboard',
+            'data_terhapus'  => 'Data Terhapus',
+            'departemen'     => 'Departemen',
+            'hasil_tes'      => 'Hasil Tes',
+            'pengguna'       => 'Akun Karyawan & Kandidat',
             'pengguna_admin' => 'Admin & Staff',
-            'peran' => 'Peran',
-            'soal' => 'Bank Soal, Alat Tes & Penjadwalan',
-            'posisi' => 'Data Posisi',
+            'peran'          => 'Peran',
+            'posisi'         => 'Posisi',
+            'soal'           => 'Alat Tes, Bank Soal & Penjadwalan',
         ];
 
         return $peta[$prefix] ?? ucwords(str_replace('_', ' ', $prefix));

@@ -24,7 +24,6 @@ class IzinSeeder extends Seeder
             ['kode_izin' => 'hasil_tes.review', 'deskripsi' => 'Review Hasil Tes'],
             ['kode_izin' => 'dashboard.lihat', 'deskripsi' => 'Akses Dashboard'],
             ['kode_izin' => 'peran.kelola', 'deskripsi' => 'Kelola Peran'],
-            ['kode_izin' => 'data_karyawan.kelola', 'deskripsi' => 'Kelola Data Karyawan'],
             ['kode_izin' => 'pengguna_admin.kelola', 'deskripsi' => 'Kelola Admin & Staff'],
             ['kode_izin' => 'departemen.kelola', 'deskripsi' => 'Kelola Data Departemen'],
             ['kode_izin' => 'posisi.kelola',      'deskripsi' => 'Kelola Data Posisi'],

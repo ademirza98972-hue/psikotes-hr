@@ -75,7 +75,7 @@ class DataKaryawanController extends Controller
                 'password'             => Hash::make($validated['id_karyawan']),
                 'tipe_akun'            => 'karyawan',
                 'peran_id'             => $peran->id,
-                'status'               => 'aktif',
+                'status'               => 'nonaktif',
                 'must_change_password' => true,
             ]);
 

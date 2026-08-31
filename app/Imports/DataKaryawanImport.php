@@ -57,7 +57,7 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
                     'password'             => Hash::make($idKaryawan),
                     'tipe_akun'            => 'karyawan',
                     'peran_id'             => $this->peranId,
-                    'status'               => 'aktif',
+                    'status'               => 'nonaktif',
                     'must_change_password' => true,
                 ]);
 

@@ -316,7 +316,12 @@
                     @else
                         <div></div>
                     @endif
-                    @if($is_last_soal)
+                    @if($is_last_soal_subtes ?? false)
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                            Selesaikan Subtes {{ $kode_subtes_timer ?? '' }} &rarr;
+                        </button>
+                    @elseif($is_last_soal)
                         <div x-data="{ showModal: false, unanswered: 0,
                             checkUnanswered() {
                                 const radios = document.querySelectorAll('input[type=radio]:checked');

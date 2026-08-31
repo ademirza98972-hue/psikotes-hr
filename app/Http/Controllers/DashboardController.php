@@ -64,9 +64,7 @@ class DashboardController extends Controller
             $query->where('user_id', $user->id);
         })
             ->where('status', '!=', 'Draft')
-            ->with(['departemen', 'alatTes' => function ($q) {
-                $q->select('alat_tes.id', 'alat_tes.kode');
-            }, 'pesertaSesiTesRecords'])
+            ->with(['departemen', 'pesertaSesiTesRecords.alatTes'])
             ->orderBy('tanggal_mulai', 'desc')
             ->get();
 
@@ -96,7 +94,7 @@ class DashboardController extends Controller
                 'departemen_terkait' => $sesi->departemen->pluck('nama_departemen')->join(', '),
                 'tanggal_mulai' => $sesi->tanggal_mulai,
                 'tanggal_selesai' => $sesi->tanggal_selesai,
-                'daftar_alat_tes_ditugaskan' => $sesi->alatTes->pluck('kode')->toArray(),
+                'daftar_alat_tes_ditugaskan' => $peserta?->alatTes->pluck('kode')->toArray() ?? [],
                 'status_pengerjaan' => $statusPengerjaan,
                 'status_sesi' => $statusSesi,
             ];
@@ -225,7 +223,7 @@ class DashboardController extends Controller
      */
     public function instruksi(int $sesiId)
     {
-        $sesi = SesiTes::with(['departemen', 'alatTes'])
+        $sesi = SesiTes::with(['departemen'])
             ->find($sesiId);
 
         if (!$sesi) {
@@ -235,7 +233,8 @@ class DashboardController extends Controller
         // Validasi: pastikan user login terdaftar sebagai peserta di sesi ini
         $pesertaSesi = PesertaSesiTes::where('sesi_tes_id', $sesiId)
             ->where('user_id', auth()->id())
-            ->exists();
+            ->with('alatTes')
+            ->first();
         if (!$pesertaSesi) {
             return redirect()->route('peserta.dashboard')->with('error', 'Anda tidak memiliki akses ke sesi tes ini.');
         }
@@ -256,7 +255,7 @@ class DashboardController extends Controller
             $statusPengerjaan = 'Belum Mengerjakan';
         }
 
-        $kodeAlatTes = $sesi->alatTes->pluck('kode')->toArray();
+        $kodeAlatTes = $pesertaSesi->alatTes->pluck('kode')->toArray();
 
         $daftarAlatTesDenganDetail = [];
         foreach ($kodeAlatTes as $kodeAlat) {

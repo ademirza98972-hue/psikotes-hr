@@ -674,6 +674,15 @@ class PengerjaanTesController extends Controller
         $is_first_soal        = $currentStep === 0;
         $is_last_soal         = $currentStep === count($daftarSoalFlat) - 1;
 
+        $is_last_soal_subtes = false;
+        if ($kodeAlatTes === 'IST' && !$is_last_soal) {
+            $nextIdx = $currentStep + 1;
+            if ($nextIdx < count($daftarSoalFlat)) {
+                $subtesNext = $this->getKodeSubtesIst($daftarSoalFlat[$nextIdx]['soal']['nomor'] ?? 0);
+                $is_last_soal_subtes = ($kodeSubtesTimer !== $subtesNext);
+            }
+        }
+
         return view('peserta.pengerjaan-soal', [
             'sesiId'            => $sesiIdView,
             'nama_sesi'         => $nama_sesi,
@@ -700,6 +709,7 @@ class PengerjaanTesController extends Controller
             'is_ist'                => $isIST ?? false,
             'detik_per_soal'        => $detikPerSoal ?? null,
             'sisa_detik_per_soal'   => $sisaDetikPerSoal ?? null,
+            'is_last_soal_subtes'   => $is_last_soal_subtes,
         ]);
     }
 
@@ -933,6 +943,36 @@ class PengerjaanTesController extends Controller
             // Reset step ke 0 agar kerjakan() bisa detect alat tes berikutnya
             Session::put($this->sessionKey($sesiId, 'current_step'), 0);
             return redirect()->route('peserta.tes.kerjakan', $sesiId);
+        }
+
+        // IST: blokir crossing ke subtes berikutnya jika masih ada soal yang belum dijawab
+        if ($kodeAlatTesAktif === 'IST' && isset($daftarSoalFlat[$nextStep])) {
+            $nomorCurrent  = $daftarSoalFlat[$currentStep]['soal']['nomor'] ?? 0;
+            $nomorNext     = $daftarSoalFlat[$nextStep]['soal']['nomor'] ?? 0;
+            $subtesCurrent = $this->getKodeSubtesIst($nomorCurrent);
+            $subtesNext    = $this->getKodeSubtesIst($nomorNext);
+
+            if ($subtesCurrent !== $subtesNext) {
+                $soalIdsSubtes = collect($daftarSoalFlat)
+                    ->filter(fn($item) => $this->getKodeSubtesIst($item['soal']['nomor'] ?? 0) === $subtesCurrent)
+                    ->pluck('soal.id')
+                    ->all();
+
+                $terjawabCount = JawabanPeserta::where('user_id', Auth::id())
+                    ->where('sesi_tes_id', $sesiId)
+                    ->whereIn('soal_id', $soalIdsSubtes)
+                    ->where(function ($q) {
+                        $q->whereNotNull('opsi_dipilih_id')
+                          ->orWhere(fn($q2) => $q2->whereNotNull('jawaban_teks')->where('jawaban_teks', '!=', ''));
+                    })
+                    ->count();
+
+                $belumDijawab = count($soalIdsSubtes) - $terjawabCount;
+                if ($belumDijawab > 0) {
+                    return redirect()->route('peserta.tes.kerjakan', $sesiId)
+                        ->with('error', "Masih ada {$belumDijawab} soal di subtes {$subtesCurrent} yang belum dijawab. Silakan lengkapi terlebih dahulu.");
+                }
+            }
         }
 
         Session::put($this->sessionKey($sesiId, 'current_step'), $nextStep);

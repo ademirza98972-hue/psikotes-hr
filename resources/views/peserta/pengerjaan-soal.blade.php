@@ -249,7 +249,8 @@
                         <p class="text-base text-slate-800 mb-5 font-medium leading-relaxed font-mono text-lg tracking-widest">{{ $soal_data['teks_soal'] }}</p>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Jawaban Anda:</label>
-                            <input type="number" name="jawaban_teks" value="{{ $saved_answer_teks ?? '' }}"
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" data-numeric
+                                   name="jawaban_teks" value="{{ $saved_answer_teks ?? '' }}"
                                    autocomplete="off"
                                    class="block w-48 rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F] font-mono text-lg"
                                    placeholder="0">
@@ -411,6 +412,18 @@
     document.querySelectorAll(selector).forEach(el => {
         el.style.userSelect = 'none';
         el.style.webkitUserSelect = 'none';
+    });
+</script>
+<script>
+    document.addEventListener('keydown', e => {
+        if (!e.target.matches('[data-numeric]')) return;
+        if (!/[0-9]/.test(e.key) && !['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+    document.addEventListener('input', e => {
+        if (!e.target.matches('[data-numeric]')) return;
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
     });
 </script>
 @endsection

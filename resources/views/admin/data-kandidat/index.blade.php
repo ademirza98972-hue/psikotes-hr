@@ -230,14 +230,14 @@ x-init="
                                                 </button>
                                             </form>
                                             <button type="button"
-                                                    @click="openUbah({{ $item->id }}, @js($namaTampil), @js($profil->nik_kandidat ?? ''), @js($item->email), @js($item->no_hp ?? ''), @js((string)($profil->tanggal_lahir ?? '')), @js($item->jenis_kelamin ?? ''), {{ $profilDeptId }}, {{ $profilPosisiId }}, @js($profil->pendidikan_terakhir ?? ''))"
+                                                    @click="openUbah({{ $item->id }}, @js($namaTampil), @js($profil->nik_kandidat ?? ''), @js($item->email), @js($profil->no_hp ?? ''), @js((string)($profil->tanggal_lahir ?? '')), @js($profil->jenis_kelamin ?? ''), {{ $profilDeptId }}, {{ $profilPosisiId }}, @js($profil->pendidikan_terakhir ?? ''))"
                                                     class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit">
                                                 <span class="material-symbols-outlined text-[20px]">edit_square</span>
                                             </button>
                                         @elseif ($status === 'ditolak')
                                             <button type="button"
-                                                    @click="openUbah({{ $item->id }}, @js($namaTampil), @js($profil->nik_kandidat ?? ''), @js($item->email), @js($item->no_hp ?? ''), @js((string)($profil->tanggal_lahir ?? '')), @js($item->jenis_kelamin ?? ''), {{ $profilDeptId }}, {{ $profilPosisiId }}, @js($profil->pendidikan_terakhir ?? ''))"
+                                                    @click="openUbah({{ $item->id }}, @js($namaTampil), @js($profil->nik_kandidat ?? ''), @js($item->email), @js($profil->no_hp ?? ''), @js((string)($profil->tanggal_lahir ?? '')), @js($profil->jenis_kelamin ?? ''), {{ $profilDeptId }}, {{ $profilPosisiId }}, @js($profil->pendidikan_terakhir ?? ''))"
                                                     class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit">
                                                 <span class="material-symbols-outlined text-[20px]">edit_square</span>

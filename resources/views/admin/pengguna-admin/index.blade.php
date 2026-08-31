@@ -11,8 +11,8 @@
     modalTambah: @js(($openModal ?? '') === 'tambah' || ($errors->any() && old('_form') === 'tambah')),
     modalUbah:   @js($errors->any() && old('_form') === 'ubah'),
     editData: @js($errors->any() && old('_form') === 'ubah'
-        ? ['id' => (int) old('edit_id', 0), 'name' => old('name', ''), 'email' => old('email', ''), 'no_hp' => old('no_hp', ''), 'peran_id' => (string) old('peran_id', ''), 'status' => old('status', 'aktif'), 'peranNama' => '', 'isSuperAdmin' => false]
-        : ['id' => 0, 'name' => '', 'email' => '', 'no_hp' => '', 'peran_id' => '', 'status' => 'aktif', 'peranNama' => '', 'isSuperAdmin' => false]),
+        ? ['id' => (int) old('edit_id', 0), 'name' => old('name', ''), 'email' => old('email', ''), 'peran_id' => (string) old('peran_id', ''), 'status' => old('status', 'aktif'), 'peranNama' => '', 'isSuperAdmin' => false]
+        : ['id' => 0, 'name' => '', 'email' => '', 'peran_id' => '', 'status' => 'aktif', 'peranNama' => '', 'isSuperAdmin' => false]),
     openEdit(d) { this.editData = d; this.modalUbah = true; },
 }">
 
@@ -129,7 +129,7 @@
                                     @auth
                                         @if($bisaEdit)
                                             <button type="button"
-                                                    @click="openEdit({ id: {{ $u->id }}, name: @js($u->name), email: @js($u->email), no_hp: @js($u->no_hp ?? ''), peran_id: @js((string)$u->peran_id), status: @js($u->status), peranNama: @js($u->peran->nama_peran ?? ''), isSuperAdmin: {{ $u->peran && $u->peran->nama_peran === 'Super Admin' ? 'true' : 'false' }} })"
+                                                    @click="openEdit({ id: {{ $u->id }}, name: @js($u->name), email: @js($u->email), peran_id: @js((string)$u->peran_id), status: @js($u->status), peranNama: @js($u->peran->nama_peran ?? ''), isSuperAdmin: {{ $u->peran && $u->peran->nama_peran === 'Super Admin' ? 'true' : 'false' }} })"
                                                     class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
                                                 <span class="material-symbols-outlined text-[20px]">edit_square</span>
                                             </button>
@@ -265,12 +265,6 @@
                                            class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 transition-all @error('email') border-rose-400 @enderror">
                                     @error('email')<p class="mt-1 text-[12px] text-rose-600 flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">error</span>{{ $message }}</p>@enderror
                                 </div>
-                                <div>
-                                    <label class="block text-[13px] font-medium text-[#191c1e] mb-1.5">No HP <span class="text-rose-600">*</span></label>
-                                    <input name="no_hp" type="text" value="{{ old('no_hp') }}" required placeholder="081234567890"
-                                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 transition-all @error('no_hp') border-rose-400 @enderror">
-                                    @error('no_hp')<p class="mt-1 text-[12px] text-rose-600 flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">error</span>{{ $message }}</p>@enderror
-                                </div>
                             </div>
                             <div>
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1.5">Status</label>
@@ -403,12 +397,6 @@
                                 <input name="email" type="email" x-model="editData.email" required
                                        class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 transition-all @error('email') border-rose-400 @enderror">
                                 @error('email')<p class="mt-1 text-[12px] text-rose-600 flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">error</span>{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label class="block text-[13px] font-medium text-[#191c1e] mb-1.5">No HP <span class="text-rose-600">*</span></label>
-                                <input name="no_hp" type="text" x-model="editData.no_hp" required
-                                       class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 transition-all @error('no_hp') border-rose-400 @enderror">
-                                @error('no_hp')<p class="mt-1 text-[12px] text-rose-600 flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">error</span>{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1.5">Status</label>

@@ -46,7 +46,6 @@ class PenggunaAdminController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'no_hp' => $data['no_hp'],
             'tipe_akun' => 'custom',
             'peran_id' => $peran->id,
             'status' => $data['status'],
@@ -86,7 +85,6 @@ class PenggunaAdminController extends Controller
         $payload = [
             'name' => $data['name'],
             'email' => $data['email'],
-            'no_hp' => $data['no_hp'],
             'peran_id' => $peran->id,
             'status' => $data['status'],
         ];

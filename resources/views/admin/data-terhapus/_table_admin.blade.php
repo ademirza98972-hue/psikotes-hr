@@ -25,7 +25,7 @@
                                 <span class="font-semibold text-primary">{{ $item->name }}</span>
                             </td>
                             <td class="px-6 py-5 text-body-md text-on-surface-variant">{{ $item->email }}</td>
-                            <td class="px-6 py-5 text-body-md text-on-surface-variant">{{ $item->no_hp ?? '-' }}</td>
+                            <td class="px-6 py-5 text-body-md text-on-surface-variant">-</td>
                             <td class="px-6 py-5 text-body-md text-on-surface-variant">{{ $item->peran?->nama_peran ?? '-' }}</td>
                             <td class="px-6 py-5">
                                 <div class="flex flex-col">

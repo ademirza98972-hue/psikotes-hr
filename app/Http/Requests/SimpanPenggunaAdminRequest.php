@@ -26,7 +26,6 @@ class SimpanPenggunaAdminRequest extends FormRequest
                     ->where('tipe_akun', 'custom'),
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'no_hp' => ['required', 'string', 'max:30'],
             'peran_id' => [
                 'required',
                 'integer',
@@ -64,7 +63,6 @@ class SimpanPenggunaAdminRequest extends FormRequest
             'name' => 'nama',
             'email' => 'email',
             'password' => 'password',
-            'no_hp' => 'no HP',
             'peran_id' => 'peran',
             'status' => 'status',
         ];

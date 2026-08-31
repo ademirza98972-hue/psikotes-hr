@@ -132,18 +132,18 @@ class AutentikasiController extends Controller
 
         DB::transaction(function () use ($data, $peran) {
             $user = User::create([
-                'name'         => $data['name'],
-                'email'        => $data['email'],
-                'password'     => Hash::make($data['password']),
-                'no_hp'        => $data['no_hp'],
-                'jenis_kelamin' => $data['jenis_kelamin'] ?? null,
-                'tipe_akun'    => 'kandidat',
-                'peran_id'     => $peran->id,
-                'status'       => 'menunggu_verifikasi',
+                'name'      => $data['name'],
+                'email'     => $data['email'],
+                'password'  => Hash::make($data['password']),
+                'tipe_akun' => 'kandidat',
+                'peran_id'  => $peran->id,
+                'status'    => 'menunggu_verifikasi',
             ]);
 
             ProfilKandidat::create([
                 'user_id'             => $user->id,
+                'no_hp'               => $data['no_hp'],
+                'jenis_kelamin'       => $data['jenis_kelamin'] ?? null,
                 'posisi_id'           => $data['posisi_dilamar'],
                 'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                 'tanggal_lahir'       => $data['tanggal_lahir'] ?? null,

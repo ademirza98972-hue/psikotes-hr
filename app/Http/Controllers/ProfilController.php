@@ -27,16 +27,17 @@ class ProfilController extends Controller
     public function perbarui(PerbaruiProfilRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        $user->no_hp = $request->input('no_hp');
-        $user->save();
-
+        $noHp = $request->input('no_hp');
         $tanggalLahir = $request->input('tanggal_lahir');
-        if ($tanggalLahir !== null) {
-            if ($user->tipe_akun === 'karyawan' && $user->dataKaryawan) {
-                $user->dataKaryawan->update(['tanggal_lahir' => $tanggalLahir]);
-            } elseif ($user->tipe_akun === 'kandidat' && $user->profilKandidat) {
-                $user->profilKandidat->update(['tanggal_lahir' => $tanggalLahir]);
-            }
+
+        if ($user->tipe_akun === 'karyawan' && $user->dataKaryawan) {
+            $updates = ['no_hp' => $noHp];
+            if ($tanggalLahir !== null) $updates['tanggal_lahir'] = $tanggalLahir;
+            $user->dataKaryawan->update($updates);
+        } elseif ($user->tipe_akun === 'kandidat' && $user->profilKandidat) {
+            $updates = ['no_hp' => $noHp];
+            if ($tanggalLahir !== null) $updates['tanggal_lahir'] = $tanggalLahir;
+            $user->profilKandidat->update($updates);
         }
 
         return redirect()

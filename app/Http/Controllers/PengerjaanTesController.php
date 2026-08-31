@@ -1023,7 +1023,10 @@ class PengerjaanTesController extends Controller
 
             $formatDasar = strtolower(str_replace(' ', '_', $soalDummy[$kodeAlat]['format_dasar'] ?? ''));
             if ($formatDasar === 'forced_choice') {
-                $jenisKelamin = Auth::user()->jenis_kelamin ?? null;
+                $authUser = Auth::user();
+                $jenisKelamin = $authUser->dataKaryawan?->jenis_kelamin
+                    ?? $authUser->profilKandidat?->jenis_kelamin
+                    ?? null;
                 $kelompokSegmen = match ($jenisKelamin) {
                     'L' => '3',
                     'P' => '4',

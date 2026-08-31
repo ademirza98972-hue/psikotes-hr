@@ -174,13 +174,13 @@ x-init="
                                                     id: '{{ $dk->id }}',
                                                     nik: @js($dk->nik_karyawan),
                                                     nama: @js($u?->name ?? ''),
-                                                    jenis_kelamin: @js($u?->jenis_kelamin ?? ''),
+                                                    jenis_kelamin: @js($dk->jenis_kelamin ?? ''),
                                                     tanggal_lahir: @js($dk->tanggal_lahir?->format('Y-m-d') ?? ''),
                                                     pendidikan_terakhir: @js($dk->pendidikan_terakhir ?? ''),
                                                     departemen_id: '{{ $dk->departemen_id }}',
                                                     posisi_id: '{{ $dk->posisi_id }}',
                                                     email: @js($u?->email ?? ''),
-                                                    no_hp: @js($u?->no_hp ?? ''),
+                                                    no_hp: @js($dk->no_hp ?? ''),
                                                 })"
                                                 class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="Edit">

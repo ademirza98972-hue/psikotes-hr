@@ -99,8 +99,6 @@ class DataKandidatController extends Controller
                 'name' => $data['nama_kandidat'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'no_hp' => $data['no_hp'],
-                'jenis_kelamin' => $data['jenis_kelamin'],
                 'tipe_akun' => 'kandidat',
                 'peran_id' => $peran->id,
                 'status' => 'aktif',
@@ -110,6 +108,8 @@ class DataKandidatController extends Controller
 
             ProfilKandidat::create([
                 'user_id' => $user->id,
+                'no_hp' => $data['no_hp'],
+                'jenis_kelamin' => $data['jenis_kelamin'],
                 'departemen' => $departemen->nama_departemen,
                 'posisi_id' => $data['posisi_dilamar'],
                 'pendidikan_terakhir' => $data['pendidikan_terakhir'],
@@ -153,8 +153,6 @@ class DataKandidatController extends Controller
             $payload = [
                 'name' => $data['nama_kandidat'],
                 'email' => $data['email'],
-                'no_hp' => $data['no_hp'],
-                'jenis_kelamin' => $data['jenis_kelamin'],
             ];
 
             if (! empty($data['password'])) {
@@ -168,6 +166,8 @@ class DataKandidatController extends Controller
             $profil = $kandidat->profilKandidat;
             if ($profil) {
                 $profil->update([
+                    'no_hp' => $data['no_hp'],
+                    'jenis_kelamin' => $data['jenis_kelamin'],
                     'departemen' => $departemen->nama_departemen,
                     'posisi_id' => $data['posisi_dilamar'],
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],

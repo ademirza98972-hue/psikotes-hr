@@ -45,7 +45,7 @@
                     </div>
                     <div>
                         <label for="no_hp" class="block text-[13px] font-medium text-[#191c1e] mb-1">No HP <span class="text-rose-500">*</span></label>
-                        <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp', $kandidat->no_hp) }}" required
+                        <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp', $profilKandidat->no_hp ?? '') }}" required
                                class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
                         @error('no_hp')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                     </div>
@@ -86,8 +86,8 @@
                             <select id="jenis_kelamin" name="jenis_kelamin" required
                                     class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-9 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
                                 <option value="">-- Pilih --</option>
-                                <option value="L" @if(old('jenis_kelamin', $kandidat->jenis_kelamin) == 'L') selected @endif>Laki-laki</option>
-                                <option value="P" @if(old('jenis_kelamin', $kandidat->jenis_kelamin) == 'P') selected @endif>Perempuan</option>
+                                <option value="L" @if(old('jenis_kelamin', $profilKandidat->jenis_kelamin ?? '') == 'L') selected @endif>Laki-laki</option>
+                                <option value="P" @if(old('jenis_kelamin', $profilKandidat->jenis_kelamin ?? '') == 'P') selected @endif>Perempuan</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
                                 <span class="material-symbols-outlined text-[18px] text-[#6b7280]">expand_more</span>

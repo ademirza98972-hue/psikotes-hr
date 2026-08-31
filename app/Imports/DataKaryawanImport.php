@@ -56,7 +56,6 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
                     'email'                => null,
                     'id_karyawan'          => $idKaryawan,
                     'password'             => Hash::make($idKaryawan),
-                    'jenis_kelamin'        => $jenisKelamin,
                     'tipe_akun'            => 'karyawan',
                     'peran_id'             => $this->peranId,
                     'status'               => 'aktif',
@@ -65,6 +64,7 @@ class DataKaryawanImport implements ToCollection, WithHeadingRow
 
                 DataKaryawan::create([
                     'nik_karyawan'  => $nik,
+                    'jenis_kelamin' => $jenisKelamin,
                     'departemen_id' => $departemen->id,
                     'posisi_id'     => $posisi->id,
                     'user_id'       => $user->id,

@@ -125,7 +125,7 @@ class DummyHasilTesSeeder extends Seeder
 
     private function getSegmen($u): string
     {
-        $gender = $u->jenis_kelamin ?? 'L';
+        $gender = $u->dataKaryawan?->jenis_kelamin ?? $u->profilKandidat?->jenis_kelamin ?? 'L';
         return $gender === 'L' ? '3' : '4';
     }
 

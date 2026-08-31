@@ -216,7 +216,7 @@
                     {{-- No HP - FIELD YANG BISA DIEDIT --}}
                     <div class="space-y-1.5">
                         <label class="block text-[13px] font-medium text-[#191c1e] mb-1" for="no_hp">No. HP</label>
-                        <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp', $user->no_hp) }}"
+                        <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp', $user->dataKaryawan?->no_hp ?? $user->profilKandidat?->no_hp ?? '') }}"
                                placeholder="0812XXXXXXXX"
                                class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
                         @error('no_hp')

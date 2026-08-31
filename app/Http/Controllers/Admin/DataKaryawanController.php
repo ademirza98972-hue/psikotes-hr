@@ -87,8 +87,6 @@ class DataKaryawanController extends Controller
                 'email'                => $validated['email'] ?: null,
                 'id_karyawan'          => $idKaryawan,
                 'password'             => Hash::make($idKaryawan),
-                'jenis_kelamin'        => $validated['jenis_kelamin'],
-                'no_hp'                => $validated['no_hp'] ?? null,
                 'tipe_akun'            => 'karyawan',
                 'peran_id'             => $peran->id,
                 'status'               => 'aktif',
@@ -97,6 +95,8 @@ class DataKaryawanController extends Controller
 
             DataKaryawan::create([
                 'nik_karyawan'        => $validated['nik_karyawan'],
+                'jenis_kelamin'       => $validated['jenis_kelamin'],
+                'no_hp'               => $validated['no_hp'] ?? null,
                 'tanggal_lahir'       => $validated['tanggal_lahir'],
                 'pendidikan_terakhir' => $validated['pendidikan_terakhir'] ?? null,
                 'departemen_id'       => $validated['departemen_id'],
@@ -118,6 +118,8 @@ class DataKaryawanController extends Controller
         DB::transaction(function () use ($data, $validated) {
             $data->update([
                 'nik_karyawan'        => $validated['nik_karyawan'],
+                'jenis_kelamin'       => $validated['jenis_kelamin'],
+                'no_hp'               => $validated['no_hp'] ?? null,
                 'tanggal_lahir'       => $validated['tanggal_lahir'],
                 'pendidikan_terakhir' => $validated['pendidikan_terakhir'] ?? null,
                 'departemen_id'       => $validated['departemen_id'],
@@ -126,10 +128,8 @@ class DataKaryawanController extends Controller
 
             if ($data->user) {
                 $data->user->update([
-                    'name'         => $validated['nama_karyawan'],
-                    'jenis_kelamin' => $validated['jenis_kelamin'],
-                    'email'        => $validated['email'] ?: null,
-                    'no_hp'        => $validated['no_hp'] ?? null,
+                    'name'  => $validated['nama_karyawan'],
+                    'email' => $validated['email'] ?: null,
                 ]);
             }
         });

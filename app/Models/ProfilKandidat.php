@@ -14,6 +14,8 @@ class ProfilKandidat extends Model
 
     protected $fillable = [
         'user_id',
+        'no_hp',
+        'jenis_kelamin',
         'departemen',
         'posisi_id',
         'pendidikan_terakhir',

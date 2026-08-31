@@ -24,7 +24,7 @@
                                 <span class="font-semibold text-primary">{{ $item->name }}</span>
                             </td>
                             <td class="px-6 py-5 text-body-md text-on-surface-variant">{{ $item->email }}</td>
-                            <td class="px-6 py-5 text-body-md text-on-surface-variant">{{ $item->no_hp ?? '-' }}</td>
+                            <td class="px-6 py-5 text-body-md text-on-surface-variant">{{ $item->dataKaryawan?->no_hp ?? '-' }}</td>
                             <td class="px-6 py-5">
                                 <div class="flex flex-col">
                                     <span class="text-body-md text-on-surface font-medium">{{ $item->deleted_at ? $item->deleted_at->format('d M Y') : '-' }}</span>

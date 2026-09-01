@@ -1,4 +1,4 @@
-@extends('layouts.peserta', ['judulHalaman' => 'Hafalan ME — IST'])
+@extends('layouts.peserta', ['judulHalaman' => 'Hafalan ME — IST', 'modeFokus' => true])
 
 @section('content')
 <div class="max-w-2xl mx-auto">
@@ -116,4 +116,5 @@
     }, DURASI * 1000);
 })();
 </script>
+@include('peserta._monitor_tes')
 @endpush

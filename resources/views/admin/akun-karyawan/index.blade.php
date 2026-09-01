@@ -259,8 +259,9 @@ x-init="
     <template x-teleport="body">
         <div x-show="modalTambah" x-cloak
              style="background:rgba(0,0,0,0.4);backdrop-filter:blur(4px)"
-             class="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto">
-            <div class="my-6 w-full max-w-xl bg-white rounded-xl shadow-2xl overflow-hidden" @click.outside="modalTambah = false">
+             class="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto"
+             @click.self="modalTambah = false">
+            <div class="my-6 w-full max-w-xl bg-white rounded-xl shadow-2xl overflow-hidden">
                 <div class="flex items-center justify-between px-4 py-2.5 border-b border-[#e0e3e5]">
                     <div>
                         <h3 class="text-sm font-semibold text-[#191c1e]">Tambah Karyawan</h3>
@@ -366,8 +367,9 @@ x-init="
     <template x-teleport="body">
         <div x-show="modalUbah" x-cloak
              style="background:rgba(0,0,0,0.4);backdrop-filter:blur(4px)"
-             class="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto">
-            <div class="my-6 w-full max-w-xl bg-white rounded-xl shadow-2xl overflow-hidden" @click.outside="modalUbah = false">
+             class="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto"
+             @click.self="modalUbah = false">
+            <div class="my-6 w-full max-w-xl bg-white rounded-xl shadow-2xl overflow-hidden">
                 <div class="flex items-center justify-between px-4 py-2.5 border-b border-[#e0e3e5]">
                     <h3 class="text-sm font-semibold text-[#191c1e]">Edit Data Karyawan</h3>
                     <button type="button" @click="modalUbah = false" class="text-[#71787c] hover:text-[#191c1e] p-1">
@@ -461,8 +463,9 @@ x-init="
     <template x-teleport="body">
         <div x-show="modalHapus" x-cloak
              style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)"
-             class="fixed inset-0 z-50 flex items-center justify-center px-4">
-            <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" @click.outside="modalHapus = false">
+             class="fixed inset-0 z-50 flex items-center justify-center px-4"
+             @click.self="modalHapus = false">
+            <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
                 <h3 class="text-base font-semibold text-[#191c1e]">Hapus Data Karyawan</h3>
                 <p class="mt-2 text-sm text-[#40484b]">
                     Apakah Anda yakin ingin menghapus <span class="font-semibold text-[#191c1e]" x-text="namaHapus"></span>?

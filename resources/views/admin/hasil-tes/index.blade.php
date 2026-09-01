@@ -284,16 +284,24 @@ class="w-full">
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-right">
-                                @if ($row['status_pengerjaan'] === 'Selesai')
-                                    <a href="{{ route('admin.hasil-tes.detail', [$row['sesi_id'], $row['peserta_id']]) }}"
-                                       class="bg-[var(--color-psikotes)] text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:shadow-md transition-all inline-block">
-                                        Lihat Hasil
-                                    </a>
-                                @else
-                                    <button class="bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)]/40 px-4 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed" disabled>
-                                        Lihat Hasil
-                                    </button>
-                                @endif
+                                <div class="flex items-center justify-end gap-2">
+                                    @if(($row['log_mencurigakan_count'] ?? 0) > 0)
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 border border-rose-200" title="Terdapat {{ $row['log_mencurigakan_count'] }} aktivitas mencurigakan">
+                                            <span class="material-symbols-outlined text-[13px]">warning</span>
+                                            {{ $row['log_mencurigakan_count'] }}
+                                        </span>
+                                    @endif
+                                    @if ($row['status_pengerjaan'] === 'Selesai')
+                                        <a href="{{ route('admin.hasil-tes.detail', [$row['sesi_id'], $row['peserta_id']]) }}"
+                                           class="bg-[var(--color-psikotes)] text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:shadow-md transition-all inline-block">
+                                            Lihat Hasil
+                                        </a>
+                                    @else
+                                        <button class="bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)]/40 px-4 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed" disabled>
+                                            Lihat Hasil
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @empty

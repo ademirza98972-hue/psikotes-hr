@@ -906,6 +906,38 @@
                 </div>
             </form>
         </div>
+    @if($logMencurigakan->isNotEmpty())
+    @php
+    $labelKejadian = [
+        'keluar_fullscreen' => 'Keluar Fullscreen',
+        'pindah_tab'        => 'Pindah Tab',
+        'halaman_ditutup'   => 'Halaman Ditutup / Dimuat Ulang',
+    ];
+    @endphp
+    <div class="container-formal" style="border-left:3px solid #f59e0b;background:#fffbeb;margin-top:12px;">
+        <div class="section-title" style="color:#b45309;">&#9888; CATATAN INTEGRITAS TES</div>
+        <table>
+            <thead>
+                <tr class="th-row">
+                    <th style="width:80px;">Waktu</th>
+                    <th>Kejadian</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($logMencurigakan as $log)
+                <tr>
+                    <td style="font-variant-numeric:tabular-nums;">{{ $log->created_at->format('H:i:s') }}</td>
+                    <td>{{ $labelKejadian[$log->tipe_kejadian] ?? $log->tipe_kejadian }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <p style="font-size:10px;color:#92400e;margin-top:4px;">
+            Total kejadian mencurigakan: {{ $logMencurigakan->count() }}
+        </p>
+    </div>
+    @endif
+
     </div>
     {{-- END HALAMAN 2 --}}
 

@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $judulHalaman ?? 'Dashboard Peserta' }} — Sistem Psikotes HR</title>
     <link rel="preload" href="/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2" crossorigin>
-    <style>html,body{background:#f7f9fb}</style>
+    <style>html,body{background:#f7f9fb}[x-cloak]{display:none!important}</style>
     <script>document.documentElement.style.setProperty('--sb-ml',localStorage.getItem('sidebarOpenPeserta')==='false'?'64px':'280px')</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -155,6 +155,7 @@
 <div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: localStorage.getItem('sidebarOpenPeserta') !== 'false' }" x-init="$watch('sidebarOpen', v => localStorage.setItem('sidebarOpenPeserta', v))">
 
     {{-- SIDEBAR --}}
+    @if(!($modeFokus ?? false))
     <aside class="fixed inset-y-0 left-0 z-50 flex flex-col overflow-y-auto overflow-x-hidden"
            style="transition: width 0.2s ease;"
            :style="{ width: sidebarOpen ? '280px' : '64px' }"
@@ -256,26 +257,32 @@
         </div>
 
     </aside>
+    @endif
 
     {{-- MAIN AREA --}}
     <div class="flex-1 flex flex-col min-h-screen overflow-hidden"
+         @if(!($modeFokus ?? false))
          style="margin-left: var(--sb-ml, 280px); transition: margin-left 0.2s ease;"
-         :style="{ marginLeft: sidebarOpen ? '280px' : '64px' }">
+         :style="{ marginLeft: sidebarOpen ? '280px' : '64px' }"
+         @endif>
 
         {{-- HEADER --}}
         <header class="flex h-16 items-center justify-between bg-white px-6 shrink-0 sticky top-0 z-40" style="border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 12px rgba(0,0,0,0.10);">
 
             <div class="flex items-center gap-3">
                 {{-- Breadcrumb --}}
+                @if(!($modeFokus ?? false))
                 <nav class="flex items-center gap-1.5 text-[13px] text-[#40484b]">
                     <a href="{{ route('peserta.dashboard') }}" class="hover:text-[#2C5F6F] transition-colors">Home</a>
                     <span class="material-symbols-outlined text-[16px]">chevron_right</span>
                     <span class="font-semibold text-[#2C5F6F]">{{ $judulHalaman ?? 'Dashboard' }}</span>
                 </nav>
+                @endif
             </div>
 
             <div class="flex items-center gap-4">
                 @auth
+                @if(!($modeFokus ?? false))
                 <div class="relative" x-data="{ open: false }" @click.away="open = false">
                     <button @click="open = ! open"
                             class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-[#f2f4f6]">
@@ -339,6 +346,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
                 @endauth
             </div>
 

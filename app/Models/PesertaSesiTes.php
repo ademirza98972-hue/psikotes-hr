@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PesertaSesiTes extends Model
 {
@@ -42,5 +43,10 @@ class PesertaSesiTes extends Model
     public function alatTes(): BelongsToMany
     {
         return $this->belongsToMany(AlatTes::class, 'peserta_alat_tes', 'peserta_sesi_tes_id', 'alat_tes_id');
+    }
+
+    public function logAktivitas(): HasMany
+    {
+        return $this->hasMany(LogAktivitasTes::class, 'peserta_sesi_tes_id');
     }
 }

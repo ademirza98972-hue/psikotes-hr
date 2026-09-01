@@ -26,10 +26,9 @@ class HasilTesController extends Controller
         $sesiList = SesiTes::with([
             'departemen',
             'alatTes',
-            'pesertaSesiTesRecords.user.dataKaryawan.departemen',
-            'pesertaSesiTesRecords.user.dataKaryawan.posisi',
-            'pesertaSesiTesRecords.user.profilKandidat.posisi',
-            'pesertaSesiTesRecords.alatTes',
+            'pesertaSesiTesRecords' => fn ($q) => $q
+                ->with(['user.dataKaryawan.departemen', 'user.dataKaryawan.posisi', 'user.profilKandidat.posisi', 'alatTes'])
+                ->withCount(['logAktivitas as log_mencurigakan_count' => fn ($q) => $q->where('mencurigakan', true)]),
         ])
             ->orderByDesc('tanggal_mulai')
             ->get();
@@ -89,7 +88,8 @@ class HasilTesController extends Controller
                     'status_pengerjaan'  => $peserta->status_pengerjaan,
                     'tanggal_pengerjaan' => $peserta->tanggal_pengerjaan,
                     'hasil_alat_tes'     => [],
-                    'alat_tes_kode'      => $alatTesKode,
+                    'alat_tes_kode'           => $alatTesKode,
+                    'log_mencurigakan_count'  => $peserta->log_mencurigakan_count ?? 0,
                 ];
             }
         }
@@ -177,7 +177,14 @@ class HasilTesController extends Controller
         );
         $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
 
-        return compact('sesi', 'user', 'hasilTes', 'psikogram', 'bisaLihatSensitif');
+        $logMencurigakan = $pesertaSesi
+            ? \App\Models\LogAktivitasTes::where('peserta_sesi_tes_id', $pesertaSesi->id)
+                ->where('mencurigakan', true)
+                ->orderBy('created_at')
+                ->get()
+            : collect();
+
+        return compact('sesi', 'user', 'hasilTes', 'psikogram', 'bisaLihatSensitif', 'logMencurigakan');
     }
 
     public function detail(int $sesiId, int $pesertaId): View
@@ -185,7 +192,7 @@ class HasilTesController extends Controller
         extract($this->buildHasilTesData($sesiId, $pesertaId));
 
         return view('admin.hasil-tes.detail', compact(
-            'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
+            'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif', 'logMencurigakan'
         ));
     }
 

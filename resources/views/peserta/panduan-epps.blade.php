@@ -1,4 +1,4 @@
-@extends('layouts.peserta', ['judulHalaman' => 'Panduan EPPS'])
+@extends('layouts.peserta', ['judulHalaman' => 'Panduan EPPS', 'modeFokus' => true])
 
 @section('content')
 @php
@@ -124,7 +124,8 @@ $ruleWaktu = ($adaTimerTotal || $adaTimerPerSoal)
     </div>
 
     {{-- Tombol Mulai --}}
-    <form method="POST" action="{{ route('peserta.tes.panduan-epps-mulai', $sesiId) }}">
+    <form method="POST" action="{{ route('peserta.tes.panduan-epps-mulai', $sesiId) }}"
+          onsubmit="sessionStorage.setItem('tes_auto_enter','1')">
         @csrf
         <button type="submit"
                 class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition-all active:scale-95"
@@ -138,4 +139,5 @@ $ruleWaktu = ($adaTimerTotal || $adaTimerPerSoal)
     </form>
 
 </div>
+@include('peserta._monitor_tes')
 @endsection

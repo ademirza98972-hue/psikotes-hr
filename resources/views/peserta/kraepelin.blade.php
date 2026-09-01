@@ -138,6 +138,15 @@
 </head>
 <body>
 
+{{-- State data untuk AJAX column swap --}}
+<div id="k-state" style="display:none"
+     data-angka='@json($angka)'
+     data-kolom-ke="{{ $kolomAktif['nomor'] }}"
+     data-kolom-selesai="{{ $kolomSelesai }}"
+     data-total-kolom="{{ $totalKolom }}"
+     data-sisa-per="{{ $sisaDetikPerKolom ?? $detikPerKolom }}"
+     data-sisa-total="{{ $sisaDetikKeseluruhan ?? 0 }}"></div>
+
 {{-- HEADER --}}
 <div class="header">
     <div class="header-left">
@@ -222,61 +231,49 @@
 </div>
 
 <script>
-// Data dari PHP
-const angka = @json($angka);
-const totalRows = angka.length - 1;
+// let (bukan const) karena diupdate setiap ganti kolom via AJAX
+let angka = @json($angka);
 const adaTimerPerKolom = @json($adaTimerPerKolom);
-const detikPerKolom = @json($detikPerKolom ?? 60);
-const sisaDetikPerKolom = @json($sisaDetikPerKolom ?? $detikPerKolom);
-const sisaDetikKeseluruhan = @json($sisaDetikKeseluruhan ?? 0);
+const detikPerKolom    = @json($detikPerKolom ?? 60);
+const sisaDetikPerKolom       = @json($sisaDetikPerKolom ?? $detikPerKolom);
+const sisaDetikKeseluruhan    = @json($sisaDetikKeseluruhan ?? 0);
+const FORM_ACTION = document.getElementById('form-kraepelin').action;
 
-let currentIndex = 0;
+let currentIndex  = 0;
+let timerInterval = null;
 
 // ===== HIGHLIGHT =====
 function updateHighlight() {
-    for (let i = 0; i < angka.length; i++) {
-        const el = document.getElementById('cell-' + i);
+    var rows = angka.length - 1;
+    for (var i = 0; i < angka.length; i++) {
+        var el = document.getElementById('cell-' + i);
         if (el) el.classList.remove('aktif');
     }
-    if (currentIndex < totalRows) {
-        const elBawah = document.getElementById('cell-' + currentIndex);
-        const elAtas  = document.getElementById('cell-' + (currentIndex + 1));
-        if (elBawah) elBawah.classList.add('aktif');
-        if (elAtas)  elAtas.classList.add('aktif');
+    if (currentIndex < rows) {
+        var elB = document.getElementById('cell-' + currentIndex);
+        var elA = document.getElementById('cell-' + (currentIndex + 1));
+        if (elB) elB.classList.add('aktif');
+        if (elA) elA.classList.add('aktif');
     }
 }
 
 // ===== SCROLL =====
 function scrollToActive() {
-    const el = document.getElementById('cell-' + currentIndex);
-    const container = document.getElementById('grid-area');
+    var el        = document.getElementById('cell-' + currentIndex);
+    var container = document.getElementById('grid-area');
     if (!el || !container) return;
-
-    const numpadHeight = 240;
-    const headerHeight = 80;
-    const containerHeight = container.clientHeight;
-
-    const elOffsetInContainer = el.offsetTop - container.offsetTop;
-    const targetScroll = elOffsetInContainer
-        - (containerHeight / 2)
-        + (el.offsetHeight / 2);
-
-    container.scrollTo({
-        top: Math.max(0, targetScroll),
-        behavior: 'smooth'
-    });
+    var targetScroll = el.offsetTop - container.offsetTop - container.clientHeight / 2 + el.offsetHeight / 2;
+    container.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
 }
 
 // ===== NUMPAD =====
 function numpadClick(digit) {
-    if (currentIndex >= totalRows) return;
-    const input = document.getElementById('jawaban-' + currentIndex);
+    var rows = angka.length - 1;
+    if (currentIndex >= rows) return;
+    var input = document.getElementById('jawaban-' + currentIndex);
     if (input) input.value = digit;
     currentIndex++;
-    if (currentIndex >= totalRows) {
-        document.getElementById('form-kraepelin').submit();
-        return;
-    }
+    if (currentIndex >= rows) { submitForm(); return; }
     updateHighlight();
     scrollToActive();
 }
@@ -284,84 +281,107 @@ function numpadClick(digit) {
 function numpadBack() {
     if (currentIndex <= 0) return;
     currentIndex--;
-    const input = document.getElementById('jawaban-' + currentIndex);
+    var input = document.getElementById('jawaban-' + currentIndex);
     if (input) input.value = '';
     updateHighlight();
     scrollToActive();
 }
 
-function submitForm() {
-    document.getElementById('form-kraepelin').submit();
+// ===== TIMER =====
+function startTimerWith(sisaPer, sisaTotal) {
+    var display = document.getElementById('timer-display');
+    if (!display) return;
+    var sisa = adaTimerPerKolom ? sisaPer : sisaTotal;
+    timerInterval = setInterval(function () {
+        sisa--;
+        display.textContent = String(Math.floor(sisa / 60)).padStart(2, '0') + ':' + String(sisa % 60).padStart(2, '0');
+        if (sisa <= 0) { clearInterval(timerInterval); submitForm(); }
+    }, 1000);
 }
 
-// ===== TIMER =====
-let timerInterval = null;
-
-function startTimer() {
-    const display = document.getElementById('timer-display');
-    if (!display) return;
-
-    if (adaTimerPerKolom) {
-        // Countdown per kolom dari sisaDetikPerKolom (persisten dari server)
-        let sisa = sisaDetikPerKolom;
-        timerInterval = setInterval(() => {
-            sisa--;
-            const m = Math.floor(sisa / 60).toString().padStart(2, '0');
-            const s = (sisa % 60).toString().padStart(2, '0');
-            display.textContent = m + ':' + s;
-            if (sisa <= 0) {
-                clearInterval(timerInterval);
-                submitForm();
-            }
-        }, 1000);
-    } else {
-        // Countdown keseluruhan dari sisaDetikKeseluruhan
-        let sisa = sisaDetikKeseluruhan;
-        timerInterval = setInterval(() => {
-            sisa--;
-            const m = Math.floor(sisa / 60).toString().padStart(2, '0');
-            const s = (sisa % 60).toString().padStart(2, '0');
-            display.textContent = m + ':' + s;
-            if (sisa <= 0) {
-                clearInterval(timerInterval);
-                submitForm();
-            }
-        }, 1000);
+// ===== UPDATE DOM SETELAH AJAX =====
+function updateGrid(newAngka) {
+    var col = document.getElementById('grid-column');
+    col.innerHTML = '';
+    for (var i = newAngka.length - 1; i >= 0; i--) {
+        var div = document.createElement('div');
+        div.className = 'cell';
+        div.id = 'cell-' + i;
+        div.textContent = newAngka[i];
+        col.appendChild(div);
     }
 }
 
-// ===== INIT =====
-window.addEventListener('load', function() {
-    updateHighlight();
-    startTimer();
+function rebuildFormInputs(newAngka, newKolomKe) {
+    var form = document.getElementById('form-kraepelin');
+    form.querySelector('[name=kolom_ke]').value = newKolomKe;
+    form.querySelectorAll('[name^="angka["], [name^="jawaban["]').forEach(function (el) { el.remove(); });
+    newAngka.forEach(function (val, i) {
+        var inp = document.createElement('input');
+        inp.type = 'hidden'; inp.name = 'angka[' + i + ']'; inp.value = val;
+        form.appendChild(inp);
+    });
+    for (var i = 0; i < newAngka.length - 1; i++) {
+        var inp = document.createElement('input');
+        inp.type = 'hidden'; inp.name = 'jawaban[' + i + ']'; inp.id = 'jawaban-' + i; inp.value = '';
+        form.appendChild(inp);
+    }
+}
 
-    // Scroll ke posisi aktif setelah render
+// ===== SUBMIT (AJAX — tidak reload halaman, fullscreen tetap aktif) =====
+function submitForm() {
+    clearInterval(timerInterval);
+    var form = document.getElementById('form-kraepelin');
+    var fd   = new FormData(form);
+
+    fetch(FORM_ACTION, { method: 'POST', body: fd, credentials: 'same-origin', redirect: 'follow' })
+        .then(function (res) { return res.text().then(function (html) { return { html: html, url: res.url }; }); })
+        .then(function (data) {
+            var doc   = new DOMParser().parseFromString(data.html, 'text/html');
+            var state = doc.getElementById('k-state');
+            if (!state) { window.location.href = data.url; return; } // tes selesai
+
+            var newAngka     = JSON.parse(state.dataset.angka);
+            var newKolomKe   = state.dataset.kolomKe;
+            var newSelesai   = parseInt(state.dataset.kolomSelesai);
+            var newTotal     = parseInt(state.dataset.totalKolom);
+            var newSisaPer   = parseInt(state.dataset.sisaPer);
+            var newSisaTotal = parseInt(state.dataset.sisaTotal);
+
+            angka = newAngka;
+            updateGrid(newAngka);
+            rebuildFormInputs(newAngka, newKolomKe);
+
+            document.querySelector('.header-center').textContent = 'Kolom ' + (newSelesai + 1) + ' dari ' + newTotal;
+            document.querySelector('.progress-bar-fill').style.width = (newTotal > 0 ? Math.round(newSelesai / newTotal * 100) : 0) + '%';
+
+            currentIndex = 0;
+            updateHighlight();
+            setTimeout(scrollToActive, 80);
+            startTimerWith(newSisaPer, newSisaTotal);
+        })
+        .catch(function () { form.submit(); }); // fallback jika fetch gagal
+}
+
+// ===== INIT =====
+window.addEventListener('load', function () {
+    updateHighlight();
+    startTimerWith(sisaDetikPerKolom, sisaDetikKeseluruhan);
     setTimeout(scrollToActive, 200);
 
-    // Keyboard numpad
-    document.addEventListener('keydown', function(e) {
-        const numpadKeys = {
-            'Numpad0': 0, 'Numpad1': 1, 'Numpad2': 2,
-            'Numpad3': 3, 'Numpad4': 4, 'Numpad5': 5,
-            'Numpad6': 6, 'Numpad7': 7, 'Numpad8': 8,
-            'Numpad9': 9,
-            'Digit0': 0, 'Digit1': 1, 'Digit2': 2,
-            'Digit3': 3, 'Digit4': 4, 'Digit5': 5,
-            'Digit6': 6, 'Digit7': 7, 'Digit8': 8,
-            'Digit9': 9,
+    document.addEventListener('keydown', function (e) {
+        var numpadKeys = {
+            'Numpad0':0,'Numpad1':1,'Numpad2':2,'Numpad3':3,'Numpad4':4,
+            'Numpad5':5,'Numpad6':6,'Numpad7':7,'Numpad8':8,'Numpad9':9,
+            'Digit0':0,'Digit1':1,'Digit2':2,'Digit3':3,'Digit4':4,
+            'Digit5':5,'Digit6':6,'Digit7':7,'Digit8':8,'Digit9':9,
         };
-        if (e.code in numpadKeys) {
-            e.preventDefault();
-            numpadClick(numpadKeys[e.code]);
-        }
-        if (e.code === 'Backspace' || e.code === 'NumpadDecimal') {
-            e.preventDefault();
-            numpadBack();
-        }
+        if (e.code in numpadKeys) { e.preventDefault(); numpadClick(numpadKeys[e.code]); }
+        if (e.code === 'Backspace' || e.code === 'NumpadDecimal') { e.preventDefault(); numpadBack(); }
     });
-
 });
 </script>
 
+@include('peserta._monitor_tes')
 </body>
 </html>

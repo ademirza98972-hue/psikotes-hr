@@ -1323,4 +1323,38 @@ class PengerjaanTesController extends Controller
 
         return redirect()->route('peserta.tes.kraepelin', $sesiId);
     }
+
+    public function logAktivitas(Request $request, int $sesiId): \Illuminate\Http\JsonResponse
+    {
+        $pesertaSesi = PesertaSesiTes::where('sesi_tes_id', $sesiId)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$pesertaSesi) {
+            return response()->json(['ok' => false], 403);
+        }
+
+        $tipeMap = [
+            'keluar_fullscreen' => true,
+            'pindah_tab'        => true,
+            'halaman_ditutup'   => true,
+            'disconnect'        => false,
+            'reconnect'         => false,
+        ];
+
+        $tipe = $request->input('tipe');
+        if (!array_key_exists($tipe, $tipeMap)) {
+            return response()->json(['ok' => false], 422);
+        }
+
+        \App\Models\LogAktivitasTes::create([
+            'peserta_sesi_tes_id' => $pesertaSesi->id,
+            'tipe_kejadian'       => $tipe,
+            'mencurigakan'        => $tipeMap[$tipe],
+            'keterangan'          => $request->input('keterangan'),
+            'created_at'          => now(),
+        ]);
+
+        return response()->json(['ok' => true]);
+    }
 }

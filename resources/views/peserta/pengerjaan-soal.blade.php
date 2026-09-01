@@ -1,4 +1,4 @@
-@extends('layouts.peserta', ['judulHalaman' => 'Pengerjaan Soal'])
+@extends('layouts.peserta', ['judulHalaman' => 'Pengerjaan Soal', 'modeFokus' => true])
 
 @section('content')
 <script>
@@ -12,7 +12,7 @@
     @php
         $grupAlat = collect($daftar_nomor_soal)->groupBy('kode_alat_tes');
     @endphp
-    <div class="sticky top-6">
+    <div class="sticky top-6" id="nav-sidebar">
         <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
             <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-3">Navigasi Soal</p>
             <div class="space-y-3 overflow-y-auto pr-1" style="max-height: calc(100vh - 180px);">
@@ -29,6 +29,7 @@
                                             : 'bg-white text-slate-500 border-slate-200 hover:border-[#2C5F6F] hover:text-[#2C5F6F]');
                                 @endphp
                                 <a href="{{ route('peserta.tes.kerjakan', $sesiId) }}?step={{ $item['step'] }}"
+                                   data-nomor="{{ $item['nomor_soal'] }}"
                                    class="flex items-center justify-center rounded border text-[10px] font-semibold transition aspect-square {{ $bg }}">
                                     {{ $loop->iteration }}
                                 </a>
@@ -53,7 +54,9 @@
     </div>
 
     {{-- KONTEN KANAN: Progress + Soal --}}
-    <div class="flex-1 min-w-0">
+    <div class="flex-1 min-w-0" id="soal-main"
+         data-is-ist="{{ $is_ist ? '1' : '0' }}"
+         data-kode-subtes="{{ $kode_subtes_timer ?? '' }}">
 
         {{-- Header Progress Bar --}}
         <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm mb-4">
@@ -320,27 +323,23 @@
                         <div></div>
                     @endif
                     @if($is_last_soal_subtes ?? false)
-                        <button type="submit"
-                                class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
-                            Selesaikan Subtes {{ $kode_subtes_timer ?? '' }} &rarr;
-                        </button>
-                    @elseif($is_last_soal)
-                        <div x-data="{ showModal: false, unanswered: 0,
-                            checkUnanswered() {
-                                const radios = document.querySelectorAll('input[type=radio]:checked');
-                                const texts  = document.querySelectorAll('input[name=jawaban_teks]');
-                                let answered = radios.length;
-                                texts.forEach(t => { if (t.value.trim()) answered++; });
-                                this.unanswered = {{ $soal_total }} - answered;
-                            }
-                        }">
+                        @php
+                        $subtesRange = [
+                            'SE' => [1,20], 'WA' => [21,40], 'AN' => [41,60], 'GE' => [61,76],
+                            'RA' => [77,96], 'ZR' => [97,116], 'FA' => [117,136], 'WU' => [137,156], 'ME' => [157,999],
+                        ];
+                        [$r0, $r1] = $subtesRange[$kode_subtes_timer ?? ''] ?? [0, 0];
+                        $belumDijawabSubtes = collect($daftar_nomor_soal)
+                            ->filter(fn($item) => $item['nomor_soal'] >= $r0 && $item['nomor_soal'] <= $r1 && !$item['sudah_dijawab'])
+                            ->count();
+                        @endphp
+                        <div x-data="{ showModal: false }">
                             <button type="button"
-                                    @click="showModal = true; checkUnanswered()"
+                                    @click="showModal = true"
                                     class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
-                                Selesai &rarr;
+                                Selesaikan Subtes {{ $kode_subtes_timer ?? '' }} &rarr;
                             </button>
 
-                            {{-- Modal Konfirmasi Selesai --}}
                             <div x-show="showModal"
                                  x-transition:enter="ease-out duration-200"
                                  x-transition:enter-start="opacity-0"
@@ -358,27 +357,69 @@
                                      x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                      x-transition:leave-end="opacity-0 scale-95 translate-y-2"
                                      class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
-                                    <h3 class="text-base font-semibold text-slate-900 mb-2">Selesaikan Tes?</h3>
+                                    <h3 class="text-base font-semibold text-slate-900 mb-2">
+                                        Selesaikan Subtes {{ $kode_subtes_timer ?? '' }}?
+                                    </h3>
                                     <p class="text-sm text-slate-600 mb-1">
-                                        Anda akan menyelesaikan <strong>{{ $nama_alat_tes }}</strong>. Jawaban yang sudah dikirim tidak dapat diubah.
+                                        Jawaban subtes ini tidak dapat diubah setelah diselesaikan.
                                     </p>
-                                    <template x-if="unanswered > 0">
-                                        <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
-                                            Masih ada <strong x-text="unanswered"></strong> soal yang belum dijawab.
-                                        </p>
-                                    </template>
+                                    @if($belumDijawabSubtes > 0)
+                                    <p class="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mt-2">
+                                        Masih ada <strong>{{ $belumDijawabSubtes }}</strong> soal belum dijawab. Jawab semua soal di subtes ini sebelum dapat melanjutkan.
+                                    </p>
+                                    <div class="flex justify-end mt-6">
+                                        <button @click="showModal = false"
+                                                class="px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
+                                            Tutup
+                                        </button>
+                                    </div>
+                                    @else
                                     <div class="flex gap-3 mt-6 justify-end">
                                         <button @click="showModal = false"
                                                 class="px-4 py-2 rounded-lg text-sm font-medium border border-[#2C5F6F] text-[#2C5F6F] hover:bg-slate-50 transition">
                                             Batal
                                         </button>
-                                        <button @click="document.getElementById('form-jawaban').submit();"
+                                        <button @click="if(window._soalSubmit) window._soalSubmit(); else document.getElementById('form-jawaban').submit();"
                                                 class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
                                             Ya, Selesaikan
                                         </button>
                                     </div>
+                                    @endif
                                 </div>
                             </div>
+                        </div>
+                    @elseif($is_last_soal)
+                        @php
+                        $belumDijawabTotal = collect($daftar_nomor_soal)->filter(fn($s) => !$s['sudah_dijawab'])->count();
+                        $currentSoalSudah  = (bool)(collect($daftar_nomor_soal)->firstWhere('is_current', true)['sudah_dijawab'] ?? false);
+                        @endphp
+                        <div x-data="{
+                            selesai() {
+                                var eff = {{ $belumDijawabTotal }};
+                                @if(!$currentSoalSudah)
+                                var dom = document.querySelectorAll('input[type=radio]:checked').length > 0 ||
+                                    Array.from(document.querySelectorAll('input[name=jawaban_teks]')).some(function(t){ return t.value.trim(); });
+                                if (dom) eff = Math.max(0, eff - 1);
+                                @endif
+                                if (eff > 0) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Soal Belum Lengkap',
+                                        text: 'Masih ada ' + eff + ' soal yang belum dijawab. Jawab semua soal sebelum dapat menyelesaikan tes.',
+                                        confirmButtonText: 'Oke, Lanjut Mengerjakan',
+                                        confirmButtonColor: '#2C5F6F',
+                                    });
+                                    return;
+                                }
+                                if (window._soalSubmit) window._soalSubmit();
+                                else document.getElementById('form-jawaban').submit();
+                            }
+                        }">
+                            <button type="button"
+                                    @click="selesai()"
+                                    class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                                Selesai &rarr;
+                            </button>
                         </div>
                     @else
                         <button type="submit"
@@ -433,5 +474,135 @@
         if (!e.target.matches('[data-numeric]')) return;
         e.target.value = e.target.value.replace(/[^0-9]/g, '');
     });
+</script>
+@include('peserta._monitor_tes')
+<script>
+// AJAX navigation — mempertahankan fullscreen saat pindah soal
+(function () {
+    var mainEl    = document.getElementById('soal-main');
+    var sidebarEl = document.getElementById('nav-sidebar');
+    if (!mainEl) return;
+
+    function showToast(msg) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Tidak Bisa Berpindah Subtes',
+            text: msg,
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#2C5F6F',
+        });
+    }
+
+    function swapContent(doc, finalUrl) {
+        var newMain    = doc.getElementById('soal-main');
+        var newSidebar = doc.getElementById('nav-sidebar');
+
+        if (!newMain) {
+            // Redirect ke halaman lain (mis. tes-selesai)
+            window.location.href = finalUrl;
+            return;
+        }
+
+        // Swap DOM
+        mainEl.parentNode.replaceChild(newMain, mainEl);
+        mainEl = newMain;
+
+        if (newSidebar && sidebarEl && sidebarEl.parentNode) {
+            sidebarEl.parentNode.replaceChild(newSidebar, sidebarEl);
+            sidebarEl = newSidebar;
+        }
+
+        // Re-init Alpine.js untuk timer & komponen baru
+        if (window.Alpine) {
+            Alpine.initTree(mainEl);
+            if (sidebarEl) Alpine.initTree(sidebarEl);
+        }
+
+        history.pushState({}, '', finalUrl);
+
+        // Reset flag isNavigating di monitor
+        if (window._monitorResetNav) window._monitorResetNav();
+    }
+
+    async function navigate(url) {
+        try {
+            var res  = await fetch(url, { credentials: 'same-origin' });
+            var html = await res.text();
+            var doc  = new DOMParser().parseFromString(html, 'text/html');
+            swapContent(doc, res.url);
+        } catch (e) {
+            window.location.href = url;
+        }
+    }
+
+    async function navigatePost(form) {
+        try {
+            var res  = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                credentials: 'same-origin',
+                redirect: 'follow',
+            });
+            var html = await res.text();
+            var doc  = new DOMParser().parseFromString(html, 'text/html');
+            swapContent(doc, res.url);
+        } catch (e) {
+            form.submit();
+        }
+    }
+
+    function getSubtesIst(nomor) {
+        if (nomor <= 20) return 'SE';
+        if (nomor <= 40) return 'WA';
+        if (nomor <= 60) return 'AN';
+        if (nomor <= 76) return 'GE';
+        if (nomor <= 96) return 'RA';
+        if (nomor <= 116) return 'ZR';
+        if (nomor <= 136) return 'FA';
+        if (nomor <= 156) return 'WU';
+        return 'ME';
+    }
+
+    // Intercept <a> klik di sidebar & area soal
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest('#soal-main a[href], #nav-sidebar a[href]');
+        if (!a) return;
+        var url = a.href;
+        if (!url || /^(javascript:|#)/.test(url)) return;
+
+        // Selalu cegah browser follow link — kita yang kendalikan navigasi
+        e.preventDefault();
+
+        // Blokir navigasi lintas subtes IST
+        if (mainEl && mainEl.dataset.isIst === '1' && mainEl.dataset.kodeSubtes && a.dataset.nomor) {
+            var targetSubtes = getSubtesIst(parseInt(a.dataset.nomor));
+            if (targetSubtes !== mainEl.dataset.kodeSubtes) {
+                if (window._monitorResetNav) window._monitorResetNav();
+                showToast('Selesaikan semua soal subtes ' + mainEl.dataset.kodeSubtes + ' terlebih dahulu sebelum berpindah ke subtes lain.');
+                return;
+            }
+        }
+
+        navigate(url);
+    });
+
+    // Intercept form submit (Selanjutnya, Selesaikan, Selesaikan Subtes)
+    document.addEventListener('submit', function (e) {
+        if (e.target.id !== 'form-jawaban') return;
+        e.preventDefault();
+        navigatePost(e.target);
+    });
+
+    // Browser back/forward
+    window.addEventListener('popstate', function () {
+        navigate(window.location.href);
+    });
+
+    // Dipanggil dari modal Alpine (form.submit() tidak trigger event listener)
+    window._soalSubmit = function () {
+        var form = document.getElementById('form-jawaban');
+        if (form) navigatePost(form);
+    };
+})();
 </script>
 @endsection

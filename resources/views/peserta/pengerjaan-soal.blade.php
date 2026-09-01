@@ -80,7 +80,9 @@
                         get menit() { return String(Math.floor((this.sisa % 3600) / 60)).padStart(2, '0') },
                         get detik() { return String(this.sisa % 60).padStart(2, '0') },
                         init() {
+                            var v = window._soalNavVersion || 0;
                             const interval = setInterval(() => {
+                                if ((window._soalNavVersion || 0) !== v) { clearInterval(interval); return; }
                                 if (this.sisa > 0) {
                                     this.sisa--;
                                 } else {
@@ -130,17 +132,21 @@
                 return 'text-[#2C5F6F]';
             },
             init() {
+                var v = window._soalNavVersion || 0;
                 const interval = setInterval(() => {
+                    if ((window._soalNavVersion || 0) !== v) { clearInterval(interval); return; }
                     if (this.sisa > 0) {
                         this.sisa--;
                     } else {
                         clearInterval(interval);
                         if (!this.submitted) {
                             this.submitted = true;
-                            document.getElementById('form-jawaban').submit();
+                            if (window._soalSubmit) window._soalSubmit();
+                            else document.getElementById('form-jawaban').submit();
                         }
                     }
                 }, 1000);
+                this.$cleanup(() => clearInterval(interval));
             }
         }" class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm mb-4 flex items-center justify-between">
             <div>
@@ -172,17 +178,21 @@
             get warnaBar() { return this.sisa <= 10 ? 'bg-red-500' : (this.sisa <= 30 ? 'bg-amber-400' : 'bg-[#2C5F6F]') },
             get warnaTimer() { return this.sisa <= 10 ? 'text-red-600' : (this.sisa <= 30 ? 'text-amber-600' : 'text-slate-700') },
             init() {
+                var v = window._soalNavVersion || 0;
                 const interval = setInterval(() => {
+                    if ((window._soalNavVersion || 0) !== v) { clearInterval(interval); return; }
                     if (this.sisa > 0) { this.sisa--; }
                     else {
                         clearInterval(interval);
                         if (!this.submitted) {
                             this.submitted = true;
                             document.getElementById('timer-expired-flag').value = '1';
-                            document.getElementById('form-jawaban').submit();
+                            if (window._soalSubmit) window._soalSubmit();
+                            else document.getElementById('form-jawaban').submit();
                         }
                     }
                 }, 1000);
+                this.$cleanup(() => clearInterval(interval));
             }
         }" class="rounded-lg border border-slate-200 bg-white shadow-sm px-5 py-3 mb-4 flex items-center justify-between gap-4">
             <div class="flex items-center gap-2">
@@ -511,6 +521,9 @@
             sidebarEl.parentNode.replaceChild(newSidebar, sidebarEl);
             sidebarEl = newSidebar;
         }
+
+        // Increment versi agar timer soal lama yang masih jalan langsung berhenti sendiri
+        window._soalNavVersion = (window._soalNavVersion || 0) + 1;
 
         // Re-init Alpine.js untuk timer & komponen baru
         if (window.Alpine) {

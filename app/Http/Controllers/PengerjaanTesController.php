@@ -256,7 +256,10 @@ class PengerjaanTesController extends Controller
             $totalSoal = count($soalDummy[$kodeAlat]['soal'] ?? []);
             $totalDijawab = $alatTesSudahSelesai->get($alatTesId)?->count() ?? 0;
 
-            if ($totalDijawab < $totalSoal) {
+            // Anggap selesai jika semua soal terjawab ATAU sudah melewati soal terakhir
+            // (flag kedua penting untuk alat tes ber-timer-per-soal yang soalnya boleh kosong)
+            $selesaiViaFlag = Session::get($this->sessionKey($sesiId, 'alat_tes_selesai_' . $kodeAlat), false);
+            if (!$selesaiViaFlag && $totalDijawab < $totalSoal) {
                 $kodeAlatTesAktif = $kodeAlat;
                 break;
             }
@@ -948,7 +951,9 @@ class PengerjaanTesController extends Controller
         // Pindah ke soal berikutnya (session hanya untuk navigasi)
         $nextStep = $currentStep + 1;
         if ($nextStep >= count($daftarSoalFlat)) {
-            // Reset step ke 0 agar kerjakan() bisa detect alat tes berikutnya
+            // Tandai alat tes ini selesai (penting untuk alat tes ber-timer-per-soal
+            // yang soalnya boleh kosong, agar kerjakan() tidak load ulang dari Q1)
+            Session::put($this->sessionKey($sesiId, 'alat_tes_selesai_' . $kodeAlatTesAktif), true);
             Session::put($this->sessionKey($sesiId, 'current_step'), 0);
             return redirect()->route('peserta.tes.kerjakan', $sesiId);
         }

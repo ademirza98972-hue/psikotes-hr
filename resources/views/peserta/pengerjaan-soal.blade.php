@@ -56,7 +56,8 @@
     {{-- KONTEN KANAN: Progress + Soal --}}
     <div class="flex-1 min-w-0" id="soal-main"
          data-is-ist="{{ $is_ist ? '1' : '0' }}"
-         data-kode-subtes="{{ $kode_subtes_timer ?? '' }}">
+         data-kode-subtes="{{ $kode_subtes_timer ?? '' }}"
+         data-timer-per-soal="{{ ($detik_per_soal ?? 0) ? '1' : '0' }}">
 
         {{-- Header Progress Bar --}}
         <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm mb-4">
@@ -411,6 +412,15 @@
                                     Array.from(document.querySelectorAll('input[name=jawaban_teks]')).some(function(t){ return t.value.trim(); });
                                 if (dom) eff = Math.max(0, eff - 1);
                                 @endif
+                                @if($detik_per_soal)
+                                var adaJawabanSelesai = document.querySelector('#form-jawaban input[name=opsi_id]:checked') ||
+                                    Array.from(document.querySelectorAll('#form-jawaban input[name=jawaban_teks], #form-jawaban textarea[name=jawaban_teks]'))
+                                        .some(function(t){ return t.value.trim() !== ''; });
+                                if (!adaJawabanSelesai) {
+                                    var flag = document.getElementById('timer-expired-flag');
+                                    if (flag) flag.value = '1';
+                                }
+                                @else
                                 if (eff > 0) {
                                     Swal.fire({
                                         icon: 'warning',
@@ -421,6 +431,7 @@
                                     });
                                     return;
                                 }
+                                @endif
                                 if (window._soalSubmit) window._soalSubmit();
                                 else document.getElementById('form-jawaban').submit();
                             }
@@ -596,6 +607,28 @@
             }
         }
 
+        // Blokir pindah soal via sidebar jika per-soal timer aktif & belum dijawab & timer belum habis
+        if (mainEl && mainEl.dataset.timerPerSoal === '1') {
+            var timerFlag2 = document.getElementById('timer-expired-flag');
+            var timerExpired2 = timerFlag2 && timerFlag2.value === '1';
+            if (!timerExpired2) {
+                var form2 = document.getElementById('form-jawaban');
+                var adaJawaban2 = (form2 && form2.querySelector('input[name="opsi_id"]:checked')) ||
+                    Array.from(document.querySelectorAll('input[name="jawaban_teks"], textarea[name="jawaban_teks"]'))
+                        .some(function (t) { return t.value.trim() !== ''; });
+                if (!adaJawaban2) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Jawaban Kosong',
+                        text: 'Pilih jawaban terlebih dahulu, atau tunggu waktu habis untuk berpindah soal.',
+                        confirmButtonText: 'Oke',
+                        confirmButtonColor: '#2C5F6F',
+                    });
+                    return;
+                }
+            }
+        }
+
         navigate(url);
     });
 
@@ -603,6 +636,26 @@
     document.addEventListener('submit', function (e) {
         if (e.target.id !== 'form-jawaban') return;
         e.preventDefault();
+
+        // Blokir submit manual jika per-soal timer aktif, timer belum habis, dan belum ada jawaban
+        var timerFlag = document.getElementById('timer-expired-flag');
+        var timerExpired = timerFlag && timerFlag.value === '1';
+        if (!timerExpired && mainEl && mainEl.dataset.timerPerSoal === '1') {
+            var adaJawaban = e.target.querySelector('input[name="opsi_id"]:checked') ||
+                Array.from(e.target.querySelectorAll('input[name="jawaban_teks"], textarea[name="jawaban_teks"]'))
+                    .some(function (t) { return t.value.trim() !== ''; });
+            if (!adaJawaban) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jawaban Kosong',
+                    text: 'Pilih jawaban terlebih dahulu, atau tunggu waktu habis untuk lanjut ke soal berikutnya.',
+                    confirmButtonText: 'Oke',
+                    confirmButtonColor: '#2C5F6F',
+                });
+                return;
+            }
+        }
+
         navigatePost(e.target);
     });
 

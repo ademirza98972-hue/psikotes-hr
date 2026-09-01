@@ -2,55 +2,55 @@
 {{-- Requires $sesiId in scope (auto-inherited from parent view) --}}
 <script>
 (function () {
-    const LOG_URL      = "{{ route('peserta.tes.logAktivitas', $sesiId) }}";
-    const CSRF         = "{{ csrf_token() }}";
-    const FS_KEY       = 'tes_fs_aktif';
-    const sudahMulai   = sessionStorage.getItem(FS_KEY) === '1';
-    const autoEnter    = sessionStorage.getItem('tes_auto_enter') === '1';
+    // Bersihkan listener dari instance _monitor_tes sebelumnya (setelah AJAX swap)
+    if (window._monitorTeardown) window._monitorTeardown();
+
+    const LOG_URL    = "{{ route('peserta.tes.logAktivitas', $sesiId) }}";
+    const CSRF       = "{{ csrf_token() }}";
+    const FS_KEY     = 'tes_fs_aktif';
+    const sudahMulai = sessionStorage.getItem(FS_KEY) === '1';
+    const autoEnter  = sessionStorage.getItem('tes_auto_enter') === '1';
     if (autoEnter) sessionStorage.removeItem('tes_auto_enter');
 
-    let disconnected  = false;
-    let isNavigating  = false;
+    let disconnected = false;
+    let isNavigating = false;
 
-    // Tandai navigasi normal (form submit / link) agar tidak dicatat sebagai mencurigakan
-    document.addEventListener('submit', function () { isNavigating = true; });
-    document.addEventListener('click', function (e) {
+    function onSubmit()      { isNavigating = true; }
+    function onLinkClick(e)  {
         var a = e.target.closest('a[href]');
         if (a && a.href && !/^(javascript:|#)/.test(a.href)) isNavigating = true;
-    }, true);
+    }
 
-    // Dipanggil setelah AJAX navigation selesai untuk reset flag
+    document.addEventListener('submit', onSubmit);
+    document.addEventListener('click',  onLinkClick, true);
+
     window._monitorResetNav = function () { isNavigating = false; };
 
-    // ===== Kirim log ke backend =====
+    // ===== Kirim log =====
     function kirimLog(tipe, keterangan) {
-        const fd = new FormData();
+        var fd = new FormData();
         fd.append('_token', CSRF);
         fd.append('tipe', tipe);
         if (keterangan) fd.append('keterangan', keterangan);
-
-        if (tipe === 'halaman_ditutup') {
-            navigator.sendBeacon(LOG_URL, fd);
-            return;
-        }
+        if (tipe === 'halaman_ditutup') { navigator.sendBeacon(LOG_URL, fd); return; }
         fetch(LOG_URL, { method: 'POST', body: fd, keepalive: true }).catch(function () {});
     }
 
-    // ===== Masuk fullscreen =====
+    // ===== Fullscreen =====
     function masukFullscreen() {
         return document.documentElement.requestFullscreen().catch(function () {});
     }
 
-    // ===== Overlay blocking =====
+    // ===== Overlay =====
     var overlay = document.createElement('div');
     overlay.id = 'fs-overlay';
     overlay.style.cssText = [
-        'position:fixed', 'inset:0', 'z-index:99999',
-        'background:#2C5F6F', 'color:white',
-        'display:none', 'flex-direction:column',
-        'align-items:center', 'justify-content:center',
+        'position:fixed','inset:0','z-index:99999',
+        'background:#2C5F6F','color:white',
+        'display:none','flex-direction:column',
+        'align-items:center','justify-content:center',
         'font-family:Work Sans,system-ui,sans-serif',
-        'text-align:center', 'padding:20px',
+        'text-align:center','padding:20px',
     ].join(';');
     overlay.innerHTML =
         '<div style="font-size:44px;margin-bottom:14px">&#9888;</div>' +
@@ -77,19 +77,18 @@
         });
     }
 
-    // Klik di mana saja pada overlay (termasuk area numpad Kraepelin di baliknya)
     overlay.addEventListener('click', doFullscreen);
 
-    // Keyboard numpad / angka juga trigger (fallback)
-    document.addEventListener('keydown', function onKey(e) {
+    function onKeyOverlay(e) {
         if (e.key === 'Escape' || overlay.style.display !== 'flex') return;
         doFullscreen();
-        document.removeEventListener('keydown', onKey);
-    });
+        document.removeEventListener('keydown', onKeyOverlay);
+    }
+    document.addEventListener('keydown', onKeyOverlay);
 
     // ===== Init =====
     if (autoEnter) {
-        // Dari panduan: langsung auto-enter fullscreen pada interaksi pertama, tanpa overlay
+        // Dari panduan via AJAX swap: sudah fullscreen, listener ini hanya safety net
         function onFirstInteraction(e) {
             if (e.key === 'Escape') return;
             masukFullscreen().then(function () { sessionStorage.setItem(FS_KEY, '1'); });
@@ -104,45 +103,21 @@
         tampilOverlay('Lanjutkan Tes', 'Klik di mana saja atau tekan tombol di bawah untuk kembali ke layar penuh.', 'Lanjutkan — Layar Penuh');
     }
 
-    // ===== Event: keluar fullscreen (bukan karena navigasi) =====
-    document.addEventListener('fullscreenchange', function () {
+    // ===== Named event listeners (agar bisa di-teardown) =====
+    function onFullscreenChange() {
         if (!document.fullscreenElement && !isNavigating) {
             kirimLog('keluar_fullscreen', null);
-            tampilOverlay(
-                'Kembali ke Layar Penuh',
-                'Anda keluar dari mode layar penuh. Klik tombol di bawah untuk melanjutkan tes.',
-                'Kembali — Layar Penuh'
-            );
+            tampilOverlay('Kembali ke Layar Penuh', 'Anda keluar dari mode layar penuh. Klik tombol di bawah untuk melanjutkan tes.', 'Kembali — Layar Penuh');
         }
-    });
-
-    // ===== Event: pindah tab =====
-    document.addEventListener('visibilitychange', function () {
-        if (document.hidden && !disconnected) {
-            kirimLog('pindah_tab', null);
-        }
-    });
-
-    // ===== Event: network =====
-    window.addEventListener('offline', function () {
-        disconnected = true;
-        kirimLog('disconnect', null);
-    });
-    window.addEventListener('online', function () {
-        disconnected = false;
-        kirimLog('reconnect', null);
-    });
-
-    // ===== Event: halaman ditutup (bukan navigasi tes biasa) =====
-    window.addEventListener('beforeunload', function () {
-        if (!isNavigating) {
-            kirimLog('halaman_ditutup', null);
-        }
-    });
-
-    // ===== Cegah DevTools & right-click =====
-    document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-    document.addEventListener('keydown', function (e) {
+    }
+    function onVisibilityChange() {
+        if (document.hidden && !disconnected) kirimLog('pindah_tab', null);
+    }
+    function onOffline()      { disconnected = true;  kirimLog('disconnect', null); }
+    function onOnline()       { disconnected = false; kirimLog('reconnect',  null); }
+    function onBeforeUnload() { if (!isNavigating) kirimLog('halaman_ditutup', null); }
+    function onContextMenu(e) { e.preventDefault(); }
+    function onKeyDevTools(e) {
         var key = e.key ? e.key.toUpperCase() : '';
         if (e.key === 'F12' ||
             (e.ctrlKey && e.shiftKey && (key === 'I' || key === 'J' || key === 'C')) ||
@@ -150,6 +125,80 @@
             e.preventDefault();
             kirimLog('pindah_tab', 'devtools:' + e.key);
         }
-    });
+    }
+
+    document.addEventListener('fullscreenchange',  onFullscreenChange);
+    document.addEventListener('visibilitychange',  onVisibilityChange);
+    window.addEventListener('offline',             onOffline);
+    window.addEventListener('online',              onOnline);
+    window.addEventListener('beforeunload',        onBeforeUnload);
+    document.addEventListener('contextmenu',       onContextMenu);
+    document.addEventListener('keydown',           onKeyDevTools);
+
+    window._monitorTeardown = function () {
+        document.removeEventListener('submit',         onSubmit);
+        document.removeEventListener('click',          onLinkClick,       true);
+        document.removeEventListener('fullscreenchange', onFullscreenChange);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        window.removeEventListener('offline',          onOffline);
+        window.removeEventListener('online',           onOnline);
+        window.removeEventListener('beforeunload',     onBeforeUnload);
+        document.removeEventListener('contextmenu',    onContextMenu);
+        document.removeEventListener('keydown',        onKeyOverlay);
+        document.removeEventListener('keydown',        onKeyDevTools);
+        window._monitorTeardown = null;
+    };
+
+    // ===== AJAX handler untuk form panduan "Mulai" =====
+    // Intercept submit → requestFullscreen() saat gesture masih aktif → swap body tanpa navigasi
+    var pandForm = document.querySelector('form[data-panduan-form]');
+    if (pandForm) {
+        pandForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            sessionStorage.setItem('tes_auto_enter', '1');
+            sessionStorage.setItem(FS_KEY, '1');
+            masukFullscreen();
+
+            isNavigating = true; // tandai agar beforeunload tidak mencatat sebagai mencurigakan
+
+            var fd = new FormData(pandForm);
+            fetch(pandForm.action, { method: 'POST', body: fd, credentials: 'same-origin', redirect: 'follow' })
+                .then(function (res) {
+                    return res.text().then(function (html) { return { html: html, url: res.url }; });
+                })
+                .then(function (data) {
+                    var doc = new DOMParser().parseFromString(data.html, 'text/html');
+
+                    // Cek apakah target pakai layout yang sama (ada Alpine / sidebar)
+                    // Kraepelin standalone tidak punya x-data atau aside
+                    var samLayout = doc.body.querySelector('[x-data], #soal-main, aside');
+                    if (!samLayout) {
+                        // Target beda layout (kraepelin standalone) — navigasi biasa
+                        window.location.href = data.url;
+                        return;
+                    }
+
+                    history.pushState({}, doc.title || '', data.url);
+                    document.title = doc.title || '';
+                    document.body.innerHTML = doc.body.innerHTML;
+
+                    // Re-eksekusi inline scripts di body baru (termasuk _monitor_tes baru)
+                    Array.from(document.body.querySelectorAll('script')).forEach(function (s) {
+                        var ns = document.createElement('script');
+                        if (s.src) { ns.src = s.src; ns.async = false; }
+                        else { ns.textContent = s.textContent; }
+                        s.parentNode.replaceChild(ns, s);
+                    });
+
+                    // Re-init Alpine untuk x-data directives
+                    if (window.Alpine) Alpine.initTree(document.body);
+                })
+                .catch(function () {
+                    // Fallback: submit normal
+                    sessionStorage.setItem('tes_auto_enter', '1');
+                    pandForm.submit();
+                });
+        });
+    }
 })();
 </script>

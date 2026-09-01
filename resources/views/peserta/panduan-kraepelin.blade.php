@@ -147,7 +147,7 @@ if ($adaTimerTotal && $adaTimerKolom) {
 
     {{-- Tombol Mulai --}}
     <form method="POST" action="{{ route('peserta.tes.panduan-kraepelin-mulai', $sesiId) }}"
-          onsubmit="sessionStorage.setItem('tes_auto_enter','1')">
+          data-panduan-form>
         @csrf
         <button type="submit"
                 class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition-all active:scale-95"

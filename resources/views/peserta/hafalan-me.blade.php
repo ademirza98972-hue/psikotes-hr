@@ -60,13 +60,14 @@
     </div>
 
     {{-- Form submit (dipakai JS setelah timer habis) --}}
-    <form id="form-lanjut" method="POST" action="{{ route('peserta.tes.hafalan-me-selesai', $sesiId) }}" class="hidden">
+    <form id="form-lanjut" method="POST" action="{{ route('peserta.tes.hafalan-me-selesai', $sesiId) }}" class="hidden"
+          data-panduan-form>
         @csrf
     </form>
 
     {{-- Tombol manual (untuk darurat) --}}
     <div class="mt-4 text-center">
-        <button id="btn-lanjut" onclick="document.getElementById('form-lanjut').submit()"
+        <button id="btn-lanjut" onclick="sessionStorage.removeItem('hafalan_me_start_{{ $sesiId }}'); document.getElementById('form-lanjut').requestSubmit()"
                 class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-6 py-2.5 text-sm font-semibold text-white opacity-30 cursor-not-allowed transition-all"
                 disabled>
             <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -82,14 +83,31 @@
 <script>
 (function () {
     const DURASI = 180; // 3 menit
-    let sisa = DURASI;
+    const KEY    = 'hafalan_me_start_{{ $sesiId }}';
     const display = document.getElementById('timer-display');
     const btn = document.getElementById('btn-lanjut');
+
+    // Ambil atau simpan timestamp mulai hafalan
+    let startTs = parseInt(sessionStorage.getItem(KEY) || '0', 10);
+    if (!startTs) {
+        startTs = Date.now();
+        sessionStorage.setItem(KEY, startTs);
+    }
+    let sisa = Math.max(0, DURASI - Math.floor((Date.now() - startTs) / 1000));
 
     function format(s) {
         const m = Math.floor(s / 60);
         const detik = s % 60;
         return m + ':' + String(detik).padStart(2, '0');
+    }
+
+    display.textContent = format(sisa);
+
+    // Waktu sudah habis sebelum halaman dimuat (reload terlambat)
+    if (sisa === 0) {
+        sessionStorage.removeItem(KEY);
+        document.getElementById('form-lanjut').requestSubmit();
+        return;
     }
 
     const interval = setInterval(() => {
@@ -104,16 +122,17 @@
         if (sisa <= 0) {
             clearInterval(interval);
             display.textContent = '0:00';
-            document.getElementById('form-lanjut').submit();
+            sessionStorage.removeItem(KEY);
+            document.getElementById('form-lanjut').requestSubmit();
         }
     }, 1000);
 
-    // Aktifkan tombol manual setelah timer habis (atau jika JS sudah jalan)
+    // Aktifkan tombol manual setelah timer habis
     setTimeout(() => {
         btn.disabled = false;
         btn.classList.remove('opacity-30', 'cursor-not-allowed');
         btn.classList.add('hover:bg-[#1E414C]', 'active:scale-95');
-    }, DURASI * 1000);
+    }, sisa * 1000);
 })();
 </script>
 @include('peserta._monitor_tes')

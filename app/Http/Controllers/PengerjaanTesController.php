@@ -189,21 +189,6 @@ class PengerjaanTesController extends Controller
         return $shuffled;
     }
 
-    private function getOrCreateOpsiOrder(int $sesiId, int $soalId, array $opsiIds): array
-    {
-        $key = $this->sessionKey($sesiId, "opsi_order_{$soalId}");
-
-        $stored = Session::get($key);
-        if ($stored !== null) {
-            return $stored;
-        }
-
-        $shuffled = $opsiIds;
-        shuffle($shuffled);
-        Session::put($key, $shuffled);
-        return $shuffled;
-    }
-
     public function kerjakan(Request $request, int $sesiId)
     {
         $sesi = $this->getSesiById($sesiId);
@@ -391,22 +376,6 @@ class PengerjaanTesController extends Controller
         $currentItem = $daftarSoalFlat[$currentStep];
         $kodeAlatTes = $currentItem['kode_alat_tes'];
         $soal        = $currentItem['soal'];
-
-        // Randomisasi posisi opsi jawaban
-        if (isset($soal['opsi']) && is_array($soal['opsi']) && count($soal['opsi']) > 1) {
-            $opsiIds = array_map(fn($o) => $o['id'], $soal['opsi']);
-            $orderedOpsiIds = $this->getOrCreateOpsiOrder($sesiId, $soal['id'], $opsiIds);
-            $idToOpsi = [];
-            foreach ($soal['opsi'] as $o) {
-                $idToOpsi[$o['id']] = $o;
-            }
-            $soal['opsi'] = [];
-            foreach ($orderedOpsiIds as $oid) {
-                if (isset($idToOpsi[$oid])) {
-                    $soal['opsi'][] = $idToOpsi[$oid];
-                }
-            }
-        }
 
         if (($soal['tipe_format'] ?? '') === 'grid') {
             return redirect()->route('peserta.tes.kraepelin', $sesiId);

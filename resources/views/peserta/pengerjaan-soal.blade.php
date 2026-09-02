@@ -588,10 +588,11 @@
         try {
             var res  = await fetch(form.action, {
                 method: 'POST',
-                body: new FormData(form),
+                body:   new FormData(form),
                 credentials: 'same-origin',
                 redirect: 'follow',
             });
+            if (!res.ok) { submitting = false; window.location.reload(); return; }
             var html = await res.text();
             var doc  = new DOMParser().parseFromString(html, 'text/html');
             swapContent(doc, res.url);

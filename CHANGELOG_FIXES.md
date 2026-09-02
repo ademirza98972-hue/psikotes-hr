@@ -4,6 +4,62 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #7 — Randomisasi opsi jawaban A-E dihapus, hanya urutan soal yang diacak
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-09-02 |
+| File | `PengerjaanTesController.php` |
+| Masalah | Opsi jawaban A-E ikut diacak per peserta, padahal soal standar psikotes memiliki kunci jawaban tetap per posisi opsi |
+| Akar | `getOrCreateOpsiOrder()` + blok shuffle opsi salah diimplementasikan dari awal |
+| Fix | Hapus method `getOrCreateOpsiOrder()` dan seluruh blok randomisasi opsi; urutan soal tetap diacak |
+| Verifikasi | Soal ditampilkan A-E sesuai urutan DB, urutan soal antar peserta berbeda |
+| Pelajaran | Randomisasi soal ≠ randomisasi opsi; untuk tes psikologi terstandar, posisi opsi tidak boleh berubah |
+
+---
+
+### Fix #6 — Timer hafalan-ME reset ke 3:00 saat refresh halaman
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-09-02 |
+| File | `resources/views/peserta/hafalan-me.blade.php` |
+| Masalah | Timer selalu mulai dari 3:00 saat peserta refresh, seolah waktu hafalan belum berjalan |
+| Akar | Timer hanya memakai `DURASI * 1000` setTimeout tanpa menyimpan kapan mulai; setiap load halaman dianggap fresh start |
+| Fix | Simpan timestamp mulai ke `sessionStorage` dengan key `hafalan_me_start_{sesiId}`; sisa waktu dihitung dari `Date.now() - startTs`; jika waktu sudah habis saat load, langsung submit |
+| Verifikasi | Refresh saat timer 1:30 → halaman reload, timer lanjut dari ~1:30 |
+| Pelajaran | Timer berbasis `setTimeout` tidak survive reload; selalu pakai timestamp epoch + `sessionStorage` untuk timer yang harus persist |
+
+---
+
+### Fix #5 — Tombol "Lanjut" hafalan-ME tidak aktif + error 405 saat timer habis
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-09-02 |
+| File | `resources/views/peserta/hafalan-me.blade.php`, `resources/views/peserta/pengerjaan-soal.blade.php` |
+| Masalah | (1) Timer menunjukkan 0:00 tapi tombol "Lanjut ke Soal" tetap disabled dan tidak bisa diklik. (2) Setelah timer habis muncul error 405 Method Not Allowed |
+| Akar | (1) `form.submit()` tidak memicu event `submit` → `_monitor_tes` AJAX handler tidak intercept → browser submit native → halaman navigasi keluar fullscreen. `setTimeout` untuk enable tombol terpicu bersamaan dengan timer habis sehingga racing condition. (2) `swapContent` di `navigatePost` tidak ada guard `!res.ok`; saat server return non-redirect (misal CSRF 419), `window.location.href` di-set ke POST URL yang sama → browser GET ke URL POST → 405 |
+| Fix | Ganti `form.submit()` → `form.requestSubmit()` agar event submit terpicu dan `_monitor_tes` bisa intercept. Tambah guard `if (!res.ok) { window.location.reload(); return; }` di `navigatePost`. Tambah `data-panduan-form` ke form hafalan-ME agar `swapContent` mengenalinya sebagai panduan page |
+| Verifikasi | Timer habis → form submit via AJAX → body swap tanpa keluar fullscreen. Tombol enable setelah waktu habis |
+| Pelajaran | `form.submit()` dan `form.requestSubmit()` berbeda: yang pertama bypass event listener. Selalu pakai `requestSubmit()` jika ada handler di event `submit` |
+
+---
+
+### Fix #4 — Fullscreen keluar saat transisi subtes 8→9 (IST hafalan-ME)
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-09-02 |
+| File | `resources/views/peserta/hafalan-me.blade.php`, `resources/views/peserta/pengerjaan-soal.blade.php` |
+| Masalah | Berpindah dari subtes 8 (WU) ke subtes 9 (ME) menyebabkan browser keluar dari fullscreen |
+| Akar | `swapContent` mendeteksi "panduan page" via atribut `data-panduan-form` pada form. `hafalan-me.blade.php` tidak memiliki atribut ini, sehingga `swapContent` tidak AJAX-swap melainkan navigasi biasa (`window.location.href`) yang me-reload halaman dan mengakhiri sesi fullscreen |
+| Fix | Tambahkan `data-panduan-form` ke `<form id="form-lanjut">` di `hafalan-me.blade.php` |
+| Verifikasi | Transisi WU → ME tetap dalam fullscreen; body swap via AJAX berjalan normal |
+| Pelajaran | Setiap halaman interstitial (panduan/hafalan) yang diakses via AJAX swap harus memiliki `data-panduan-form` pada form submit-nya |
+
+---
+
 ### Fix #3 — Sisa referensi `profilKaryawan` setelah refactor: 500 error di Hasil Tes & Pengerjaan Tes
 
 | Field | Detail |

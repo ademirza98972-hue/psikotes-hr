@@ -341,7 +341,7 @@
                         ];
                         [$r0, $r1] = $subtesRange[$kode_subtes_timer ?? ''] ?? [0, 0];
                         $belumDijawabSubtes = collect($daftar_nomor_soal)
-                            ->filter(fn($item) => $item['nomor_soal'] >= $r0 && $item['nomor_soal'] <= $r1 && !$item['sudah_dijawab'])
+                            ->filter(fn($item) => $item['nomor_soal'] >= $r0 && $item['nomor_soal'] <= $r1 && !$item['sudah_dijawab'] && !$item['is_current'])
                             ->count();
                         @endphp
                         <div x-data="{ showModal: false }">
@@ -379,18 +379,18 @@
                                         Masih ada <strong>{{ $belumDijawabSubtes }}</strong> soal belum dijawab. Jawab semua soal di subtes ini sebelum dapat melanjutkan.
                                     </p>
                                     <div class="flex justify-end mt-6">
-                                        <button @click="showModal = false"
+                                        <button type="button" @click="showModal = false"
                                                 class="px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
                                             Tutup
                                         </button>
                                     </div>
                                     @else
                                     <div class="flex gap-3 mt-6 justify-end">
-                                        <button @click="showModal = false"
+                                        <button type="button" @click="showModal = false"
                                                 class="px-4 py-2 rounded-lg text-sm font-medium border border-[#2C5F6F] text-[#2C5F6F] hover:bg-slate-50 transition">
                                             Batal
                                         </button>
-                                        <button @click="if(window._soalSubmit) window._soalSubmit(); else document.getElementById('form-jawaban').submit();"
+                                        <button type="button" @click="if(window._soalSubmit) window._soalSubmit(); else document.getElementById('form-jawaban').submit();"
                                                 class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
                                             Ya, Selesaikan
                                         </button>

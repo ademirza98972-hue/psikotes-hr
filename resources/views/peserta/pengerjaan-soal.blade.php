@@ -519,8 +519,25 @@
         var newSidebar = doc.getElementById('nav-sidebar');
 
         if (!newMain) {
-            // Redirect ke halaman lain (mis. tes-selesai)
-            window.location.href = finalUrl;
+            // Cek apakah target adalah halaman panduan (antar subtes IST, dll.)
+            var isPanduan = doc.querySelector('form[data-panduan-form]');
+            if (isPanduan) {
+                // Tetap dalam fullscreen — body swap (sama dengan handler di _monitor_tes)
+                sessionStorage.setItem('tes_auto_enter', '1');
+                history.pushState({}, doc.title || '', finalUrl);
+                document.title = doc.title || '';
+                document.body.innerHTML = doc.body.innerHTML;
+                Array.from(document.body.querySelectorAll('script')).forEach(function (s) {
+                    var ns = document.createElement('script');
+                    if (s.src) { ns.src = s.src; ns.async = false; }
+                    else { ns.textContent = s.textContent; }
+                    s.parentNode.replaceChild(ns, s);
+                });
+                if (window.Alpine) Alpine.initTree(document.body);
+            } else {
+                // Halaman lain (mis. tes-selesai) — navigasi biasa
+                window.location.href = finalUrl;
+            }
             return;
         }
 

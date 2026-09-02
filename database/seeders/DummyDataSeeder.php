@@ -7,7 +7,6 @@ use App\Models\Departemen;
 use App\Models\Peran;
 use App\Models\Posisi;
 use App\Models\ProfilKandidat;
-use App\Models\ProfilKaryawan;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -51,7 +50,7 @@ class DummyDataSeeder extends Seeder
         foreach ($namaKaryawan as $index => $nama) {
             $nomorUrut = str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT);
             // NIK 16 digit: 3201 + DDMMYY(tahun pakai 1990-1995) + 4 digit urut + 4 digit random
-            $tahunLahir = str_pad((string) (1990 + $index), 2, '0', STR_PAD_LEFT);
+            $tahunLahir = substr((string) (1990 + $index), -2);
             $bulan = str_pad((string) (1 + ($index % 12)), 2, '0', STR_PAD_LEFT);
             $tanggal = str_pad((string) (1 + ($index % 28)), 2, '0', STR_PAD_LEFT);
             $acak = str_pad((string) random_int(1000, 9999), 4, '0', STR_PAD_LEFT);
@@ -82,9 +81,7 @@ class DummyDataSeeder extends Seeder
     }
 
     /**
-     * 2. AKUN KARYAWAN (users + profil_karyawan) - 5 akun
-     *  - Mengambil 5 data_karyawan berstatus 'sudah_terpakai' yang belum punya akun.
-     *  - Nama & NIK harus MATCH PERSIS dengan data_karyawan (agar lolos validasi sistem).
+     * 2. AKUN KARYAWAN - 5 akun dari data_karyawan sudah_terpakai yang belum punya user
      */
     private function seedAkunKaryawan(): void
     {
@@ -95,9 +92,8 @@ class DummyDataSeeder extends Seeder
             return;
         }
 
-        // Ambil data_karyawan sudah_terpakai yang belum punya profil_karyawan
         $kandidatMaster = DataKaryawan::where('status', 'sudah_terpakai')
-            ->whereDoesntHave('pengguna')
+            ->whereDoesntHave('user')
             ->orderBy('id')
             ->limit(5)
             ->get();
@@ -133,19 +129,12 @@ class DummyDataSeeder extends Seeder
                 'status' => 'aktif',
             ]);
 
-            ProfilKaryawan::create([
-                'user_id' => $user->id,
-                'data_karyawan_id' => $master->id,
-                'nama_karyawan' => $master->nama_karyawan,
-                'nik_karyawan' => $master->nik_karyawan,
-                'departemen' => $master->departemen,
-                'jabatan' => $master->jabatan,
-            ]);
+            $master->update(['user_id' => $user->id]);
 
             $created++;
         }
 
-        $this->command->info("[2] Akun Karyawan: {$created} user + profil_karyawan dibuat.");
+        $this->command->info("[2] Akun Karyawan: {$created} user dibuat.");
     }
 
     /**

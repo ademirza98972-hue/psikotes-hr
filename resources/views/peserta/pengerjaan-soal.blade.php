@@ -500,6 +500,9 @@
 <script>
 // AJAX navigation — mempertahankan fullscreen saat pindah soal
 (function () {
+    // Teardown IIFE lama (terjadi saat body-swap dari panduan ke soal berikutnya)
+    if (window._navTeardown) window._navTeardown();
+
     var mainEl    = document.getElementById('soal-main');
     var sidebarEl = document.getElementById('nav-sidebar');
     if (!mainEl) return;
@@ -609,7 +612,7 @@
     }
 
     // Intercept <a> klik di sidebar & area soal
-    document.addEventListener('click', function (e) {
+    function onNavClick(e) {
         var a = e.target.closest('#soal-main a[href], #nav-sidebar a[href]');
         if (!a) return;
         var url = a.href;
@@ -651,10 +654,10 @@
         }
 
         navigate(url);
-    });
+    }
 
     // Intercept form submit (Selanjutnya, Selesaikan, Selesaikan Subtes)
-    document.addEventListener('submit', function (e) {
+    function onNavSubmit(e) {
         if (e.target.id !== 'form-jawaban') return;
         e.preventDefault();
         if (submitting) return;
@@ -668,6 +671,7 @@
                 Array.from(e.target.querySelectorAll('input[name="jawaban_teks"], textarea[name="jawaban_teks"]'))
                     .some(function (t) { return t.value.trim() !== ''; });
             if (!adaJawaban) {
+                submitting = false;
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jawaban Kosong',
@@ -680,12 +684,22 @@
         }
 
         navigatePost(e.target);
-    });
+    }
 
-    // Browser back/forward
-    window.addEventListener('popstate', function () {
+    function onNavPopstate() {
         navigate(window.location.href);
-    });
+    }
+
+    document.addEventListener('click',   onNavClick);
+    document.addEventListener('submit',  onNavSubmit);
+    window.addEventListener('popstate',  onNavPopstate);
+
+    window._navTeardown = function () {
+        document.removeEventListener('click',  onNavClick);
+        document.removeEventListener('submit', onNavSubmit);
+        window.removeEventListener('popstate', onNavPopstate);
+        window._navTeardown = null;
+    };
 
     // Dipanggil dari modal Alpine (form.submit() tidak trigger event listener)
     window._soalSubmit = function () {

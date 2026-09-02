@@ -24,7 +24,7 @@ class AlatTesController extends Controller
     {
         $perPage = $this->getPerPage($request, 10);
 
-        $totalSoal = AlatTes::withCount('soal')->get()->sum('soal_count');
+        $totalSoal = \App\Models\Soal::count();
         $totalAlat = AlatTes::count();
         $alatPopuler = AlatTes::withCount('soal')->orderByDesc('soal_count')->first();
 

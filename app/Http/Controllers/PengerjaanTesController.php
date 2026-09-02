@@ -175,6 +175,34 @@ class PengerjaanTesController extends Controller
             ->map(fn ($a) => $a->id);
     }
 
+    private function reorderSoalFlat(array $flat, string $kode, int $sesiId): array
+    {
+        if ($kode === 'IST') {
+            $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
+            $perSubtes = [];
+            foreach ($flat as $item) {
+                $perSubtes[$this->getKodeSubtesIst($item['soal']['nomor'])][] = $item;
+            }
+            $flat = [];
+            foreach ($subtesUrutan as $subtes) {
+                if (empty($perSubtes[$subtes])) continue;
+                $ids = array_map(fn($i) => $i['soal']['id'], $perSubtes[$subtes]);
+                $idToItem = array_combine($ids, $perSubtes[$subtes]);
+                foreach ($this->getOrCreateSoalOrder($sesiId, $kode, $ids, $subtes) as $id) {
+                    if (isset($idToItem[$id])) $flat[] = $idToItem[$id];
+                }
+            }
+        } elseif (in_array($kode, ['EPPS', 'PAP'])) {
+            $ids = array_map(fn($i) => $i['soal']['id'], $flat);
+            $idToItem = array_combine($ids, $flat);
+            $flat = [];
+            foreach ($this->getOrCreateSoalOrder($sesiId, $kode, $ids) as $id) {
+                if (isset($idToItem[$id])) $flat[] = $idToItem[$id];
+            }
+        }
+        return $flat;
+    }
+
     private function getOrCreateSoalOrder(int $sesiId, string $kodeAlatTes, array $soalIds, ?string $kodeSubtes = null): array
     {
         $key = $kodeSubtes
@@ -265,41 +293,7 @@ class PengerjaanTesController extends Controller
             $daftarSoalFlat[] = ['kode_alat_tes' => $kodeAlatTesAktif, 'soal' => $soal];
         }
 
-        if ($kodeAlatTesAktif === 'IST') {
-            $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
-            $soalPerSubtes = [];
-            foreach ($daftarSoalFlat as $item) {
-                $soalPerSubtes[$this->getKodeSubtesIst($item['soal']['nomor'])][] = $item;
-            }
-            $daftarSoalFlat = [];
-            foreach ($subtesUrutan as $subtes) {
-                if (empty($soalPerSubtes[$subtes])) continue;
-                $ids = array_map(fn($i) => $i['soal']['id'], $soalPerSubtes[$subtes]);
-                $orderedIds = $this->getOrCreateSoalOrder($sesiId, $kodeAlatTesAktif, $ids, $subtes);
-                $idToItem = [];
-                foreach ($soalPerSubtes[$subtes] as $item) {
-                    $idToItem[$item['soal']['id']] = $item;
-                }
-                foreach ($orderedIds as $id) {
-                    if (isset($idToItem[$id])) {
-                        $daftarSoalFlat[] = $idToItem[$id];
-                    }
-                }
-            }
-        } elseif (in_array($kodeAlatTesAktif, ['EPPS', 'PAP'])) {
-            $ids = array_map(fn($item) => $item['soal']['id'], $daftarSoalFlat);
-            $orderedIds = $this->getOrCreateSoalOrder($sesiId, $kodeAlatTesAktif, $ids);
-            $idToItem = [];
-            foreach ($daftarSoalFlat as $item) {
-                $idToItem[$item['soal']['id']] = $item;
-            }
-            $daftarSoalFlat = [];
-            foreach ($orderedIds as $id) {
-                if (isset($idToItem[$id])) {
-                    $daftarSoalFlat[] = $idToItem[$id];
-                }
-            }
-        }
+        $daftarSoalFlat = $this->reorderSoalFlat($daftarSoalFlat, $kodeAlatTesAktif, $sesiId);
 
         if ($request->query('prev') === '1' && $currentStep > 0) {
             $alatTesCheck = \App\Models\AlatTes::where('kode', $kodeAlatTesAktif)->first();
@@ -313,12 +307,12 @@ class PengerjaanTesController extends Controller
                     : 'Tidak dapat kembali ke soal sebelumnya karena timer per soal sedang aktif.';
                 return redirect()->route('peserta.tes.kerjakan', $sesiId)->with('error', $pesan);
             }
-            $currentStep = $currentStep - 1;
+            $currentStep--;
             Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
         }
 
         if ($request->query('next') === '1' && $currentStep + 1 < count($daftarSoalFlat)) {
-            $currentStep = $currentStep + 1;
+            $currentStep++;
             Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
         }
 
@@ -753,41 +747,7 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        if ($kodeAlatTesAktif === 'IST') {
-            $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
-            $soalPerSubtes = [];
-            foreach ($daftarSoalFlat as $item) {
-                $soalPerSubtes[$this->getKodeSubtesIst($item['soal']['nomor'])][] = $item;
-            }
-            $daftarSoalFlat = [];
-            foreach ($subtesUrutan as $subtes) {
-                if (empty($soalPerSubtes[$subtes])) continue;
-                $ids = array_map(fn($i) => $i['soal']['id'], $soalPerSubtes[$subtes]);
-                $orderedIds = $this->getOrCreateSoalOrder($sesiId, $kodeAlatTesAktif, $ids, $subtes);
-                $idToItem = [];
-                foreach ($soalPerSubtes[$subtes] as $item) {
-                    $idToItem[$item['soal']['id']] = $item;
-                }
-                foreach ($orderedIds as $id) {
-                    if (isset($idToItem[$id])) {
-                        $daftarSoalFlat[] = $idToItem[$id];
-                    }
-                }
-            }
-        } elseif (in_array($kodeAlatTesAktif, ['EPPS', 'PAP'])) {
-            $ids = array_map(fn($item) => $item['soal']['id'], $daftarSoalFlat);
-            $orderedIds = $this->getOrCreateSoalOrder($sesiId, $kodeAlatTesAktif, $ids);
-            $idToItem = [];
-            foreach ($daftarSoalFlat as $item) {
-                $idToItem[$item['soal']['id']] = $item;
-            }
-            $daftarSoalFlat = [];
-            foreach ($orderedIds as $id) {
-                if (isset($idToItem[$id])) {
-                    $daftarSoalFlat[] = $idToItem[$id];
-                }
-            }
-        }
+        $daftarSoalFlat = $this->reorderSoalFlat($daftarSoalFlat, $kodeAlatTesAktif, $sesiId);
 
         $currentStep = (int) Session::get($this->sessionKey($sesiId, 'current_step'), 0);
 
@@ -1148,6 +1108,17 @@ class PengerjaanTesController extends Controller
             );
         }
 
+        $stat = GridInputPeserta::where('user_id', $userId)
+            ->where('sesi_tes_id', $sesiId)
+            ->where('alat_tes_id', $alatTesId)
+            ->where('kolom_ke', $kolomKe)
+            ->selectRaw('
+                SUM(is_benar = 1) as jumlah_benar,
+                SUM(is_benar = 0 AND jawaban_peserta != 0 AND jawaban_peserta IS NOT NULL) as jumlah_salah,
+                SUM(jawaban_peserta IS NULL OR jawaban_peserta = 0) as jumlah_kelewat,
+                MIN(waktu_input) as waktu_min
+            ')->first();
+
         HasilKolomGrid::updateOrCreate(
             [
                 'user_id'     => $userId,
@@ -1156,36 +1127,10 @@ class PengerjaanTesController extends Controller
                 'kolom_ke'    => $kolomKe,
             ],
             [
-                'jumlah_benar'    => GridInputPeserta::where('user_id', $userId)
-                    ->where('sesi_tes_id', $sesiId)
-                    ->where('alat_tes_id', $alatTesId)
-                    ->where('kolom_ke', $kolomKe)
-                    ->where('is_benar', true)
-                    ->count(),
-                'jumlah_salah'    => GridInputPeserta::where('user_id', $userId)
-                    ->where('sesi_tes_id', $sesiId)
-                    ->where('alat_tes_id', $alatTesId)
-                    ->where('kolom_ke', $kolomKe)
-                    ->where('is_benar', false)
-                    ->where('jawaban_peserta', '!=', 0)
-                    ->count(),
-                'jumlah_kelewat'  => GridInputPeserta::where('user_id', $userId)
-                    ->where('sesi_tes_id', $sesiId)
-                    ->where('alat_tes_id', $alatTesId)
-                    ->where('kolom_ke', $kolomKe)
-                    ->where(function ($q) {
-                        $q->whereNull('jawaban_peserta')
-                          ->orWhere('jawaban_peserta', 0);
-                    })
-                    ->count(),
-                'waktu_pakai_detik' => (int) max(0, now()->diffInSeconds(
-                    GridInputPeserta::where('user_id', $userId)
-                        ->where('sesi_tes_id', $sesiId)
-                        ->where('alat_tes_id', $alatTesId)
-                        ->where('kolom_ke', $kolomKe)
-                        ->min('waktu_input')
-                        ?? now()
-                )),
+                'jumlah_benar'      => (int) ($stat->jumlah_benar ?? 0),
+                'jumlah_salah'      => (int) ($stat->jumlah_salah ?? 0),
+                'jumlah_kelewat'    => (int) ($stat->jumlah_kelewat ?? 0),
+                'waktu_pakai_detik' => (int) max(0, now()->diffInSeconds($stat->waktu_min ?? now())),
             ]
         );
 

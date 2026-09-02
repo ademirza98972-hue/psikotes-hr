@@ -151,11 +151,14 @@ class PenjadwalanTesController extends Controller
         $sudahAda = 0;
 
         DB::transaction(function () use ($validated, $sesi, &$ditambahkan, &$sudahAda) {
+            $sudahTerdaftar = PesertaSesiTes::where('sesi_tes_id', $sesi->id)
+                ->whereIn('user_id', $validated['user_ids'])
+                ->pluck('user_id')
+                ->flip()
+                ->all();
+
             foreach ($validated['user_ids'] as $userId) {
-                $existing = PesertaSesiTes::where('sesi_tes_id', $sesi->id)
-                    ->where('user_id', $userId)
-                    ->first();
-                if ($existing) {
+                if (isset($sudahTerdaftar[$userId])) {
                     $sudahAda++;
                     continue;
                 }

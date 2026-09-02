@@ -44,14 +44,9 @@ class HasilTesController extends Controller
             'jumlah_peserta'     => $sesi->jumlah_peserta,
         ])->all();
 
-        $hasilPeserta = [];
-        foreach ($sesiList as $sesi) {
-            if ($sesi->pesertaSesiTesRecords->isNotEmpty()) {
-                $hasilPeserta[$sesi->id] = true;
-            }
-        }
         if (!$selectedSesiId && $sesiList->isNotEmpty()) {
-            $selectedSesiId = $sesiList->first(fn($s) => ($hasilPeserta[$s->id] ?? false))?->id ?? $sesiList->first()->id;
+            $selectedSesiId = $sesiList->first(fn($s) => $s->pesertaSesiTesRecords->isNotEmpty())?->id
+                ?? $sesiList->first()->id;
         }
 
         $hasilTes = [];
@@ -62,19 +57,9 @@ class HasilTesController extends Controller
                     continue;
                 }
 
-                $departemen = '—';
-                $posisi = '—';
                 $dk = $user->dataKaryawan;
-                if ($dk) {
-                    $departemen = $dk->departemen?->nama_departemen ?? '—';
-                    $posisi = $dk->posisi?->nama_posisi ?? '—';
-                } else {
-                    $kandidat = $user->profilKandidat;
-                    if ($kandidat) {
-                        $departemen = $kandidat->departemen ?? '—';
-                        $posisi = $kandidat->posisi?->nama_posisi ?? '—';
-                    }
-                }
+                $departemen = $dk?->departemen?->nama_departemen ?? $user->profilKandidat?->departemen ?? '—';
+                $posisi     = $dk?->posisi?->nama_posisi ?? $user->profilKandidat?->posisi?->nama_posisi ?? '—';
 
                 $alatTesKode = $peserta->alatTes?->pluck('kode')->join(', ') ?: '—';
 
@@ -171,10 +156,7 @@ class HasilTesController extends Controller
             }
         }
 
-        $hasilTes['hasil_alat_tes'] = $hasilAlatTes;
-        $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps(
-            $hasilTes['hasil_alat_tes'], $pesertaId, $sesiId
-        );
+        $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps($hasilAlatTes, $pesertaId, $sesiId);
         $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
 
         $logMencurigakan = $pesertaSesi
@@ -287,15 +269,7 @@ class HasilTesController extends Controller
 
     protected function injectHasilEpps(array $hasilAlatPeserta, int $userId, int $sesiId): array
     {
-        $adaEpps = false;
-        foreach ($hasilAlatPeserta as $alat) {
-            if (($alat['nama_alat_tes'] ?? null) === 'EPPS') {
-                $adaEpps = true;
-                break;
-            }
-        }
-
-        if (!$adaEpps) {
+        if (!collect($hasilAlatPeserta)->contains('nama_alat_tes', 'EPPS')) {
             return $hasilAlatPeserta;
         }
 
@@ -315,15 +289,11 @@ class HasilTesController extends Controller
             ];
         })->all();
 
-        $hasilBaru = [];
-        foreach ($hasilAlatPeserta as $alat) {
-            if (($alat['nama_alat_tes'] ?? null) === 'EPPS') {
-                $alat['skor_ringkas'] = $skorRingkasBaru;
-            }
-            $hasilBaru[] = $alat;
-        }
-
-        return $hasilBaru;
+        return collect($hasilAlatPeserta)->map(fn($alat) =>
+            ($alat['nama_alat_tes'] ?? null) === 'EPPS'
+                ? array_merge($alat, ['skor_ringkas' => $skorRingkasBaru])
+                : $alat
+        )->all();
     }
 
     protected function buildPapScores(array $hasilAlatPeserta): array
@@ -413,14 +383,12 @@ class HasilTesController extends Controller
     {
         $alatAktif = \App\Models\AlatTes::where('is_aktif', true)
             ->whereNull('deleted_at')
+            ->with(['dimensiAlatTes' => fn($q) => $q->with(['bidangLaporan.bidangLaporan', 'levelDimensi'])->orderBy('urutan')])
             ->get(['id', 'nama']);
 
         $map = [];
         foreach ($alatAktif as $alat) {
-            $dimensinya = DimensiAlatTes::where('alat_tes_id', $alat->id)
-                ->with(['bidangLaporan.bidangLaporan', 'levelDimensi'])
-                ->orderBy('urutan')
-                ->get();
+            $dimensinya = $alat->dimensiAlatTes;
 
             if ($dimensinya->isEmpty()) {
                 continue;

@@ -247,10 +247,7 @@ class ScoringEngineService
             foreach ($j->opsiDipilih->bobotOpsiDimensi as $bobot) {
                 if ($bobot->bobot > 0) {
                     $dimensiId = $bobot->dimensi_id;
-                    if (!isset($tally[$dimensiId])) {
-                        $tally[$dimensiId] = 0;
-                    }
-                    $tally[$dimensiId] += $bobot->bobot;
+                    $tally[$dimensiId] = ($tally[$dimensiId] ?? 0) + $bobot->bobot;
                 }
             }
         }
@@ -310,7 +307,7 @@ class ScoringEngineService
         $skorMentah = 0;
 
         foreach ($jawaban as $j) {
-            $soalAsli = Soal::where('id', $j->soal->duplikat_dari_soal_id)->first();
+            $soalAsli = Soal::find($j->soal->duplikat_dari_soal_id);
             if (!$soalAsli) {
                 continue;
             }

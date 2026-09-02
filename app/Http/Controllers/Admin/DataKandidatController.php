@@ -205,36 +205,23 @@ class DataKandidatController extends Controller
 
     public function approve(int $id): RedirectResponse
     {
-        $kandidat = User::findOrFail($id);
-
-        abort_unless($kandidat->tipe_akun === 'kandidat', 404);
-
-        if ($kandidat->status !== 'menunggu_verifikasi') {
-            return back()->with('error', 'Hanya akun dengan status menunggu_verifikasi yang dapat diaktifkan.');
-        }
-
-        $kandidat->update(['status' => 'aktif']);
-
-        return redirect()
-            ->route('admin.data-kandidat.index')
-            ->with($this::FLASH_SUCCESS, 'Kandidat berhasil diaktifkan.');
+        return $this->ubahStatusKandidat($id, 'aktif', 'Kandidat berhasil diaktifkan.', 'diaktifkan');
     }
 
     public function tolak(int $id): RedirectResponse
     {
+        return $this->ubahStatusKandidat($id, 'ditolak', 'Kandidat berhasil ditolak. Data tetap disimpan.', 'ditolak');
+    }
+
+    private function ubahStatusKandidat(int $id, string $status, string $pesan, string $label): RedirectResponse
+    {
         $kandidat = User::findOrFail($id);
-
         abort_unless($kandidat->tipe_akun === 'kandidat', 404);
-
         if ($kandidat->status !== 'menunggu_verifikasi') {
-            return back()->with('error', 'Hanya akun dengan status menunggu_verifikasi yang dapat ditolak.');
+            return back()->with('error', "Hanya akun dengan status menunggu_verifikasi yang dapat di{$label}.");
         }
-
-        $kandidat->update(['status' => 'ditolak']);
-
-        return redirect()
-            ->route('admin.data-kandidat.index')
-            ->with($this::FLASH_SUCCESS, 'Kandidat berhasil ditolak. Data tetap disimpan.');
+        $kandidat->update(['status' => $status]);
+        return redirect()->route('admin.data-kandidat.index')->with($this::FLASH_SUCCESS, $pesan);
     }
 
     public function toggleStatus(int $id): RedirectResponse

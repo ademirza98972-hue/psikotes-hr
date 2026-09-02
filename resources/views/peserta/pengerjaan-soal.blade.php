@@ -286,10 +286,12 @@
                             </div>
                         @endif
                         <p class="text-sm font-medium text-slate-700 mb-3">Pilih salah satu:</p>
-                        <div class="grid grid-cols-5 gap-2">
+                        <div class="grid grid-cols-5 gap-2"
+                             x-data="{ sel: '{{ $saved_answer ?? '' }}' }">
                             @foreach($soal_data['opsi'] as $opsi)
-                                <label class="flex flex-col items-center gap-2 border-2 rounded-lg p-2 cursor-pointer transition
-                                              {{ $saved_answer == $opsi['id'] ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-slate-200 hover:border-[#2C5F6F]/50' }}">
+                                <label @click="sel = '{{ $opsi['id'] }}'"
+                                       :class="sel == '{{ $opsi['id'] }}' ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-slate-200 hover:border-[#2C5F6F]/50'"
+                                       class="flex flex-col items-center gap-2 border-2 rounded-lg p-2 cursor-pointer transition">
                                     <input type="radio" name="opsi_id" value="{{ $opsi['id'] }}"
                                            @checked($saved_answer == $opsi['id'])
                                            class="sr-only">

@@ -503,6 +503,7 @@
     var mainEl    = document.getElementById('soal-main');
     var sidebarEl = document.getElementById('nav-sidebar');
     if (!mainEl) return;
+    var submitting = false;
 
     function showToast(msg) {
         Swal.fire({
@@ -561,6 +562,8 @@
 
         history.pushState({}, '', finalUrl);
 
+        submitting = false;
+
         // Reset flag isNavigating di monitor
         if (window._monitorResetNav) window._monitorResetNav();
     }
@@ -588,6 +591,7 @@
             var doc  = new DOMParser().parseFromString(html, 'text/html');
             swapContent(doc, res.url);
         } catch (e) {
+            submitting = false;
             form.submit();
         }
     }
@@ -653,6 +657,8 @@
     document.addEventListener('submit', function (e) {
         if (e.target.id !== 'form-jawaban') return;
         e.preventDefault();
+        if (submitting) return;
+        submitting = true;
 
         // Blokir submit manual jika per-soal timer aktif, timer belum habis, dan belum ada jawaban
         var timerFlag = document.getElementById('timer-expired-flag');

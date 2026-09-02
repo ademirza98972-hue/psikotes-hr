@@ -26,7 +26,6 @@
 
     window._monitorResetNav = function () { isNavigating = false; };
 
-    // ===== Kirim log =====
     function kirimLog(tipe, keterangan) {
         var fd = new FormData();
         fd.append('_token', CSRF);
@@ -36,12 +35,10 @@
         fetch(LOG_URL, { method: 'POST', body: fd, keepalive: true }).catch(function () {});
     }
 
-    // ===== Fullscreen =====
     function masukFullscreen() {
         return document.documentElement.requestFullscreen().catch(function () {});
     }
 
-    // ===== Overlay =====
     var overlay = document.createElement('div');
     overlay.id = 'fs-overlay';
     overlay.style.cssText = [
@@ -86,7 +83,6 @@
     }
     document.addEventListener('keydown', onKeyOverlay);
 
-    // ===== Init =====
     if (autoEnter) {
         // Dari panduan via AJAX swap: sudah fullscreen, listener ini hanya safety net
         function onFirstInteraction(e) {
@@ -103,7 +99,6 @@
         tampilOverlay('Lanjutkan Tes', 'Klik di mana saja atau tekan tombol di bawah untuk kembali ke layar penuh.', 'Lanjutkan — Layar Penuh');
     }
 
-    // ===== Named event listeners (agar bisa di-teardown) =====
     function onFullscreenChange() {
         if (!document.fullscreenElement && !isNavigating) {
             kirimLog('keluar_fullscreen', null);
@@ -149,7 +144,6 @@
         window._monitorTeardown = null;
     };
 
-    // ===== AJAX handler untuk form panduan "Mulai" =====
     // Intercept submit → requestFullscreen() saat gesture masih aktif → swap body tanpa navigasi
     var pandForm = document.querySelector('form[data-panduan-form]');
     if (pandForm) {

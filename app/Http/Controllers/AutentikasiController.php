@@ -33,7 +33,6 @@ class AutentikasiController extends Controller
         $identifier = $request->input('identifier');
         $password   = $request->input('password');
 
-        // Cari user berdasarkan email atau id_karyawan
         $user = User::where('email', $identifier)
             ->orWhere('id_karyawan', $identifier)
             ->whereIn('tipe_akun', ['kandidat', 'karyawan'])

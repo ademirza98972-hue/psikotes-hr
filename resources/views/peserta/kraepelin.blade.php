@@ -134,7 +134,6 @@
         .numpad-btn.del:active { background: #fca5a5; }
         .numpad-btn.wide { grid-column: span 2; }
     </style>
-    <meta name="debug-sisa" content="{{ $sisaDetikPerKolom ?? 'null' }} / detikPerKolom={{ $detikPerKolom ?? 'null' }}">
 </head>
 <body>
 
@@ -242,7 +241,6 @@ const FORM_ACTION = document.getElementById('form-kraepelin').action;
 let currentIndex  = 0;
 let timerInterval = null;
 
-// ===== HIGHLIGHT =====
 function updateHighlight() {
     var rows = angka.length - 1;
     for (var i = 0; i < angka.length; i++) {
@@ -257,7 +255,6 @@ function updateHighlight() {
     }
 }
 
-// ===== SCROLL =====
 function scrollToActive() {
     var el        = document.getElementById('cell-' + currentIndex);
     var container = document.getElementById('grid-area');
@@ -266,7 +263,6 @@ function scrollToActive() {
     container.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
 }
 
-// ===== NUMPAD =====
 function numpadClick(digit) {
     var rows = angka.length - 1;
     if (currentIndex >= rows) return;
@@ -287,7 +283,6 @@ function numpadBack() {
     scrollToActive();
 }
 
-// ===== TIMER =====
 function startTimerWith(sisaPer, sisaTotal) {
     var display = document.getElementById('timer-display');
     if (!display) return;
@@ -299,7 +294,6 @@ function startTimerWith(sisaPer, sisaTotal) {
     }, 1000);
 }
 
-// ===== UPDATE DOM SETELAH AJAX =====
 function updateGrid(newAngka) {
     var col = document.getElementById('grid-column');
     col.innerHTML = '';
@@ -328,7 +322,6 @@ function rebuildFormInputs(newAngka, newKolomKe) {
     }
 }
 
-// ===== SUBMIT (AJAX — tidak reload halaman, fullscreen tetap aktif) =====
 function submitForm() {
     clearInterval(timerInterval);
     var form = document.getElementById('form-kraepelin');
@@ -363,7 +356,6 @@ function submitForm() {
         .catch(function () { form.submit(); }); // fallback jika fetch gagal
 }
 
-// ===== INIT =====
 window.addEventListener('load', function () {
     updateHighlight();
     startTimerWith(sisaDetikPerKolom, sisaDetikKeseluruhan);

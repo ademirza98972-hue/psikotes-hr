@@ -24,7 +24,6 @@ class AlatTesController extends Controller
     {
         $perPage = $this->getPerPage($request, 10);
 
-        // Compute stats before paginating
         $totalSoal = AlatTes::withCount('soal')->get()->sum('soal_count');
         $totalAlat = AlatTes::count();
         $alatPopuler = AlatTes::withCount('soal')->orderByDesc('soal_count')->first();
@@ -160,7 +159,6 @@ class AlatTesController extends Controller
         $baris = array_map('str_getcsv', file($file->getRealPath()));
         $header = array_map('trim', array_shift($baris));
 
-        // Validasi header CSV
         $headerWajib = ['dimensi_kode','kelompok_segmen','tahap',
                         'skor_mentah_min','skor_mentah_max','skor_hasil'];
         $headerKurang = array_diff($headerWajib, $header);
@@ -170,7 +168,6 @@ class AlatTesController extends Controller
             ]);
         }
 
-        // Ambil semua dimensi alat tes ini untuk lookup kode → id
         $dimensiMap = \App\Models\DimensiAlatTes::where('alat_tes_id', $id)
             ->pluck('id', 'kode_dimensi');
 

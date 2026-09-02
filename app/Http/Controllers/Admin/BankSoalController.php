@@ -313,7 +313,6 @@ class BankSoalController extends Controller
                     $existing = $existingOps->firstWhere('urutan', $urutan);
                     if ($existing) {
                         $existing->update(['teks_opsi' => $teks ?? '']);
-                        // Upload gambar opsi jika ada
                         if ($request->hasFile("gambar_opsi.$huruf")) {
                             $existing->gambar_opsi = $request->file("gambar_opsi.$huruf")->store('ist/opsi', 'public');
                             $existing->save();
@@ -324,7 +323,6 @@ class BankSoalController extends Controller
                             'teks_opsi' => $teks ?? '',
                             'urutan'    => $urutan,
                         ]);
-                        // Upload gambar opsi jika ada
                         if ($request->hasFile("gambar_opsi.$huruf")) {
                             $opsi->gambar_opsi = $request->file("gambar_opsi.$huruf")->store('ist/opsi', 'public');
                             $opsi->save();

@@ -15,44 +15,22 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    /**
-     * Data peserta login sebenarnya (auth()->user()) atau fallback ke dummy
-     * RETURN OBJEK agar kompatibel dengan view yang menggunakan $pengguna->property
-     */
     private function getPesertaLoginSaatIni(): object
     {
         /** @var \App\Models\User $userAsli */
-        $userAsli = auth()->user(); // Ambil user asli yang sedang login
+        $userAsli = auth()->user();
 
-        if ($userAsli) {
-            // Gunakan data asli jika tersedia
-            return (object) [
-                'id' => $userAsli->id,
-                'name' => $userAsli->name,
-                'email' => $userAsli->email,
-                'tipe_akun' => $userAsli->tipe_akun ?? 'peserta',
-                'foto_profil' => $userAsli->foto_profil,
-                'status' => $userAsli->status ?? 'aktif',
-            ];
-        }
-
-        // Fallback data dummy jika belum ada auth sungguhan
         return (object) [
-            'id' => 1,
-            'name' => 'Budi Santoso',
-            'email' => 'budi.santoso@company.com',
-            'tipe_akun' => 'peserta',
-            'foto_profil' => null,
-            'status' => 'aktif',
+            'id' => $userAsli->id,
+            'name' => $userAsli->name,
+            'email' => $userAsli->email,
+            'tipe_akun' => $userAsli->tipe_akun ?? 'peserta',
+            'foto_profil' => $userAsli->foto_profil,
+            'status' => $userAsli->status ?? 'aktif',
         ];
     }
 
-    /**
-     * Data dummy sesi tes yang ditugaskan kepada peserta simulasi
-     * Minimal 3 sesi dengan status berbeda (Belum Mengerjakan, Sedang Berjalan, Selesai)
-     * Assignment bersifat per-individu, bukan paket bersama
-     */
-    private function getSesiTesDummy(): array
+    private function getSesiTes(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -113,14 +91,12 @@ class DashboardController extends Controller
         $nikBelumTerpakai = $totalDataKaryawan - $totalKaryawan;
         $totalPeran = Peran::count();
 
-        // Kandidat menunggu (max 2, oldest first)
         $kandidatMenungguList = User::where('tipe_akun', 'kandidat')
             ->where('status', 'menunggu_verifikasi')
             ->orderBy('created_at', 'asc')
             ->take(2)
             ->get();
 
-        // Trend 7 hari terakhir
         $batas7Hari = Carbon::now()->subDays(7);
         $karyawanBaru7Hari = User::where('tipe_akun', 'karyawan')->where('created_at', '>=', $batas7Hari)->count();
         $kandidatBaru7Hari = User::where('tipe_akun', 'kandidat')->where('created_at', '>=', $batas7Hari)->count();
@@ -142,7 +118,6 @@ class DashboardController extends Controller
             $labelTanggal[] = $hari->translatedFormat('D, d M');
         }
 
-        // Sapaan berdasarkan jam saat ini + tanggal lengkap Indonesia
         $jamSekarang = (int) Carbon::now()->hour;
         if ($jamSekarang >= 4 && $jamSekarang < 11) {
             $sapaan = 'Selamat pagi';
@@ -205,11 +180,8 @@ class DashboardController extends Controller
 
     public function peserta(Request $request): View
     {
-        // Gunakan data peserta simulasi sementara
         $pengguna = $this->getPesertaLoginSaatIni();
-
-        // Ambil data sesi tes yang ditugaskan ke peserta ini
-        $sesiTes = $this->getSesiTesDummy();
+        $sesiTes = $this->getSesiTes();
 
         return view('peserta.dashboard', [
             'pengguna' => $pengguna,

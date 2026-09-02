@@ -2,7 +2,6 @@
 
 @section('content')
 <script>
-    // 移除 main 的 max-w-5xl 限制，使页面撑满全宽
     const m = document.querySelector('main');
     if (m) { m.style.maxWidth = '100%'; m.style.paddingLeft = '24px'; m.style.paddingRight = '24px'; }
 </script>

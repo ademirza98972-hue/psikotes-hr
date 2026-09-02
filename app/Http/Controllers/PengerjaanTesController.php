@@ -18,10 +18,6 @@ class PengerjaanTesController extends Controller
 {
     public function __construct(private ScoringEngineService $scoringService) {}
 
-    /**
-     * Ambil semua sesi_tes di mana user login terdaftar sebagai peserta,
-     * lengkap dengan daftar kode alat tes yang ditugaskan.
-     */
     private function getSesiPeserta(): array
     {
         $userId = Auth::id();
@@ -79,10 +75,6 @@ class PengerjaanTesController extends Controller
         ];
     }
 
-    /**
-     * Ambil semua soal + opsi_jawaban untuk alat tes yang ditugaskan
-     * ke sesi-sesi milik user login. Output keyed by kode_alat_tes.
-     */
     private function getSoalPeserta(): array
     {
         $userId = Auth::id();
@@ -172,6 +164,17 @@ class PengerjaanTesController extends Controller
         };
     }
 
+    private function getAlatTesByKode(int $pesertaSesiTesId): \Illuminate\Support\Collection
+    {
+        return PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
+            ->with('alatTes:id,kode')
+            ->get()
+            ->pluck('alatTes')
+            ->filter()
+            ->keyBy('kode')
+            ->map(fn ($a) => $a->id);
+    }
+
     private function getOrCreateSoalOrder(int $sesiId, string $kodeAlatTes, array $soalIds, ?string $kodeSubtes = null): array
     {
         $key = $kodeSubtes
@@ -211,17 +214,9 @@ class PengerjaanTesController extends Controller
         $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
 
-        // Ambil alat_tes_id untuk setiap kode alat tes yang ditugaskan
         $pesertaSesiTesId = $sesi['peserta_sesi_tes_id'];
-        $alatTesByKode = \App\Models\PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
-            ->with('alatTes:id,kode')
-            ->get()
-            ->pluck('alatTes')
-            ->filter()
-            ->keyBy('kode')
-            ->map(fn ($a) => $a->id);
+        $alatTesByKode = $this->getAlatTesByKode($pesertaSesiTesId);
 
-        // Hitung jumlah soal yang sudah dijawab per alat tes
         $userId = Auth::id();
         $alatTesSudahSelesai = \App\Models\JawabanPeserta::where('user_id', $userId)
             ->where('sesi_tes_id', $sesiId)
@@ -232,7 +227,6 @@ class PengerjaanTesController extends Controller
             ->get()
             ->groupBy(fn($j) => $j->soal->alat_tes_id);
 
-        // Tentukan alat tes yang sedang aktif (pertama yang belum selesai)
         $kodeAlatTesAktif = null;
         foreach ($daftarAlatTes as $kodeAlat) {
             $alatTesId = $alatTesByKode[$kodeAlat] ?? null;
@@ -250,15 +244,12 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Jika semua alat tes sudah selesai, redirect ke halaman selesai
         if (!$kodeAlatTesAktif) {
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
 
-        // Inisialisasi step ke 0 untuk sesi baru (atau ambil dari session)
         $currentStep = (int) Session::get($this->sessionKey($sesiId, 'current_step'), 0);
 
-        // Reset current step jika berpindah alat tes
         $kodeAlatTesSesiKey = $this->sessionKey($sesiId, 'kode_alat_tes_aktif');
         $kodeAlatTesSesiSebelumnya = Session::get($kodeAlatTesSesiKey);
         if ($kodeAlatTesSesiSebelumnya !== $kodeAlatTesAktif) {
@@ -269,30 +260,16 @@ class PengerjaanTesController extends Controller
             $currentStep = 0;
         }
 
-        // Flatten hanya soal dari alat tes aktif
         $daftarSoalFlat = [];
         foreach ($soalDummy[$kodeAlatTesAktif]['soal'] as $soal) {
             $daftarSoalFlat[] = ['kode_alat_tes' => $kodeAlatTesAktif, 'soal' => $soal];
         }
 
-        // Randomisasi urutan soal berdasarkan alat tes
         if ($kodeAlatTesAktif === 'IST') {
             $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
             $soalPerSubtes = [];
             foreach ($daftarSoalFlat as $item) {
-                $nomor = $item['soal']['nomor'];
-                $subtes = match(true) {
-                    $nomor <= 20  => 'SE',
-                    $nomor <= 40  => 'WA',
-                    $nomor <= 60  => 'AN',
-                    $nomor <= 76  => 'GE',
-                    $nomor <= 96  => 'RA',
-                    $nomor <= 116 => 'ZR',
-                    $nomor <= 136 => 'FA',
-                    $nomor <= 156 => 'WU',
-                    default        => 'ME',
-                };
-                $soalPerSubtes[$subtes][] = $item;
+                $soalPerSubtes[$this->getKodeSubtesIst($item['soal']['nomor'])][] = $item;
             }
             $daftarSoalFlat = [];
             foreach ($subtesUrutan as $subtes) {
@@ -324,7 +301,6 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Tangani query ?prev=1 (kembali ke soal sebelumnya)
         if ($request->query('prev') === '1' && $currentStep > 0) {
             $alatTesCheck = \App\Models\AlatTes::where('kode', $kodeAlatTesAktif)->first();
             $blockedPerSoal = $alatTesCheck?->batas_waktu_per_soal_aktif;
@@ -341,13 +317,11 @@ class PengerjaanTesController extends Controller
             Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
         }
 
-        // Tangani query ?next=1 (loncat ke soal berikutnya tanpa menyimpan)
         if ($request->query('next') === '1' && $currentStep + 1 < count($daftarSoalFlat)) {
             $currentStep = $currentStep + 1;
             Session::put($this->sessionKey($sesiId, 'current_step'), $currentStep);
         }
 
-        // Tangani query ?step=N (lompat ke nomor soal tertentu)
         if ($request->query('step') !== null) {
             $targetStep = (int) $request->query('step');
             if ($targetStep >= 0 && $targetStep < count($daftarSoalFlat)) {
@@ -368,7 +342,6 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Jika step melebihi total soal, berarti sudah selesai
         if ($currentStep >= count($daftarSoalFlat)) {
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
@@ -381,30 +354,16 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.kraepelin', $sesiId);
         }
 
-        // EPPS: panduan sekali di awal
         if ($kodeAlatTes === 'EPPS' && !Session::get($this->sessionKey($sesiId, 'epps_panduan_selesai'))) {
             return redirect()->route('peserta.tes.panduan-epps', $sesiId);
         }
 
-        // PAPI Kostick: panduan sekali di awal
         if ($kodeAlatTes === 'PAP' && !Session::get($this->sessionKey($sesiId, 'papi_panduan_selesai'))) {
             return redirect()->route('peserta.tes.panduan-papi', $sesiId);
         }
 
-        // IST: panduan per subtes + hafalan ME
         if ($kodeAlatTes === 'IST') {
-            $nomorSoal = $soal['nomor'] ?? 0;
-            $kodeSub = match(true) {
-                $nomorSoal <= 20  => 'SE',
-                $nomorSoal <= 40  => 'WA',
-                $nomorSoal <= 60  => 'AN',
-                $nomorSoal <= 76  => 'GE',
-                $nomorSoal <= 96  => 'RA',
-                $nomorSoal <= 116 => 'ZR',
-                $nomorSoal <= 136 => 'FA',
-                $nomorSoal <= 156 => 'WU',
-                default           => 'ME',
-            };
+            $kodeSub = $this->getKodeSubtesIst($soal['nomor'] ?? 0);
             if ($kodeSub === 'ME') {
                 if (!Session::get($this->sessionKey($sesiId, 'me_hafalan_selesai'))) {
                     return redirect()->route('peserta.tes.hafalan-me', $sesiId);
@@ -416,14 +375,12 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // IST per-subtes timer
         $kodeSubtesSaat = $kodeAlatTes;
         $alatTesSaat = \App\Models\AlatTes::where('kode', $kodeSubtesSaat)->first()
             ?? \App\Models\AlatTes::find($alatTesByKode->get($kodeSubtesSaat) ?? 0);
         $isIST = ($alatTesSaat?->kode === 'IST' || str_contains($alatTesSaat?->nama ?? '', 'IST'));
 
-        // Per-soal timer (berlaku untuk semua alat tes yang mengaktifkannya)
-        $detikPerSoal = ($alatTesSaat?->batas_waktu_per_soal_aktif && $alatTesSaat?->batas_waktu_per_soal_detik)
+        $detikPerSoal =($alatTesSaat?->batas_waktu_per_soal_aktif && $alatTesSaat?->batas_waktu_per_soal_detik)
             ? (int) $alatTesSaat->batas_waktu_per_soal_detik
             : null;
 
@@ -449,18 +406,7 @@ class PengerjaanTesController extends Controller
         $kodeSubtesTimer = null;
 
         if ($isIST) {
-            $nomorSoal = $soal['nomor'];
-            $kodeSubtesTimer = match(true) {
-                $nomorSoal <= 20  => 'SE',
-                $nomorSoal <= 40  => 'WA',
-                $nomorSoal <= 60  => 'AN',
-                $nomorSoal <= 76  => 'GE',
-                $nomorSoal <= 96  => 'RA',
-                $nomorSoal <= 116 => 'ZR',
-                $nomorSoal <= 136 => 'FA',
-                $nomorSoal <= 156 => 'WU',
-                default           => 'ME',
-            };
+            $kodeSubtesTimer = $this->getKodeSubtesIst($soal['nomor']);
 
             $dimensiSubtes = \App\Models\DimensiAlatTes::where('alat_tes_id', $alatTesSaat?->id)
                 ->where('kode_dimensi', $kodeSubtesTimer)
@@ -521,17 +467,7 @@ class PengerjaanTesController extends Controller
                 if ($kodeSubtesBerikutnya) {
                     foreach ($daftarSoalFlat as $stepIdx => $item) {
                         $nomorItem = $item['soal']['nomor'];
-                        $kodeItem = match(true) {
-                            $nomorItem <= 20  => 'SE',
-                            $nomorItem <= 40  => 'WA',
-                            $nomorItem <= 60  => 'AN',
-                            $nomorItem <= 76  => 'GE',
-                            $nomorItem <= 96  => 'RA',
-                            $nomorItem <= 116 => 'ZR',
-                            $nomorItem <= 136 => 'FA',
-                            $nomorItem <= 156 => 'WU',
-                            default           => 'ME',
-                        };
+                        $kodeItem = $this->getKodeSubtesIst($nomorItem);
                         if ($kodeItem === $kodeSubtesBerikutnya) {
                             Session::put($this->sessionKey($sesiId, 'current_step'), $stepIdx);
                             return redirect()->route('peserta.tes.kerjakan', $sesiId);
@@ -579,7 +515,6 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Hitung posisi soal dalam alat tes ini
         $soalNomorAlatIni   = $soal['nomor'];
         $alatTesIndex       = 0;
         foreach ($daftarAlatTes as $idx => $kode) {
@@ -589,7 +524,6 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Ambil semua alat tes yang punya soal (untuk hitung total alat tes dengan soal)
         $alatTesDenganSoal = [];
         foreach ($daftarAlatTes as $kode) {
             if (isset($soalDummy[$kode])) {
@@ -604,7 +538,6 @@ class PengerjaanTesController extends Controller
         $savedAnswer = $jawabanRecord?->opsi_dipilih_id;
         $savedAnswerTeks = $jawabanRecord?->jawaban_teks;
 
-        // Bangun daftar nomor soal untuk navigasi sidebar
         $soalIds = collect($daftarSoalFlat)->pluck('soal.id')->filter()->values();
         $sudahDijawabIds = JawabanPeserta::where('user_id', Auth::id())
             ->where('sesi_tes_id', $sesiId)
@@ -629,7 +562,6 @@ class PengerjaanTesController extends Controller
             ];
         })->all();
 
-        // Variable untuk view
         $sesiIdView           = $sesiId;
         $nama_sesi            = $sesi['nama_sesi'];
         $kode_alat_tes        = $kodeAlatTes;
@@ -780,13 +712,7 @@ class PengerjaanTesController extends Controller
         $userId        = Auth::id();
 
         $pesertaSesiTesId = $sesi['peserta_sesi_tes_id'];
-        $alatTesByKode = \App\Models\PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
-            ->with('alatTes:id,kode')
-            ->get()
-            ->pluck('alatTes')
-            ->filter()
-            ->keyBy('kode')
-            ->map(fn ($a) => $a->id);
+        $alatTesByKode = $this->getAlatTesByKode($pesertaSesiTesId);
 
         // Tandai alat tes aktif yang belum selesai dengan menyimpan jawaban kosong
         $aktif = Session::get($this->sessionKey($sesiId, 'kode_alat_tes_aktif'));
@@ -800,7 +726,6 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Reset step dan timer agar alat tes berikutnya dimulai fresh
         Session::put($this->sessionKey($sesiId, 'current_step'), 0);
         Session::forget($this->sessionKey($sesiId, 'kode_alat_tes_aktif'));
 
@@ -817,7 +742,6 @@ class PengerjaanTesController extends Controller
         $soalDummy     = $this->getSoalPeserta();
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
 
-        // Flatten hanya soal dari alat tes aktif (sama seperti kerjakan())
         $kodeAlatTesAktif = Session::get($this->sessionKey($sesiId, 'kode_alat_tes_aktif'));
         $daftarSoalFlat = [];
         if ($kodeAlatTesAktif && isset($soalDummy[$kodeAlatTesAktif])) {
@@ -829,24 +753,11 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Randomisasi urutan soal berdasarkan alat tes (sama seperti kerjakan())
         if ($kodeAlatTesAktif === 'IST') {
             $subtesUrutan = ['SE','WA','AN','GE','RA','ZR','FA','WU','ME'];
             $soalPerSubtes = [];
             foreach ($daftarSoalFlat as $item) {
-                $nomor = $item['soal']['nomor'];
-                $subtes = match(true) {
-                    $nomor <= 20  => 'SE',
-                    $nomor <= 40  => 'WA',
-                    $nomor <= 60  => 'AN',
-                    $nomor <= 76  => 'GE',
-                    $nomor <= 96  => 'RA',
-                    $nomor <= 116 => 'ZR',
-                    $nomor <= 136 => 'FA',
-                    $nomor <= 156 => 'WU',
-                    default        => 'ME',
-                };
-                $soalPerSubtes[$subtes][] = $item;
+                $soalPerSubtes[$this->getKodeSubtesIst($item['soal']['nomor'])][] = $item;
             }
             $daftarSoalFlat = [];
             foreach ($subtesUrutan as $subtes) {
@@ -880,7 +791,6 @@ class PengerjaanTesController extends Controller
 
         $currentStep = (int) Session::get($this->sessionKey($sesiId, 'current_step'), 0);
 
-        // Validasi: pastikan step masih dalam range
         if ($currentStep >= count($daftarSoalFlat)) {
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
@@ -917,7 +827,6 @@ class PengerjaanTesController extends Controller
             }
         }
 
-        // Pindah ke soal berikutnya (session hanya untuk navigasi)
         $nextStep = $currentStep + 1;
         if ($nextStep >= count($daftarSoalFlat)) {
             // Tandai alat tes ini selesai (penting untuk alat tes ber-timer-per-soal
@@ -927,7 +836,6 @@ class PengerjaanTesController extends Controller
             return redirect()->route('peserta.tes.kerjakan', $sesiId);
         }
 
-        // IST: blokir crossing ke subtes berikutnya jika masih ada soal yang belum dijawab
         if ($kodeAlatTesAktif === 'IST' && isset($daftarSoalFlat[$nextStep])) {
             $nomorCurrent  = $daftarSoalFlat[$currentStep]['soal']['nomor'] ?? 0;
             $nomorNext     = $daftarSoalFlat[$nextStep]['soal']['nomor'] ?? 0;
@@ -973,15 +881,8 @@ class PengerjaanTesController extends Controller
         $daftarAlatTes = $sesi['daftar_alat_tes_ditugaskan'];
         $userId        = Auth::id();
 
-        // Muat alat_tes_id untuk setiap kode alat tes yang ditugaskan
         $pesertaSesiTesId = $sesi['peserta_sesi_tes_id'];
-        $alatTesByKode = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesiTesId)
-            ->with('alatTes:id,kode')
-            ->get()
-            ->pluck('alatTes')
-            ->filter()
-            ->keyBy('kode')
-            ->map(fn ($a) => $a->id);
+        $alatTesByKode = $this->getAlatTesByKode($pesertaSesiTesId);
 
         $skorHasil = [];
 
@@ -1022,7 +923,7 @@ class PengerjaanTesController extends Controller
                     default     => 'USIA_51_60',
                 };
             } else {
-                $kelompokSegmen = 'default'; // akan diupdate saat norma lengkap
+                $kelompokSegmen = 'default';
             }
 
             $skorHasil[$kodeAlat] = $this->scoringService->dispatch(
@@ -1092,13 +993,11 @@ class PengerjaanTesController extends Controller
             $pesertaSesi->refresh();
         }
 
-        // Hitung sisa waktu dari durasi alat tes
         $alatTesModel = \App\Models\AlatTes::find($alatTesId);
         $durasiDetik  = ($alatTesModel?->durasi_total_menit ?? 60) * 60;
         $detikBerjalan = (int) $pesertaSesi?->waktu_mulai?->diffInSeconds(now());
         $sisaDetik = (int) max(0, $durasiDetik - $detikBerjalan);
 
-        // Kalau waktu habis, langsung selesai
         if ($sisaDetik <= 0) {
             return redirect()->route('peserta.tes.selesai', $sesiId);
         }
@@ -1123,7 +1022,6 @@ class PengerjaanTesController extends Controller
         $adaTimerPerKolom = $alatTesModel?->batas_waktu_per_soal_aktif ?? false;
         $detikPerKolom    = $alatTesModel?->batas_waktu_per_soal_detik ?? 60;
 
-        // Persistensi timer per-kolom
         $sisaDetikPerKolom = $detikPerKolom;
         if ($adaTimerPerKolom) {
             $pesertaAlatTes = PesertaAlatTes::where('peserta_sesi_tes_id', $pesertaSesi->id)
@@ -1133,7 +1031,6 @@ class PengerjaanTesController extends Controller
             $kolomAktifNomor = (int) $kolomAktif['nomor'];
 
             if (!$pesertaAlatTes) {
-                // Kasus 1: record tidak ada → create baru
                 $pesertaAlatTes = PesertaAlatTes::create([
                     'peserta_sesi_tes_id' => $pesertaSesi->id,
                     'alat_tes_id'         => $alatTesId,
@@ -1142,7 +1039,6 @@ class PengerjaanTesController extends Controller
                 ]);
                 $sisaDetikPerKolom = $detikPerKolom;
             } elseif (!$pesertaAlatTes->kolom_ke) {
-                // Kasus 2: kolom_ke null → inisialisasi
                 $pesertaAlatTes->update([
                     'waktu_mulai_kolom' => now(),
                     'kolom_ke'          => $kolomAktifNomor,
@@ -1155,7 +1051,6 @@ class PengerjaanTesController extends Controller
                 } else {
                     $sisaDetikPerKolom = (int) max(0, $detikPerKolom - $pesertaAlatTes->waktu_mulai_kolom->diffInSeconds(now()));
                     if ($sisaDetikPerKolom <= 0) {
-                        // Kasus 4: waktu habis → simpan jawaban kosong, redirect ke kolom berikutnya
                         $sudahAda = \App\Models\GridInputPeserta::where('user_id', Auth::id())
                             ->where('sesi_tes_id', $sesiId)
                             ->where('alat_tes_id', $alatTesId)
@@ -1187,7 +1082,6 @@ class PengerjaanTesController extends Controller
                     }
                 }
             } else {
-                // Kasus 5: kolom_ke != nomor aktif → reset ke kolom baru
                 $pesertaAlatTes->update([
                     'waktu_mulai_kolom' => now(),
                     'kolom_ke'          => $kolomAktifNomor,

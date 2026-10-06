@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $judulHalaman ?? 'Dashboard Admin' }} — Sistem Psikotes HR</title>
     <link rel="preload" href="/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2" crossorigin>
-    <style>html,body{background:#f7f9fb}</style>
+    <style>html,body{background:#fafafa}</style>
     <script>document.documentElement.style.setProperty('--sb-ml',localStorage.getItem('sidebarOpen')==='false'?'64px':'280px')</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -20,16 +20,16 @@
             --on-surface: #191c1e;
             --on-surface-variant: #40484b;
 
-            /* Dark sidebar tokens */
-            --sb-bg: #0d1629;
-            --sb-border: rgba(255,255,255,0.07);
-            --sb-text: #8fa8b8;
-            --sb-text-hover: #c5dde6;
-            --sb-text-active: #7fd8ea;
-            --sb-active-bg: rgba(95,207,223,0.22);
-            --sb-hover-bg: rgba(255,255,255,0.055);
-            --sb-label: #344d5c;
-            --sb-divider: rgba(255,255,255,0.06);
+            /* shadcn sidebar tokens */
+            --sb-bg: var(--sidebar);
+            --sb-border: var(--sidebar-border);
+            --sb-text: var(--muted-foreground);
+            --sb-text-hover: var(--sidebar-accent-foreground);
+            --sb-text-active: var(--sidebar-accent-foreground);
+            --sb-active-bg: oklch(0.94 0 0);
+            --sb-hover-bg: var(--sidebar-accent);
+            --sb-label: var(--muted-foreground);
+            --sb-divider: var(--sidebar-border);
         }
 
         /* Sidebar base */
@@ -38,15 +38,17 @@
         .sidebar-link {
             display: flex;
             align-items: center;
-            gap: 11px;
-            padding: 9px 12px;
-            margin: 1px 10px;
-            color: var(--sb-text);
+            gap: 10px;
+            height: 34px;
+            padding: 0 10px;
+            margin: 1px 8px;
+            color: var(--sidebar-foreground);
             font-size: 13.5px;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: background 0.12s ease, color 0.12s ease;
         }
+        .sidebar-link .material-symbols-outlined { color: var(--sb-text); }
         .sidebar-link:hover {
             background: var(--sb-hover-bg);
             color: var(--sb-text-hover);
@@ -54,24 +56,21 @@
         .sidebar-link.active {
             background: var(--sb-active-bg);
             color: var(--sb-text-active);
-            font-weight: 600;
-            box-shadow: inset 3px 0 0 var(--sb-text-active);
+            font-weight: 500;
         }
         .sidebar-link.active .material-symbols-outlined {
             color: var(--sb-text-active);
         }
         .section-label {
-            padding: 14px 22px 5px;
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 0.09em;
-            text-transform: uppercase;
+            padding: 14px 18px 6px;
+            font-size: 12px;
+            font-weight: 500;
             color: var(--sb-label);
         }
         .nav-divider {
             height: 1px;
             background: var(--sb-divider);
-            margin: 6px 22px;
+            margin: 6px 16px;
         }
 
         /* Sidebar text elements — fade on collapse */
@@ -99,44 +98,9 @@
         /* Collapsed sidebar */
         aside.collapsed .sidebar-link {
             justify-content: center;
-            padding: 9px 0;
-            margin: 1px 0;
-            border-radius: 0;
+            padding: 0;
+            margin: 2px 12px;
             gap: 0;
-        }
-        aside.collapsed .sidebar-link:hover {
-            background: var(--sb-hover-bg);
-            border-radius: 0;
-        }
-        /* Active item in collapsed: full-width "tab" pointing right */
-        aside.collapsed .sidebar-link.active {
-            background: var(--sb-active-bg);
-            border-radius: 10px 0 0 10px;
-            margin: 1px 0;
-            position: relative;
-            overflow: visible;
-        }
-        /* Curved notch above active — sb-bg colored square, bottom-left corner rounded */
-        aside.collapsed .sidebar-link.active::before {
-            content: '';
-            position: absolute;
-            top: -12px; right: 0;
-            width: 12px; height: 12px;
-            background: var(--sb-bg);
-            border-bottom-left-radius: 12px;
-            pointer-events: none;
-            z-index: 2;
-        }
-        /* Curved notch below active — sb-bg colored square, top-left corner rounded */
-        aside.collapsed .sidebar-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -12px; right: 0;
-            width: 12px; height: 12px;
-            background: var(--sb-bg);
-            border-top-left-radius: 12px;
-            pointer-events: none;
-            z-index: 2;
         }
         aside.collapsed .sidebar-link > span:not(.material-symbols-outlined) { opacity: 0; pointer-events: none; max-width: 0; }
         aside.collapsed .sidebar-link .ml-auto { display: none; }
@@ -149,7 +113,7 @@
         aside:not(.collapsed) .sb-header-collapsed { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen bg-[#f7f9fb] font-body antialiased">
+<body class="min-h-screen bg-[#fafafa] text-foreground font-body antialiased">
 
 
 <div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false' }" x-init="$watch('sidebarOpen', v => localStorage.setItem('sidebarOpen', v))">
@@ -165,7 +129,7 @@
             <div class="flex items-center gap-3 min-w-0">
                 <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-8 w-8 object-contain shrink-0">
                 <div class="whitespace-nowrap min-w-0">
-                    <p class="text-sm font-bold leading-none" style="color: #e2e8f0;">Psikotes HR</p>
+                    <p class="text-sm font-bold leading-none" style="color: var(--sidebar-foreground);">Psikotes HR</p>
                     <p class="text-[11px] mt-0.5" style="color: var(--sb-text);">Admin Panel</p>
                 </div>
             </div>
@@ -328,7 +292,7 @@
             @auth
             <div class="flex items-center gap-3">
                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-                     style="background: rgba(44,95,111,0.4); color: var(--sb-text-active);"
+                     style="background: oklch(0.92 0 0); color: var(--sidebar-foreground);"
                      id="avatar-sidebar-{{ auth()->id() }}">
                     @if(auth()->user()->foto_profil)
                         <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
@@ -341,7 +305,7 @@
                 </div>
                 <div class="user-card-actions min-w-0 flex-1 flex items-center gap-2">
                     <div class="min-w-0 flex-1 link-text">
-                        <p class="text-sm font-semibold truncate" style="color: #e2e8f0;">{{ auth()->user()->name }}</p>
+                        <p class="text-sm font-semibold truncate" style="color: var(--sidebar-foreground);">{{ auth()->user()->name }}</p>
                         <p class="text-[11px] truncate" style="color: var(--sb-text);">{{ auth()->user()->peran->nama_peran ?? '-' }}</p>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
@@ -365,23 +329,23 @@
          :style="{ marginLeft: sidebarOpen ? '280px' : '64px' }">
 
         {{-- HEADER --}}
-        <header class="flex h-16 items-center justify-between bg-white px-6 shrink-0 sticky top-0 z-40" style="border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 12px rgba(0,0,0,0.10);">
+        <header class="flex h-16 items-center justify-between bg-background/95 backdrop-blur px-6 shrink-0 sticky top-0 z-40 border-b border-border">
 
             <div class="flex items-center gap-3">
                 {{-- Breadcrumb --}}
-                <nav class="flex items-center gap-1.5 text-[13px] text-[#40484b]">
-                    <a href="{{ route('admin.dashboard') }}" class="hover:text-[#2C5F6F] transition-colors">Home</a>
+                <nav class="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <a href="{{ route('admin.dashboard') }}" class="hover:text-foreground transition-colors">Home</a>
                     <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-                    <span class="font-semibold text-[#2C5F6F]">{{ $judulHalaman ?? 'Dashboard' }}</span>
+                    <span class="font-medium text-foreground">{{ $judulHalaman ?? 'Dashboard' }}</span>
                 </nav>
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 border-r border-[#e0e3e5] pr-4">
-                    <button class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1.5 rounded-md hover:bg-[#f2f4f6]" title="Notifikasi">
+                <div class="flex items-center gap-2 border-r border-border pr-4">
+                    <button class="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-md hover:bg-accent" title="Notifikasi">
                         <span class="material-symbols-outlined text-[20px]">notifications</span>
                     </button>
-                    <button class="text-[#40484b] hover:text-[#2C5F6F] transition-colors p-1.5 rounded-md hover:bg-[#f2f4f6]" title="Bantuan">
+                    <button class="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-md hover:bg-accent" title="Bantuan">
                         <span class="material-symbols-outlined text-[20px]">help_outline</span>
                     </button>
                 </div>
@@ -389,8 +353,8 @@
                 @auth
                 <div class="relative" x-data="{ open: false }" @click.away="open = false">
                     <button @click="open = ! open"
-                            class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-[#f2f4f6]">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}" id="avatar-header-{{ auth()->id() }}">
+                            class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-accent">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-muted text-foreground' }}" id="avatar-header-{{ auth()->id() }}">
                             @if(auth()->user()->foto_profil)
                                 <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                                      class="h-8 w-8 rounded-full object-cover" alt="Foto Profil"
@@ -400,8 +364,8 @@
                                 <span class="text-xs font-semibold">{{ mb_substr(explode(' ', auth()->user()->name)[0], 0, 1) }}</span>
                             @endif
                         </div>
-                        <span class="text-[#191c1e] hidden sm:inline">{{ auth()->user()->name }}</span>
-                        <span class="material-symbols-outlined text-[16px] text-[#40484b]">expand_more</span>
+                        <span class="text-foreground hidden sm:inline">{{ auth()->user()->name }}</span>
+                        <span class="material-symbols-outlined text-[16px] text-muted-foreground">expand_more</span>
                     </button>
 
                     <div x-show="open"
@@ -411,11 +375,11 @@
                          x-transition:leave="transition ease-in duration-75"
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute right-0 top-full z-50 mt-1 w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-[#e0e3e5] focus:outline-none">
+                         class="absolute right-0 top-full z-50 mt-1 w-64 origin-top-right rounded-md bg-white shadow-lg border border-border focus:outline-none">
 
                         <div class="p-4">
                             <div class="flex items-center gap-3 mb-3">
-                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-[#2C5F6F]/10 text-[#2C5F6F]' }}" id="avatar-dropdown-{{ auth()->id() }}">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full {{ auth()->user()->foto_profil ? '' : 'bg-muted text-foreground' }}" id="avatar-dropdown-{{ auth()->id() }}">
                                     @if(auth()->user()->foto_profil)
                                         <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                                              class="h-11 w-11 rounded-full object-cover" alt="Foto Profil"
@@ -426,15 +390,15 @@
                                     @endif
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-sm font-semibold text-[#191c1e] truncate">{{ auth()->user()->name }}</p>
-                                    <p class="text-xs text-[#40484b] truncate">{{ auth()->user()->email }}</p>
+                                    <p class="text-sm font-semibold text-foreground truncate">{{ auth()->user()->name }}</p>
+                                    <p class="text-xs text-muted-foreground truncate">{{ auth()->user()->email }}</p>
                                 </div>
                             </div>
 
-                            <hr class="border-[#e0e3e5] mb-3">
+                            <hr class="border-border mb-3">
 
                             <a href="{{ route('profil.index') }}"
-                               class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-[#191c1e] hover:bg-[#f2f4f6] transition">
+                               class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground hover:bg-accent transition">
                                 <span class="material-symbols-outlined text-[18px]">person</span>
                                 Edit Profil
                             </a>
@@ -476,7 +440,7 @@
         Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('sukses')), timer: 2500, timerProgressBar: true, showConfirmButton: false });
         @endif
         @if(session('error'))
-        Swal.fire({ icon: 'error', title: 'Perhatian', text: @json(session('error')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        Swal.fire({ icon: 'error', title: 'Perhatian', text: @json(session('error')), showConfirmButton: true, confirmButtonColor: '#171717' });
         @endif
 
         // Global interceptor: ganti semua onsubmit="return confirm(...)" dengan SweetAlert2
@@ -494,7 +458,7 @@
                         title: 'Konfirmasi',
                         text: pesan,
                         showCancelButton: true,
-                        confirmButtonColor: '#2C5F6F',
+                        confirmButtonColor: '#171717',
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'Ya, Lanjutkan',
                         cancelButtonText: 'Batal',
@@ -514,13 +478,13 @@
                   . '</div>'
                 : '';
         @endphp
-        Swal.fire({ icon: 'warning', title: 'Perhatian', html: @json(session('info') . $nikHtml), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        Swal.fire({ icon: 'warning', title: 'Perhatian', html: @json(session('info') . $nikHtml), showConfirmButton: true, confirmButtonColor: '#171717' });
         @endif
         @if(session('warning'))
-        Swal.fire({ icon: 'warning', title: 'Perhatian', text: @json(session('warning')), showConfirmButton: true, confirmButtonColor: '#2C5F6F' });
+        Swal.fire({ icon: 'warning', title: 'Perhatian', text: @json(session('warning')), showConfirmButton: true, confirmButtonColor: '#171717' });
         @endif
         @if($errors->any())
-        Swal.fire({ icon: 'error', title: 'Terdapat Kesalahan', html: '<ul style="text-align:left;list-style:disc;padding-left:1.2rem">' + @json($errors->all()).map(e => `<li>${e}</li>`).join('') + '</ul>', confirmButtonColor: '#2C5F6F' });
+        Swal.fire({ icon: 'error', title: 'Terdapat Kesalahan', html: '<ul style="text-align:left;list-style:disc;padding-left:1.2rem">' + @json($errors->all()).map(e => `<li>${e}</li>`).join('') + '</ul>', confirmButtonColor: '#171717' });
         @endif
     </script>
     @stack('scripts')

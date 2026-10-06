@@ -4,6 +4,38 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #9 — Komponen UI shadcn: tombol Edit mati & override class tidak berlaku
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-06 |
+| File | `resources/views/admin/alat-tes/index.blade.php`, `resources/views/components/ui/*` (branch `ui-shadcn`) |
+| Masalah | (1) Klik Edit di tabel Alat Tes tidak membuka dialog. (2) `class="w-36"` / `whitespace-normal` yang dikirim ke `<x-ui.input>` / `<x-ui.td>` tidak berpengaruh → input tetap lebar penuh, tabel scroll horizontal (scrollWidth 1367 > 1110) |
+| Akar | (1) `@js(...)` di dalam atribut komponen Blade (`<x-ui.button @click="...@js(..)">`) **tidak dikompilasi** — terkirim mentah ke browser → JS error. (2) `$attributes->class()` hanya menggabung class; `w-full` bawaan vs `w-36` → yang menang ditentukan urutan CSS, bukan urutan atribut |
+| Fix | (1) Di atribut komponen pakai `{{ Js::from($x) }}`; `@js` hanya boleh di elemen HTML biasa. (2) Override class bawaan komponen pakai suffix important Tailwind v4: `w-36!`, `whitespace-normal!` |
+| Verifikasi | Dialog Edit terbuka & terisi (kode IST, format Mixed, durasi 90, action `/admin/alat-tes/5`); tabel muat tanpa scroll di 1280px; Escape menutup dialog |
+| Pelajaran | Saat migrasi halaman ke `<x-ui.*>`: grep `@js` di dalam tag `<x-` dan pakai `!` untuk menimpa class bawaan komponen |
+| Log Keyword | `@js`, `x-ui`, Js::from, class override, `!` |
+| Deploy | `npm run build && php artisan view:clear` |
+
+---
+
+### Fix #8 — Rollback migrasi admin Filament → kembali ke Tailwind
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-06 |
+| File | Semua perubahan sejak commit `f96adf8` (app/Filament, composer.json/lock, routes/web.php, User.php, views filament, dll.) |
+| Masalah | Migrasi panel admin ke Filament v3 memunculkan banyak regresi (Kelola Dimensi level kosong, Alpine tidak jalan, redirect ke `/livewire/update` 405, layout grid tidak ter-compile, login admin nonaktif lolos) dan UI tidak sesuai sistem lama |
+| Akar | Fitur admin lama (Alpine + Blade custom) tidak bisa dipetakan 1:1 ke komponen Filament; tiap halaman custom perlu ditulis ulang |
+| Fix | `git stash push -u` (stash: "backup: migrasi Filament") → working tree kembali ke `f96adf8`; `composer install` (vendor/filament terhapus); `.env` APP_LOCALE=en; `optimize:clear` |
+| Verifikasi | `vendor/filament` tidak ada; 80 route `admin.*` kembali; `/login` 200, `/admin/login` 200 ("Login Admin"), halaman admin tanpa sesi → 302 ke `/login` |
+| Pelajaran | Migrasi UI besar dikerjakan di branch terpisah dan di-commit bertahap, bukan langsung di `main` tanpa commit |
+| Log Keyword | Filament, rollback, stash |
+| Deploy | `composer install && php artisan optimize:clear`. Pulihkan Filament: `git stash apply stash@{0}` lalu `composer install` |
+
+---
+
 ### Fix #7 — Randomisasi opsi jawaban A-E dihapus, hanya urutan soal yang diacak
 
 | Field | Detail |

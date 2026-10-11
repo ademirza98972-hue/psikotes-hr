@@ -73,21 +73,6 @@ class User extends Authenticatable
         return $this->hasMany(JawabanPeserta::class, 'user_id');
     }
 
-    public function gridInputPeserta(): HasMany
-    {
-        return $this->hasMany(GridInputPeserta::class, 'user_id');
-    }
-
-    public function hasilKolomGrid(): HasMany
-    {
-        return $this->hasMany(HasilKolomGrid::class, 'user_id');
-    }
-
-    public function hasilSkorPeserta(): HasMany
-    {
-        return $this->hasMany(HasilSkorPeserta::class, 'user_id');
-    }
-
     public function pesertaSesiTes(): HasMany
     {
         return $this->hasMany(PesertaSesiTes::class, 'user_id');

@@ -27,7 +27,7 @@ class HasilTesController extends Controller
             'departemen',
             'alatTes',
             'pesertaSesiTesRecords' => fn ($q) => $q
-                ->with(['user.dataKaryawan.departemen', 'user.dataKaryawan.posisi', 'user.profilKandidat.posisi', 'alatTes'])
+                ->with(['user.dataKaryawan.departemen', 'user.dataKaryawan.posisi', 'user.profilKandidat.posisi.departemen', 'alatTes'])
                 ->withCount(['logAktivitas as log_mencurigakan_count' => fn ($q) => $q->where('mencurigakan', true)]),
         ])
             ->orderByDesc('tanggal_mulai')
@@ -58,7 +58,7 @@ class HasilTesController extends Controller
                 }
 
                 $dk = $user->dataKaryawan;
-                $departemen = $dk?->departemen?->nama_departemen ?? $user->profilKandidat?->departemen ?? '—';
+                $departemen = $dk?->departemen?->nama_departemen ?? $user->profilKandidat?->posisi?->departemen?->nama_departemen ?? '—';
                 $posisi     = $dk?->posisi?->nama_posisi ?? $user->profilKandidat?->posisi?->nama_posisi ?? '—';
 
                 $alatTesKode = $peserta->alatTes?->pluck('kode')->join(', ') ?: '—';

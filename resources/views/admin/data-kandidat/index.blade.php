@@ -138,7 +138,7 @@ x-init="
                     @forelse ($kandidat as $item)
                         @php
                             $profil = $item->profilKandidat;
-                            $profilDeptId = $profil ? ($departemenMap[$profil->departemen] ?? 0) : 0;
+                            $profilDeptId = $profil?->posisi?->departemen_id ?? 0;
                             $profilPosisiId = $profil ? ($profil->posisi_id ?? 0) : 0;
                             $namaTampil = $item->name;
                             $status = $item->status;

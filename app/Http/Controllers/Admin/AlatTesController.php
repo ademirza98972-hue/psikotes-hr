@@ -116,17 +116,6 @@ class AlatTesController extends Controller
             ->with($this::FLASH_SUCCESS, "Alat tes '{$nama}' berhasil dihapus.");
     }
 
-    public function restore(int $id): RedirectResponse
-    {
-        $alatTes = AlatTes::withTrashed()->findOrFail($id);
-        $nama = $alatTes->nama;
-        $alatTes->restore();
-
-        return redirect()
-            ->route('admin.alat-tes.index')
-            ->with($this::FLASH_SUCCESS, "Alat tes '{$nama}' berhasil dipulihkan.");
-    }
-
     public function norma(Request $request, int $id): View
     {
         $alatTes = AlatTes::findOrFail($id);

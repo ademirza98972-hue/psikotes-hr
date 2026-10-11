@@ -18,25 +18,6 @@ class PengerjaanTesController extends Controller
 {
     public function __construct(private ScoringEngineService $scoringService) {}
 
-    private function getSesiPeserta(): array
-    {
-        $userId = Auth::id();
-        if (!$userId) return [];
-
-        $pesertaSesiList = PesertaSesiTes::where('user_id', $userId)
-            ->with(['sesiTes', 'alatTes'])
-            ->get();
-
-        return $pesertaSesiList->map(function (PesertaSesiTes $ps) {
-            return [
-                'id'                         => $ps->sesi_tes_id,
-                'nama_sesi'                  => $ps->sesiTes?->nama_sesi ?? '—',
-                'peserta_sesi_tes_id'        => $ps->id,
-                'daftar_alat_tes_ditugaskan' => $ps->alatTes->pluck('kode')->all(),
-            ];
-        })->all();
-    }
-
     private function getSesiById(int $sesiId): ?array
     {
         $userId = Auth::id();

@@ -18,11 +18,6 @@ class DimensiTurunanKomponen extends Model
         'bobot',
     ];
 
-    public function dimensiTurunan(): BelongsTo
-    {
-        return $this->belongsTo(DimensiAlatTes::class, 'dimensi_turunan_id', 'id');
-    }
-
     public function dimensiKomponen(): BelongsTo
     {
         return $this->belongsTo(DimensiAlatTes::class, 'dimensi_komponen_id', 'id');

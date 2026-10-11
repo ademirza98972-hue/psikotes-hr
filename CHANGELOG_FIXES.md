@@ -4,6 +4,70 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #13 — Audit kebersihan: seeder rusak, kolom redundan kandidat, kode & relasi mati
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-12 |
+| File | `database/seeders/DummyDataSeeder.php`, `app/Models/DataKaryawan.php`, `app/Models/ProfilKandidat.php`, `DataKandidatController.php`, `HasilTesController.php`, `admin/data-kandidat/index.blade.php`, 8 model (relasi mati), `AlatTesController.php`, `DashboardController.php`, `PengerjaanTesController.php`, migration `2026_10_12_000001_bersihkan_kolom_dan_tabel_tidak_terpakai.php`, `tests/Feature/SmokeHalamanTest.php`, `tests/Feature/SeederCekTest.php` |
+| Masalah | (1) `php artisan db:seed` gagal: `Unknown column 'nama_karyawan' in 'field list'`. (2) `profil_kandidat.departemen` (string nama) NULL untuk 9 dari 17 kandidat (semua yang daftar sendiri) → modal Ubah kandidat tidak memilih departemen; basi bila departemen di-rename. (3) Banyak kode tak terpakai |
+| Akar | (1) Fix #1 memindahkan nama/departemen/jabatan ke `users`/FK, tapi `DummyDataSeeder` tetap menulis kolom lama; commit e9a6c32 malah menambah kolom hantu itu ke `$fillable` sehingga error pindah ke SQL. (2) Departemen disimpan dua kali (string + `posisi.departemen_id`), hanya alur admin yang mengisi string. (3) Sisa refactor |
+| Fix | (1) Seeder buat karyawan seperti alur HR (`users` + `data_karyawan.user_id`, login via `id_karyawan`); `$fillable` dibersihkan. (2) Departemen kandidat diturunkan dari `profilKandidat.posisi.departemen`; kolom di-drop via migration. (3) Hapus method mati `AlatTesController::restore` (tanpa route; restore lewat Data Terhapus), `DashboardController::mulaiTes`, `PengerjaanTesController::getSesiPeserta`, 21 relasi Eloquent tak dipakai; drop tabel kosong `interpretasi_teks`, `standar_kompetensi_posisi` |
+| Verifikasi | `php artisan test`: 12/12 lulus (baseline 10/10). `SeederCekTest` tanpa fix seeder 1/2, dengan fix 2/2 (dalam transaksi, DB asli tidak berubah — dicek 0 baris sisa). Smoke semua route GET `admin/*` tanpa 5xx; `php artisan view:cache` sukses. Relasi semua model divalidasi terhadap skema DB (kolom FK/pivot ada) |
+| Pelajaran | Setelah ubah skema, jalankan `migrate:fresh --seed` — seeder ikut rusak diam-diam. Jangan tambah kolom ke `$fillable` untuk membungkam error. Cek pemakaian relasi lewat nama relasi (`with('x.y')`), bukan hanya nama kelas: `bidang_laporan` tampak tak terpakai padahal dipakai psikogram |
+| Log Keyword | seeder, nama_karyawan, fillable, profil_kandidat.departemen, redundan, relasi mati, dead code |
+| Deploy | `php artisan migrate` (drop kolom `profil_kandidat.departemen` + 2 tabel kosong) |
+
+---
+
+### Fix #12 — Login super admin membuka halaman peserta: precedence OR di query login peserta
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-11 |
+| File | `app/Http/Controllers/AutentikasiController.php`, `tests/Feature/LoginPortalTest.php` (baru) |
+| Masalah | Super admin login lewat `/login` (portal peserta) berhasil masuk dan diarahkan ke `/peserta/dashboard` |
+| Akar | (1) `loginPeserta`: `where(email)->orWhere(id_karyawan)->whereIn(tipe_akun)` jadi SQL `email = ? OR (id_karyawan = ? AND tipe_akun IN …)` → filter tipe akun tidak berlaku untuk pencocokan email, akun `custom` (admin) lolos. (2) `loginAdmin`: `redirect()->intended()` memakai `url.intended` sisa akses `/peserta/...` sebelum login → admin dibuang ke halaman peserta |
+| Fix | (1) Bungkus email/id_karyawan dalam closure `where(fn ($q) => …)`. (2) Buang `url.intended` sebelum redirect admin bila path bukan `/admin` |
+| Verifikasi | `php artisan test --filter=LoginPortalTest`: tanpa fix 0/2 lulus (tidak ada error session; redirect `/peserta/dashboard`), dengan fix 2/2 lulus. Tes pakai `DatabaseTransactions` (password super admin di-rollback) |
+| Pelajaran | Kombinasi `orWhere` + filter lain WAJIB dibungkus closure. `intended()` lintas portal harus difilter per prefix |
+| Log Keyword | login, super admin, peserta, orWhere, precedence, intended, tipe_akun |
+| Deploy | Tidak perlu build; cukup deploy file PHP |
+
+---
+
+### Fix #11 — Dashboard/notifikasi shadcn: konten keluar kartu & tombol Batal nyangkut
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-07 |
+| File | `resources/views/admin/dashboard.blade.php`, `resources/views/components/ui/notifikasi.blade.php` (branch `ui-shadcn`) |
+| Masalah | (1) Baris "Peringatan Integritas" melebar keluar kartu di desktop; di layar 390px seluruh halaman scroll horizontal (scrollWidth 551 > 390). (2) Dialog pemberitahuan (tanpa batal) yang dibuka tepat setelah dialog konfirmasi masih menampilkan tombol "Batal" |
+| Akar | (1) Container `grid` tanpa `grid-cols-*` → track `auto` ikut lebar konten `truncate`/tabel `whitespace-nowrap`. (2) `x-show` pada tombol tidak sempat diterapkan saat dialog ditutup & dibuka di tick yang sama |
+| Fix | (1) List → `flex flex-col`; grid responsif → `grid grid-cols-1 … xl:grid-cols-3` (minmax(0,1fr)). (2) Ganti `x-show` → `:hidden` (preflight Tailwind v4 `[hidden]{display:none!important}`) |
+| Verifikasi | 0 elemen melewati batas kartu di 1440px; main 390/390 di mobile, tabel scroll di dalam kartu; urutan konfirmasi→info→konfirmasi: tombol `[Batal, Ya, Hapus]` → `[Mengerti]` → `[Batal, Ya]`; 18 halaman admin GET + 6 halaman detail render 200 di layout baru |
+| Pelajaran | Setiap `grid` yang anaknya berisi teks panjang/tabel wajib `grid-cols-1` (atau flex-col). Untuk tampil/sembunyi yang dibuka-tutup cepat, pakai `:hidden` |
+| Log Keyword | overflow, grid-cols-1, truncate, x-show, Batal, konfirmasi |
+| Deploy | `npm run build && php artisan view:clear` |
+
+---
+
+### Fix #10 — Label grafik dashboard berbahasa Inggris
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-06 |
+| File | `app/Http/Controllers/DashboardController.php` |
+| Masalah | Sumbu grafik "Pendaftaran 7 Hari" tampil "Wed, 30 Sep … Tue, 06 Oct", padahal tanggal header sudah "Selasa, 6 Oktober 2026" |
+| Akar | `Carbon::setLocale('id')` dipanggil setelah loop label (`translatedFormat('D, d M')`); `APP_LOCALE=en` jadi label memakai locale default |
+| Fix | Pindahkan `Carbon::setLocale('id')` ke sebelum loop label |
+| Verifikasi | Render /admin/dashboard: labels `["Rab, 30 Sep",…,"Sel, 06 Okt"]`, header tetap "Selamat malam, Super Admin" + tanggal Indonesia |
+| Pelajaran | `setLocale` di tengah method hanya berlaku untuk baris sesudahnya — taruh di awal |
+| Log Keyword | `translatedFormat`, `setLocale`, label grafik |
+| Deploy | — |
+
+---
+
 ### Fix #9 — Komponen UI shadcn: tombol Edit mati & override class tidak berlaku
 
 | Field | Detail |

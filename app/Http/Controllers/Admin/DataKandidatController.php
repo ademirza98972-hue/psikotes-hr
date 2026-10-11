@@ -62,7 +62,6 @@ class DataKandidatController extends Controller
 
         $semuaPosisi = Posisi::orderBy('nama_posisi')->get();
         $daftarDepartemen = Departemen::orderBy('nama_departemen')->get();
-        $departemenMap = Departemen::pluck('id', 'nama_departemen');
 
         return view('admin.data-kandidat.index', [
             'kandidat' => $kandidat,
@@ -71,7 +70,6 @@ class DataKandidatController extends Controller
             'filterStatus' => $filterStatus,
             'filterPosisi' => $filterPosisiId,
             'daftarDepartemen' => $daftarDepartemen,
-            'departemenMap' => $departemenMap,
         ]);
     }
 
@@ -104,13 +102,11 @@ class DataKandidatController extends Controller
                 'status' => 'aktif',
             ]);
 
-            $departemen = Departemen::findOrFail($data['departemen']);
 
             ProfilKandidat::create([
                 'user_id' => $user->id,
                 'no_hp' => $data['no_hp'],
                 'jenis_kelamin' => $data['jenis_kelamin'],
-                'departemen' => $departemen->nama_departemen,
                 'posisi_id' => $data['posisi_dilamar'],
                 'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                 'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
@@ -131,7 +127,7 @@ class DataKandidatController extends Controller
 
         $departemen = Departemen::orderBy('nama_departemen')->get();
 
-        $currentDepartemenId = Departemen::where('nama_departemen', optional($kandidat->profilKandidat)->departemen)->value('id');
+        $currentDepartemenId = $kandidat->profilKandidat?->posisi?->departemen_id;
 
         return view('admin.data-kandidat.ubah', [
             'kandidat' => $kandidat,
@@ -161,14 +157,12 @@ class DataKandidatController extends Controller
 
             $kandidat->update($payload);
 
-            $departemen = Departemen::findOrFail($data['departemen']);
 
             $profil = $kandidat->profilKandidat;
             if ($profil) {
                 $profil->update([
                     'no_hp' => $data['no_hp'],
                     'jenis_kelamin' => $data['jenis_kelamin'],
-                    'departemen' => $departemen->nama_departemen,
                     'posisi_id' => $data['posisi_dilamar'],
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                     'tanggal_lahir' => $data['tanggal_lahir'] ?? null,

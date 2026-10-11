@@ -11,7 +11,7 @@
     ];
 @endphp
 
-<div class="mx-auto max-w-7xl space-y-6 p-2"
+<div class="mx-auto max-w-7xl space-y-6"
      x-data="{
          modalTambah: false,
          batasAktif: {{ old('batas_waktu_per_soal_aktif') ? 'true' : 'false' }},

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LevelDimensi extends Model
 {
@@ -30,20 +29,5 @@ class LevelDimensi extends Model
     public function dimensi(): BelongsTo
     {
         return $this->belongsTo(DimensiAlatTes::class, 'dimensi_id', 'id');
-    }
-
-    public function interpretasiTeks(): HasMany
-    {
-        return $this->hasMany(InterpretasiTeks::class, 'level_id');
-    }
-
-    public function hasilSkorPeserta(): HasMany
-    {
-        return $this->hasMany(HasilSkorPeserta::class, 'level_id');
-    }
-
-    public function standarKompetensiPosisi(): HasMany
-    {
-        return $this->hasMany(StandarKompetensiPosisi::class, 'level_id_diharapkan');
     }
 }

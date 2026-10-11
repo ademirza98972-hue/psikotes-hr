@@ -44,7 +44,7 @@ x-init="
             </div>
             @if(auth()->user()->hasIzin('pengguna.tambah'))
                 <button type="button" @click="modalTambah = true"
-                   class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors active:scale-[0.98]">
+                   class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-colors active:scale-[0.98]">
                     <span class="material-symbols-outlined text-[18px]">person_add</span>
                     Tambah Karyawan
                 </button>
@@ -59,11 +59,11 @@ x-init="
                     </span>
                     <input type="text" name="cari" value="{{ $kataKunci }}"
                         placeholder="Cari nama atau NIK..."
-                        class="w-full rounded-lg border border-[#c0c8cb] py-2 pl-9 pr-4 text-sm text-[#191c1e] placeholder-[#71787c] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all">
+                        class="w-full rounded-lg border border-[#c0c8cb] py-2 pl-9 pr-4 text-sm text-[#191c1e] placeholder-[#71787c] outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all">
                 </div>
                 <div class="relative min-w-[180px]">
                     <select name="departemen" onchange="this.form.submit()"
-                        class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
+                        class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer bg-white">
                         <option value="">Semua Departemen</option>
                         @foreach ($semuaDepartemen as $item)
                             <option value="{{ $item->id }}" @if($filterDepartemen == $item->id) selected @endif>{{ $item->nama_departemen }}</option>
@@ -75,7 +75,7 @@ x-init="
                 </div>
                 <div class="relative min-w-[180px]">
                     <select name="posisi" onchange="this.form.submit()"
-                        class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
+                        class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer bg-white">
                         <option value="">Semua Posisi</option>
                         @foreach ($semuaPosisi as $item)
                             <option value="{{ $item->id }}" @if($filterPosisi == $item->id) selected @endif>{{ $item->nama_posisi }}</option>
@@ -100,15 +100,15 @@ x-init="
             <table class="w-full text-left border-collapse">
                 <caption class="sr-only">Daftar Akun Karyawan</caption>
                 <thead style="position: sticky; top: 0; z-index: 5;">
-                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">ID Karyawan</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">NIK</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Nama Karyawan</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Departemen</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Posisi</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;">Status Akun</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color:#7db8c2;">Aksi</th>
+                    <tr style="background: var(--muted); border-bottom: 1px solid var(--border);">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:var(--muted-foreground);width:52px">No.</th>
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider" style="color:var(--muted-foreground);">ID Karyawan</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:var(--muted-foreground);">NIK</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:var(--muted-foreground);">Nama Karyawan</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:var(--muted-foreground);">Departemen</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:var(--muted-foreground);">Posisi</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center" style="color:var(--muted-foreground);">Status Akun</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color:var(--muted-foreground);">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#e0e3e5]">
@@ -132,7 +132,7 @@ x-init="
                                 default    => 'bg-amber-500',
                             };
                             $avatarBg = match(hexdec(substr(md5($u?->name ?? ''), 0, 6)) % 4) {
-                                0 => 'bg-[#2C5F6F]/10 text-[#2C5F6F]',
+                                0 => 'bg-primary/10 text-primary',
                                 1 => 'bg-blue-100 text-blue-700',
                                 2 => 'bg-violet-100 text-violet-700',
                                 default => 'bg-amber-100 text-amber-700',
@@ -140,7 +140,7 @@ x-init="
                         @endphp
                         <tr class="hover:bg-[#f7f9fb] transition-colors group">
                             <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
-                            <td class="px-4 py-4 text-sm font-mono font-semibold text-[#2C5F6F]">
+                            <td class="px-4 py-4 text-sm font-mono font-semibold text-primary">
                                 {{ $u?->id_karyawan ?? '—' }}
                             </td>
                             <td class="px-6 py-4 text-sm font-mono text-[#40484b]">
@@ -193,7 +193,7 @@ x-init="
                                         <form method="POST" action="{{ route('admin.akun-karyawan.toggle-status', $dk->id) }}" class="inline">
                                             @csrf @method('PATCH')
                                             <button type="submit"
-                                                    class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
+                                                    class="p-2 rounded-lg text-[#40484b] hover:text-primary hover:bg-primary/10 transition-colors"
                                                     title="{{ $u?->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}">
                                                 <span class="material-symbols-outlined text-[18px]">{{ $u?->status === 'aktif' ? 'block' : 'check_circle' }}</span>
                                             </button>
@@ -230,7 +230,7 @@ x-init="
                                     <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">group</span>
                                     <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Data Karyawan</p>
                                     @if(auth()->user()->hasIzin('pengguna.tambah'))
-                                        <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95 mt-3">
+                                        <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95 mt-3">
                                             <span class="material-symbols-outlined text-[16px]">add</span>
                                             Tambah Karyawan
                                         </button>
@@ -275,7 +275,7 @@ x-init="
                     @csrf
                     <input type="hidden" name="_form" value="tambah">
                     <div class="px-4 py-3 space-y-2 max-h-[75vh] overflow-y-auto">
-                        @php $inp = 'w-full rounded-md border border-[#c0c8cb] px-2.5 py-1.5 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20'; @endphp
+                        @php $inp = 'w-full rounded-md border border-[#c0c8cb] px-2.5 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20'; @endphp
                         @php $lbl = 'block text-[11px] font-medium text-[#40484b] mb-0.5'; @endphp
                         <div class="grid grid-cols-2 gap-2">
                             <div>
@@ -356,7 +356,7 @@ x-init="
                         <button type="button" @click="modalTambah = false"
                                 class="rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
                         <button type="submit"
-                                class="rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">Simpan</button>
+                                class="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-primary/90 transition-colors">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -381,7 +381,7 @@ x-init="
                     <input type="hidden" name="_form" value="ubah">
                     <input type="hidden" name="id" :value="ubah.id">
                     <div class="px-4 py-3 space-y-2 max-h-[75vh] overflow-y-auto">
-                        @php $inp = 'w-full rounded-md border border-[#c0c8cb] px-2.5 py-1.5 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20'; @endphp
+                        @php $inp = 'w-full rounded-md border border-[#c0c8cb] px-2.5 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20'; @endphp
                         @php $lbl = 'block text-[11px] font-medium text-[#40484b] mb-0.5'; @endphp
                         <div class="grid grid-cols-2 gap-2">
                             <div>
@@ -452,7 +452,7 @@ x-init="
                         <button type="button" @click="modalUbah = false"
                                 class="rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
                         <button type="submit"
-                                class="rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">Simpan</button>
+                                class="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-primary/90 transition-colors">Simpan</button>
                     </div>
                 </form>
             </div>

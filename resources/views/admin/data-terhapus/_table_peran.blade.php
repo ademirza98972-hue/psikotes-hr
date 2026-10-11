@@ -6,14 +6,14 @@
         <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left border-collapse">
                 <thead style="position: sticky; top: 0; z-index: 5;">
-                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Nama Peran</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Deskripsi</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center" style="color: #7db8c2;">Jumlah Pengguna</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Dihapus Pada</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Dihapus Oleh</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color: #7db8c2;">Aksi</th>
+                    <tr style="background: var(--muted); border-bottom: 1px solid var(--border);">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:var(--muted-foreground);width:52px">No.</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--muted-foreground);">Nama Peran</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--muted-foreground);">Deskripsi</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center" style="color: var(--muted-foreground);">Jumlah Pengguna</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--muted-foreground);">Dihapus Pada</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--muted-foreground);">Dihapus Oleh</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color: var(--muted-foreground);">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-outline-variant/30">

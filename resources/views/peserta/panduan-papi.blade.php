@@ -32,7 +32,7 @@ $ruleWaktu = ($adaTimerTotal || $adaTimerPerSoal)
             <span class="material-symbols-outlined text-[14px]">work</span>
             <span class="text-[11px] font-bold uppercase tracking-wider">PAPI Kostick — Kepribadian Kerja</span>
         </div>
-        <h2 class="text-[22px] font-semibold text-[#00303c]">Personality and Preference Inventory</h2>
+        <h2 class="text-[22px] font-semibold text-foreground">Personality and Preference Inventory</h2>
         <div class="flex flex-wrap items-center gap-3 mt-2">
             <span class="inline-flex items-center gap-1 text-[12px] text-[#40484b]">
                 <span class="material-symbols-outlined text-[14px]">quiz</span>
@@ -54,7 +54,7 @@ $ruleWaktu = ($adaTimerTotal || $adaTimerPerSoal)
     {{-- Cara Pengerjaan --}}
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Cara Pengerjaan</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Cara Pengerjaan</p>
         </div>
         <div class="px-6 py-5 space-y-3">
             <p class="text-[14px] text-[#191c1e] leading-relaxed">
@@ -73,7 +73,7 @@ $ruleWaktu = ($adaTimerTotal || $adaTimerPerSoal)
     {{-- Perbedaan dengan EPPS --}}
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Yang Perlu Diperhatikan</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Yang Perlu Diperhatikan</p>
         </div>
         <div class="divide-y divide-[#f0f2f3]">
             @php
@@ -97,7 +97,7 @@ $ruleWaktu = ($adaTimerTotal || $adaTimerPerSoal)
     {{-- Contoh --}}
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Contoh Soal</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Contoh Soal</p>
         </div>
         <div class="px-6 py-5">
             <p class="text-[12px] text-[#71787c] mb-4">Pilih <strong>salah satu</strong> pernyataan yang paling menggambarkan Anda saat bekerja:</p>
@@ -116,7 +116,7 @@ $ruleWaktu = ($adaTimerTotal || $adaTimerPerSoal)
                 </div>
             </div>
             <div class="rounded-lg bg-[#f7f9fb] border border-[#e0e3e5] px-4 py-3 flex items-start gap-2">
-                <span class="material-symbols-outlined text-[15px] text-[#2C5F6F] shrink-0 mt-0.5">info</span>
+                <span class="material-symbols-outlined text-[15px] text-primary shrink-0 mt-0.5">info</span>
                 <p class="text-[12px] text-[#40484b] leading-relaxed">Pernyataan kedua dipilih (ditandai hijau). Pilih sesuai yang <strong>paling menggambarkan perilaku kerja Anda</strong> sehari-hari.</p>
             </div>
         </div>

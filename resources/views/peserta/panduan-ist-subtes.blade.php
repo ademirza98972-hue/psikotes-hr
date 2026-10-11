@@ -194,7 +194,7 @@ $accentBorder = $warnaCss['border'];
             <span class="material-symbols-outlined text-[14px]">{{ $d['icon'] }}</span>
             <span class="text-[11px] font-bold uppercase tracking-wider">IST — Subtes {{ $kodeSubtes }}</span>
         </div>
-        <h2 class="text-[22px] font-semibold text-[#00303c]">{{ $d['judul'] }}</h2>
+        <h2 class="text-[22px] font-semibold text-foreground">{{ $d['judul'] }}</h2>
         <div class="flex items-center gap-3 mt-2">
             <span class="inline-flex items-center gap-1 text-[12px] text-[#40484b]">
                 <span class="material-symbols-outlined text-[14px]">schedule</span>
@@ -211,7 +211,7 @@ $accentBorder = $warnaCss['border'];
     {{-- Instruksi --}}
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Cara Pengerjaan</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Cara Pengerjaan</p>
         </div>
         <div class="px-6 py-5 space-y-3">
             <p class="text-[14px] text-[#191c1e] leading-relaxed">{!! $d['instruksi'] !!}</p>
@@ -230,7 +230,7 @@ $accentBorder = $warnaCss['border'];
     @if(count($d['contoh']) > 0)
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Contoh</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Contoh</p>
         </div>
         <div class="divide-y divide-[#e0e3e5]">
             @foreach($d['contoh'] as $i => $contoh)
@@ -260,7 +260,7 @@ $accentBorder = $warnaCss['border'];
                 @endif
 
                 <div class="rounded-lg bg-[#f7f9fb] border border-[#e0e3e5] px-4 py-3 flex items-start gap-2">
-                    <span class="material-symbols-outlined text-[15px] text-[#2C5F6F] shrink-0 mt-0.5">info</span>
+                    <span class="material-symbols-outlined text-[15px] text-primary shrink-0 mt-0.5">info</span>
                     <p class="text-[13px] text-[#40484b] leading-relaxed">{!! $contoh['alasan'] !!}</p>
                 </div>
             </div>

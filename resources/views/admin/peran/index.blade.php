@@ -38,19 +38,19 @@
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-0">
         <div>
             <nav class="flex items-center gap-2 mb-2 text-[#40484b] text-sm">
-                <a href="{{ route('admin.dashboard') }}" class="hover:text-[#2C5F6F] transition-colors">Dashboard</a>
+                <a href="{{ route('admin.dashboard') }}" class="hover:text-primary transition-colors">Dashboard</a>
                 <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-                <span class="font-semibold text-[#2C5F6F]">Kelola Peran & Izin</span>
+                <span class="font-semibold text-primary">Kelola Peran & Izin</span>
             </nav>
-            <h2 class="text-[32px] leading-[40px] font-bold text-[#001a22]">Kelola Peran & Izin</h2>
+            <h2 class="text-[32px] leading-[40px] font-bold text-foreground">Kelola Peran & Izin</h2>
             <p class="text-[14px] leading-[20px] text-[#40484b] mt-1">Kelola hak akses dan tanggung jawab pengguna dalam sistem.</p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
             <form method="GET" action="{{ route('admin.peran.index') }}" class="flex items-center gap-2">
                 <div class="relative group">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#40484b] text-[20px] transition-colors group-focus-within:text-[#2C5F6F]">search</span>
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#40484b] text-[20px] transition-colors group-focus-within:text-primary">search</span>
                     <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama peran..."
-                        class="pl-10 pr-4 py-2.5 w-64 bg-white border border-[#c0c8cb] rounded-xl focus:ring-2 focus:ring-[#2C5F6F] focus:border-[#2C5F6F] outline-none text-[14px] leading-[20px] transition-all shadow-sm">
+                        class="pl-10 pr-4 py-2.5 w-64 bg-white border border-[#c0c8cb] rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none text-[14px] leading-[20px] transition-all shadow-sm">
                 </div>
                 <button type="submit" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#c0c8cb] rounded-xl text-[12px] leading-[16px] font-medium text-[#191c1e] hover:bg-[#f2f4f6] transition-colors shadow-sm">
                     <span class="material-symbols-outlined text-[20px]">filter_list</span>
@@ -66,7 +66,7 @@
             @auth
                 @if(auth()->user()->hasIzin('peran.kelola'))
                     <button type="button" @click="modalTambah = true"
-                       class="flex items-center gap-2 px-5 py-2.5 bg-[#2C5F6F] text-white rounded-xl text-[12px] leading-[16px] font-medium hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-[#2C5F6F]/20">
+                       class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-[12px] leading-[16px] font-medium hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-primary/20">
                         <span class="material-symbols-outlined text-[20px]">add</span>
                         Tambah Peran
                     </button>
@@ -91,13 +91,13 @@
         <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left border-collapse">
                 <thead style="position: sticky; top: 0; z-index: 5;">
-                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em]" style="color: #7db8c2;">Nama Peran</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em]" style="color: #7db8c2;">Deskripsi</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-center" style="color: #7db8c2;">Jumlah Izin</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-center" style="color: #7db8c2;">Jumlah Pengguna</th>
-                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-right" style="color: #7db8c2;">Aksi</th>
+                    <tr style="background: var(--muted); border-bottom: 1px solid var(--border);">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:var(--muted-foreground);width:52px">No.</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em]" style="color: var(--muted-foreground);">Nama Peran</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em]" style="color: var(--muted-foreground);">Deskripsi</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-center" style="color: var(--muted-foreground);">Jumlah Izin</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-center" style="color: var(--muted-foreground);">Jumlah Pengguna</th>
+                        <th class="px-6 py-4 font-[11px] leading-[16px] font-semibold uppercase tracking-[0.05em] text-right" style="color: var(--muted-foreground);">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#c0c8cb]/30">
@@ -106,7 +106,7 @@
                             <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($peran->currentPage() - 1) * $peran->perPage() + $loop->iteration }}</td>
                             <td class="px-6 py-5 whitespace-nowrap">
                                 <div class="flex items-center gap-3">
-                                    <span class="text-[18px] leading-[24px] font-semibold text-[#001a22]">{{ $p->nama_peran }}</span>
+                                    <span class="text-[18px] leading-[24px] font-semibold text-foreground">{{ $p->nama_peran }}</span>
                                     @if ($p->nama_peran === 'Super Admin')
                                         <span class="px-2 py-0.5 rounded-md bg-purple-50 border border-purple-200 text-[10px] font-bold text-purple-700 uppercase tracking-tight">Protected</span>
                                     @endif
@@ -116,7 +116,7 @@
                                 <p class="text-[14px] leading-[20px] text-[#40484b] line-clamp-2">{{ $p->deskripsi ?? '-' }}</p>
                             </td>
                             <td class="px-6 py-5 text-center">
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#eceef0] text-[#001a22] font-semibold text-[14px] leading-[20px]">{{ $p->izin_count }}</span>
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#eceef0] text-foreground font-semibold text-[14px] leading-[20px]">{{ $p->izin_count }}</span>
                             </td>
                             <td class="px-6 py-5 text-center">
                                 @if ($p->pengguna_count > 0)
@@ -184,7 +184,7 @@
                                     <p class="text-[12px] text-[#71787c] mb-4">Buat peran baru untuk mengatur hak akses pengguna.</p>
                                     @auth
                                         @if(auth()->user()->hasIzin('peran.kelola'))
-                                            <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                            <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95">
                                                 <span class="material-symbols-outlined text-[16px]">add</span>
                                                 Tambah Peran
                                             </button>
@@ -211,7 +211,7 @@
                         <span class="text-[11px] text-[#40484b] uppercase tracking-wider">System Role</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <div class="w-2.5 h-2.5 rounded-full bg-[#2C5F6F]"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
                         <span class="text-[11px] text-[#40484b] uppercase tracking-wider">Custom Role</span>
                     </div>
                 </div>
@@ -233,11 +233,11 @@
 
             {{-- Header --}}
             <div class="flex items-center gap-3 px-6 py-4 border-b border-[#e0e3e5] shrink-0 bg-white rounded-t-2xl">
-                <div class="w-9 h-9 rounded-xl bg-[#2C5F6F]/10 flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">shield_person</span>
+                <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[20px] text-primary">shield_person</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="text-[15px] font-semibold text-[#001a22] leading-tight">Tambah Peran Baru</h3>
+                    <h3 class="text-[15px] font-semibold text-foreground leading-tight">Tambah Peran Baru</h3>
                     <p class="text-[12px] text-[#40484b] mt-0.5">Buat peran dan tentukan izin aksesnya.</p>
                 </div>
                 <button type="button" @click="modalTambah = false"
@@ -255,21 +255,21 @@
                     {{-- Section: Informasi Peran --}}
                     <div class="bg-white rounded-xl border border-[#e0e3e5] shadow-sm overflow-hidden">
                         <div class="px-5 py-3 border-b border-[#e0e3e5]">
-                            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Informasi Peran</p>
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Informasi Peran</p>
                         </div>
                         <div class="px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1.5">Nama Peran <span class="text-rose-600">*</span></label>
                                 <input name="nama_peran" type="text" value="{{ old('nama_peran') }}" required maxlength="255"
                                        placeholder="cth. HR Manager"
-                                       class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 transition-all @error('nama_peran') border-rose-400 bg-rose-50 @enderror">
+                                       class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all @error('nama_peran') border-rose-400 bg-rose-50 @enderror">
                                 @error('nama_peran')<p class="mt-1 text-[12px] text-rose-600 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1.5">Deskripsi <span class="text-[12px] font-normal text-[#40484b]">(opsional)</span></label>
                                 <textarea name="deskripsi" rows="3" maxlength="1000"
                                           placeholder="Deskripsi singkat peran ini..."
-                                          class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 resize-none transition-all">{{ old('deskripsi') }}</textarea>
+                                          class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all">{{ old('deskripsi') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -277,10 +277,10 @@
                     {{-- Section: Daftar Izin --}}
                     <div class="bg-white rounded-xl border border-[#e0e3e5] shadow-sm overflow-hidden">
                         <div class="px-5 py-3 border-b border-[#e0e3e5] flex items-center justify-between">
-                            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Daftar Izin <span class="text-rose-500 ml-0.5">*</span></p>
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Daftar Izin <span class="text-rose-500 ml-0.5">*</span></p>
                             <div class="flex gap-2">
                                 <button type="button" @click="centangSemua('modal-tambah-izin')"
-                                        class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-medium text-[#2C5F6F] border border-[#2C5F6F]/30 bg-[#2C5F6F]/5 rounded-lg hover:bg-[#2C5F6F]/10 transition-colors">
+                                        class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-medium text-primary border border-primary/30 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
                                     <span class="material-symbols-outlined text-[13px]">check_circle</span> Centang Semua
                                 </button>
                                 <button type="button" @click="batalkanSemua('modal-tambah-izin')"
@@ -293,12 +293,12 @@
                             <div id="modal-tambah-izin" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 @foreach ($kelompokIzin as $labelKelompok => $daftar)
                                     @php $gId = 't-kg-' . \Illuminate\Support\Str::slug($labelKelompok); @endphp
-                                    <div class="border border-[#e0e3e5] rounded-xl overflow-hidden hover:border-[#2C5F6F]/40 transition-colors">
+                                    <div class="border border-[#e0e3e5] rounded-xl overflow-hidden hover:border-primary/40 transition-colors">
                                         <div class="flex items-center justify-between px-4 py-2.5 bg-[#f7f9fb] border-b border-[#e0e3e5]">
                                             <p class="text-[11px] font-bold uppercase tracking-wider text-[#40484b]">{{ $labelKelompok }}</p>
                                             <div class="flex gap-1">
                                                 <button type="button" @click="centangSemuaKelompok('{{ $gId }}')"
-                                                        class="px-2 py-0.5 text-[10px] font-semibold text-[#2C5F6F] hover:bg-[#2C5F6F]/10 rounded-md transition-colors">+ Semua</button>
+                                                        class="px-2 py-0.5 text-[10px] font-semibold text-primary hover:bg-primary/10 rounded-md transition-colors">+ Semua</button>
                                                 <button type="button" @click="batalkanSemuaKelompok('{{ $gId }}')"
                                                         class="px-2 py-0.5 text-[10px] font-semibold text-[#40484b] hover:bg-[#f2f4f6] rounded-md transition-colors">− Semua</button>
                                             </div>
@@ -308,7 +308,7 @@
                                                 <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[#f7f9fb] transition-colors select-none">
                                                     <input type="checkbox" name="izin[]" value="{{ $izin->id }}"
                                                            {{ in_array($izin->id, old('izin', [])) ? 'checked' : '' }}
-                                                           class="w-4 h-4 rounded border-[#c0c8cb] text-[#2C5F6F] focus:ring-[#2C5F6F] shrink-0">
+                                                           class="w-4 h-4 rounded border-[#c0c8cb] text-primary focus:ring-primary shrink-0">
                                                     <span class="text-[13px] text-[#191c1e] leading-snug">{{ $izin->deskripsi }}</span>
                                                 </label>
                                             @endforeach
@@ -324,7 +324,7 @@
                     <button type="button" @click="modalTambah = false"
                             class="rounded-xl border border-[#c0c8cb] px-5 py-2.5 text-[14px] font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
                     <button type="submit"
-                            class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[#1E414C] transition-all active:scale-95">
+                            class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-primary/90 transition-all active:scale-95">
                         <span class="material-symbols-outlined text-[18px]">save</span> Simpan Peran
                     </button>
                 </div>
@@ -344,11 +344,11 @@
 
             {{-- Header --}}
             <div class="flex items-center gap-3 px-6 py-4 border-b border-[#e0e3e5] shrink-0 bg-white rounded-t-2xl">
-                <div class="w-9 h-9 rounded-xl bg-[#2C5F6F]/10 flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">edit_square</span>
+                <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[20px] text-primary">edit_square</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="text-[15px] font-semibold text-[#001a22] leading-tight">Ubah Peran</h3>
+                    <h3 class="text-[15px] font-semibold text-foreground leading-tight">Ubah Peran</h3>
                     <p class="text-[12px] text-[#40484b] mt-0.5 truncate" x-text="editData.nama_peran"></p>
                 </div>
                 <button type="button" @click="modalUbah = false"
@@ -374,19 +374,19 @@
                     {{-- Section: Informasi Peran --}}
                     <div class="bg-white rounded-xl border border-[#e0e3e5] shadow-sm overflow-hidden">
                         <div class="px-5 py-3 border-b border-[#e0e3e5]">
-                            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Informasi Peran</p>
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Informasi Peran</p>
                         </div>
                         <div class="px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1.5">Nama Peran <span class="text-rose-600">*</span></label>
                                 <input name="nama_peran" type="text" x-model="editData.nama_peran" required maxlength="255"
-                                       class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 transition-all @error('nama_peran') border-rose-400 bg-rose-50 @enderror">
+                                       class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all @error('nama_peran') border-rose-400 bg-rose-50 @enderror">
                                 @error('nama_peran')<p class="mt-1 text-[12px] text-rose-600 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[13px] font-medium text-[#191c1e] mb-1.5">Deskripsi <span class="text-[12px] font-normal text-[#40484b]">(opsional)</span></label>
                                 <textarea name="deskripsi" rows="3" maxlength="1000" x-model="editData.deskripsi"
-                                          class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 resize-none transition-all"></textarea>
+                                          class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all"></textarea>
                             </div>
                         </div>
                     </div>
@@ -394,10 +394,10 @@
                     {{-- Section: Daftar Izin --}}
                     <div class="bg-white rounded-xl border border-[#e0e3e5] shadow-sm overflow-hidden">
                         <div class="px-5 py-3 border-b border-[#e0e3e5] flex items-center justify-between">
-                            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Daftar Izin <span class="text-rose-500 ml-0.5">*</span></p>
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Daftar Izin <span class="text-rose-500 ml-0.5">*</span></p>
                             <div class="flex gap-2">
                                 <button type="button" @click="centangSemua('modal-ubah-izin')"
-                                        class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-medium text-[#2C5F6F] border border-[#2C5F6F]/30 bg-[#2C5F6F]/5 rounded-lg hover:bg-[#2C5F6F]/10 transition-colors">
+                                        class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-medium text-primary border border-primary/30 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
                                     <span class="material-symbols-outlined text-[13px]">check_circle</span> Centang Semua
                                 </button>
                                 <button type="button" @click="batalkanSemua('modal-ubah-izin')"
@@ -410,12 +410,12 @@
                             <div id="modal-ubah-izin" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 @foreach ($kelompokIzin as $labelKelompok => $daftar)
                                     @php $gId = 'u-kg-' . \Illuminate\Support\Str::slug($labelKelompok); @endphp
-                                    <div class="border border-[#e0e3e5] rounded-xl overflow-hidden hover:border-[#2C5F6F]/40 transition-colors">
+                                    <div class="border border-[#e0e3e5] rounded-xl overflow-hidden hover:border-primary/40 transition-colors">
                                         <div class="flex items-center justify-between px-4 py-2.5 bg-[#f7f9fb] border-b border-[#e0e3e5]">
                                             <p class="text-[11px] font-bold uppercase tracking-wider text-[#40484b]">{{ $labelKelompok }}</p>
                                             <div class="flex gap-1">
                                                 <button type="button" @click="centangSemuaKelompok('{{ $gId }}')"
-                                                        class="px-2 py-0.5 text-[10px] font-semibold text-[#2C5F6F] hover:bg-[#2C5F6F]/10 rounded-md transition-colors">+ Semua</button>
+                                                        class="px-2 py-0.5 text-[10px] font-semibold text-primary hover:bg-primary/10 rounded-md transition-colors">+ Semua</button>
                                                 <button type="button" @click="batalkanSemuaKelompok('{{ $gId }}')"
                                                         class="px-2 py-0.5 text-[10px] font-semibold text-[#40484b] hover:bg-[#f2f4f6] rounded-md transition-colors">− Semua</button>
                                             </div>
@@ -428,7 +428,7 @@
                                                     <input type="checkbox" name="izin[]" value="{{ $izin->id }}"
                                                            {{ $errors->any() && old('_form') === 'ubah' && in_array($izin->id, (array) old('izin', [])) ? 'checked' : '' }}
                                                            :disabled="{{ $izinWajib ? 'true' : 'false' }} && editData.nama_peran === 'Super Admin'"
-                                                           class="w-4 h-4 rounded border-[#c0c8cb] text-[#2C5F6F] focus:ring-[#2C5F6F] shrink-0 disabled:cursor-not-allowed disabled:opacity-60">
+                                                           class="w-4 h-4 rounded border-[#c0c8cb] text-primary focus:ring-primary shrink-0 disabled:cursor-not-allowed disabled:opacity-60">
                                                     <span class="text-[13px] text-[#191c1e] leading-snug flex-1">
                                                         {{ $izin->deskripsi }}
                                                         @if($izinWajib)
@@ -451,7 +451,7 @@
                     <button type="button" @click="modalUbah = false"
                             class="rounded-xl border border-[#c0c8cb] px-5 py-2.5 text-[14px] font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
                     <button type="submit"
-                            class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[#1E414C] transition-all active:scale-95">
+                            class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-primary/90 transition-all active:scale-95">
                         <span class="material-symbols-outlined text-[18px]">save</span> Perbarui Peran
                     </button>
                 </div>

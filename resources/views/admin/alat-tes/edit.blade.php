@@ -10,11 +10,11 @@
     {{-- PAGE HEADER --}}
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h2 class="text-[20px] font-semibold text-[#00303c]">Edit Alat Tes</h2>
+            <h2 class="text-[20px] font-semibold text-foreground">Edit Alat Tes</h2>
             <p class="mt-0.5 text-[13px] text-[#40484b]">Ubah detail instrumen alat tes.</p>
         </div>
         <a href="{{ route('admin.alat-tes.index') }}"
-           class="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#40484b] hover:text-[#2C5F6F] transition-colors border border-[#e0e3e5] hover:border-[#2C5F6F]/30 px-3 py-2 rounded-xl bg-white">
+           class="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#40484b] hover:text-primary transition-colors border border-[#e0e3e5] hover:border-primary/30 px-3 py-2 rounded-xl bg-white">
             <span class="material-symbols-outlined text-[16px]">arrow_back</span>
             Kembali
         </a>
@@ -32,7 +32,7 @@
                     <label for="kode" class="block text-[12px] font-medium text-[#40484b] mb-2">Kode Alat Tes</label>
                     <input id="kode" name="kode" type="text" value="{{ old('kode', $alatTes->kode) }}" required maxlength="20"
                            placeholder="Kode"
-                           class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm font-semibold text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                           class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm font-semibold text-[#191c1e] focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all outline-none">
                     <p class="mt-1.5 text-[11px] text-[#919eab]">Kode singkat instrumen (misal: DISC)</p>
                 </div>
 
@@ -40,14 +40,14 @@
                     <label for="nama" class="block text-[12px] font-medium text-[#40484b] mb-2">Nama Lengkap Alat Tes</label>
                     <input id="nama" name="nama" type="text" value="{{ old('nama', $alatTes->nama) }}" maxlength="150"
                            placeholder="Dominance, Influence, Steadiness, Conscientiousness"
-                           class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                           class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all outline-none">
                 </div>
 
                 <div>
                     <label for="format_dasar" class="block text-[12px] font-medium text-[#40484b] mb-2">Format Soal</label>
                     <div class="relative">
                         <select id="format_dasar" name="format_dasar" x-model="formatDasar" required
-                                class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none cursor-pointer">
+                                class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all outline-none cursor-pointer">
                             @foreach ($pilihanFormat as $format)
                                 <option value="{{ $format }}" @selected(old('format_dasar', $alatTes->format_dasar) === $format)>{{ $format }}</option>
                             @endforeach
@@ -60,7 +60,7 @@
                     <label for="pola_skoring" class="block text-[12px] font-medium text-[#40484b] mb-2">Pola Skoring</label>
                     <div class="relative">
                         <select id="pola_skoring" name="pola_skoring" required
-                                class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none cursor-pointer">
+                                class="w-full appearance-none bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all outline-none cursor-pointer">
                             <option value="kognitif" @selected(old('pola_skoring', $alatTes->pola_skoring) === 'kognitif')>Kognitif — untuk CFIT</option>
                             <option value="forced_choice" @selected(old('pola_skoring', $alatTes->pola_skoring) === 'forced_choice')>Forced Choice — untuk EPPS</option>
                             <option value="forced_choice_rollup" @selected(old('pola_skoring', $alatTes->pola_skoring) === 'forced_choice_rollup')>Forced Choice Rollup — untuk Papikostik</option>
@@ -73,7 +73,7 @@
                 <div>
                     <label for="durasi_total_menit" class="block text-[12px] font-medium text-[#40484b] mb-2">Durasi Total (menit)</label>
                     <input id="durasi_total_menit" name="durasi_total_menit" type="number" min="0" value="{{ old('durasi_total_menit', $alatTes->durasi_total_menit) }}"
-                           class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                           class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all outline-none">
                 </div>
             </div>
 
@@ -81,7 +81,7 @@
                 <label for="deskripsi" class="block text-[12px] font-medium text-[#40484b] mb-2">Deskripsi</label>
                 <textarea id="deskripsi" name="deskripsi" rows="3"
                           placeholder="Jelaskan tujuan dan fungsi alat tes ini..."
-                          class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none resize-none">{{ old('deskripsi', $alatTes->deskripsi) }}</textarea>
+                          class="w-full bg-[#f2f4f6] border border-[#e0e3e5] rounded-xl px-4 py-2.5 text-sm text-[#191c1e] focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all outline-none resize-none">{{ old('deskripsi', $alatTes->deskripsi) }}</textarea>
             </div>
         </div>
 
@@ -96,7 +96,7 @@
                         <input type="hidden" name="batas_waktu_per_soal_aktif" value="0">
                         <input type="checkbox" name="batas_waktu_per_soal_aktif" value="1" x-model="batasAktif"
                                {{ old('batas_waktu_per_soal_aktif', $alatTes->batas_waktu_per_soal_aktif) ? 'checked' : '' }}
-                               class="mt-0.5 h-4 w-4 rounded border-[#c0c8cb] text-[#2C5F6F] focus:ring-[#2C5F6F] cursor-pointer">
+                               class="mt-0.5 h-4 w-4 rounded border-[#c0c8cb] text-primary focus:ring-primary cursor-pointer">
                         <div>
                             <p class="text-[13px] font-medium text-[#191c1e]">Aktifkan Batas Waktu per Soal</p>
                             <p class="text-[11px] text-[#40484b] mt-0.5">Peserta harus menjawab dalam waktu yang ditentukan.</p>
@@ -106,7 +106,7 @@
                         <label for="batas_waktu_per_soal_detik" class="block text-[11px] font-medium text-[#40484b] mb-1.5">Detik per Soal</label>
                         <input id="batas_waktu_per_soal_detik" name="batas_waktu_per_soal_detik" type="number" min="1"
                                value="{{ old('batas_waktu_per_soal_detik', $alatTes->batas_waktu_per_soal_detik) }}"
-                               class="w-40 bg-white border border-[#e0e3e5] rounded-lg px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F] transition-all outline-none">
+                               class="w-40 bg-white border border-[#e0e3e5] rounded-lg px-3 py-2 text-sm text-[#191c1e] focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all outline-none">
                     </div>
                 </div>
             </div>
@@ -132,7 +132,7 @@
                 Batal
             </a>
             <button type="submit"
-                    class="inline-flex items-center gap-1.5 rounded-xl bg-[#2C5F6F] px-6 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                    class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-6 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95">
                 <span class="material-symbols-outlined text-[16px]">save</span>
                 Simpan
             </button>

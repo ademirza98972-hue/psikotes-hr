@@ -32,7 +32,7 @@
 <div class="space-y-6">
 
     {{-- Welcome Banner --}}
-    <div class="rounded-xl p-6 text-white shadow-sm" style="background: linear-gradient(to right, #2C5F6F, #3d7a8a)">
+    <div class="rounded-xl p-6 text-white shadow-sm" style="background: linear-gradient(to right, #00843D, #00A651)">
         <div class="flex items-start justify-between flex-wrap gap-3">
             <div>
                 <h2 class="text-xl font-semibold">{{ $sapaan }}, {{ $pengguna->name }}!</h2>
@@ -64,11 +64,11 @@
     @endif
 
     {{-- Stat Cards --}}
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div class="rounded-xl border border-[#e0e3e5] bg-white p-5 shadow-sm">
             <div class="flex items-center gap-4">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2C5F6F]/10">
-                    <span class="material-symbols-outlined text-[22px] text-[#2C5F6F]">assignment</span>
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <span class="material-symbols-outlined text-[22px] text-primary">assignment</span>
                 </div>
                 <div>
                     <p class="text-2xl font-bold text-[#191c1e]">{{ $totalSesi }}</p>
@@ -105,10 +105,10 @@
     {{-- Sesi Perlu Dikerjakan --}}
     <div id="sesi-aktif" class="scroll-mt-20">
         <h3 class="text-base font-semibold text-[#191c1e] mb-3 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-[#2C5F6F]">pending_actions</span>
+            <span class="material-symbols-outlined text-[18px] text-primary">pending_actions</span>
             Perlu Dikerjakan
             @if ($sesiAktif->isNotEmpty())
-                <span class="inline-flex items-center justify-center rounded-full bg-[#2C5F6F] min-w-[1.25rem] px-1.5 py-0.5 text-xs font-bold text-white">{{ $sesiAktif->count() }}</span>
+                <span class="inline-flex items-center justify-center rounded-full bg-primary min-w-[1.25rem] px-1.5 py-0.5 text-xs font-bold text-white">{{ $sesiAktif->count() }}</span>
             @endif
         </h3>
 
@@ -194,13 +194,13 @@
                             </button>
                         @elseif ($sesi['status_pengerjaan'] === 'Sedang Berjalan')
                             <a href="{{ route('peserta.tes.kerjakan', $sesi['id']) }}"
-                               class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
+                               class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
                                 <span class="material-symbols-outlined text-base">play_arrow</span>
                                 Lanjutkan Tes
                             </a>
                         @else
                             <a href="{{ route('peserta.tes.instruksi', $sesi['id']) }}"
-                               class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
+                               class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e4450] transition">
                                 <span class="material-symbols-outlined text-base">play_arrow</span>
                                 Mulai Tes
                             </a>

@@ -6,7 +6,7 @@
     <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
         <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-[28px] leading-9 font-semibold text-[#00303c]">Aktivitas Terbaru</h1>
+                <h1 class="text-[28px] leading-9 font-semibold text-foreground">Aktivitas Terbaru</h1>
                 <p class="mt-1 text-sm text-[#40484b]">Daftar seluruh pengguna sistem dari semua tipe akun.</p>
             </div>
             <a href="{{ route('admin.dashboard') }}"
@@ -16,8 +16,8 @@
         </div>
         <form method="GET" action="{{ route('admin.aktivitas.index') }}" class="flex flex-wrap gap-2 items-center">
             <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama atau email..."
-                class="flex-1 min-w-[200px] rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
-            <button type="submit" class="rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1E414C] transition-all">Cari</button>
+                class="flex-1 min-w-[200px] rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+            <button type="submit" class="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90 transition-all">Cari</button>
             @if ($kataKunci)
                 <a href="{{ route('admin.aktivitas.index') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Reset</a>
             @endif
@@ -27,13 +27,13 @@
     <div class="mt-4 rounded-xl border border-[#e0e3e5] bg-white overflow-hidden shadow-sm">
         <div style="overflow: auto; max-height: calc(100vh - 300px);">
         <table class="w-full divide-y divide-[#e0e3e5] text-sm">
-            <thead style="position: sticky; top: 0; z-index: 5;"><tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
-                <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2; width:52px">No.</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Nama</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Email</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Tipe Akun</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Status</th>
-                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style="color: #7db8c2;">Dibuat</th>
+            <thead style="position: sticky; top: 0; z-index: 5;"><tr style="background: var(--muted); border-bottom: 1px solid var(--border);">
+                <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide" style="color: var(--muted-foreground); width:52px">No.</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--muted-foreground);">Nama</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--muted-foreground);">Email</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--muted-foreground);">Tipe Akun</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--muted-foreground);">Status</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style="color: var(--muted-foreground);">Dibuat</th>
             </tr></thead>
             <tbody class="divide-y divide-[#e0e3e5] bg-white">
                 @forelse ($aktivitas as $u)
@@ -44,7 +44,7 @@
                         <td class="px-4 py-3">
                             @php
                                 $badgeClass = match($u->tipe_akun) {
-                                    'karyawan' => 'bg-[#2C5F6F]/10 text-[#2C5F6F] border border-[#2C5F6F]/20',
+                                    'karyawan' => 'bg-primary/10 text-primary border border-primary/20',
                                     'kandidat' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
                                     'custom' => 'bg-violet-50 text-violet-700 border border-violet-200',
                                     default => 'bg-[#f2f4f6] text-[#40484b] border border-[#c0c8cb]',

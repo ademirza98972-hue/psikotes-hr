@@ -41,11 +41,11 @@
     --font-body: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
     --font-inter: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-    /* Project primary */
-    --color-psikotes: #2C5F6F;
-    --color-psikotes-light: #4A8A9B;
-    --color-psikotes-subtle: #E8F0F2;
-    --color-psikotes-glow: rgba(44, 95, 111, 0.12);
+    /* Project primary (alias lama → hijau Jhonlin, sama dengan --primary) */
+    --color-psikotes: #00843D;
+    --color-psikotes-light: #00A651;
+    --color-psikotes-subtle: #E9F6EF;
+    --color-psikotes-glow: rgba(0, 132, 61, 0.12);
 
     /* Material Design 3 tokens from Stitch reference */
     --color-on-primary: #ffffff;
@@ -84,7 +84,7 @@
     --color-placeholder: #919eab;
 
     /* Stitch reference — action teal */
-    --color-action-teal: #2C5F6F;
+    --color-action-teal: #00843D;
     --color-on-action-teal: #ffffff;
 
     /* Stitch reference — typography scale */
@@ -106,7 +106,8 @@
     --spacing-container-max: 1440px;
 }
 
-/* shadcn/ui tokens (neutral) — https://ui.shadcn.com/docs/theming */
+/* shadcn/ui tokens — https://ui.shadcn.com/docs/theming
+   Primary = hijau Jhonlin Group (logo #00A651, digelapkan agar teks putih kontras AA 4.8:1) */
 :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -114,7 +115,7 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
+    --primary: #00843D;
     --primary-foreground: oklch(0.985 0 0);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
@@ -125,11 +126,13 @@
     --destructive: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --ring: #00A651;
+    --brand-green: #00A651;
+    --brand-navy: #2E3192;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-accent: #E9F6EF;
+    --sidebar-accent-foreground: #00672F;
     --sidebar-border: oklch(0.922 0 0);
 }
 
@@ -157,6 +160,8 @@
     --color-sidebar-accent: var(--sidebar-accent);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
+    --color-brand-green: var(--brand-green);
+    --color-brand-navy: var(--brand-navy);
 }
 
 @layer base {

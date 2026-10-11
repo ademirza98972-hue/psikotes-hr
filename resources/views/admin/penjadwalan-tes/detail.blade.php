@@ -38,7 +38,7 @@
             <p class="mt-0.5 text-sm text-[#41484b]">Detail sesi penjadwalan dan manajemen peserta.</p>
         </div>
         <a href="{{ route('admin.penjadwalan-tes.index') }}"
-           class="inline-flex items-center gap-1 text-[#2C5F6F] font-semibold text-sm hover:opacity-80 transition-opacity">
+           class="inline-flex items-center gap-1 text-primary font-semibold text-sm hover:opacity-80 transition-opacity">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
             Kembali
         </a>
@@ -84,15 +84,15 @@
                 <div class="mb-5">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm text-[#41484b]">Progres Peserta: <span class="font-bold text-[#191c1e]">{{ $pesertaSelesai }}/{{ $pesertaTotal }}</span> selesai</span>
-                        <span class="text-sm font-bold text-[#2C5F6F]">{{ $persen }}%</span>
+                        <span class="text-sm font-bold text-primary">{{ $persen }}%</span>
                     </div>
                     <div class="w-full h-2 bg-[#e6e8ea] rounded-full overflow-hidden">
-                        <div class="h-full rounded-full transition-all" style="width: {{ $persen }}%; background-color: #2C5F6F;"></div>
+                        <div class="h-full rounded-full transition-all" style="width: {{ $persen }}%; background-color: #00843D;"></div>
                     </div>
                 </div>
 
                 <a href="{{ route('admin.penjadwalan-tes.edit', $sesi->id) }}"
-                   class="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors">
+                   class="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-colors">
                     <span class="material-symbols-outlined text-[18px]">edit</span>
                     Edit Sesi
                 </a>
@@ -105,7 +105,7 @@
             {{-- Form Tambah Peserta --}}
             <section class="rounded-xl border border-[#c1c7cb] bg-white p-5 shadow-sm">
                 <div class="flex items-center gap-2 mb-4">
-                    <span class="material-symbols-outlined text-[#2C5F6F]">person_add</span>
+                    <span class="material-symbols-outlined text-primary">person_add</span>
                     <h3 class="text-base font-semibold text-[#191c1e]">Tambah Peserta</h3>
                 </div>
 
@@ -119,7 +119,7 @@
                         <div class="flex rounded-xl border border-[#e0e3e5] overflow-hidden text-sm">
                             <button type="button" id="btn-karyawan"
                                     onclick="filterTipe('karyawan')"
-                                    class="px-4 py-2 font-semibold bg-[#2C5F6F] text-white transition-colors">
+                                    class="px-4 py-2 font-semibold bg-primary text-white transition-colors">
                                 Karyawan
                             </button>
                             <button type="button" id="btn-kandidat"
@@ -137,7 +137,7 @@
                                    placeholder="Cari nama..."
                                    class="w-full pl-9 pr-4 py-2 bg-[#f2f4f6] border border-[#e0e3e5]
                                           rounded-xl text-sm text-[#191c1e] outline-none
-                                          focus:ring-2 focus:ring-[#2C5F6F]/40 focus:border-[#2C5F6F]">
+                                          focus:ring-2 focus:ring-primary/40 focus:border-primary">
                         </div>
                     </div>
 
@@ -146,15 +146,15 @@
                                     border-b border-[#e0e3e5]">
                             <input type="checkbox" id="select-all"
                                    onchange="toggleSelectAll(this)"
-                                   class="h-4 w-4 rounded border-[#c0c8cb] text-[#2C5F6F]
-                                          focus:ring-[#2C5F6F]">
+                                   class="h-4 w-4 rounded border-[#c0c8cb] text-primary
+                                          focus:ring-primary">
                             <label for="select-all"
                                    class="text-[12px] font-semibold text-[#40484b] uppercase
                                           tracking-wider cursor-pointer">
                                 Pilih Semua
                             </label>
                             <span id="counter-terpilih"
-                                  class="ml-auto text-[12px] text-[#2C5F6F] font-semibold">
+                                  class="ml-auto text-[12px] text-primary font-semibold">
                                 0 dipilih
                             </span>
                         </div>
@@ -168,8 +168,8 @@
                                     <input type="checkbox" name="user_ids[]"
                                            value="{{ $user->id }}"
                                            onchange="updateCounter()"
-                                           class="h-4 w-4 rounded border-[#c0c8cb] text-[#2C5F6F]
-                                                  focus:ring-[#2C5F6F] user-checkbox">
+                                           class="h-4 w-4 rounded border-[#c0c8cb] text-primary
+                                                  focus:ring-primary user-checkbox">
                                     <div>
                                         <p class="text-sm font-semibold text-[#191c1e]">
                                             {{ $user->name }}
@@ -199,12 +199,12 @@
                                 @foreach ($sesi->alatTes as $alat)
                                     <label class="flex items-center gap-3 p-3 rounded-xl
                                                   border border-[#e0e3e5] bg-[#f2f4f6]
-                                                  cursor-pointer hover:border-[#2C5F6F]/40
+                                                  cursor-pointer hover:border-primary/40
                                                   transition-colors">
                                         <input type="checkbox" name="alat_tes_ids[]"
                                                value="{{ $alat->id }}"
                                                class="h-4 w-4 rounded border-[#c0c8cb]
-                                                      text-[#2C5F6F] focus:ring-[#2C5F6F]">
+                                                      text-primary focus:ring-primary">
                                         <div>
                                             <p class="text-sm font-semibold text-[#191c1e]">
                                                 {{ $alat->nama }}
@@ -221,7 +221,7 @@
 
                     <button type="submit"
                             class="w-full flex items-center justify-center gap-2
-                                   bg-[#2C5F6F] hover:bg-[#1E414C] text-white
+                                   bg-primary hover:bg-primary/90 text-white
                                    rounded-xl px-4 py-2.5 text-sm font-semibold
                                    transition-all active:scale-95"
                             {{ $sesi->alatTes->isEmpty() ? 'disabled' : '' }}>
@@ -234,7 +234,7 @@
             {{-- Tabel Peserta --}}
             <section class="rounded-xl border border-[#c1c7cb] bg-white p-5 shadow-sm">
                 <div class="flex items-center gap-2 mb-4">
-                    <span class="material-symbols-outlined text-[#2C5F6F]">groups</span>
+                    <span class="material-symbols-outlined text-primary">groups</span>
                     <h3 class="text-base font-semibold text-[#191c1e]">Daftar Peserta</h3>
                 </div>
 
@@ -307,11 +307,11 @@ function filterTipe(tipe) {
     tipeAktif = tipe;
     const btnK = document.getElementById('btn-karyawan');
     const btnC = document.getElementById('btn-kandidat');
-    btnK.classList.toggle('bg-[#2C5F6F]', tipe === 'karyawan');
+    btnK.classList.toggle('bg-primary', tipe === 'karyawan');
     btnK.classList.toggle('text-white', tipe === 'karyawan');
     btnK.classList.toggle('bg-white', tipe !== 'karyawan');
     btnK.classList.toggle('text-[#40484b]', tipe !== 'karyawan');
-    btnC.classList.toggle('bg-[#2C5F6F]', tipe === 'kandidat');
+    btnC.classList.toggle('bg-primary', tipe === 'kandidat');
     btnC.classList.toggle('text-white', tipe === 'kandidat');
     btnC.classList.toggle('bg-white', tipe !== 'kandidat');
     btnC.classList.toggle('text-[#40484b]', tipe !== 'kandidat');

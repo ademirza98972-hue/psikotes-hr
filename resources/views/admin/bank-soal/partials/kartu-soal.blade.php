@@ -10,7 +10,7 @@
         </div>
         <div class="flex gap-1">
             <a href="{{ route('admin.bank-soal.edit', $soal['id']) }}"
-               class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#f2f4f6] hover:text-[#2C5F6F] transition-colors"
+               class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#f2f4f6] hover:text-primary transition-colors"
                title="Edit soal">
                 <span class="material-symbols-outlined text-[18px]">edit</span>
             </a>
@@ -39,13 +39,13 @@
         <ul class="mt-4 space-y-2">
             @foreach (['A','B','C','D'] as $i => $huruf)
                 @php $opsi = $soal['opsi'][$i] ?? ''; @endphp
-                <li class="flex items-center gap-3 rounded-xl border {{ $soal['kunci_jawaban'] === $huruf ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-[#e0e3e5] bg-white' }} px-4 py-3 text-sm transition-colors hover:border-[#2C5F6F]/50">
-                    <span class="flex items-center justify-center w-6 h-6 rounded-full border {{ $soal['kunci_jawaban'] === $huruf ? 'border-[#2C5F6F] bg-[#2C5F6F] text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-bold shrink-0">
+                <li class="flex items-center gap-3 rounded-xl border {{ $soal['kunci_jawaban'] === $huruf ? 'border-primary bg-primary/5' : 'border-[#e0e3e5] bg-white' }} px-4 py-3 text-sm transition-colors hover:border-primary/50">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full border {{ $soal['kunci_jawaban'] === $huruf ? 'border-primary bg-primary text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-bold shrink-0">
                         {{ $huruf }}
                     </span>
                     <span class="{{ $soal['kunci_jawaban'] === $huruf ? 'font-semibold text-[#191c1e]' : 'text-[#40484b]' }}">{{ $opsi }}</span>
                     @if ($soal['kunci_jawaban'] === $huruf)
-                        <span class="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#2C5F6F]">
+                        <span class="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
                             <span class="material-symbols-outlined text-[14px]">check_circle</span>
                             Kunci
                         </span>
@@ -72,7 +72,7 @@
             <div class="relative flex items-center justify-between px-8">
                 <div class="absolute left-10 right-10 h-[2px] bg-[#c0c8cb] -z-10"></div>
                 @for($i = 0; $i < 5; $i++)
-                    <div class="w-5 h-5 rounded-full border-2 border-[#c0c8cb] bg-white hover:border-[#2C5F6F] transition-colors cursor-pointer"></div>
+                    <div class="w-5 h-5 rounded-full border-2 border-[#c0c8cb] bg-white hover:border-primary transition-colors cursor-pointer"></div>
                 @endfor
             </div>
         </div>
@@ -80,10 +80,10 @@
     @elseif ($format === 'Forced Choice')
         <p class="text-[11px] uppercase tracking-widest text-[#40484b] mb-3">Pilih satu pernyataan yang paling menggambarkan diri Anda</p>
         <div class="flex flex-col md:flex-row gap-4">
-            <div class="flex-1 p-4 rounded-xl border-2 border-[#e0e3e5] hover:border-[#2C5F6F]/50 bg-[#f7f9fb] cursor-pointer transition-all flex items-start gap-3">
+            <div class="flex-1 p-4 rounded-xl border-2 border-[#e0e3e5] hover:border-primary/50 bg-[#f7f9fb] cursor-pointer transition-all flex items-start gap-3">
                 <div class="mt-0.5 w-5 h-5 rounded-full border-2 border-[#c0c8cb] flex-shrink-0"></div>
                 <div>
-                    <span class="font-bold text-[#00303c] block mb-1 text-sm">Pernyataan A</span>
+                    <span class="font-bold text-foreground block mb-1 text-sm">Pernyataan A</span>
                     <p class="text-[14px] text-[#40484b]">{{ $soal['pernyataan_a'] }}</p>
                     <span class="mt-2 inline-block rounded-lg bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
                         {{ $soal['dimensi_a'] }}
@@ -91,10 +91,10 @@
                 </div>
             </div>
             <div class="flex items-center justify-center text-[#c0c8cb] italic text-sm font-semibold shrink-0">VS</div>
-            <div class="flex-1 p-4 rounded-xl border-2 border-[#e0e3e5] hover:border-[#2C5F6F]/50 bg-[#f7f9fb] cursor-pointer transition-all flex items-start gap-3">
+            <div class="flex-1 p-4 rounded-xl border-2 border-[#e0e3e5] hover:border-primary/50 bg-[#f7f9fb] cursor-pointer transition-all flex items-start gap-3">
                 <div class="mt-0.5 w-5 h-5 rounded-full border-2 border-[#c0c8cb] flex-shrink-0"></div>
                 <div>
-                    <span class="font-bold text-[#00303c] block mb-1 text-sm">Pernyataan B</span>
+                    <span class="font-bold text-foreground block mb-1 text-sm">Pernyataan B</span>
                     <p class="text-[14px] text-[#40484b]">{{ $soal['pernyataan_b'] }}</p>
                     <span class="mt-2 inline-block rounded-lg bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
                         {{ $soal['dimensi_b'] }}
@@ -144,14 +144,14 @@
             <ul class="space-y-1.5">
                 @foreach ($soal['opsi'] as $idx => $opsiTeks)
                     @php $huruf = chr(65 + $idx); $hurufLower = strtolower($huruf); @endphp
-                    <li class="flex items-center gap-2 rounded-lg border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-[#e0e3e5]' }} px-3 py-2 text-sm">
-                        <span class="flex items-center justify-center w-5 h-5 rounded-full border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-[#2C5F6F] bg-[#2C5F6F] text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-semibold">{{ $huruf }}</span>
+                    <li class="flex items-center gap-2 rounded-lg border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-primary bg-primary/5' : 'border-[#e0e3e5]' }} px-3 py-2 text-sm">
+                        <span class="flex items-center justify-center w-5 h-5 rounded-full border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-primary bg-primary text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-semibold">{{ $huruf }}</span>
                         @if (!empty($opsiTeks['gambar']))
                             <img src="{{ asset('storage/' . $opsiTeks['gambar']) }}" class="h-16 max-w-[120px] rounded border border-slate-200 object-contain">
                         @endif
                         <span>{{ $opsiTeks['teks'] ?? $opsiTeks }}</span>
                         @if (strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower)
-                            <span class="ml-auto text-[11px] font-semibold text-[#2C5F6F]">Kunci</span>
+                            <span class="ml-auto text-[11px] font-semibold text-primary">Kunci</span>
                         @endif
                     </li>
                 @endforeach

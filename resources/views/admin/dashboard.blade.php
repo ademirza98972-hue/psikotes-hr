@@ -1,20 +1,19 @@
 @extends('layouts.admin', ['judulHalaman' => 'Dashboard'])
 
 @section('content')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-
 @php
     $u = auth()->user();
     $bisaKelolaTes = $u->hasIzin('soal.lihat') || $u->hasIzin('kategori_tes.kelola');
     $bisaLihatHasil = $u->hasIzin('hasil_tes.lihat');
+    $bisaVerifikasi = $u->hasIzin('pengguna.verifikasi');
     $labelKejadian = ['pindah_tab' => 'Pindah tab', 'keluar_fullscreen' => 'Keluar layar penuh', 'halaman_ditutup' => 'Halaman ditutup'];
     $persen = fn ($n) => $pesertaTotal > 0 ? round($n / $pesertaTotal * 100) : 0;
 
     $kpi = [
         ['Sesi Berjalan', $jumlahSesiBerjalan, 'event_available', "{$jumlahSesiMendatang} sesi mendatang"],
-        ['Total Peserta', $pesertaTotal, 'groups', "{$pesertaBelum} belum mulai mengerjakan"],
+        ['Total Peserta', $pesertaTotal, 'groups', 'Di semua sesi yang diterbitkan'],
         ['Tes Selesai', $pesertaSelesai, 'task_alt', "{$tingkatPenyelesaian}% tingkat penyelesaian"],
-        ['Sedang Mengerjakan', $pesertaSedang, 'pending', 'Peserta yang sudah mulai tes'],
+        ['Sedang Mengerjakan', $pesertaSedang, 'pending', "{$pesertaBelum} lainnya belum mulai"],
     ];
 @endphp
 
@@ -83,12 +82,17 @@
         </x-ui.card>
 
         <x-ui.card class="flex flex-col gap-5 py-6">
-            <x-ui.card-header title="Status Pengerjaan" description="Seluruh peserta di sesi tes aktif" />
+            <x-ui.card-header title="Status Pengerjaan" description="Peserta di semua sesi yang diterbitkan" />
             <div class="grid gap-4 px-6">
-                @foreach ([['Selesai', $pesertaSelesai, 'bg-emerald-500'], ['Sedang mengerjakan', $pesertaSedang, 'bg-amber-500'], ['Belum mulai', $pesertaBelum, 'bg-zinc-300']] as [$label, $jumlah, $warna])
+                @foreach ([
+                    ['Selesai', $pesertaSelesai, 'bg-primary', null],
+                    ['Sedang mengerjakan', $pesertaSedang, 'bg-amber-500', 'Sesi masih berjalan'],
+                    ['Belum mulai', $pesertaBelum, 'bg-zinc-300', 'Sesi berjalan atau mendatang'],
+                    ['Tidak selesai', $pesertaTidakSelesai, 'bg-rose-400', 'Sesi berakhir sebelum tes selesai'],
+                ] as [$label, $jumlah, $warna, $keterangan])
                     <div class="grid gap-1.5">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="flex items-center gap-2"><span class="size-2 rounded-full {{ $warna }}"></span>{{ $label }}</span>
+                            <span class="flex items-center gap-2" @if ($keterangan) title="{{ $keterangan }}" @endif><span class="size-2 rounded-full {{ $warna }}"></span>{{ $label }}</span>
                             <span class="tabular-nums text-muted-foreground"><span class="font-medium text-foreground">{{ number_format($jumlah) }}</span> · {{ $persen($jumlah) }}%</span>
                         </div>
                         <div class="h-2 overflow-hidden rounded-full bg-muted">
@@ -187,6 +191,7 @@
                                     {{ $k->profilKandidat?->posisi?->nama_posisi ?? '-' }} · {{ $k->created_at->diffForHumans(null, true) }}
                                 </p>
                             </div>
+                            @if ($bisaVerifikasi)
                             <form action="{{ route('admin.data-kandidat.approve', $k->id) }}" method="POST">
                                 @csrf
                                 <x-ui.button type="submit" variant="outline" size="icon-sm" title="Aktifkan" class="text-emerald-600 hover:text-emerald-700">
@@ -199,13 +204,14 @@
                                     <span class="material-symbols-outlined">close</span>
                                 </x-ui.button>
                             </form>
+                            @endif
                         </div>
                     @endforeach
                 </div>
-                @if ($kandidatMenunggu > 2)
+                @if ($kandidatMenunggu > $kandidatMenungguList->count() && $u->hasIzin('pengguna.lihat'))
                     <div class="mt-auto px-6">
-                        <x-ui.button variant="ghost" size="sm" class="w-full" :href="route('admin.data-kandidat.index')">
-                            Lihat {{ $kandidatMenunggu - 2 }} kandidat lainnya
+                        <x-ui.button variant="ghost" size="sm" class="w-full" :href="route('admin.data-kandidat.index', ['status' => 'menunggu_verifikasi'])">
+                            Lihat {{ $kandidatMenunggu - $kandidatMenungguList->count() }} kandidat lainnya
                             <span class="material-symbols-outlined">chevron_right</span>
                         </x-ui.button>
                     </div>
@@ -299,16 +305,17 @@
         <x-ui.card-header title="Ringkasan Pengguna" description="Akun yang terdaftar di sistem" />
         <div class="mt-5 grid grid-cols-2 gap-px overflow-hidden border-y border-border bg-border md:grid-cols-4">
             @foreach ([
-                ['Akun Karyawan', $totalKaryawan, "+{$karyawanBaru7Hari} minggu ini", 'admin.akun-karyawan.index', 'pengguna.lihat'],
+                ['Akun Karyawan', $totalKaryawan, "+{$karyawanBaru7Hari} minggu ini · {$karyawanWajibGantiPassword} belum ganti password", 'admin.akun-karyawan.index', 'pengguna.lihat'],
                 ['Akun Kandidat', $totalKandidat, "{$kandidatAktif} aktif · {$kandidatDitolak} ditolak", 'admin.data-kandidat.index', 'pengguna.lihat'],
-                ['Data Karyawan Tanpa Akun', $nikBelumTerpakai, "dari {$totalDataKaryawan} data master", 'admin.akun-karyawan.index', 'pengguna.lihat'],
+                ['Karyawan Nonaktif', $karyawanNonaktif, 'Belum bisa login sampai diaktifkan', 'admin.akun-karyawan.index', 'pengguna.lihat'],
                 ['Admin & Staff', $totalAdminStaff, "{$totalPeran} peran tersedia", 'admin.pengguna-admin.index', 'pengguna_admin.kelola'],
             ] as [$judul, $nilai, $sub, $rute, $izin])
-                <a href="{{ $u->hasIzin($izin) ? route($rute) : '#' }}" class="bg-card px-6 py-4 transition-colors hover:bg-muted/50">
+                @php $tag = $u->hasIzin($izin) ? 'a' : 'div'; @endphp
+                <{{ $tag }} @if ($tag === 'a') href="{{ route($rute) }}" @endif class="bg-card px-6 py-4 transition-colors {{ $tag === 'a' ? 'hover:bg-muted/50' : '' }}">
                     <p class="text-sm text-muted-foreground">{{ $judul }}</p>
                     <p class="mt-1 text-2xl font-semibold tabular-nums">{{ number_format($nilai) }}</p>
                     <p class="mt-1 text-xs text-muted-foreground">{{ $sub }}</p>
-                </a>
+                </{{ $tag }}>
             @endforeach
         </div>
     </x-ui.card>
@@ -322,12 +329,13 @@ function grafikTren(data) {
         rentang: '90',
         get potong() { return -Number(this.rentang); },
         get total() { return data[this.seri].slice(this.potong).reduce((a, b) => a + b, 0).toLocaleString('id-ID'); },
-        mulai() {
-            if (!window.Chart) return;
+        async mulai() {
+            const Chart = await window.muatChart();
+            const warnaUtama = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
             Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
             chart = new Chart(this.$refs.kanvas, {
                 type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: '#2a78d6', hoverBackgroundColor: '#1f5fae',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: warnaUtama, hoverBackgroundColor: warnaUtama + 'cc',
                     borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: 'bottom', maxBarThickness: 32, barPercentage: 0.8 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false, animation: { duration: 250 },

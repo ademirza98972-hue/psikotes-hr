@@ -1,97 +1,43 @@
 @extends('layouts.auth', ['judulHalaman' => 'Login Admin'])
 
 @section('content')
-<div x-data="{ showPwd: false }" class="space-y-6">
-    <div class="space-y-1">
-        <h2 class="font-body font-semibold text-2xl text-on-surface">Masuk ke Dashboard Admin</h2>
-        <p class="font-body text-sm text-on-surface-variant">Silakan masukkan kredensial admin Anda untuk melanjutkan.</p>
+<div class="grid gap-6">
+    <div class="grid gap-1.5 text-center">
+        <h1 class="text-2xl font-semibold tracking-tight">Panel Admin</h1>
+        <p class="text-sm text-muted-foreground">Masuk dengan akun Admin atau HR untuk mengelola tes.</p>
     </div>
 
-    @if ($errors->any())
-        <div class="rounded-sm border border-rose-600 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            <ul class="list-disc space-y-1 pl-5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    @include('auth.partials.pilih-portal')
 
-    <form method="POST" action="{{ route('login.admin') }}" class="space-y-5">
+    <form method="POST" action="{{ route('login.admin') }}" class="grid gap-4">
         @csrf
 
-        <div class="space-y-1.5">
-            <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email">Alamat Email</label>
-            <div class="relative focused-input group">
-                <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value="{{ old('email') }}"
-                    required
-                    autofocus
-                    autocomplete="email"
-                    placeholder="nama@perusahaan.com"
-                    class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @enderror"
-                >
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
-            </div>
+        <div class="grid gap-2">
+            <x-ui.label for="email">Email</x-ui.label>
+            <x-ui.input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="email"
+                        placeholder="nama@perusahaan.com" class="h-10!"
+                        :aria-invalid="$errors->has('email') ? 'true' : null" />
+            @error('email')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
         </div>
 
-        <div class="space-y-1.5">
-            <div class="flex justify-between items-center">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="password">Kata Sandi</label>
-                <a href="{{ route('password.request') }}" class="text-xs text-psikotes font-medium hover:underline">Lupa password?</a>
+        <div class="grid gap-2">
+            <div class="flex items-center justify-between">
+                <x-ui.label for="password">Kata sandi</x-ui.label>
+                <a href="{{ route('password.request') }}" class="text-sm text-primary underline-offset-4 hover:underline">Lupa password?</a>
             </div>
-            <div class="relative focused-input group">
-                <input
-                    id="password"
-                    name="password"
-                    :type="showPwd ? 'text' : 'password'"
-                    required
-                    autocomplete="current-password"
-                    placeholder="••••••••"
-                    class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors"
-                >
-                <button
-                    type="button"
-                    @click="showPwd = !showPwd"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant hover:text-on-surface transition-colors flex items-center"
-                >
-                    <span class="material-symbols-outlined text-lg" x-text="showPwd ? 'visibility_off' : 'visibility'"></span>
-                </button>
-            </div>
-            @error('password')
-                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-            @enderror
+            <x-ui.input-password id="password" name="password" required autocomplete="current-password" class="h-10!"
+                                 :aria-invalid="$errors->has('password') ? 'true' : null" />
+            @error('password')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
         </div>
 
-        <div class="flex items-center gap-2 py-1">
-            <input
-                id="ingat_saya"
-                name="ingat_saya"
-                type="checkbox"
-                value="1"
-                {{ old('ingat_saya') ? 'checked' : '' }}
-                class="w-4 h-4 rounded-sm border-outline-variant text-psikotes focus:ring-psikotes cursor-pointer"
-            >
-            <label for="ingat_saya" class="font-body text-sm text-on-surface-variant cursor-pointer select-none">Ingat saya di perangkat ini</label>
-        </div>
+        <x-ui.label for="ingat_saya" class="font-normal text-muted-foreground">
+            <x-ui.checkbox id="ingat_saya" name="ingat_saya" value="1" :checked="old('ingat_saya')" />
+            Ingat saya di perangkat ini
+        </x-ui.label>
 
-        <button type="submit"
-            class="w-full bg-psikotes text-white font-body font-semibold text-sm py-3.5 rounded-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm shadow-psikotes/20">
-            <span>Masuk</span>
-            <span class="material-symbols-outlined text-[18px]">login</span>
-        </button>
+        <x-ui.button type="submit" size="lg" class="w-full">
+            Masuk ke Dashboard <span class="material-symbols-outlined">arrow_forward</span>
+        </x-ui.button>
     </form>
-
-    <div class="pt-6 border-t border-surface-variant">
-        <p class="font-body text-sm text-on-surface-variant text-center">
-            Bukan admin? <a href="{{ route('login') }}" class="text-psikotes font-medium hover:underline">Login sebagai Peserta</a>
-        </p>
-        <p class="font-body text-sm text-on-surface-variant text-center mt-2">
-            Membutuhkan bantuan akses? <a href="#" class="text-psikotes font-medium hover:underline">Hubungi IT Support</a>
-        </p>
-    </div>
 </div>
 @endsection

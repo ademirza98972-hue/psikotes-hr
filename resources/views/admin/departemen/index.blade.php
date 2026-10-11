@@ -17,10 +17,10 @@
                 <div class="relative flex-1 min-w-[200px] max-w-sm">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#71787b] text-[18px]">search</span>
                     <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama departemen..."
-                        class="block w-full rounded-lg border border-[#c0c8cb] pl-10 pr-4 py-2.5 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]">
+                        class="block w-full rounded-lg border border-[#c0c8cb] pl-10 pr-4 py-2.5 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary">
                 </div>
 
-                <button type="submit" class="rounded-lg bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1a4550] transition whitespace-nowrap">
+                <button type="submit" class="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1a4550] transition whitespace-nowrap">
                     Terapkan Filter
                 </button>
 
@@ -36,7 +36,7 @@
             @auth
                 @if(auth()->user()->hasIzin('departemen.kelola'))
                     <button type="button" @click="openModal('tambah')"
-                            class="rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap">
+                            class="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap">
                         <span class="material-symbols-outlined text-[18px]">add</span>
                         Tambah Departemen
                     </button>
@@ -50,11 +50,11 @@
         <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="w-full text-left border-collapse">
                 <thead style="position: sticky; top: 0; z-index: 5;">
-                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
-                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest" style="color: #7db8c2;">NAMA DEPARTEMEN</th>
-                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-center" style="color: #7db8c2;">JUMLAH POSISI</th>
-                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-right" style="color: #7db8c2;">AKSI</th>
+                    <tr style="background: var(--muted); border-bottom: 1px solid var(--border);">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:var(--muted-foreground);width:52px">No.</th>
+                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest" style="color: var(--muted-foreground);">NAMA DEPARTEMEN</th>
+                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-center" style="color: var(--muted-foreground);">JUMLAH POSISI</th>
+                        <th class="px-6 py-4 font-[11px] uppercase tracking-widest text-right" style="color: var(--muted-foreground);">AKSI</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#c0c8cb]/30 text-sm">
@@ -105,7 +105,7 @@
                                     <p class="text-[12px] text-[#71787c] mb-4">Tambahkan departemen untuk mulai mengelola organisasi.</p>
                                     @auth
                                         @if(auth()->user()->hasIzin('departemen.kelola'))
-                                            <button type="button" @click="openModal('tambah')" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                            <button type="button" @click="openModal('tambah')" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95">
                                                 <span class="material-symbols-outlined text-[16px]">add</span>
                                                 Tambah Departemen
                                             </button>
@@ -157,7 +157,7 @@
                         <div>
                             <label class="block text-[11px] font-semibold uppercase tracking-widest text-[#40484b] mb-1.5">Nama Departemen</label>
                             <input type="text" name="nama_departemen" x-model="nama" required
-                                   class="block w-full rounded-lg border border-[#c0c8cb] px-4 py-3 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]">
+                                   class="block w-full rounded-lg border border-[#c0c8cb] px-4 py-3 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary">
                             <template x-if="errors.nama_departemen">
                                 <span class="mt-1 block text-xs text-rose-600" x-text="errors.nama_departemen[0]"></span>
                             </template>
@@ -165,7 +165,7 @@
 
                         <template x-if="mode === 'edit'">
                             <div class="bg-[#f2f4f6] rounded-lg p-3 flex items-start gap-3">
-                                <span class="material-symbols-outlined text-[#2C5F6F] text-[18px] mt-0.5">info</span>
+                                <span class="material-symbols-outlined text-primary text-[18px] mt-0.5">info</span>
                                 <p class="text-xs text-[#40484b]">
                                     Perubahan nama departemen akan otomatis diperbarui pada seluruh profil karyawan yang terhubung.
                                 </p>
@@ -181,7 +181,7 @@
                         Batal
                     </button>
                     <button type="submit" form="departemen-form"
-                            class="rounded-lg bg-[#2C5F6F] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-all active:scale-95 shadow-sm">
+                            class="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-all active:scale-95 shadow-sm">
                         Simpan
                     </button>
                 </div>
@@ -215,7 +215,7 @@ function confirmHapus(id, nama) {
     Swal.fire({
         icon: 'warning', title: 'Hapus Departemen?',
         text: `Departemen "${nama}" akan dihapus.`,
-        showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+        showCancelButton: true, confirmButtonColor: '#00843D', cancelButtonColor: '#d33',
         confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
     }).then(r => {
         if (!r.isConfirmed) return;

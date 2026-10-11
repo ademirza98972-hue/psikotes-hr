@@ -12,14 +12,14 @@
     {{-- PAGE HEADER --}}
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">Bank Soal</h2>
+            <h2 class="text-[28px] leading-9 font-semibold text-foreground">Bank Soal</h2>
             <p class="mt-0.5 text-[14px] text-[#40484b]">Kelola kumpulan instrumen tes psikologi.</p>
         </div>
         <div class="flex items-center gap-2">
             @if(auth()->user()->hasIzin('soal.tambah'))
             @if($alatTesTerpilih)
                 <a href="{{ route('admin.bank-soal.tambah', $alatTesTerpilih->id) }}"
-                   class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
+                   class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
                     <span class="material-symbols-outlined text-[18px]">add</span>
                     Tambah Soal
                 </a>
@@ -28,7 +28,7 @@
                 @php $alatFirst = $alatTesSemua[0] ?? null; @endphp
                 @if($alatFirst)
                 <a href="{{ route('admin.bank-soal.tambah', $alatFirst->id) }}"
-                   class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
+                   class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
                     <span class="material-symbols-outlined text-[18px]">add</span>
                     Tambah Soal
                 </a>
@@ -51,7 +51,7 @@
                 <div>
                     <label for="alat_tes_id" class="block text-[11px] uppercase tracking-wider font-semibold text-[#40484b] mb-1">Filter Instrumen</label>
                     <select id="alat_tes_id" name="alat_tes_id"
-                            class="block w-64 rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                            class="block w-64 rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer">
                         <option value="">Semua Instrumen</option>
                         @foreach ($alatTesSemua as $alat)
                             <option value="{{ $alat->id }}" @selected((int) request('alat_tes_id') === $alat->id)>
@@ -60,7 +60,7 @@
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                <button type="submit" class="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95">
                     Tampilkan Soal
                 </button>
                 @if (request('alat_tes_id'))
@@ -143,7 +143,7 @@
                             : $kelompok['alat']->nama;
                     @endphp
                     <a href="{{ route('admin.bank-soal.index', ['alat_tes_id' => $alatId]) }}"
-                       class="flex items-center justify-between rounded-xl border border-[#e0e3e5] bg-white px-5 py-4 shadow-sm hover:shadow-md hover:border-[#2C5F6F]/40 transition-all group">
+                       class="flex items-center justify-between rounded-xl border border-[#e0e3e5] bg-white px-5 py-4 shadow-sm hover:shadow-md hover:border-primary/40 transition-all group">
                         <div class="flex items-center gap-3 min-w-0">
                             <span class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-bold {{ kode_badge_class($kodeAlat) }}">
                                 {{ $kodeAlat ?: '?' }}
@@ -154,9 +154,9 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0 ml-3">
-                            <span class="text-[13px] font-bold text-[#2C5F6F]">{{ $kelompok['jumlahSoal'] }}</span>
+                            <span class="text-[13px] font-bold text-primary">{{ $kelompok['jumlahSoal'] }}</span>
                             <span class="text-[11px] text-[#40484b]">soal</span>
-                            <span class="material-symbols-outlined text-[18px] text-[#c0c8cb] group-hover:text-[#2C5F6F] transition-colors">chevron_right</span>
+                            <span class="material-symbols-outlined text-[18px] text-[#c0c8cb] group-hover:text-primary transition-colors">chevron_right</span>
                         </div>
                     </a>
                 @endforeach
@@ -173,7 +173,7 @@ function confirmHapus(soalId, url) {
     Swal.fire({
         icon: 'warning', title: 'Hapus Soal?',
         text: 'Soal ini akan dihapus secara permanen.',
-        showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+        showCancelButton: true, confirmButtonColor: '#00843D', cancelButtonColor: '#d33',
         confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
     }).then(r => { if (r.isConfirmed) document.getElementById('hapus-soal-' + soalId).submit(); });
 }

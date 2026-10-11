@@ -659,7 +659,7 @@
                         @if($iqData)
                         <tr style="background:#f0f7f9;font-weight:700;">
                             <td style="padding:6px 10px;text-align:center;border:1px solid #ddd;"></td>
-                            <td style="padding:6px 10px;border:1px solid #ddd;color:#2C5F6F;">IQ TOTAL: <strong>{{ $iqSkor > 0 ? number_format($iqSkor, 0) : '-' }}</strong> &mdash; {{ $klasifikasiIQ }}</td>
+                            <td style="padding:6px 10px;border:1px solid #ddd;color:#00843D;">IQ TOTAL: <strong>{{ $iqSkor > 0 ? number_format($iqSkor, 0) : '-' }}</strong> &mdash; {{ $klasifikasiIQ }}</td>
                             <td colspan="5" style="border:1px solid #ddd;"></td>
                         </tr>
                         @endif

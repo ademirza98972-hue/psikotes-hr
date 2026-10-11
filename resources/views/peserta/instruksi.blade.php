@@ -80,7 +80,7 @@
     <!-- Checkbox Persetujuan -->
     <div class="mb-6 flex items-start">
         <input type="checkbox" id="persetujuan" x-model="persetujuan"
-            class="mt-1 h-4 w-4 text-[#2C5F6F] rounded focus:ring-[#2C5F6F]" />
+            class="mt-1 h-4 w-4 text-primary rounded focus:ring-primary" />
         <label for="persetujuan" class="ml-3 text-sm text-slate-700">
             Saya telah membaca dan memahami peraturan di atas
         </label>
@@ -90,7 +90,7 @@
     <div class="flex gap-3">
         <a href="{{ route('peserta.tes.kerjakan', $sesiId) }}"
            :class="{
-               'bg-[#2C5F6F] text-white hover:bg-[#1e4450] transition': persetujuan,
+               'bg-primary text-white hover:bg-[#1e4450] transition': persetujuan,
                'bg-slate-200 text-slate-500 cursor-not-allowed pointer-events-none': !persetujuan
            }"
            class="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium">

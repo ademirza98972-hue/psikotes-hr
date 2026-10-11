@@ -26,11 +26,11 @@
     <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-4 px-4 pt-6 pb-4 border-b border-[#e0e3e5]">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
             <div>
-                <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">Daftar Penjadwalan Tes</h2>
+                <h2 class="text-[28px] leading-9 font-semibold text-foreground">Daftar Penjadwalan Tes</h2>
                 <p class="mt-0.5 text-[14px] text-[#40484b]">Sesi tes yang dijadwalkan untuk kandidat dan karyawan.</p>
             </div>
             <a href="{{ route('admin.penjadwalan-tes.tambah') }}"
-               class="self-start inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors whitespace-nowrap">
+               class="self-start inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-colors whitespace-nowrap">
                 <span class="material-symbols-outlined text-[18px]">add</span>
                 Tambah Penjadwalan
             </a>
@@ -42,11 +42,11 @@
                 </span>
                 <input type="text" name="cari" value="{{ $cari }}"
                     placeholder="Cari nama sesi..."
-                    class="w-full rounded-lg border border-[#c0c8cb] py-2 pl-9 pr-4 text-sm text-[#191c1e] placeholder-[#71787c] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all bg-white">
+                    class="w-full rounded-lg border border-[#c0c8cb] py-2 pl-9 pr-4 text-sm text-[#191c1e] placeholder-[#71787c] outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all bg-white">
             </div>
             <div class="relative min-w-[160px]">
                 <select name="status" onchange="this.form.submit()"
-                    class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-9 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
+                    class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-9 text-sm text-[#191c1e] outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer bg-white">
                     <option value="">Semua Status</option>
                     <option value="Draft"   @selected($filterStatus === 'Draft')>Draft</option>
                     <option value="Aktif"   @selected($filterStatus === 'Aktif')>Aktif</option>
@@ -146,7 +146,7 @@
                 {{-- Actions --}}
                 <div class="flex items-center gap-2 px-5 py-3 border-t border-slate-100 bg-slate-50/60">
                     <a href="{{ route('admin.penjadwalan-tes.detail', $sesi->id) }}"
-                       class="inline-flex items-center gap-1.5 rounded-xl bg-[#2C5F6F] px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:bg-[#1E414C] active:scale-95">
+                       class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:bg-primary/90 active:scale-95">
                         <span class="material-symbols-outlined text-[14px]">open_in_new</span>
                         Detail
                     </a>
@@ -173,7 +173,7 @@
                 <p class="mt-3 text-sm font-semibold text-slate-500">Belum ada penjadwalan tes</p>
                 <p class="mt-1 text-[12px] text-slate-400">Buat sesi tes pertama untuk mulai menjadwalkan peserta.</p>
                 <a href="{{ route('admin.penjadwalan-tes.tambah') }}"
-                   class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition">
+                   class="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition">
                     <span class="material-symbols-outlined text-[16px]">add</span>
                     Tambah Penjadwalan
                 </a>

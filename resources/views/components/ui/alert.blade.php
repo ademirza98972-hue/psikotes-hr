@@ -5,6 +5,7 @@
         'default'     => 'bg-card text-card-foreground',
         'destructive' => 'bg-card text-destructive [&_p.desc]:text-destructive/90',
         'warning'     => 'border-amber-200 bg-amber-50 text-amber-900 [&_p.desc]:text-amber-800',
+        'success'     => 'border-emerald-200 bg-emerald-50 text-emerald-900 [&_p.desc]:text-emerald-800',
     ];
 @endphp
 

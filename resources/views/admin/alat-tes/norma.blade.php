@@ -7,15 +7,15 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <nav class="text-[13px] text-[#40484b] mb-1">
-                <a href="{{ route('admin.alat-tes.index') }}" class="hover:text-[#2C5F6F] transition-colors">Alat Tes</a>
+                <a href="{{ route('admin.alat-tes.index') }}" class="hover:text-primary transition-colors">Alat Tes</a>
                 <span class="mx-1">/</span>
-                <span class="text-[#00303c] font-semibold">Norma</span>
+                <span class="text-foreground font-semibold">Norma</span>
             </nav>
-            <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">{{ $alatTes->nama }}</h2>
+            <h2 class="text-[28px] leading-9 font-semibold text-foreground">{{ $alatTes->nama }}</h2>
             <p class="mt-0.5 text-[14px] text-[#40484b]">Kelola data norma konversi dari CSV.</p>
         </div>
         <a href="{{ route('admin.alat-tes.index') }}"
-           class="inline-flex items-center gap-2 border border-[#c0c8cb] hover:border-[#2C5F6F] text-[#40484b] hover:text-[#2C5F6F] px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 whitespace-nowrap">
+           class="inline-flex items-center gap-2 border border-[#c0c8cb] hover:border-primary text-[#40484b] hover:text-primary px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 whitespace-nowrap">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
             Kembali
         </a>
@@ -23,13 +23,13 @@
 
     {{-- Section 1: Upload CSV --}}
     <div class="bg-white border border-[#e0e3e5] rounded-xl p-6">
-        <h3 class="text-[16px] font-bold text-[#00303c] mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">upload_file</span>
+        <h3 class="text-[16px] font-bold text-foreground mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-primary">upload_file</span>
             Upload Norma CSV
         </h3>
 
         <div class="bg-[#f2f4f6] border border-[#e0e3e5] rounded-lg p-4 mb-5">
-            <p class="text-[13px] font-semibold text-[#00303c] mb-2">Format CSV yang diterima:</p>
+            <p class="text-[13px] font-semibold text-foreground mb-2">Format CSV yang diterima:</p>
             <code class="text-[12px] text-[#40484b] bg-white border border-[#e0e3e5] rounded px-2 py-1 block font-mono mb-2">
                 dimensi_kode,kelompok_segmen,tahap,skor_mentah_min,skor_mentah_max,skor_hasil
             </code>
@@ -39,7 +39,7 @@
             <p class="text-[12px] text-[#40484b] mt-2">Kode dimensi yang tersedia untuk alat tes ini:</p>
             <div class="flex flex-wrap gap-2 mt-2">
                 @forelse($dimensi as $d)
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#e8f0f2] text-[#2C5F6F] border border-[#4A8A9B]/30">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary/10 text-primary border border-brand-green/30">
                         {{ $d->kode_dimensi }}
                     </span>
                 @empty
@@ -57,14 +57,14 @@
         <form action="{{ route('admin.alat-tes.uploadNorma', $alatTes->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <div>
-                <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">File CSV</label>
+                <label class="block text-[13px] font-semibold text-foreground mb-1.5">File CSV</label>
                 <input type="file" name="file_csv" accept=".csv" required
-                       class="block w-full text-sm text-[#40484b] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2C5F6F] file:text-white hover:file:bg-[#1E414C] transition-colors cursor-pointer">
+                       class="block w-full text-sm text-[#40484b] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 transition-colors cursor-pointer">
             </div>
 
             <div class="flex items-start gap-2.5">
                 <input type="checkbox" name="hapus_lama" id="hapus_lama" value="1"
-                       class="mt-0.5 w-4 h-4 rounded border-[#c0c8cb] text-[#2C5F6F] focus:ring-[#2C5F6F]">
+                       class="mt-0.5 w-4 h-4 rounded border-[#c0c8cb] text-primary focus:ring-primary">
                 <label for="hapus_lama" class="text-[13px] text-[#40484b] cursor-pointer select-none">
                     Hapus data norma lama sebelum import
                 </label>
@@ -75,7 +75,7 @@
             </p>
 
             <button type="submit"
-                    class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
+                    class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
                 <span class="material-symbols-outlined text-[18px]">upload</span>
                 Upload & Import
             </button>
@@ -84,8 +84,8 @@
 
     {{-- Section 2: Status Norma --}}
     <div class="bg-white border border-[#e0e3e5] rounded-xl p-6">
-        <h3 class="text-[16px] font-bold text-[#00303c] mb-1 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">bar_chart</span>
+        <h3 class="text-[16px] font-bold text-foreground mb-1 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-primary">bar_chart</span>
             Status Norma
         </h3>
         <p class="text-[14px] text-[#40484b] mb-4">
@@ -102,7 +102,7 @@
             {{-- Filter & per-page --}}
             <form method="GET" class="flex flex-wrap items-center gap-3 mb-3">
                 <select name="dimensi" onchange="this.form.submit()"
-                        class="rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                        class="rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                     <option value="">Semua Dimensi</option>
                     @foreach($dimensi as $d)
                         <option value="{{ $d->id }}" {{ $filterDimensi == $d->id ? 'selected' : '' }}>
@@ -111,7 +111,7 @@
                     @endforeach
                 </select>
                 <select name="per_page" onchange="this.form.submit()"
-                        class="rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                        class="rounded-lg border border-[#c0c8cb] bg-white px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                     @foreach([25, 50, 100, 250] as $n)
                         <option value="{{ $n }}" {{ $perPage == $n ? 'selected' : '' }}>{{ $n }} baris</option>
                     @endforeach
@@ -137,7 +137,7 @@
                         @foreach($contohNorma as $n)
                             <tr class="hover:bg-[#f2f4f6] transition-colors">
                                 <td class="px-4 py-2.5">
-                                    <span class="inline-block px-2 py-0.5 rounded bg-[#e8f0f2] text-[#2C5F6F] text-[11px] font-bold">
+                                    <span class="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary text-[11px] font-bold">
                                         {{ $n->dimensi->kode_dimensi ?? '-' }}
                                     </span>
                                 </td>
@@ -145,7 +145,7 @@
                                 <td class="px-4 py-2.5 text-center font-medium text-[#40484b]">{{ $n->tahap }}</td>
                                 <td class="px-4 py-2.5 text-right font-mono text-[#40484b]">{{ number_format($n->skor_mentah_min, 2) }}</td>
                                 <td class="px-4 py-2.5 text-right font-mono text-[#40484b]">{{ number_format($n->skor_mentah_max, 2) }}</td>
-                                <td class="px-4 py-2.5 text-right font-mono font-semibold text-[#2C5F6F]">{{ number_format($n->skor_hasil, 2) }}</td>
+                                <td class="px-4 py-2.5 text-right font-mono font-semibold text-primary">{{ number_format($n->skor_hasil, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

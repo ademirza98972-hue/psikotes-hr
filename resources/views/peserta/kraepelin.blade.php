@@ -19,7 +19,7 @@
 
         /* HEADER */
         .header {
-            background: #2C5F6F;
+            background: #00843D;
             color: white;
             padding: 10px 20px;
             display: grid;
@@ -58,7 +58,7 @@
         }
         .progress-bar-fill {
             height: 100%;
-            background: #2C5F6F;
+            background: #00843D;
             transition: width 0.3s;
         }
 

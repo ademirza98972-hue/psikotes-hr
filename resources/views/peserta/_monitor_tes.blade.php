@@ -43,7 +43,7 @@
     overlay.id = 'fs-overlay';
     overlay.style.cssText = [
         'position:fixed','inset:0','z-index:99999',
-        'background:#2C5F6F','color:white',
+        'background:#00843D','color:white',
         'display:none','flex-direction:column',
         'align-items:center','justify-content:center',
         'font-family:Work Sans,system-ui,sans-serif',
@@ -55,7 +55,7 @@
         '<div id="fs-msg" style="font-size:14px;opacity:.85;margin-bottom:28px;max-width:380px">' +
         'Tes harus dikerjakan dalam mode layar penuh. Klik tombol di bawah untuk memulai.' +
         '</div>' +
-        '<button id="fs-btn" style="background:white;color:#2C5F6F;border:none;padding:14px 32px;' +
+        '<button id="fs-btn" style="background:white;color:#00843D;border:none;padding:14px 32px;' +
         'font-size:16px;font-weight:700;border-radius:10px;cursor:pointer;">Mulai Tes — Layar Penuh</button>';
     document.body.appendChild(overlay);
 

@@ -101,8 +101,8 @@
 
     <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
         <a href="{{ route('admin.hasil-tes.print', [$sesi->id, $hasilTes['peserta_id']]) }}" target="_blank"
-           class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white
-                  shadow-sm hover:bg-[#234853] inline-block">Cetak PDF</a>
+           class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white
+                  shadow-sm hover:bg-primary/90 inline-block">Cetak PDF</a>
     </div>
 
     {{-- ========== HALAMAN 1 ========== --}}
@@ -806,7 +806,7 @@
                             <p style="font-size:13px;font-weight:700;color:#1a1a1a;text-align:center;line-height:1.6;">
                                 Kecerdasan Umum peserta diperkirakan berada pada taraf<br>
                                 <span style="color:#c0392b;">{{ $klasifikasiIQ }}</span><br>
-                                dengan IQ = <span style="font-size:20px;color:#2C5F6F;">{{ $iqSkor > 0 ? number_format($iqSkor, 0) : '-' }}</span><br>
+                                dengan IQ = <span style="font-size:20px;color:#00843D;">{{ $iqSkor > 0 ? number_format($iqSkor, 0) : '-' }}</span><br>
                                 berdasarkan pada skala IST.
                             </p>
                         </div>
@@ -850,7 +850,7 @@
                                         $kat = kategoriIST($skor);
                                     @endphp
                                     <tr style="border-bottom:1px solid #e0e3e5;">
-                                        <td style="padding:5px 10px;font-weight:600;color:#2C5F6F;">{{ $aspek['kode'] }} - {{ $aspek['nama'] }}</td>
+                                        <td style="padding:5px 10px;font-weight:600;color:#00843D;">{{ $aspek['kode'] }} - {{ $aspek['nama'] }}</td>
                                         <td style="padding:5px 10px;text-align:center;">{{ $s ? number_format($s['skor_mentah'], 0) : '-' }}</td>
                                         <td style="padding:5px 10px;text-align:center;font-weight:700;">{{ $skor > 0 ? number_format($skor, 0) : '-' }}</td>
                                         <td style="padding:5px 10px;text-align:center;">{{ $kat ?: '-' }}</td>
@@ -858,9 +858,9 @@
                                 @endforeach
                                 @if($iqData)
                                     <tr style="background:#f0f7f9;font-weight:700;">
-                                        <td style="padding:6px 10px;color:#2C5F6F;">IQ TOTAL</td>
+                                        <td style="padding:6px 10px;color:#00843D;">IQ TOTAL</td>
                                         <td style="padding:6px 10px;text-align:center;">{{ number_format($iqData['skor_mentah'], 0) }}</td>
-                                        <td style="padding:6px 10px;text-align:center;color:#2C5F6F;font-size:14px;">{{ $iqSkor > 0 ? number_format($iqSkor, 0) : '-' }}</td>
+                                        <td style="padding:6px 10px;text-align:center;color:#00843D;font-size:14px;">{{ $iqSkor > 0 ? number_format($iqSkor, 0) : '-' }}</td>
                                         <td style="padding:6px 10px;text-align:center;">{{ $klasifikasiIQ }}</td>
                                     </tr>
                                 @endif
@@ -900,7 +900,7 @@
                           style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:8px 10px; font-size:11px; resize:none; font-family:inherit; box-sizing:border-box;">{{ old('catatan_hr', $hasilTes['catatan_hr'] ?? '') }}</textarea>
                 <div style="margin-top:8px;">
                     <button type="submit"
-                            style="background:#2C5F6F; color:white; border:none; padding:8px 16px; font-size:11px; font-weight:600; border-radius:4px; cursor:pointer;">
+                            style="background:#00843D; color:white; border:none; padding:8px 16px; font-size:11px; font-weight:600; border-radius:4px; cursor:pointer;">
                         Simpan Catatan
                     </button>
                 </div>

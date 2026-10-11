@@ -22,10 +22,10 @@
                             @foreach($soalGrup as $item)
                                 @php
                                     $bg = $item['is_current']
-                                        ? 'bg-[#2C5F6F] text-white border-[#2C5F6F]'
+                                        ? 'bg-primary text-white border-primary'
                                         : ($item['sudah_dijawab']
                                             ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                                            : 'bg-white text-slate-500 border-slate-200 hover:border-[#2C5F6F] hover:text-[#2C5F6F]');
+                                            : 'bg-white text-slate-500 border-slate-200 hover:border-primary hover:text-primary');
                                 @endphp
                                 <a href="{{ route('peserta.tes.kerjakan', $sesiId) }}?step={{ $item['step'] }}"
                                    data-nomor="{{ $item['nomor_soal'] }}"
@@ -40,7 +40,7 @@
             {{-- Legenda --}}
             <div class="mt-4 pt-3 border-t border-slate-100 space-y-1.5">
                 <div class="flex items-center gap-2 text-[10px] text-slate-500">
-                    <span class="w-3 h-3 rounded bg-[#2C5F6F] shrink-0"></span> Sedang dikerjakan
+                    <span class="w-3 h-3 rounded bg-primary shrink-0"></span> Sedang dikerjakan
                 </div>
                 <div class="flex items-center gap-2 text-[10px] text-slate-500">
                     <span class="w-3 h-3 rounded bg-emerald-50 border border-emerald-300 shrink-0"></span> Sudah dijawab
@@ -109,7 +109,7 @@
                 </div>
             </div>
             <div class="w-full bg-slate-200 rounded-full h-1.5">
-                <div class="bg-[#2C5F6F] h-full rounded-full transition-all duration-300"
+                <div class="bg-primary h-full rounded-full transition-all duration-300"
                      style="width: {{ ($soal_nomor - 1) / max($soal_total, 1) * 100 }}%"></div>
             </div>
             <div class="mt-2 text-xs text-slate-500">
@@ -129,7 +129,7 @@
             get warnaTimer() {
                 if (this.sisa <= 30) return 'text-red-600';
                 if (this.sisa <= 60) return 'text-orange-500';
-                return 'text-[#2C5F6F]';
+                return 'text-primary';
             },
             init() {
                 var v = window._soalNavVersion || 0;
@@ -156,7 +156,7 @@
             <div class="flex items-center gap-4">
                 <div class="w-32 bg-slate-200 rounded-full h-2">
                     <div class="h-full rounded-full transition-all duration-1000"
-                         :class="sisa <= 30 ? 'bg-red-500' : sisa <= 60 ? 'bg-orange-400' : 'bg-[#2C5F6F]'"
+                         :class="sisa <= 30 ? 'bg-red-500' : sisa <= 60 ? 'bg-orange-400' : 'bg-primary'"
                          :style="'width:' + persen + '%'"></div>
                 </div>
                 <div class="text-2xl font-bold font-mono tabular-nums" :class="warnaTimer">
@@ -175,7 +175,7 @@
             get menit() { return String(Math.floor(this.sisa / 60)).padStart(2, '0') },
             get detik() { return String(this.sisa % 60).padStart(2, '0') },
             get persen() { return (this.sisa / this.durasi) * 100 },
-            get warnaBar() { return this.sisa <= 10 ? 'bg-red-500' : (this.sisa <= 30 ? 'bg-amber-400' : 'bg-[#2C5F6F]') },
+            get warnaBar() { return this.sisa <= 10 ? 'bg-red-500' : (this.sisa <= 30 ? 'bg-amber-400' : 'bg-primary') },
             get warnaTimer() { return this.sisa <= 10 ? 'text-red-600' : (this.sisa <= 30 ? 'text-amber-600' : 'text-slate-700') },
             init() {
                 var v = window._soalNavVersion || 0;
@@ -223,10 +223,10 @@
                         </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach($soal_data['opsi'] as $opsi)
-                                <label class="flex items-start gap-3 border border-slate-200 rounded-lg p-4 hover:border-[#2C5F6F]/50 hover:bg-[#2C5F6F]/5 transition cursor-pointer">
+                                <label class="flex items-start gap-3 border border-slate-200 rounded-lg p-4 hover:border-primary/50 hover:bg-primary/5 transition cursor-pointer">
                                     <input type="radio" name="opsi_id" value="{{ $opsi['id'] }}"
                                            @checked($saved_answer == $opsi['id'])
-                                           class="mt-0.5 h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F] shrink-0" />
+                                           class="mt-0.5 h-4 w-4 text-primary focus:ring-primary shrink-0" />
                                     <p class="text-sm text-slate-700 leading-relaxed">{{ $opsi['teks'] }}</p>
                                 </label>
                             @endforeach
@@ -240,10 +240,10 @@
                         @endif
                         <div class="space-y-3">
                             @foreach($soal_data['opsi'] as $opsi)
-                                <label class="flex items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg hover:border-[#2C5F6F]/50 hover:bg-[#2C5F6F]/5 transition cursor-pointer">
+                                <label class="flex items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg hover:border-primary/50 hover:bg-primary/5 transition cursor-pointer">
                                     <input type="radio" name="opsi_id" value="{{ $opsi['id'] }}"
                                            @checked($saved_answer == $opsi['id'])
-                                           class="h-4 w-4 text-[#2C5F6F] focus:ring-[#2C5F6F] shrink-0" />
+                                           class="h-4 w-4 text-primary focus:ring-primary shrink-0" />
                                     <span class="text-sm text-slate-700">{{ $opsi['teks'] }}</span>
                                 </label>
                             @endforeach
@@ -256,7 +256,7 @@
                             <label class="block text-sm font-medium text-slate-700 mb-2">Jawaban Anda:</label>
                             <input type="text" name="jawaban_teks" value="{{ $saved_answer_teks ?? '' }}"
                                    autocomplete="off"
-                                   class="block w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                                   class="block w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                                    placeholder="Ketik satu kata yang mencakup kedua kata di atas">
                         </div>
 
@@ -268,7 +268,7 @@
                             <input type="text" inputmode="numeric" pattern="[0-9]*" data-numeric
                                    name="jawaban_teks" value="{{ $saved_answer_teks ?? '' }}"
                                    autocomplete="off"
-                                   class="block w-48 rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F] font-mono text-lg"
+                                   class="block w-48 rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary font-mono text-lg"
                                    placeholder="0">
                         </div>
 
@@ -289,7 +289,7 @@
                              x-data="{ sel: '{{ $saved_answer ?? '' }}' }">
                             @foreach($soal_data['opsi'] as $opsi)
                                 <label @click="sel = '{{ $opsi['id'] }}'"
-                                       :class="sel == '{{ $opsi['id'] }}' ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-slate-200 hover:border-[#2C5F6F]/50'"
+                                       :class="sel == '{{ $opsi['id'] }}' ? 'border-primary bg-primary/5' : 'border-slate-200 hover:border-primary/50'"
                                        class="flex flex-col items-center gap-2 border-2 rounded-lg p-2 cursor-pointer transition">
                                     <input type="radio" name="opsi_id" value="{{ $opsi['id'] }}"
                                            @checked($saved_answer == $opsi['id'])
@@ -313,7 +313,7 @@
                                 <label class="flex items-center gap-2">
                                     <input type="radio" name="opsi_id" value="{{ $opsi['id'] }}"
                                            @checked($saved_answer == $opsi['id'])
-                                           class="h-4 w-4 text-[#2C5F6F] border-slate-300 focus:ring-[#2C5F6F]" />
+                                           class="h-4 w-4 text-primary border-slate-300 focus:ring-primary" />
                                     <span class="text-sm text-slate-700">{{ $opsi['teks'] }}</span>
                                 </label>
                             @endforeach
@@ -348,7 +348,7 @@
                         <div x-data="{ showModal: false }">
                             <button type="button"
                                     @click="showModal = true"
-                                    class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                                    class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-primary hover:bg-[#1e4450] transition">
                                 Selesaikan Subtes {{ $kode_subtes_timer ?? '' }} &rarr;
                             </button>
 
@@ -388,11 +388,11 @@
                                     @else
                                     <div class="flex gap-3 mt-6 justify-end">
                                         <button type="button" @click="showModal = false"
-                                                class="px-4 py-2 rounded-lg text-sm font-medium border border-[#2C5F6F] text-[#2C5F6F] hover:bg-slate-50 transition">
+                                                class="px-4 py-2 rounded-lg text-sm font-medium border border-primary text-primary hover:bg-slate-50 transition">
                                             Batal
                                         </button>
                                         <button type="button" @click="if(window._soalSubmit) window._soalSubmit(); else document.getElementById('form-jawaban').submit();"
-                                                class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                                                class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary hover:bg-[#1e4450] transition">
                                             Ya, Selesaikan
                                         </button>
                                     </div>
@@ -428,7 +428,7 @@
                                         title: 'Soal Belum Lengkap',
                                         text: 'Masih ada ' + eff + ' soal yang belum dijawab. Jawab semua soal sebelum dapat menyelesaikan tes.',
                                         confirmButtonText: 'Oke, Lanjut Mengerjakan',
-                                        confirmButtonColor: '#2C5F6F',
+                                        confirmButtonColor: '#00843D',
                                     });
                                     return;
                                 }
@@ -439,13 +439,13 @@
                         }">
                             <button type="button"
                                     @click="selesai()"
-                                    class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                                    class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-primary hover:bg-[#1e4450] transition">
                                 Selesai &rarr;
                             </button>
                         </div>
                     @else
                         <button type="submit"
-                                class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-[#2C5F6F] hover:bg-[#1e4450] transition">
+                                class="inline-flex items-center gap-2 px-6 py-2 rounded-md text-sm font-medium text-white bg-primary hover:bg-[#1e4450] transition">
                             Selanjutnya &rarr;
                         </button>
                     @endif
@@ -515,7 +515,7 @@
             title: 'Tidak Bisa Berpindah Subtes',
             text: msg,
             confirmButtonText: 'Oke',
-            confirmButtonColor: '#2C5F6F',
+            confirmButtonColor: '#00843D',
         });
     }
 
@@ -648,7 +648,7 @@
                         title: 'Jawaban Kosong',
                         text: 'Pilih jawaban terlebih dahulu, atau tunggu waktu habis untuk berpindah soal.',
                         confirmButtonText: 'Oke',
-                        confirmButtonColor: '#2C5F6F',
+                        confirmButtonColor: '#00843D',
                     });
                     return;
                 }
@@ -679,7 +679,7 @@
                     title: 'Jawaban Kosong',
                     text: 'Pilih jawaban terlebih dahulu, atau tunggu waktu habis untuk lanjut ke soal berikutnya.',
                     confirmButtonText: 'Oke',
-                    confirmButtonColor: '#2C5F6F',
+                    confirmButtonColor: '#00843D',
                 });
                 return;
             }

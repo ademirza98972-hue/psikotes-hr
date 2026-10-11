@@ -58,7 +58,7 @@ x-init="
         </div>
         @if (auth()->user()->hasIzin('pengguna.tambah'))
             <button type="button" @click="modalTambah = true"
-               class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors active:scale-[0.98] whitespace-nowrap">
+               class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-colors active:scale-[0.98] whitespace-nowrap">
                 <span class="material-symbols-outlined text-[18px]">person_add</span>
                 Tambah Kandidat
             </button>
@@ -75,13 +75,13 @@ x-init="
                 </span>
                 <input type="text" name="cari" value="{{ $kataKunci }}"
                     placeholder="Cari nama, email, atau NIK KTP..."
-                    class="w-full rounded-lg border border-[#c0c8cb] py-2 pl-9 pr-4 text-sm text-[#191c1e] placeholder-[#71787c] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all">
+                    class="w-full rounded-lg border border-[#c0c8cb] py-2 pl-9 pr-4 text-sm text-[#191c1e] placeholder-[#71787c] outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all">
             </div>
 
             {{-- Filter Status --}}
             <div class="relative min-w-[180px]">
                 <select name="status" onchange="this.form.submit()"
-                    class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
+                    class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer bg-white">
                     <option value="">Semua Status</option>
                     <option value="menunggu_verifikasi" @if($filterStatus === 'menunggu_verifikasi') selected @endif>Menunggu Verifikasi</option>
                     <option value="aktif" @if($filterStatus === 'aktif') selected @endif>Aktif</option>
@@ -95,7 +95,7 @@ x-init="
             {{-- Filter Posisi --}}
             <div class="relative min-w-[180px]">
                 <select name="posisi" onchange="this.form.submit()"
-                    class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
+                    class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer bg-white">
                     <option value="">Semua Posisi</option>
                     @foreach ($semuaPosisi as $p)
                         <option value="{{ $p->id }}" @if($filterPosisi == $p->id) selected @endif>{{ $p->nama_posisi }}</option>
@@ -124,14 +124,14 @@ x-init="
             <table class="w-full text-left border-collapse">
                 <caption class="sr-only">Daftar Akun Kandidat</caption>
                 <thead style="position: sticky; top: 0; z-index: 5;">
-                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">NIK</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Nama Kandidat</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Email</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: #7db8c2;">Posisi yang Dilamar</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center" style="color: #7db8c2;">Status</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color: #7db8c2;">Aksi</th>
+                    <tr style="background: var(--muted); border-bottom: 1px solid var(--border);">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:var(--muted-foreground);width:52px">No.</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--muted-foreground);">NIK</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--muted-foreground);">Nama Kandidat</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--muted-foreground);">Email</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color: var(--muted-foreground);">Posisi yang Dilamar</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center" style="color: var(--muted-foreground);">Status</th>
+                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color: var(--muted-foreground);">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#e0e3e5]">
@@ -144,7 +144,7 @@ x-init="
                             $status = $item->status;
                             $inisial = strtoupper(mb_substr(explode(' ', $namaTampil)[0], 0, 2));
                             $avatarBg = match(hexdec(substr(substr(md5($namaTampil), 0, 6), 0, 6)) % 4) {
-                                0 => 'bg-[#2C5F6F]/10 text-[#2C5F6F]',
+                                0 => 'bg-primary/10 text-primary',
                                 1 => 'bg-blue-100 text-blue-700',
                                 2 => 'bg-violet-100 text-violet-700',
                                 default => 'bg-amber-100 text-amber-700',
@@ -222,7 +222,7 @@ x-init="
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit"
-                                                        class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
+                                                        class="p-2 rounded-lg text-[#40484b] hover:text-primary hover:bg-primary/10 transition-colors"
                                                         title="{{ $item->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}">
                                                     <span class="material-symbols-outlined text-[18px]">
                                                         {{ $item->status === 'aktif' ? 'block' : 'check_circle' }}
@@ -272,7 +272,7 @@ x-init="
                                     <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Data Kandidat</p>
                                     <p class="text-[12px] text-[#71787c] mb-4">Tambahkan kandidat baru untuk memulai proses seleksi.</p>
                                     @if (auth()->user()->hasIzin('pengguna.tambah'))
-                                        <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                        <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95">
                                             <span class="material-symbols-outlined text-[16px]">add</span>
                                             Tambah Kandidat
                                         </button>
@@ -319,13 +319,13 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Nama Kandidat <span class="text-rose-500">*</span></label>
                                 <input name="nama_kandidat" type="text" required value="{{ old('nama_kandidat') }}"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('nama_kandidat') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('nama_kandidat') border-rose-400 @enderror">
                                 @error('nama_kandidat')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">NIK KTP <span class="text-rose-500">*</span></label>
                                 <input name="nik_kandidat" type="text" maxlength="16" value="{{ old('nik_kandidat') }}"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('nik_kandidat') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('nik_kandidat') border-rose-400 @enderror">
                                 @error('nik_kandidat')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -334,13 +334,13 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Email <span class="text-rose-500">*</span></label>
                                 <input name="email" type="email" required value="{{ old('email') }}"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('email') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('email') border-rose-400 @enderror">
                                 @error('email')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">No. HP <span class="text-rose-500">*</span></label>
                                 <input name="no_hp" type="text" required value="{{ old('no_hp') }}"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('no_hp') border-rose-400 @enderror">
                                 @error('no_hp')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -349,13 +349,13 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Tgl. Lahir <span class="text-rose-500">*</span></label>
                                 <input name="tanggal_lahir" type="date" required value="{{ old('tanggal_lahir') }}"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('tanggal_lahir') border-rose-400 @enderror">
                                 @error('tanggal_lahir')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Jenis Kelamin <span class="text-rose-500">*</span></label>
                                 <select name="jenis_kelamin" required
-                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 appearance-none bg-white cursor-pointer @error('jenis_kelamin') border-rose-400 @enderror">
+                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 appearance-none bg-white cursor-pointer @error('jenis_kelamin') border-rose-400 @enderror">
                                     <option value="">-- Pilih --</option>
                                     <option value="L" @if(old('jenis_kelamin') === 'L') selected @endif>Laki-laki</option>
                                     <option value="P" @if(old('jenis_kelamin') === 'P') selected @endif>Perempuan</option>
@@ -370,7 +370,7 @@ x-init="
                                 <select id="tambah-kandidat-dept" name="departemen" required
                                         x-model="tambahDeptId"
                                         @change="loadPosisi('posisiTambah', tambahDeptId, null)"
-                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 appearance-none bg-white cursor-pointer @error('departemen') border-rose-400 @enderror">
+                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 appearance-none bg-white cursor-pointer @error('departemen') border-rose-400 @enderror">
                                     <option value="">-- Pilih --</option>
                                     @foreach($daftarDepartemen as $dept)
                                         <option value="{{ $dept->id }}" @if(old('departemen') == $dept->id) selected @endif>{{ $dept->nama_departemen }}</option>
@@ -381,7 +381,7 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Posisi Dilamar <span class="text-rose-500">*</span></label>
                                 <select id="tambah-kandidat-posisi" name="posisi_dilamar" required
-                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 appearance-none bg-white cursor-pointer @error('posisi_dilamar') border-rose-400 @enderror">
+                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 appearance-none bg-white cursor-pointer @error('posisi_dilamar') border-rose-400 @enderror">
                                     <option value="">-- Pilih --</option>
                                     <template x-for="p in posisiTambah" :key="p.id">
                                         <option :value="String(p.id)" x-text="p.nama_posisi"></option>
@@ -394,7 +394,7 @@ x-init="
                         <div>
                             <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Pendidikan Terakhir <span class="text-rose-500">*</span></label>
                             <input name="pendidikan_terakhir" type="text" required value="{{ old('pendidikan_terakhir') }}" placeholder="contoh: S1 Psikologi"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('pendidikan_terakhir') border-rose-400 @enderror">
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('pendidikan_terakhir') border-rose-400 @enderror">
                             @error('pendidikan_terakhir')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                         </div>
                         {{-- Password --}}
@@ -402,13 +402,13 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Password <span class="text-rose-500">*</span></label>
                                 <input name="password" type="password" required
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('password') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('password') border-rose-400 @enderror">
                                 @error('password')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Konfirmasi Password <span class="text-rose-500">*</span></label>
                                 <input name="password_confirmation" type="password" required
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20">
                             </div>
                         </div>
                     </div>
@@ -416,7 +416,7 @@ x-init="
                         <button type="button" @click="modalTambah = false"
                                 class="rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
                         <button type="submit"
-                                class="rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">Simpan</button>
+                                class="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-primary/90 transition-colors">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -446,13 +446,13 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Nama Kandidat <span class="text-rose-500">*</span></label>
                                 <input name="nama_kandidat" type="text" required :value="ubah.nama"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('nama_kandidat') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('nama_kandidat') border-rose-400 @enderror">
                                 @error('nama_kandidat')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">NIK KTP</label>
                                 <input name="nik_kandidat" type="text" maxlength="16" :value="ubah.nik"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('nik_kandidat') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('nik_kandidat') border-rose-400 @enderror">
                                 @error('nik_kandidat')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -461,13 +461,13 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Email <span class="text-rose-500">*</span></label>
                                 <input name="email" type="email" required :value="ubah.email"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('email') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('email') border-rose-400 @enderror">
                                 @error('email')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">No. HP <span class="text-rose-500">*</span></label>
                                 <input name="no_hp" type="text" required :value="ubah.no_hp"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('no_hp') border-rose-400 @enderror">
                                 @error('no_hp')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -476,13 +476,13 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Tgl. Lahir <span class="text-rose-500">*</span></label>
                                 <input name="tanggal_lahir" type="date" required :value="ubah.tgl"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('tanggal_lahir') border-rose-400 @enderror">
                                 @error('tanggal_lahir')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Jenis Kelamin <span class="text-rose-500">*</span></label>
                                 <select name="jenis_kelamin" required
-                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 appearance-none bg-white cursor-pointer @error('jenis_kelamin') border-rose-400 @enderror">
+                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 appearance-none bg-white cursor-pointer @error('jenis_kelamin') border-rose-400 @enderror">
                                     <option value="">-- Pilih --</option>
                                     <option value="L" :selected="ubah.jk === 'L'">Laki-laki</option>
                                     <option value="P" :selected="ubah.jk === 'P'">Perempuan</option>
@@ -497,7 +497,7 @@ x-init="
                                 <select name="departemen" required
                                         x-model="ubah.deptId"
                                         @change="loadPosisi('posisiUbah', ubah.deptId, null); ubah.posisiId = ''"
-                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 appearance-none bg-white cursor-pointer @error('departemen') border-rose-400 @enderror">
+                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 appearance-none bg-white cursor-pointer @error('departemen') border-rose-400 @enderror">
                                     <option value="">-- Pilih --</option>
                                     @foreach($daftarDepartemen as $dept)
                                         <option value="{{ $dept->id }}">{{ $dept->nama_departemen }}</option>
@@ -508,7 +508,7 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Posisi Dilamar <span class="text-rose-500">*</span></label>
                                 <select name="posisi_dilamar" required
-                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 appearance-none bg-white cursor-pointer @error('posisi_dilamar') border-rose-400 @enderror">
+                                        class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 appearance-none bg-white cursor-pointer @error('posisi_dilamar') border-rose-400 @enderror">
                                     <option value="">-- Pilih --</option>
                                     <template x-for="p in posisiUbah" :key="p.id">
                                         <option :value="String(p.id)" x-text="p.nama_posisi" :selected="String(p.id) === ubah.posisiId"></option>
@@ -521,7 +521,7 @@ x-init="
                         <div>
                             <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Pendidikan Terakhir <span class="text-rose-500">*</span></label>
                             <input name="pendidikan_terakhir" type="text" required :value="ubah.pendidikan" placeholder="contoh: S1 Psikologi"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('pendidikan_terakhir') border-rose-400 @enderror">
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('pendidikan_terakhir') border-rose-400 @enderror">
                             @error('pendidikan_terakhir')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                         </div>
                         {{-- Password (opsional) --}}
@@ -529,13 +529,13 @@ x-init="
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Password Baru <span class="text-[#71787c] font-normal">(opsional)</span></label>
                                 <input name="password" type="password"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20 @error('password') border-rose-400 @enderror">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 @error('password') border-rose-400 @enderror">
                                 @error('password')<p class="mt-0.5 text-[11px] text-rose-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-[12px] font-medium text-[#40484b] mb-0.5">Konfirmasi Password</label>
                                 <input name="password_confirmation" type="password"
-                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20">
+                                       class="w-full rounded-lg border border-[#c0c8cb] px-2.5 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20">
                             </div>
                         </div>
                     </div>
@@ -543,7 +543,7 @@ x-init="
                         <button type="button" @click="modalUbah = false"
                                 class="rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
                         <button type="submit"
-                                class="rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">Simpan</button>
+                                class="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-primary/90 transition-colors">Simpan</button>
                     </div>
                 </form>
             </div>

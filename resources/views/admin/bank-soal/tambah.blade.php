@@ -47,8 +47,8 @@
                         class="w-full bg-[#f2f4f6] border border-[#e0e3e5]
                                rounded-xl px-4 py-3 text-sm font-mono
                                text-[#191c1e] focus:ring-2
-                               focus:ring-[#2C5F6F]/40
-                               focus:border-[#2C5F6F] outline-none
+                               focus:ring-primary/40
+                               focus:border-primary outline-none
                                transition-all resize-none"
                         placeholder="1,6,2,8,8,2,2,1,6,9,6,4,6,6,2,1,7,6,1,6,2,4,1,6,4,9,1"
                     >{{ old('teks_soal') }}</textarea>
@@ -61,7 +61,7 @@
             <div>
                 <label for="teks_soal" class="block text-sm font-medium text-slate-700">Teks Soal <span class="text-rose-500">*</span></label>
                 <textarea id="teks_soal" name="teks_soal" rows="3" required
-                          class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">{{ old('teks_soal') }}</textarea>
+                          class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">{{ old('teks_soal') }}</textarea>
             </div>
 
             <div class="space-y-3">
@@ -74,7 +74,7 @@
                         <label for="kunci_{{ $huruf }}" class="w-6 text-sm font-semibold text-slate-700">{{ $huruf }}.</label>
                         <input type="text" name="opsi[{{ $huruf }}]" value="{{ old('opsi.' . $huruf) }}" required
                                placeholder="Teks opsi {{ $huruf }}"
-                               class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                               class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                     </div>
                 @endforeach
             </div>
@@ -83,14 +83,14 @@
             <div>
                 <label for="pernyataan" class="block text-sm font-medium text-slate-700">Pernyataan <span class="text-rose-500">*</span></label>
                 <textarea id="pernyataan" name="pernyataan" rows="3" required
-                          class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">{{ old('pernyataan') }}</textarea>
+                          class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">{{ old('pernyataan') }}</textarea>
             </div>
 
             <div>
                 <label for="dimensi" class="block text-sm font-medium text-slate-700">Nama Dimensi <span class="text-rose-500">*</span></label>
                 <input id="dimensi" name="dimensi" type="text" value="{{ old('dimensi') }}" required maxlength="100"
                        placeholder="mis. Influence, Dominance, D, Pa, ..."
-                       class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                       class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                 <p class="mt-1 text-xs text-slate-500">&nbsp;</p>
             </div>
 
@@ -105,13 +105,13 @@
                     <div class="mt-2">
                         <label for="pernyataan_a" class="block text-sm font-medium text-slate-700">Teks Pernyataan <span class="text-rose-500">*</span></label>
                         <textarea id="pernyataan_a" name="pernyataan_a" rows="3" required
-                                  class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">{{ old('pernyataan_a') }}</textarea>
+                                  class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">{{ old('pernyataan_a') }}</textarea>
                     </div>
                     <div class="mt-3">
                         <label for="dimensi_a" class="block text-sm font-medium text-slate-700">Dimensi A <span class="text-rose-500">*</span></label>
                         @if ($dimensiList->isNotEmpty())
                             <select id="dimensi_a" name="dimensi_a" required
-                                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                                 <option value="">-- Pilih Dimensi A --</option>
                                 @foreach ($dimensiList as $d)
                                     <option value="{{ $d->kode_dimensi }}" {{ $defaultDimensiA === $d->kode_dimensi ? 'selected' : '' }}>{{ $d->kode_dimensi }} — {{ $d->nama_dimensi }}</option>
@@ -119,7 +119,7 @@
                             </select>
                         @else
                             <input id="dimensi_a" name="dimensi_a" type="text" value="{{ $defaultDimensiA }}" required maxlength="100"
-                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                         @endif
                     </div>
                 </div>
@@ -129,13 +129,13 @@
                     <div class="mt-2">
                         <label for="pernyataan_b" class="block text-sm font-medium text-slate-700">Teks Pernyataan <span class="text-rose-500">*</span></label>
                         <textarea id="pernyataan_b" name="pernyataan_b" rows="3" required
-                                  class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">{{ old('pernyataan_b') }}</textarea>
+                                  class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">{{ old('pernyataan_b') }}</textarea>
                     </div>
                     <div class="mt-3">
                         <label for="dimensi_b" class="block text-sm font-medium text-slate-700">Dimensi B <span class="text-rose-500">*</span></label>
                         @if ($dimensiList->isNotEmpty())
                             <select id="dimensi_b" name="dimensi_b" required
-                                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                                 <option value="">-- Pilih Dimensi B --</option>
                                 @foreach ($dimensiList as $d)
                                     <option value="{{ $d->kode_dimensi }}" {{ $defaultDimensiB === $d->kode_dimensi ? 'selected' : '' }}>{{ $d->kode_dimensi }} — {{ $d->nama_dimensi }}</option>
@@ -143,7 +143,7 @@
                             </select>
                         @else
                             <input id="dimensi_b" name="dimensi_b" type="text" value="{{ $defaultDimensiB }}" required maxlength="100"
-                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                         @endif
                     </div>
                 </div>
@@ -157,7 +157,7 @@
             <div>
                 <label for="tipe_format" class="block text-sm font-medium text-slate-700">Tipe Format <span class="text-rose-500">*</span></label>
                 <select id="tipe_format" name="tipe_format"
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                     <option value="pilihan_ganda" {{ old('tipe_format') === 'pilihan_ganda' ? 'selected' : '' }}>Pilihan Ganda</option>
                     <option value="pilihan_gambar" {{ old('tipe_format') === 'pilihan_gambar' ? 'selected' : '' }}>Pilihan Gambar</option>
                     <option value="isian_teks" {{ old('tipe_format') === 'isian_teks' ? 'selected' : '' }}>Isian Teks</option>
@@ -170,14 +170,14 @@
                 <div class="mb-4">
                     <label for="teks_soal" class="block text-sm font-medium text-slate-700">Teks Soal</label>
                     <textarea id="teks_soal" name="teks_soal" rows="3"
-                              class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                              class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                               placeholder="Isi teks soal (opsional untuk soal isian)">{{ old('teks_soal') }}</textarea>
                 </div>
 
                 <div id="section_gambar_soal">
                     <label class="block text-sm font-medium text-slate-700">Gambar Soal</label>
                     <input type="file" name="gambar_soal" accept="image/*"
-                           class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#2C5F6F] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-[#234853]">
+                           class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-primary/90">
                 </div>
             </div>
 
@@ -188,19 +188,19 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700">Jawaban benar (2 poin)</label>
                         <input type="text" id="ge_2poin" placeholder="simbol, lambang, tanda"
-                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700">Jawaban kurang tepat (1 poin) <span class="text-slate-400 font-normal">— opsional</span></label>
                         <input type="text" id="ge_1poin" placeholder="nama, tanda pengenal"
-                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                               class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                     </div>
                     <input type="hidden" name="kunci_jawaban" id="ge_kunci_hidden">
                 </div>
                 <div id="section_kunci_angka" class="hidden">
                     <label class="block text-sm font-medium text-slate-700">Kunci Jawaban <span class="text-rose-500">*</span></label>
                     <input type="text" id="kunci_jawaban_input" name="kunci_jawaban" value="{{ old('kunci_jawaban') }}"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]"
+                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                            placeholder="Jawaban angka, contoh: 35">
                 </div>
             </div>
@@ -214,11 +214,11 @@
                             <div class="flex items-center gap-3">
                                 <input type="radio" name="kunci_jawaban" value="{{ $huruf }}" id="kunci_{{ $huruf }}"
                                        @checked(old('kunci_jawaban') === $huruf)
-                                       class="h-4 w-4 border-slate-300 text-[#2C5F6F]">
+                                       class="h-4 w-4 border-slate-300 text-primary">
                                 <label for="kunci_{{ $huruf }}" class="w-6 text-sm font-semibold text-slate-700">{{ strtoupper($huruf) }}.</label>
                                 <input type="text" name="opsi[{{ $huruf }}]" value="{{ old('opsi.' . $huruf) }}"
                                        placeholder="Teks opsi {{ strtoupper($huruf) }}"
-                                       class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none">
+                                       class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none">
                                 <div class="gambar-opsi-wrapper">
                                     <input type="file" name="gambar_opsi[{{ $huruf }}]" accept="image/*"
                                            class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-1 file:text-sm file:text-slate-700">
@@ -260,7 +260,7 @@
 
         <div class="sticky bottom-0 -mx-6 mt-4 flex justify-end gap-2 border-t border-slate-200 bg-white px-6 py-3 shadow-[0_-2px_4px_rgba(0,0,0,0.04)]">
             <a href="{{ route('admin.bank-soal.index', ['alat_tes_id' => $alatTes->id]) }}" class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</a>
-            <button type="submit" class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#234853]">Simpan</button>
+            <button type="submit" class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90">Simpan</button>
         </div>
 
         <script>

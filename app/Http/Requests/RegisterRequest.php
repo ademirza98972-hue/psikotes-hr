@@ -44,13 +44,17 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'required' => ':attribute wajib diisi.',
+            'required' => ':Attribute wajib diisi.',
             'email' => 'Format :attribute tidak valid.',
-            'unique' => ':attribute sudah terdaftar.',
-            'min' => ':attribute minimal :min karakter.',
+            'unique' => ':Attribute sudah terdaftar.',
+            'min' => ':Attribute minimal :min karakter.',
             'confirmed' => 'Konfirmasi :attribute tidak cocok.',
-            'in' => ':attribute tidak valid.',
-            'max' => ':attribute maksimal :max karakter.',
+            'in' => ':Attribute tidak valid.',
+            'max' => ':Attribute maksimal :max karakter.',
+            'digits' => ':Attribute harus :digits digit angka.',
+            'integer' => ':Attribute tidak valid.',
+            'exists' => ':Attribute tidak ditemukan.',
+            'date' => ':Attribute bukan tanggal yang valid.',
         ];
     }
 
@@ -60,11 +64,11 @@ class RegisterRequest extends FormRequest
             'name' => 'nama',
             'email' => 'email',
             'password' => 'password',
-            'no_hp' => 'no HP',
+            'no_hp' => 'no. HP',
             'tipe_akun' => 'tipe akun',
             'posisi_dilamar' => 'posisi yang dilamar',
             'pendidikan_terakhir' => 'pendidikan terakhir',
-            'nik_kandidat' => 'nik KTP',
+            'nik_kandidat' => 'NIK KTP',
             'nik_karyawan' => 'NIK',
             'jenis_kelamin' => 'jenis kelamin',
         ];

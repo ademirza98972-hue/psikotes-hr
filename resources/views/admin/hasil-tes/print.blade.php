@@ -25,7 +25,7 @@
             padding: 7px 18px; border: none; border-radius: 6px;
             font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s;
         }
-        .btn-print { background: #2C5F6F; color: #fff; }
+        .btn-print { background: #00843D; color: #fff; }
         .btn-print:hover { background: #1e4550; }
         .btn-close  { background: #475569; color: #fff; }
         .btn-close:hover { background: #334155; }

@@ -4,6 +4,54 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #16 — Portal peserta: sidebar gelap beda sendiri & tidak responsif di HP
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-12 |
+| File | `layouts/panel.blade.php` (baru), `layouts/admin.blade.php`, `layouts/peserta.blade.php`, `peserta/dashboard.blade.php`, `tests/Feature/SmokeHalamanTest.php` |
+| Masalah | (1) Sidebar peserta gelap (CSS kustom ~150 baris) beda dari admin. (2) Di HP sidebar 280px selalu tampil dan memakan layar, tanpa tombol buka/tutup. (3) SweetAlert dimuat dari CDN. (4) 3 kartu statistik dashboard peserta terpotong di 375px ("Total Ditugas…") |
+| Akar | Dua layout ditulis terpisah; admin sudah pindah ke shadcn (Fix #8–#11), peserta tidak ikut. Grid `grid-cols-3` tanpa breakpoint |
+| Fix | Kerangka bersama `layouts.panel` (sidebar, topbar, notifikasi, flash); `admin`/`peserta` hanya menyusun menu lalu `@extends('layouts.panel')`. Peserta dapat drawer mobile + collapse desktop; SweetAlert CDN diganti `x-ui.notifikasi` (shim `window.Swal` menangani 4 dialog di halaman pengerjaan tes). Mode fokus (halaman tes) tetap tanpa sidebar, topbar menampilkan logo + judul. Grid kartu `grid-cols-1 sm:grid-cols-3` |
+| Verifikasi | `php artisan test` 14/14 (tes baru: dashboard/panduan/profil peserta render dengan `sb-item`). Browser: 1440px sidebar identik admin, collapse tersimpan; 375px sidebar tersembunyi, drawer terbuka via tombol, scrollWidth 375 = innerWidth; `Swal.fire(...)` buka dialog "Oke" → `isConfirmed: true`, 0 script SweetAlert; dashboard admin tetap sama (badge Data Terhapus 11) |
+| Pelajaran | Layout yang mirip harus berbagi satu kerangka — kalau tidak, satu sisi tertinggal saat redesain |
+| Log Keyword | layout peserta, sidebar, panel, mobile, drawer, SweetAlert, Swal shim, modeFokus |
+| Deploy | `npm run build && php artisan view:clear` |
+
+---
+
+### Fix #15 — Dashboard admin: status peserta menyesatkan, tombol verifikasi 403 untuk HR Viewer, warna teal sisa
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-12 |
+| File | `DashboardController.php`, `admin/dashboard.blade.php`, `AppServiceProvider.php`, `resources/js/app.js`, `package.json`, `resources/css/app.css`, 59 view (recolor), `tests/Feature/DashboardAdminTest.php` |
+| Masalah | (1) Saat 0 sesi berjalan, dashboard menampilkan "Sedang Mengerjakan 3", "Belum mulai 26 (48%)", deskripsi "sesi tes aktif"; peserta sesi Draft ikut terhitung; grafik (25) ≠ KPI. (2) HR Viewer melihat tombol Setujui/Tolak & "Lihat kandidat lainnya" → klik 403. (3) Kartu "Data Karyawan Tanpa Akun" selalu 0. (4) 674 kode teal `#2C5F6F` di 42+ file tidak ikut tema hijau |
+| Akar | (1) Status dihitung hanya dari `waktu_mulai`, tanpa melihat apakah sesinya masih berjalan; filter Draft tidak ada. (2) View tidak cek `pengguna.verifikasi`/`pengguna.lihat`. (3) Sejak Fix #1 akun karyawan dibuat otomatis → konsep usang. (4) Warna di-hardcode per halaman |
+| Fix | (1) Status per sesi: berjalan = `status='Aktif' AND tanggal_selesai >= hari ini` → Sedang/Belum mulai; selain itu → **Tidak selesai** (kategori baru); Draft dikecualikan di KPI, grafik, hasil terbaru. (2) Tombol digating izin. (3) Diganti "Karyawan Nonaktif" (akun buatan HR, belum bisa login) + jumlah belum ganti password. (4) Skrip recolor: class `-[#2C5F6F]`→`-primary`, hover gelap→`-primary/90`, header tabel gelap→token `muted`. Juga: Chart.js CDN → npm (chunk lazy 196KB, offline-safe), `puppeteer` (tak terpakai) dihapus, locale Carbon `id` dipindah ke `AppServiceProvider` (global), N+1 kandidat menunggu, kartu tanpa izin bukan link `#` |
+| Verifikasi | `DashboardAdminTest`: kode lama 0/2, baru 2/2. Total `php artisan test` 13/13. Data nyata: Selesai 23 · Sedang 0 · Belum 0 · Tidak selesai 16 (dulu 25/3/26), grafik 23 = KPI 23. Recolor 921 penggantian, sisa `#2C5F6F` = 0, smoke semua halaman admin tanpa 5xx |
+| Pelajaran | Status "belum/sedang" tidak bermakna tanpa konteks periode sesi. Sembunyikan aksi yang tidak diizinkan, jangan biarkan berakhir 403. Penulisan file via Python di Windows bisa gagal `Errno 22` saat file dikunci server — cek isi file sesudahnya |
+| Log Keyword | dashboard, status pengerjaan, tidak selesai, Draft, HR Viewer, pengguna.verifikasi, recolor, #2C5F6F, Chart.js, puppeteer, setLocale |
+| Deploy | `npm install && npm run build && php artisan view:clear` |
+
+---
+
+### Fix #14 — Redesain halaman auth (hijau Jhonlin): `php artisan test` mati & pesan validasi register berbahasa Inggris
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-12 |
+| File | `phpunit.xml`, `app/Http/Requests/RegisterRequest.php`, `resources/views/layouts/auth.blade.php`, `resources/views/auth/*.blade.php`, `components/ui/{input,select,alert,input-password}.blade.php`, `resources/css/app.css`, `admin/dashboard.blade.php` |
+| Masalah | (1) `php artisan test` berhenti: `Test directory "tests/Unit" not found`. (2) Register NIK salah → "The nik KTP field must be 16 digits." (Inggris), pesan lain diawali huruf kecil |
+| Akar | (1) **Regresi Fix #13**: `tests/Unit` dihapus tapi testsuite `Unit` di `phpunit.xml` tidak ikut dihapus. (2) `RegisterRequest::messages()` tidak punya terjemahan `digits/integer/exists/date` (APP_LOCALE=en) dan memakai `:attribute`, bukan `:Attribute` |
+| Fix | (1) Hapus testsuite `Unit`. (2) Tambah 4 pesan + pakai `:Attribute`. Sekaligus: `--primary` shadcn → hijau Jhonlin `#00843D` (logo `#00A651` digelapkan, kontras putih 4.8:1 AA); 5 halaman auth ditulis ulang pakai `x-ui.*`; error field tampil inline (`aria-invalid`); grafik dashboard ambil warna dari `--primary` |
+| Verifikasi | `php artisan test` 11/11 lulus. Browser 1440px & 375px: 5 halaman auth 200, tanpa scroll horizontal (scrollWidth 375 = innerWidth); submit register invalid → 8 pesan Indonesia, baris grid tetap sejajar (`items-start`); toggle password jalan; login admin akun uji → dashboard hijau |
+| Pelajaran | Saat menghapus folder test, cek `phpunit.xml`. Atribut Alpine `:type` di tag `<x-ui.*>` dievaluasi Blade sebagai PHP — pakai `x-bind:type` |
+| Log Keyword | phpunit, tests/Unit, digits, :Attribute, auth, login, register, hijau, primary |
+| Deploy | `npm run build && php artisan view:clear` |
+
+---
+
 ### Fix #13 — Audit kebersihan: seeder rusak, kolom redundan kandidat, kode & relasi mati
 
 | Field | Detail |

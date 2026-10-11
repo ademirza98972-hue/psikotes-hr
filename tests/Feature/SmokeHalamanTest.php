@@ -27,4 +27,16 @@ class SmokeHalamanTest extends TestCase
 
         $this->assertSame([], $gagal);
     }
+
+    public function test_halaman_portal_peserta_render_dengan_sidebar_yang_sama(): void
+    {
+        $peserta = User::where('tipe_akun', 'kandidat')->where('status', 'aktif')->firstOrFail();
+
+        foreach (['/peserta/dashboard', '/peserta/panduan', '/profil'] as $uri) {
+            $this->actingAs($peserta)->get($uri)
+                ->assertOk()
+                ->assertSee('Portal Peserta')
+                ->assertSee('class="sb-item', false);
+        }
+    }
 }

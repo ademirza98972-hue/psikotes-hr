@@ -6,7 +6,7 @@
     {{-- PAGE HEADER --}}
     <div class="flex items-center justify-between">
         <div>
-            <h2 class="text-[24px] font-semibold text-[#00303c]">Tambah Akun Kandidat</h2>
+            <h2 class="text-[24px] font-semibold text-foreground">Tambah Akun Kandidat</h2>
             <p class="mt-0.5 text-[13px] text-[#40484b]">Daftarkan akun kandidat baru ke sistem.</p>
         </div>
         <a href="{{ route('admin.data-kandidat.index') }}"
@@ -32,7 +32,7 @@
         {{-- SECTION: Informasi Akun --}}
         <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
             <div class="border-b border-[#e0e3e5] px-6 py-4">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Informasi Akun</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Informasi Akun</p>
             </div>
             <div class="space-y-5 px-6 py-5">
                 <div class="grid gap-4 sm:grid-cols-2">
@@ -40,14 +40,14 @@
                         <label for="email" class="block text-[13px] font-medium text-[#191c1e] mb-1">Email <span class="text-rose-500">*</span></label>
                         <input id="email" name="email" type="email" value="{{ old('email') }}" required
                                placeholder="contoh@email.com"
-                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('email') border-rose-400 @enderror">
+                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 @error('email') border-rose-400 @enderror">
                         @error('email')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="no_hp" class="block text-[13px] font-medium text-[#191c1e] mb-1">No HP <span class="text-rose-500">*</span></label>
                         <input id="no_hp" name="no_hp" type="text" value="{{ old('no_hp') }}" required
                                placeholder="08xxxxxxxxxx"
-                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('no_hp') border-rose-400 @enderror">
+                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 @error('no_hp') border-rose-400 @enderror">
                         @error('no_hp')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                     </div>
                 </div>
@@ -57,7 +57,7 @@
         {{-- SECTION: Profil Kandidat --}}
         <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
             <div class="border-b border-[#e0e3e5] px-6 py-4">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Profil Kandidat</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Profil Kandidat</p>
             </div>
             <div class="space-y-5 px-6 py-5">
                 <div class="grid gap-4 sm:grid-cols-2">
@@ -65,14 +65,14 @@
                         <label for="nama_kandidat" class="block text-[13px] font-medium text-[#191c1e] mb-1">Nama Kandidat <span class="text-rose-500">*</span></label>
                         <input id="nama_kandidat" name="nama_kandidat" type="text" value="{{ old('nama_kandidat') }}" required
                                placeholder="Nama lengkap"
-                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nama_kandidat') border-rose-400 @enderror">
+                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 @error('nama_kandidat') border-rose-400 @enderror">
                         @error('nama_kandidat')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="nik_kandidat" class="block text-[13px] font-medium text-[#191c1e] mb-1">NIK KTP <span class="text-rose-500">*</span></label>
                         <input id="nik_kandidat" name="nik_kandidat" type="text" value="{{ old('nik_kandidat') }}" maxlength="16" required
                                placeholder="16 digit NIK"
-                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm font-mono text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('nik_kandidat') border-rose-400 @enderror">
+                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm font-mono text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 @error('nik_kandidat') border-rose-400 @enderror">
                         @error('nik_kandidat')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                     </div>
                 </div>
@@ -80,14 +80,14 @@
                     <div>
                         <label for="tanggal_lahir" class="block text-[13px] font-medium text-[#191c1e] mb-1">Tanggal Lahir</label>
                         <input id="tanggal_lahir" name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir') }}"
-                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('tanggal_lahir') border-rose-400 @enderror">
+                               class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 @error('tanggal_lahir') border-rose-400 @enderror">
                         @error('tanggal_lahir')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="jenis_kelamin" class="block text-[13px] font-medium text-[#191c1e] mb-1">Jenis Kelamin <span class="text-rose-500">*</span></label>
                         <div class="relative">
                             <select id="jenis_kelamin" name="jenis_kelamin" required
-                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-9 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-9 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer">
                                 <option value="">-- Pilih --</option>
                                 <option value="L" @if(old('jenis_kelamin') == 'L') selected @endif>Laki-laki</option>
                                 <option value="P" @if(old('jenis_kelamin') == 'P') selected @endif>Perempuan</option>
@@ -103,7 +103,7 @@
                         <label for="departemen" class="block text-[13px] font-medium text-[#191c1e] mb-1">Departemen <span class="text-rose-500">*</span></label>
                         <div class="relative">
                             <select id="departemen" name="departemen" required
-                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-9 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-9 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer">
                                 <option value="">-- Pilih Departemen --</option>
                                 @foreach($departemen as $item)
                                     <option value="{{ $item->id }}" @if(old('departemen') == $item->id) selected @endif>{{ $item->nama_departemen }}</option>
@@ -118,7 +118,7 @@
                         <label for="posisi_dilamar" class="block text-[13px] font-medium text-[#191c1e] mb-1">Posisi yang Dilamar <span class="text-rose-500">*</span></label>
                         <div class="relative">
                             <select id="posisi_dilamar" name="posisi_dilamar" required
-                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-9 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 appearance-none cursor-pointer">
+                                    class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-9 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer">
                                 <option value="">-- Pilih Posisi --</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
@@ -131,7 +131,7 @@
                     <label for="pendidikan_terakhir" class="block text-[13px] font-medium text-[#191c1e] mb-1">Pendidikan Terakhir <span class="text-rose-500">*</span></label>
                     <input id="pendidikan_terakhir" name="pendidikan_terakhir" type="text" value="{{ old('pendidikan_terakhir') }}" required
                            placeholder="contoh: S1 Psikologi"
-                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('pendidikan_terakhir') border-rose-400 @enderror">
+                           class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 @error('pendidikan_terakhir') border-rose-400 @enderror">
                     @error('pendidikan_terakhir')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                 </div>
             </div>
@@ -140,7 +140,7 @@
         {{-- SECTION: Password --}}
         <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
             <div class="border-b border-[#e0e3e5] px-6 py-4">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Password</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Password</p>
             </div>
             <div class="space-y-5 px-6 py-5">
                 <div class="grid gap-4 sm:grid-cols-2">
@@ -149,7 +149,7 @@
                         <div class="relative">
                             <input id="password" name="password" type="password" minlength="8" required
                                    placeholder="Minimal 8 karakter"
-                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-10 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20 @error('password') border-rose-400 @enderror">
+                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-10 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 @error('password') border-rose-400 @enderror">
                             <button type="button" onclick="togglePw('password', this)"
                                     class="absolute inset-y-0 right-0 flex items-center px-3 text-[#6b7280] hover:text-[#191c1e]">
                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
@@ -162,7 +162,7 @@
                         <div class="relative">
                             <input id="password_confirmation" name="password_confirmation" type="password" minlength="8" required
                                    placeholder="Ulangi password"
-                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-10 text-sm text-[#191c1e] shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-2 focus:ring-[#2C5F6F]/20">
+                                   class="block w-full rounded-lg border border-[#c0c8cb] bg-white px-3 py-2.5 pr-10 text-sm text-[#191c1e] shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                             <button type="button" onclick="togglePw('password_confirmation', this)"
                                     class="absolute inset-y-0 right-0 flex items-center px-3 text-[#6b7280] hover:text-[#191c1e]">
                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
@@ -183,7 +183,7 @@
             <a href="{{ route('admin.data-kandidat.index') }}"
                class="rounded-xl border border-[#c0c8cb] px-5 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</a>
             <button type="submit"
-                    class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                    class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95">
                 <span class="material-symbols-outlined text-[16px]">save</span>
                 Simpan
             </button>

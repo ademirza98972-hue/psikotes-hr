@@ -7,15 +7,15 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <nav class="text-[13px] text-[#40484b] mb-1">
-                <a href="{{ route('admin.alat-tes.index') }}" class="hover:text-[#2C5F6F] transition-colors">Alat Tes</a>
+                <a href="{{ route('admin.alat-tes.index') }}" class="hover:text-primary transition-colors">Alat Tes</a>
                 <span class="mx-1">/</span>
-                <span class="text-[#00303c] font-semibold">Dimensi</span>
+                <span class="text-foreground font-semibold">Dimensi</span>
             </nav>
-            <h2 class="text-[28px] leading-9 font-semibold text-[#00303c]">Kelola Dimensi — {{ $alatTes->nama }}</h2>
+            <h2 class="text-[28px] leading-9 font-semibold text-foreground">Kelola Dimensi — {{ $alatTes->nama }}</h2>
             <p class="mt-0.5 text-[14px] text-[#40484b]">Definisikan dimensi dan level skor untuk alat tes ini.</p>
         </div>
         <a href="{{ route('admin.alat-tes.index') }}"
-           class="inline-flex items-center gap-2 border border-[#c0c8cb] hover:border-[#2C5F6F] text-[#40484b] hover:text-[#2C5F6F] px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 whitespace-nowrap">
+           class="inline-flex items-center gap-2 border border-[#c0c8cb] hover:border-primary text-[#40484b] hover:text-primary px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 whitespace-nowrap">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
             Kembali
         </a>
@@ -24,57 +24,57 @@
 
     {{-- FORM TAMBAH DIMENSI --}}
     <div class="bg-white border border-[#e0e3e5] rounded-xl p-6">
-        <h3 class="text-[16px] font-bold text-[#00303c] mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-[#2C5F6F]">add_circle</span>
+        <h3 class="text-[16px] font-bold text-foreground mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-primary">add_circle</span>
             Tambah Dimensi
         </h3>
         <form action="{{ route('admin.alat-tes.simpanDimensi', $alatTes->id) }}" method="POST" class="space-y-4">
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Kode Dimensi *</label>
+                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Kode Dimensi *</label>
                     <input type="text" name="kode_dimensi" required maxlength="50"
-                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                 </div>
                 <div>
-                    <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Nama Dimensi *</label>
+                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Nama Dimensi *</label>
                     <input type="text" name="nama_dimensi" required maxlength="150"
-                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                 </div>
                 <div>
-                    <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Tipe Kategori *</label>
+                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Tipe Kategori *</label>
                     <select name="tipe_kategori" required
-                            class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors bg-white">
+                            class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white">
                         <option value="psikogram">Psikogram</option>
                         <option value="klinis">Klinis</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Arah Skor *</label>
+                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Arah Skor *</label>
                     <select name="arah_skor" required
-                            class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors bg-white">
+                            class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white">
                         <option value="tinggi_baik">Tinggi = Baik</option>
                         <option value="rendah_baik">Rendah = Baik</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Urutan</label>
+                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Urutan</label>
                     <input type="number" name="urutan" min="0" value="0"
-                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                 </div>
                 <div>
-                    <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Durasi (detik) — hanya untuk IST</label>
+                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Durasi (detik) — hanya untuk IST</label>
                     <input type="number" name="durasi_detik" min="0" placeholder="kosongkan = pakai default 420"
-                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                 </div>
             </div>
             <div>
-                <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Deskripsi Aspek</label>
+                <label class="block text-[13px] font-semibold text-foreground mb-1.5">Deskripsi Aspek</label>
                 <textarea name="deskripsi_aspek" rows="2"
-                          class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors resize-none"></textarea>
+                          class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none"></textarea>
             </div>
             <button type="submit"
-                    class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
+                    class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
                 <span class="material-symbols-outlined text-[18px]">add</span>
                 Tambah Dimensi
             </button>
@@ -113,7 +113,7 @@
                      Swal.fire({
                          icon: 'warning', title: 'Reset ke Default?',
                          text: 'Data level saat ini akan hilang.',
-                         showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+                         showCancelButton: true, confirmButtonColor: '#00843D', cancelButtonColor: '#d33',
                          confirmButtonText: 'Ya, Reset', cancelButtonText: 'Batal',
                      }).then(r => { if (r.isConfirmed) this.levels = this.defaultLevels(); });
                  },
@@ -142,10 +142,10 @@
                 {{-- VIEW MODE --}}
                 <div x-show="!editing" class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="inline-block px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#e8f0f2] text-[#2C5F6F] border border-[#4A8A9B]/30">
+                        <span class="inline-block px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary/10 text-primary border border-brand-green/30">
                             {{ $dim->kode_dimensi }}
                         </span>
-                        <h3 class="text-[15px] font-bold text-[#00303c]">{{ $dim->nama_dimensi }}</h3>
+                        <h3 class="text-[15px] font-bold text-foreground">{{ $dim->nama_dimensi }}</h3>
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold
                             {{ $dim->tipe_kategori === 'psikogram'
                                 ? 'bg-violet-100 text-violet-700 border border-violet-200'
@@ -162,13 +162,13 @@
                     <div class="flex items-center gap-1 shrink-0">
                         <button type="button"
                                 @click="editing = true"
-                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-primary transition-colors"
                                 title="Edit dimensi">
                             <span class="material-symbols-outlined text-[18px]">edit</span>
                         </button>
                         <button type="button"
                                 @click="applyDefaults()"
-                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-[#2C5F6F] transition-colors"
+                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-primary transition-colors"
                                 title="Reset level ke default">
                             <span class="material-symbols-outlined text-[18px]">restart_alt</span>
                         </button>
@@ -197,54 +197,54 @@
                     @method('PUT')
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Kode Dimensi *</label>
+                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Kode Dimensi *</label>
                             <input type="text" name="kode_dimensi" required maxlength="50"
                                    value="{{ old('kode_dimensi', $dim->kode_dimensi) }}"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                         </div>
                         <div>
-                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Nama Dimensi *</label>
+                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Nama Dimensi *</label>
                             <input type="text" name="nama_dimensi" required maxlength="150"
                                    value="{{ old('nama_dimensi', $dim->nama_dimensi) }}"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                         </div>
                         <div>
-                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Tipe Kategori *</label>
+                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Tipe Kategori *</label>
                             <select name="tipe_kategori" required @change="tipe = $event.target.value"
-                                    class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors bg-white">
+                                    class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white">
                                 <option value="psikogram" @selected($dim->tipe_kategori === 'psikogram')>Psikogram</option>
                                 <option value="klinis" @selected($dim->tipe_kategori === 'klinis')>Klinis</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Arah Skor *</label>
+                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Arah Skor *</label>
                             <select name="arah_skor" required
-                                    class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors bg-white">
+                                    class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white">
                                 <option value="tinggi_baik" @selected($dim->arah_skor === 'tinggi_baik')>Tinggi = Baik</option>
                                 <option value="rendah_baik" @selected($dim->arah_skor === 'rendah_baik')>Rendah = Baik</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Urutan</label>
+                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Urutan</label>
                             <input type="number" name="urutan" min="0"
                                    value="{{ old('urutan', $dim->urutan) }}"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                         </div>
                         <div>
-                            <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Durasi (detik) — hanya untuk IST</label>
+                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Durasi (detik) — hanya untuk IST</label>
                             <input type="number" name="durasi_detik" min="0" placeholder="kosongkan = pakai default 420"
                                    value="{{ old('durasi_detik', $dim->durasi_detik) }}"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[13px] font-semibold text-[#00303c] mb-1.5">Deskripsi Aspek</label>
+                        <label class="block text-[13px] font-semibold text-foreground mb-1.5">Deskripsi Aspek</label>
                         <textarea name="deskripsi_aspek" rows="2"
-                                  class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors resize-none">{{ old('deskripsi_aspek', $dim->deskripsi_aspek) }}</textarea>
+                                  class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none">{{ old('deskripsi_aspek', $dim->deskripsi_aspek) }}</textarea>
                     </div>
                     <div class="flex items-center gap-2">
                         <button type="submit"
-                                class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
+                                class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
                             <span class="material-symbols-outlined text-[18px]">save</span>
                             Simpan
                         </button>
@@ -260,13 +260,13 @@
             {{-- Sub-section: Level Dimensi --}}
             <div>
                 <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-[14px] font-bold text-[#00303c] flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px] text-[#2C5F6F]">tune</span>
+                    <h4 class="text-[14px] font-bold text-foreground flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
                         Level Dimensi
                     </h4>
                     <button type="button"
                             @click="addLevel()"
-                            class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#2C5F6F] hover:text-[#1E414C] transition-colors">
+                            class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-primary hover:text-primary/90 transition-colors">
                         <span class="material-symbols-outlined text-[16px]">add</span>
                         Tambah Level
                     </button>
@@ -315,21 +315,21 @@
                                                    x-model="level.label"
                                                    required
                                                    maxlength="50"
-                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors">
+                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                                         </td>
                                         <td class="px-4 py-2.5">
                                             <input type="number" step="0.01"
                                                    :name="`levels[${idx}][skor_min]`"
                                                    x-model.number="level.skor_min"
                                                    required
-                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors text-right font-mono">
+                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-right font-mono">
                                         </td>
                                         <td class="px-4 py-2.5">
                                             <input type="number" step="0.01"
                                                    :name="`levels[${idx}][skor_max]`"
                                                    x-model.number="level.skor_max"
                                                    required
-                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F] outline-none transition-colors text-right font-mono">
+                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-right font-mono">
                                         </td>
                                         <td class="px-4 py-2.5 text-center">
                                             <button type="button"
@@ -348,7 +348,7 @@
 
                     <div class="flex items-center justify-end gap-2 mt-3">
                         <button type="submit"
-                                class="inline-flex items-center gap-2 bg-[#2C5F6F] hover:bg-[#1E414C] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
+                                class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
                             <span class="material-symbols-outlined text-[18px]">save</span>
                             Simpan Level
                         </button>

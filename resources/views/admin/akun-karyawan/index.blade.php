@@ -6,7 +6,8 @@
     $bisaTambah = $saya->hasIzin('pengguna.tambah');
     $bisaEdit = $saya->hasIzin('pengguna.edit');
     $bisaHapus = $saya->hasIzin('pengguna.hapus');
-    $adaFilter = $kataKunci || $filterDepartemen || $filterPosisi;
+    $adaFilter = $kataKunci || $filterDepartemen || $filterPosisi || $filterStatus;
+    $pilihanStatus = ['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif', 'wajib_ganti' => 'Belum ganti password'];
     $angka = fn ($n) => number_format((int) $n, 0, ',', '.');
 
     // Isian form saat validasi gagal → modal dibuka lagi dengan data terakhir
@@ -48,16 +49,20 @@
         @endif
     </div>
 
-    {{-- RINGKASAN --}}
+    {{-- RINGKASAN: tiap sel sekaligus pintasan filter status (sama dengan Akun Kandidat) --}}
     <x-ui.card class="overflow-hidden">
         <div class="grid grid-cols-2 gap-px bg-border lg:grid-cols-4">
             @foreach ([
-                ['Total karyawan', $ringkasan->total, 'badge', 'text-brand-indigo bg-brand-indigo/10'],
-                ['Aktif', $ringkasan->aktif, 'check_circle', 'text-brand-green-deep bg-brand-green/10'],
-                ['Nonaktif', $ringkasan->nonaktif, 'person_off', 'text-zinc-600 bg-zinc-100'],
-                ['Belum ganti password', $ringkasan->wajib_ganti, 'key', 'text-brand-blue bg-brand-blue/10'],
-            ] as [$judul, $nilai, $ikon, $warna])
-                <div class="flex items-center gap-3 bg-card px-4 py-4 sm:px-5">
+                ['Total karyawan', $ringkasan->total, 'badge', 'text-brand-indigo bg-brand-indigo/10', null],
+                ['Aktif', $ringkasan->aktif, 'check_circle', 'text-brand-green-deep bg-brand-green/10', 'aktif'],
+                ['Nonaktif', $ringkasan->nonaktif, 'person_off', 'text-zinc-600 bg-zinc-100', 'nonaktif'],
+                ['Belum ganti password', $ringkasan->wajib_ganti, 'key', 'text-brand-blue bg-brand-blue/10', 'wajib_ganti'],
+            ] as [$judul, $nilai, $ikon, $warna, $status])
+                @php $terpilih = $filterStatus === $status; @endphp
+                <a href="{{ route('admin.akun-karyawan.index', array_filter(['status' => $status, 'departemen' => $filterDepartemen, 'posisi' => $filterPosisi, 'cari' => $kataKunci])) }}"
+                   @if ($terpilih) aria-current="true" @endif
+                   class="relative flex items-center gap-3 bg-card px-4 py-4 transition-colors hover:bg-muted/40 sm:px-5">
+                    @if ($terpilih)<span class="absolute inset-x-0 bottom-0 h-0.5 bg-brand-green" aria-hidden="true"></span>@endif
                     <span class="hidden size-9 shrink-0 items-center justify-center rounded-lg sm:flex {{ $warna }}">
                         <span class="material-symbols-outlined text-[20px]">{{ $ikon }}</span>
                     </span>
@@ -65,7 +70,7 @@
                         <p class="truncate text-xs font-medium text-muted-foreground">{{ $judul }}</p>
                         <p class="text-xl font-semibold tabular-nums">{{ $angka($nilai) }}</p>
                     </div>
-                </div>
+                </a>
             @endforeach
         </div>
     </x-ui.card>
@@ -73,11 +78,17 @@
     {{-- DAFTAR --}}
     <x-ui.card>
         <form method="GET" action="{{ route('admin.akun-karyawan.index') }}"
-              class="grid gap-2 border-b border-border p-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_13rem_13rem_auto]">
+              class="grid gap-2 border-b border-border p-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_12rem_12rem_12rem_auto]">
             <div class="relative sm:col-span-2 lg:col-span-1">
                 <span class="material-symbols-outlined pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[18px] text-muted-foreground">search</span>
                 <x-ui.input type="search" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama atau NIK" aria-label="Cari nama atau NIK" class="pl-9" />
             </div>
+            <x-ui.select name="status" aria-label="Filter status" onchange="this.form.submit()">
+                <option value="">Semua status</option>
+                @foreach ($pilihanStatus as $nilai => $label)
+                    <option value="{{ $nilai }}" @selected($filterStatus === $nilai)>{{ $label }}</option>
+                @endforeach
+            </x-ui.select>
             <x-ui.select name="departemen" aria-label="Filter departemen" onchange="this.form.submit()">
                 <option value="">Semua departemen</option>
                 @foreach ($semuaDepartemen as $item)
@@ -90,7 +101,7 @@
                     <option value="{{ $item->id }}" @selected($filterPosisi == $item->id)>{{ $item->nama_posisi }}</option>
                 @endforeach
             </x-ui.select>
-            <div class="flex gap-2 sm:col-span-2 lg:col-span-1">
+            <div class="flex gap-2">
                 <x-ui.button type="submit" variant="secondary" class="flex-1 lg:flex-none">Cari</x-ui.button>
                 @if ($adaFilter)
                     <x-ui.button variant="ghost" :href="route('admin.akun-karyawan.index')" class="flex-1 lg:flex-none">

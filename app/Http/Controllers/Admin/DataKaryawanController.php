@@ -29,6 +29,7 @@ class DataKaryawanController extends Controller
         $kataKunci       = $request->input('cari');
         $filterDepartemen = $request->input('departemen');
         $filterPosisi    = $request->input('posisi');
+        $filterStatus    = in_array($request->input('status'), ['aktif', 'nonaktif', 'wajib_ganti'], true) ? $request->input('status') : null;
         $perPage         = $this->getPerPage($request, 15);
 
         $data = DataKaryawan::with(['departemen', 'posisi', 'user'])
@@ -40,6 +41,9 @@ class DataKaryawanController extends Controller
             })
             ->when($filterDepartemen, fn ($q) => $q->where('departemen_id', (int) $filterDepartemen))
             ->when($filterPosisi,    fn ($q) => $q->where('posisi_id', (int) $filterPosisi))
+            ->when($filterStatus, fn ($q) => $q->whereHas('user', fn ($uq) => $filterStatus === 'wajib_ganti'
+                ? $uq->where('must_change_password', true)
+                : $uq->where('status', $filterStatus)))
             ->orderBy(
                 \App\Models\User::select('name')
                     ->whereColumn('users.id', 'data_karyawan.user_id')
@@ -53,6 +57,7 @@ class DataKaryawanController extends Controller
             'kataKunci'       => $kataKunci,
             'filterDepartemen' => $filterDepartemen,
             'filterPosisi'    => $filterPosisi,
+            'filterStatus'    => $filterStatus,
             'semuaDepartemen' => Departemen::orderBy('nama_departemen')->get(),
             'semuaPosisi'     => Posisi::when($filterDepartemen, fn ($q) => $q->where('departemen_id', $filterDepartemen))->orderBy('nama_posisi')->get(),
             'ringkasan'       => User::where('tipe_akun', 'karyawan')

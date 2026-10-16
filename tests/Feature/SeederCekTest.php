@@ -32,7 +32,9 @@ class SeederCekTest extends TestCase
         $kandidat = User::where('tipe_akun', 'kandidat')->whereHas('profilKandidat')->firstOrFail();
 
         $this->actingAs($admin)->get('/admin/data-kandidat')->assertOk();
-        $this->actingAs($admin)->get("/admin/data-kandidat/{$kandidat->id}/ubah")->assertOk();
+        $this->actingAs($admin)->get("/admin/data-kandidat/{$kandidat->id}/ubah")
+            ->assertRedirect(route('admin.data-kandidat.index', ['ubah' => $kandidat->id]));
+        $this->actingAs($admin)->get("/admin/data-kandidat?ubah={$kandidat->id}")->assertOk()->assertSee($kandidat->email);
         $this->actingAs($admin)->get('/admin/hasil-tes')->assertOk();
     }
 }

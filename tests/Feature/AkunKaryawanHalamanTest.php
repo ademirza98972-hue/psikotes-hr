@@ -23,6 +23,17 @@ class AkunKaryawanHalamanTest extends TestCase
         $res->assertSee(route('admin.akun-karyawan.import'))->assertSee(route('admin.akun-karyawan.template'));
     }
 
+    public function test_filter_status_dari_kartu_ringkasan_cocok_dengan_angkanya(): void
+    {
+        $admin = User::where('email', 'superadmin@psikotes-hr.test')->firstOrFail();
+        $ringkasan = $this->actingAs($admin)->get('/admin/akun-karyawan')->viewData('ringkasan');
+
+        foreach (['aktif' => 'aktif', 'nonaktif' => 'nonaktif', 'wajib_ganti' => 'wajib_ganti'] as $status => $kolom) {
+            $data = $this->actingAs($admin)->get("/admin/akun-karyawan?status={$status}&per_page=100")->assertOk()->viewData('data');
+            $this->assertSame((int) $ringkasan->$kolom, $data->total(), "filter {$status}");
+        }
+    }
+
     public function test_tambah_gagal_validasi_membuka_ulang_form_dengan_isian(): void
     {
         $admin = User::where('email', 'superadmin@psikotes-hr.test')->firstOrFail();

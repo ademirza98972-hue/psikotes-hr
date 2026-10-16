@@ -25,7 +25,7 @@ class DataKandidatController extends Controller
         $filterStatus = $request->input('status');
         $filterPosisiId = $request->input('posisi');
 
-        $statusValid = ['menunggu_verifikasi', 'aktif', 'ditolak'];
+        $statusValid = ['menunggu_verifikasi', 'aktif', 'nonaktif', 'ditolak'];
         if (! in_array($filterStatus, $statusValid, true)) {
             $filterStatus = null;
         }
@@ -70,14 +70,20 @@ class DataKandidatController extends Controller
             'filterStatus' => $filterStatus,
             'filterPosisi' => $filterPosisiId,
             'daftarDepartemen' => $daftarDepartemen,
+            'ringkasan' => User::where('tipe_akun', 'kandidat')
+                ->selectRaw("COUNT(*) as total, SUM(status = 'menunggu_verifikasi') as menunggu, SUM(status = 'aktif') as aktif, SUM(status = 'ditolak') as ditolak")
+                ->first(),
+            // ?tambah=1 / ?ubah={id} → modal langsung terbuka (tautan lama /tambah & /{id}/ubah diarahkan ke sini)
+            'bukaTambah' => $request->boolean('tambah'),
+            'bukaUbah' => $request->filled('ubah')
+                ? User::with('profilKandidat.posisi')->where('tipe_akun', 'kandidat')->find((int) $request->input('ubah'))
+                : null,
         ]);
     }
 
-    public function tambah(): View
+    public function tambah(): RedirectResponse
     {
-        $departemen = Departemen::orderBy('nama_departemen')->get();
-
-        return view('admin.data-kandidat.tambah', compact('departemen'));
+        return redirect()->route('admin.data-kandidat.index', ['tambah' => 1]);
     }
 
     public function simpan(SimpanKandidatRequest $request): RedirectResponse
@@ -119,22 +125,13 @@ class DataKandidatController extends Controller
             ->with($this::FLASH_SUCCESS, 'Akun kandidat berhasil ditambahkan.');
     }
 
-    public function ubah(int $id): View
+    public function ubah(int $id): RedirectResponse
     {
-        $kandidat = User::with('profilKandidat')->findOrFail($id);
+        $kandidat = User::findOrFail($id);
 
         abort_unless($kandidat->tipe_akun === 'kandidat', 404);
 
-        $departemen = Departemen::orderBy('nama_departemen')->get();
-
-        $currentDepartemenId = $kandidat->profilKandidat?->posisi?->departemen_id;
-
-        return view('admin.data-kandidat.ubah', [
-            'kandidat' => $kandidat,
-            'profilKandidat' => $kandidat->profilKandidat,
-            'departemen' => $departemen,
-            'currentDepartemenId' => $currentDepartemenId,
-        ]);
+        return redirect()->route('admin.data-kandidat.index', ['ubah' => $id]);
     }
 
     public function perbarui(PerbaruiKandidatRequest $request, int $id): RedirectResponse

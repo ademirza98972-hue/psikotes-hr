@@ -4,6 +4,22 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #25 — Halaman Akun Kandidat tidak konsisten, halaman tambah/ubah ganda, baris "menunggu" melebar di ponsel
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/data-kandidat/index.blade.php` (tulis ulang), hapus `admin/data-kandidat/{tambah,ubah}.blade.php`, `app/Http/Controllers/Admin/DataKandidatController.php` (`ringkasan`, `bukaTambah`/`bukaUbah`, status `nonaktif` boleh difilter, `tambah()`/`ubah()` jadi redirect), `tests/Feature/SeederCekTest.php`, test baru `tests/Feature/AkunKandidatHalamanTest.php` |
+| Masalah | Sama dengan Akun Karyawan sebelum Fix #24 (hex lepas, header sticky `-mx-6`, tabel ber-scroll, dua salinan form modal); ditambah dua halaman terpisah `tambah.blade.php` (226 baris) dan `ubah.blade.php` (234 baris) yang menduplikasi form modal: `ubah` tidak ditautkan dari mana pun, `tambah` hanya dari tombol dashboard |
+| Akar | Form kandidat pernah dibuat sebagai halaman lalu dipindah ke modal tanpa membuang versi halaman |
+| Fix | Pola Fix #24: ringkasan 4 sel (total, menunggu, aktif, ditolak) yang sekaligus jadi pintasan filter status; toolbar filter; tabel responsif; tombol Setujui/Tolak tampil di baris "menunggu verifikasi" (baris disorot amber), aksi lain di dropdown; satu dialog form tambah/ubah (Identitas / Lamaran / Akun & kontak, password wajib hanya saat tambah); satu dialog konfirmasi untuk setujui/tolak/hapus. `/tambah` dan `/{id}/ubah` kini redirect ke `index?tambah=1` / `index?ubah={id}` yang langsung membuka modal, jadi tautan lama tetap jalan. Nama field, route POST/PUT, dan validasi tidak berubah |
+| Verifikasi | Browser superadmin: 1440px rapi; 375px `scrollWidth` 375, tabel 358 ≤ kartu 359; baris "menunggu" sempat 414 > 359 (4 tombol sejajar), setelah aksi jadi grid 2 kolom di ponsel = 358. Ringkasan 17/1/13/3 sesuai data; `/tambah` membuka modal (password required = true); `/20/ubah` membuka modal terisi (Finance / Chief Financial Officer / 1999-05-15, password required = false) dan simpan memberi toast "Berhasil"; tambah dengan email duplikat + konfirmasi password beda kembali ke modal dengan 2 pesan error, departemen & posisi tetap. Emoji 0; `php artisan test` 22/22 |
+| Pelajaran | Saat memindah form ke modal, hapus halaman lamanya dan ubah route-nya jadi redirect; dua salinan form pasti divergen. Kolom aksi yang jumlah tombolnya berbeda per status harus diuji pada baris dengan tombol terbanyak |
+| Log Keyword | akun kandidat, data-kandidat, verifikasi, setujui, tolak, modal, redirect tambah ubah, 375px |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
 ### Fix #24 — Halaman Akun Karyawan tidak konsisten & fitur import Excel tak punya tombol
 
 | Field | Detail |
@@ -17,6 +33,8 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 | Pelajaran | `x-model` pada `<select>` yang opsinya dimuat async tidak memilih ulang bila nilainya tidak berubah — kosongkan nilai dulu, pasang lagi setelah `$nextTick`. Menu dropdown di tabel butuh tabel tanpa `overflow-x-auto`; sembunyikan kolom bertahap, jangan andalkan scroll horizontal |
 | Log Keyword | akun karyawan, import excel, template, modal, dropdown aksi, x-model select posisi, responsif, 375px |
 | Deploy | `npm run build`, `php artisan view:clear` |
+
+**Revisi Fix #24 (2026-10-16, laporan user):** kartu ringkasan Akun Karyawan tidak bisa diklik untuk filter, beda dengan Akun Kandidat (Fix #25). Kartu dijadikan tautan filter `?status=aktif|nonaktif|wajib_ganti` (filter lain ikut terbawa, kartu terpilih bergaris hijau), ditambah select Status di toolbar; `DataKaryawanController::index` memfilter lewat `user.status` / `user.must_change_password`. Verifikasi: browser, kartu Nonaktif = 3 dan tabel 3 baris; Belum ganti password = 16 dan footer "dari 16 karyawan"; 375px `scrollWidth` 375; test baru membandingkan angka kartu dengan total hasil filter untuk ketiga status; `php artisan test` 23/23. Catatan: sempat muncul 500 `rename(...storage/framework/views...): Access is denied` tepat setelah `view:clear` — kunci file Windows saat kompilasi view, hilang setelah muat ulang, bukan dari kode.
 
 ---
 

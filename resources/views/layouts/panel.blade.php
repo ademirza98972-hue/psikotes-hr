@@ -12,7 +12,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $judulHalaman ?? 'Dashboard' }} — Sistem Psikotes HR</title>
     <link rel="preload" href="/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2" crossorigin>
-    <style>html,body{background:#fafafa}</style>
+    <style>html,body{background:#f6f7f9}</style>
     <script>document.documentElement.style.setProperty('--sb-ml', localStorage.getItem('sidebarOpen') === 'false' ? '4.5rem' : '16.5rem')</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -56,7 +56,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#fafafa] font-inter text-foreground antialiased">
+<body class="min-h-screen bg-[#f6f7f9] font-inter text-foreground antialiased">
 
 @php
     $u = auth()->user();
@@ -91,7 +91,8 @@
     <aside class="fixed inset-y-0 left-0 z-50 flex w-[16.5rem] -translate-x-full flex-col border-r border-zinc-200/80 bg-white transition-[width,transform] duration-200 lg:w-[var(--sb-ml)] lg:translate-x-0"
            :class="{ 'translate-x-0': mobileOpen, collapsed: !sidebarOpen }">
 
-        <div class="flex h-16 shrink-0 items-center px-3">
+        <div class="bg-brand-gradient h-0.5 shrink-0" aria-hidden="true"></div>
+        <div class="flex h-[3.875rem] shrink-0 items-center px-3">
             <a href="{{ route($beranda) }}" class="sb-user flex min-w-0 flex-1 items-center gap-3 rounded-lg px-2 py-1.5">
                 <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-9 w-9 shrink-0 object-contain">
                 <div class="grid min-w-0 leading-tight">

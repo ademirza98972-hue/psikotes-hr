@@ -127,8 +127,16 @@
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
     --ring: #00A651;
+    /* Palet logo Jhonlin Group (sampel piksel public/images/logo.png):
+       swoosh hijau + gradasi wordmark indigo -> biru -> teal -> hijau */
     --brand-green: #00A651;
-    --brand-navy: #2E3192;
+    --brand-green-deep: #00843D;
+    --brand-teal: #00737D;
+    --brand-blue: #114D8B;
+    --brand-indigo: #2D3194;
+    --brand-navy: #2D3194;
+    --brand-ink: #171A4D;
+    --brand-gradient: linear-gradient(90deg, #2D3194 0%, #114D8B 35%, #00737D 65%, #00A651 100%);
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-accent: #E9F6EF;
@@ -162,6 +170,11 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-brand-green: var(--brand-green);
     --color-brand-navy: var(--brand-navy);
+    --color-brand-green-deep: var(--brand-green-deep);
+    --color-brand-teal: var(--brand-teal);
+    --color-brand-blue: var(--brand-blue);
+    --color-brand-indigo: var(--brand-indigo);
+    --color-brand-ink: var(--brand-ink);
 }
 
 @layer base {
@@ -170,6 +183,7 @@
 }
 
 @layer utilities {
+    .bg-brand-gradient { background-image: var(--brand-gradient); }
     .font-display-lg { font-size: var(--text-display-lg); font-weight: 600; }
     .font-headline-md { font-size: var(--text-headline-md); font-weight: 600; }
     .font-body-lg { font-size: var(--text-body-lg); font-weight: 400; }

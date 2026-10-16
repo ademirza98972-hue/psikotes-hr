@@ -4,6 +4,24 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #23 — Dashboard admin generik & warna lepas dari logo: rombak UI dengan palet Jhonlin Group
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/css/app.css` (token `--brand-*`, `.bg-brand-gradient`), `resources/views/admin/dashboard.blade.php` (tulis ulang tampilan), `resources/views/layouts/panel.blade.php` (latar #f6f7f9, garis gradasi di atas sidebar) |
+| Masalah | Dashboard tampak generik (shadcn polos, abu semua); warna tidak mengikuti logo (hanya hijau, indigo `#2E3192` tak tepat); tabel Sesi Aktif & Hasil Terbaru di ponsel bergantung pada scroll horizontal di dalam kartu; KPI 1 kolom di 375px memanjang ~4 layar |
+| Akar | Tidak ada token palet brand; warna dipilih per elemen (emerald/amber/zinc Tailwind) |
+| Fix | Palet diambil dari sampel piksel `public/images/logo.png`: hijau `#00A651` (swoosh), indigo `#2D3194`, biru `#114D8B`, teal `#00737D` (gradasi wordmark), plus ink `#171A4D` dan `--brand-gradient`. Dashboard: hero ink dengan motif lengkung (gema swoosh), ringkasan kalimat dari data asli, cincin tingkat penyelesaian SVG; KPI berwarna urut gradasi logo (2 kolom di ponsel); status pengerjaan = bar komposisi + legenda; grafik tren warna brand (hijau / biru per seri); Sesi Aktif & Hasil Terbaru jadi daftar grid responsif (tanpa tabel); ringkasan pengguna jadi 4 kartu ikon. Ikon Material Symbols saja, nol emoji. Controller & query tidak diubah |
+| Verifikasi | Browser (preview `laravel`, superadmin): 1440px `scrollWidth` main 1146 = `clientWidth` 1146; 375px `scrollWidth` 375 = 375, tidak ada elemen melewati tepi; angka sama dengan data (3 sesi berjalan, 42 peserta, 25 selesai = 60%, 16 tidak selesai, 1 kandidat menunggu, 16 peringatan); console tanpa error; scan emoji di view = 0; `php artisan test` 17/17 (termasuk `DashboardAdminTest` HR Viewer tanpa tombol verifikasi) |
+| Pelajaran | Warna brand harus satu sumber token (`--brand-*`) dan diambil dari logo, bukan ditebak; daftar di kartu sempit lebih baik grid responsif daripada tabel ber-scroll |
+| Log Keyword | dashboard, palet logo, brand, warna, hero, KPI, responsif, 375px, gradasi |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+**Revisi Fix #23 (2026-10-16, permintaan user):** Ringkasan Pengguna dipindah dari paling bawah ke tepat di bawah kartu KPI, dipadatkan jadi satu kartu 4 sel (2x2 di ponsel, 4 kolom di desktop). Verifikasi: 1440px dan 375px `scrollWidth` = `clientWidth`, angka sama (28 karyawan, 17 kandidat, 3 nonaktif, 5 admin); test 17/17.
+
+---
+
 ### Fix #22 — Laporan PAPI: grafik radar JavaScript tidak ikut PDF, tanpa kontrol kelengkapan, 3 salinan kode
 
 | Field | Detail |

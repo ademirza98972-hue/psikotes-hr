@@ -17,6 +17,7 @@ class SimpanAlatTesRequest extends FormRequest
         return [
             'nama' => 'required|string|max:150',
             'kode' => ['required', 'string', 'max:20', Rule::unique('alat_tes', 'kode')],
+            'deskripsi' => 'nullable|string|max:1000',
             'format_dasar' => 'required|string|max:50',
             'pola_skoring' => 'required|string|in:kognitif,forced_choice,forced_choice_rollup,grid',
             'jumlah_soal' => 'nullable|integer|min:0',

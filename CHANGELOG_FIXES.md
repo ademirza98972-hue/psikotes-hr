@@ -4,6 +4,22 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #26 — Alat Tes: deskripsi tidak pernah tersimpan, dimensi baru selalu urutan 0, UI tidak konsisten
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/alat-tes/{index,dimensi,norma}.blade.php` (tulis ulang), partial baru `_kepala.blade.php` & `_konfirmasi.blade.php`, hapus `tambah.blade.php` & `edit.blade.php`, `app/Http/Controllers/Admin/AlatTesController.php`, `app/Http/Requests/{Simpan,Perbarui}AlatTesRequest.php`, `app/Models/AlatTes.php` (relasi `normaKonversi`), `resources/views/vendor/pagination/tailwind.blade.php`, test baru `tests/Feature/AlatTesHalamanTest.php` |
+| Masalah | (1) Form alat tes punya kolom Deskripsi, tetapi `deskripsi` tidak ada di `rules()` maupun `create/update` → isian dibuang diam-diam (EPPS masih `null`). (2) Form tambah dimensi mengirim `urutan=0` sebagai nilai bawaan, sehingga fallback `max+1` di controller tidak pernah jalan. (3) `instruksi_subtes` (terisi di 9 dimensi IST) divalidasi tetapi tidak ada di form, jadi tak bisa dilihat/diedit. (4) Kartu "Aktif" menampilkan total alat, bukan `is_aktif`. (5) Halaman `tambah`/`edit` alat tes menduplikasi modal dan tidak ditautkan. (6) Dimensi & norma memakai hex lepas dan `confirm()`/`Swal` |
+| Akar | Form dan request validasi berkembang terpisah; nilai bawaan input `urutan` menimpa logika "taruh di akhir" |
+| Fix | `deskripsi` masuk rules + disimpan; input urutan dikosongkan (placeholder "Otomatis"); `instruksi_subtes` ditambahkan ke modal dimensi; ringkasan pakai hitungan nyata (alat, aktif, soal, dimensi, baris norma). Index jadi kartu per instrumen (kode, format, pola, deskripsi, soal/dimensi/norma, durasi, tombol Dimensi & Norma); satu modal tambah/ubah, `/tambah` & `/{id}/edit` redirect ke `index?tambah=1` / `?ubah={id}`. Dimensi: kepala bersama + tab Dimensi/Norma, daftar `<details>` (PAPI 27 dimensi tidak lagi memanjang), editor level dengan penanda "Belum disimpan" + Batalkan, modal ubah dimensi, dialog hapus. Norma: area unggah, peringatan "ganti semua" yang menyebut jumlah baris, panduan kolom, tabel ringkas (min–maks digabung). Paginasi bersama diberi `flex-wrap` (norma 65 halaman melebar 9px di 375px). Controller juga memakai `?? null` untuk `durasi_total_menit`/`batas_waktu_per_soal_detik` (sebelumnya 500 bila field tidak dikirim) |
+| Verifikasi | Browser superadmin 1440px: 4 kartu (EPPS 225/17/1.608, IST 176/10/1.310, KRP 50/4/0, PAPI 90/27/0), ringkasan 4/541/58/2.918; `/2/edit` membuka modal terisi; simpan deskripsi "UJI DESKRIPSI" → DB terisi (lalu dikembalikan ke `null`); modal dimensi IST SE menampilkan instruksi 145 karakter & durasi 420; editor level: "Level bawaan" → 5 level + badge, "Batalkan" → kembali 0 (tidak disimpan ke data asli karena simpan level me-reset `level_id` hasil skor). 375px: index, dimensi IST/PAPI, norma `scrollWidth` 375. Emoji 0. `php artisan test` 26/26 (3 test baru: render + redirect, deskripsi tersimpan, dimensi tanpa urutan = maks+1) |
+| Pelajaran | Jangan menaruh `"..."` di dalam `{{ }}` pada atribut komponen `x-ui.*` yang berkutip ganda — parser tag komponen Blade terpotong dan muncul `ParseError: unexpected endif` jauh dari baris penyebab; pakai string kutip tunggal. Saat menguji form Alpine via JS, ubah state dan submit di dua langkah terpisah — `x-model` baru menulis ke DOM di tick berikutnya |
+| Log Keyword | alat tes, deskripsi tidak tersimpan, urutan dimensi 0, instruksi_subtes, level dimensi, norma CSV, ParseError endif, Js::from kutip ganda, paginasi flex-wrap |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
 ### Fix #25 — Halaman Akun Kandidat tidak konsisten, halaman tambah/ubah ganda, baris "menunggu" melebar di ponsel
 
 | Field | Detail |

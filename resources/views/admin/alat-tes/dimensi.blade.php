@@ -1,370 +1,224 @@
-@extends('layouts.admin', ['judulHalaman' => "Kelola Dimensi — {$alatTes->nama}"])
+@extends('layouts.admin', ['judulHalaman' => "Dimensi — {$alatTes->nama}"])
 
 @section('content')
-<div class="space-y-6">
+@php
+    $tipeLabel = ['psikogram' => 'Psikogram', 'klinis' => 'Klinis'];
+    $arahLabel = ['tinggi_baik' => 'Tinggi = baik', 'rendah_baik' => 'Rendah = baik'];
+    $jumlahLevel = $dimensi->sum(fn ($d) => $d->levelDimensi->count());
 
-    {{-- PAGE HEADER --}}
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-            <nav class="text-[13px] text-[#40484b] mb-1">
-                <a href="{{ route('admin.alat-tes.index') }}" class="hover:text-primary transition-colors">Alat Tes</a>
-                <span class="mx-1">/</span>
-                <span class="text-foreground font-semibold">Dimensi</span>
-            </nav>
-            <h2 class="text-[28px] leading-9 font-semibold text-foreground">Kelola Dimensi — {{ $alatTes->nama }}</h2>
-            <p class="mt-0.5 text-[14px] text-[#40484b]">Definisikan dimensi dan level skor untuk alat tes ini.</p>
-        </div>
-        <a href="{{ route('admin.alat-tes.index') }}"
-           class="inline-flex items-center gap-2 border border-[#c0c8cb] hover:border-primary text-[#40484b] hover:text-primary px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 whitespace-nowrap">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-            Kembali
-        </a>
+    $dataForm = fn ($d) => [
+        'id' => (string) $d->id, 'kode_dimensi' => $d->kode_dimensi, 'nama_dimensi' => $d->nama_dimensi,
+        'tipe_kategori' => $d->tipe_kategori, 'arah_skor' => $d->arah_skor, 'urutan' => (string) $d->urutan,
+        'durasi_detik' => (string) ($d->durasi_detik ?? ''), 'deskripsi_aspek' => $d->deskripsi_aspek ?? '',
+        'instruksi_subtes' => $d->instruksi_subtes ?? '',
+    ];
+    $formAwal = old('_form') ? ['mode' => old('_form'), 'data' => [
+        'id' => (string) old('id', ''), 'kode_dimensi' => old('kode_dimensi', ''), 'nama_dimensi' => old('nama_dimensi', ''),
+        'tipe_kategori' => old('tipe_kategori', 'psikogram'), 'arah_skor' => old('arah_skor', 'tinggi_baik'), 'urutan' => (string) old('urutan', ''),
+        'durasi_detik' => (string) old('durasi_detik', ''), 'deskripsi_aspek' => old('deskripsi_aspek', ''), 'instruksi_subtes' => old('instruksi_subtes', ''),
+    ]] : null;
+@endphp
+
+<div class="mx-auto max-w-5xl space-y-6"
+     x-data="kelolaDimensi({ urlSimpan: @js(route('admin.alat-tes.simpanDimensi', $alatTes->id)), urlDasar: @js(url("admin/alat-tes/{$alatTes->id}/dimensi")), formAwal: @js($formAwal) })">
+
+    @include('admin.alat-tes._kepala', ['deskripsi' => 'Aspek yang diskor dari jawaban peserta dan level interpretasinya.'])
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-muted-foreground">
+            <span class="font-medium text-foreground tabular-nums">{{ $dimensi->count() }}</span> dimensi ·
+            <span class="font-medium text-foreground tabular-nums">{{ $jumlahLevel }}</span> level skor
+        </p>
+        <x-ui.button @click="bukaForm('tambah', {})"><span class="material-symbols-outlined">add</span>Tambah Dimensi</x-ui.button>
     </div>
 
+    @if ($dimensi->isEmpty())
+        <x-ui.card>
+            <x-ui.empty icon="psychology" title="Belum ada dimensi" description="Dimensi menentukan aspek apa saja yang dihitung dari jawaban peserta.">
+                <x-ui.button size="sm" @click="bukaForm('tambah', {})"><span class="material-symbols-outlined">add</span>Tambah Dimensi</x-ui.button>
+            </x-ui.empty>
+        </x-ui.card>
+    @else
+        <div class="space-y-3">
+            @foreach ($dimensi as $dim)
+                @php
+                    $levels = $dim->levelDimensi->sortBy('urutan')->values()->map(fn ($l) => [
+                        'label' => $l->label, 'skor_min' => (float) $l->skor_min, 'skor_max' => (float) $l->skor_max,
+                    ]);
+                @endphp
+                <details class="group rounded-xl border border-border bg-card shadow-sm open:shadow-md">
+                    <summary class="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 sm:px-5 [&::-webkit-details-marker]:hidden">
+                        <span class="w-6 shrink-0 text-right text-xs tabular-nums text-muted-foreground">{{ $dim->urutan }}</span>
+                        <x-ui.badge variant="outline" class="shrink-0 font-mono">{{ $dim->kode_dimensi }}</x-ui.badge>
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-medium">{{ $dim->nama_dimensi }}</p>
+                            <p class="truncate text-xs text-muted-foreground">
+                                {{ $tipeLabel[$dim->tipe_kategori] ?? $dim->tipe_kategori }} · {{ $arahLabel[$dim->arah_skor] ?? $dim->arah_skor }}
+                                @if ($dim->durasi_detik) · {{ $dim->durasi_detik }} detik @endif
+                            </p>
+                        </div>
+                        <div class="hidden shrink-0 gap-1 md:flex">
+                            @forelse ($levels->take(5) as $l)
+                                <span class="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">{{ $l['label'] }}</span>
+                            @empty
+                                <span class="text-xs text-muted-foreground">Tanpa level</span>
+                            @endforelse
+                            @if ($levels->count() > 5)<span class="px-1 text-[11px] text-muted-foreground">+{{ $levels->count() - 5 }}</span>@endif
+                        </div>
+                        <span class="material-symbols-outlined shrink-0 text-[20px] text-muted-foreground transition-transform group-open:rotate-180">expand_more</span>
+                    </summary>
 
-    {{-- FORM TAMBAH DIMENSI --}}
-    <div class="bg-white border border-[#e0e3e5] rounded-xl p-6">
-        <h3 class="text-[16px] font-bold text-foreground mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-primary">add_circle</span>
-            Tambah Dimensi
-        </h3>
-        <form action="{{ route('admin.alat-tes.simpanDimensi', $alatTes->id) }}" method="POST" class="space-y-4">
-            @csrf
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Kode Dimensi *</label>
-                    <input type="text" name="kode_dimensi" required maxlength="50"
-                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Nama Dimensi *</label>
-                    <input type="text" name="nama_dimensi" required maxlength="150"
-                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Tipe Kategori *</label>
-                    <select name="tipe_kategori" required
-                            class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white">
-                        <option value="psikogram">Psikogram</option>
-                        <option value="klinis">Klinis</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Arah Skor *</label>
-                    <select name="arah_skor" required
-                            class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white">
-                        <option value="tinggi_baik">Tinggi = Baik</option>
-                        <option value="rendah_baik">Rendah = Baik</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Urutan</label>
-                    <input type="number" name="urutan" min="0" value="0"
-                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-[13px] font-semibold text-foreground mb-1.5">Durasi (detik) — hanya untuk IST</label>
-                    <input type="number" name="durasi_detik" min="0" placeholder="kosongkan = pakai default 420"
-                           class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                </div>
-            </div>
-            <div>
-                <label class="block text-[13px] font-semibold text-foreground mb-1.5">Deskripsi Aspek</label>
-                <textarea name="deskripsi_aspek" rows="2"
-                          class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none"></textarea>
-            </div>
-            <button type="submit"
-                    class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
-                <span class="material-symbols-outlined text-[18px]">add</span>
-                Tambah Dimensi
-            </button>
-        </form>
-    </div>
+                    <div class="space-y-5 border-t border-border px-4 py-5 sm:px-5">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="space-y-2 text-sm">
+                                <p class="{{ $dim->deskripsi_aspek ? 'text-muted-foreground' : 'italic text-muted-foreground/70' }}">{{ $dim->deskripsi_aspek ?: 'Belum ada deskripsi aspek.' }}</p>
+                                @if ($dim->instruksi_subtes)
+                                    <p class="flex items-center gap-1.5 text-xs text-muted-foreground"><span class="material-symbols-outlined text-[16px]">description</span>Punya instruksi subtes</p>
+                                @endif
+                            </div>
+                            <div class="flex shrink-0 gap-2">
+                                <x-ui.button variant="outline" size="sm" @click="bukaForm('ubah', {{ Js::from($dataForm($dim)) }})">
+                                    <span class="material-symbols-outlined">edit</span>Ubah dimensi
+                                </x-ui.button>
+                                <x-ui.button variant="ghost" size="sm" class="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                    @click="tanya({ judul: 'Hapus dimensi', pesan: {{ Js::from('Dimensi ' . $dim->nama_dimensi . ' beserta ' . $levels->count() . ' levelnya akan dihapus permanen.') }}, url: {{ Js::from(route('admin.alat-tes.hapusDimensi', [$alatTes->id, $dim->id])) }} })">
+                                    <span class="material-symbols-outlined">delete</span>Hapus
+                                </x-ui.button>
+                            </div>
+                        </div>
 
-    {{-- DAFTAR DIMENSI --}}
-    @forelse ($dimensi as $dim)
-        <div class="bg-white border border-[#e0e3e5] rounded-xl p-6"
-             x-data="{
-                 editing: false,
-                 tipe: '{{ $dim->tipe_kategori }}',
-                 levels: @js($dim->levelDimensi->sortBy('urutan')->values()->map(fn($l) => [
-                     'label' => $l->label,
-                     'skor_min' => (float) $l->skor_min,
-                     'skor_max' => (float) $l->skor_max,
-                     'urutan' => (int) $l->urutan,
-                 ])),
-                 defaultLevels() {
-                     if (this.tipe === 'psikogram') {
-                         return [
-                             { label: 'R', skor_min: 0, skor_max: 0, urutan: 0 },
-                             { label: 'K', skor_min: 1, skor_max: 1, urutan: 1 },
-                             { label: 'C', skor_min: 2, skor_max: 2, urutan: 2 },
-                             { label: 'B', skor_min: 3, skor_max: 3, urutan: 3 },
-                             { label: 'BS', skor_min: 4, skor_max: 4, urutan: 4 },
-                         ];
-                     }
-                     return [
-                         { label: 'Normal', skor_min: 0, skor_max: 0, urutan: 0 },
-                         { label: 'Perlu Perhatian', skor_min: 1, skor_max: 1, urutan: 1 },
-                         { label: 'Signifikan', skor_min: 2, skor_max: 2, urutan: 2 },
-                     ];
-                 },
-                 applyDefaults() {
-                     Swal.fire({
-                         icon: 'warning', title: 'Reset ke Default?',
-                         text: 'Data level saat ini akan hilang.',
-                         showCancelButton: true, confirmButtonColor: '#00843D', cancelButtonColor: '#d33',
-                         confirmButtonText: 'Ya, Reset', cancelButtonText: 'Batal',
-                     }).then(r => { if (r.isConfirmed) this.levels = this.defaultLevels(); });
-                 },
-                 addLevel() {
-                     this.levels.push({ label: '', skor_min: 0, skor_max: 0, urutan: this.levels.length });
-                 },
-                 removeLevel(idx) {
-                     if (this.levels.length <= 1) return;
-                     Swal.fire({
-                         icon: 'warning', title: 'Hapus Level?',
-                         text: `Hapus level '${this.levels[idx].label || 'ini'}'?`,
-                         showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6b7280',
-                         confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
-                     }).then(r => {
-                         if (r.isConfirmed) {
-                             this.levels.splice(idx, 1);
-                             this.levels.forEach((l, i) => l.urutan = i);
-                         }
-                     });
-                 }
-             }">
-
-            {{-- Header Dimensi --}}
-            <div class="mb-5 pb-4 border-b border-[#e0e3e5]">
-
-                {{-- VIEW MODE --}}
-                <div x-show="!editing" class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="inline-block px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary/10 text-primary border border-brand-green/30">
-                            {{ $dim->kode_dimensi }}
-                        </span>
-                        <h3 class="text-[15px] font-bold text-foreground">{{ $dim->nama_dimensi }}</h3>
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold
-                            {{ $dim->tipe_kategori === 'psikogram'
-                                ? 'bg-violet-100 text-violet-700 border border-violet-200'
-                                : 'bg-amber-100 text-amber-700 border border-amber-200' }}">
-                            {{ $dim->tipe_kategori === 'psikogram' ? 'Psikogram' : 'Klinis' }}
-                        </span>
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold
-                            {{ $dim->arah_skor === 'tinggi_baik'
-                                ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                                : 'bg-rose-100 text-rose-700 border border-rose-200' }}">
-                            {{ $dim->arah_skor === 'tinggi_baik' ? 'Tinggi = Baik' : 'Rendah = Baik' }}
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-1 shrink-0">
-                        <button type="button"
-                                @click="editing = true"
-                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-primary transition-colors"
-                                title="Edit dimensi">
-                            <span class="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                        <button type="button"
-                                @click="applyDefaults()"
-                                class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#e0e3e5] hover:text-primary transition-colors"
-                                title="Reset level ke default">
-                            <span class="material-symbols-outlined text-[18px]">restart_alt</span>
-                        </button>
-                        <form action="{{ route('admin.alat-tes.hapusDimensi', [$alatTes->id, $dim->id]) }}"
-                              method="POST" onsubmit="return confirm('Hapus dimensi \'{{ addslashes($dim->nama_dimensi) }}\'? Semua level terkait akan ikut terhapus.')">
+                        {{-- Editor level: perubahan lokal sampai "Simpan level" ditekan --}}
+                        <form method="POST" action="{{ route('admin.alat-tes.simpanLevel', [$alatTes->id, $dim->id]) }}"
+                              x-data="editorLevel({{ Js::from($levels) }}, @js($dim->tipe_kategori))" class="rounded-lg border border-border">
                             @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                    class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
-                                    title="Hapus dimensi">
-                                <span class="material-symbols-outlined text-[18px]">delete</span>
-                            </button>
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2.5">
+                                <p class="flex items-center gap-2 text-sm font-medium">
+                                    Level skor
+                                    <x-ui.badge variant="warning" x-show="berubah" x-cloak>Belum disimpan</x-ui.badge>
+                                </p>
+                                <div class="flex gap-1">
+                                    <x-ui.button variant="ghost" size="sm" @click="isiDefault()" title="Isi dengan level bawaan sesuai tipe kategori">
+                                        <span class="material-symbols-outlined">auto_fix</span><span class="hidden sm:inline">Level bawaan</span>
+                                    </x-ui.button>
+                                    <x-ui.button variant="ghost" size="sm" @click="tambah()">
+                                        <span class="material-symbols-outlined">add</span>Level
+                                    </x-ui.button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-[minmax(0,1fr)_3.75rem_3.75rem_2rem] gap-2 px-3 pt-2.5 text-xs font-medium text-muted-foreground sm:grid-cols-[1.5rem_minmax(0,1fr)_7rem_7rem_2rem]">
+                                <span class="hidden sm:block">#</span><span>Label</span><span>Skor min</span><span>Skor maks</span><span></span>
+                            </div>
+                            <div class="grid gap-2 p-3">
+                                <template x-for="(level, i) in levels" :key="i">
+                                    <div class="grid grid-cols-[minmax(0,1fr)_3.75rem_3.75rem_2rem] items-center gap-2 sm:grid-cols-[1.5rem_minmax(0,1fr)_7rem_7rem_2rem]">
+                                        <span class="hidden text-xs tabular-nums text-muted-foreground sm:block" x-text="i + 1"></span>
+                                        <x-ui.input ::name="`levels[${i}][label]`" x-model="level.label" required maxlength="50" ::aria-label="`Label level ${i + 1}`" />
+                                        <x-ui.input type="number" step="0.01" ::name="`levels[${i}][skor_min]`" x-model.number="level.skor_min" required class="px-2 text-right font-mono" ::aria-label="`Skor minimum level ${i + 1}`" />
+                                        <x-ui.input type="number" step="0.01" ::name="`levels[${i}][skor_max]`" x-model.number="level.skor_max" required class="px-2 text-right font-mono" ::aria-label="`Skor maksimum level ${i + 1}`" />
+                                        <input type="hidden" :name="`levels[${i}][urutan]`" :value="i">
+                                        <x-ui.button variant="ghost" size="icon-sm" @click="hapus(i)" ::disabled="levels.length <= 1" title="Hapus level">
+                                            <span class="material-symbols-outlined">close</span>
+                                            <span class="sr-only">Hapus level</span>
+                                        </x-ui.button>
+                                    </div>
+                                </template>
+                                <p x-show="levels.length === 0" class="py-4 text-center text-sm text-muted-foreground">Belum ada level. Tambah manual atau pakai level bawaan.</p>
+                            </div>
+                            <div class="flex justify-end gap-2 border-t border-border px-3 py-2.5">
+                                <x-ui.button variant="ghost" size="sm" x-show="berubah" x-cloak @click="batal()">Batalkan</x-ui.button>
+                                <x-ui.button type="submit" size="sm" ::disabled="levels.length === 0"><span class="material-symbols-outlined">save</span>Simpan level</x-ui.button>
+                            </div>
                         </form>
                     </div>
-                </div>
-
-                @if ($dim->deskripsi_aspek)
-                    <p x-show="!editing" class="text-[13px] text-[#40484b] mt-3">{{ $dim->deskripsi_aspek }}</p>
-                @endif
-
-                {{-- EDIT MODE --}}
-                <form x-show="editing" x-cloak
-                      action="{{ route('admin.alat-tes.updateDimensi', [$alatTes->id, $dim->id]) }}"
-                      method="POST" class="space-y-4 pt-1">
-                    @csrf
-                    @method('PUT')
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Kode Dimensi *</label>
-                            <input type="text" name="kode_dimensi" required maxlength="50"
-                                   value="{{ old('kode_dimensi', $dim->kode_dimensi) }}"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Nama Dimensi *</label>
-                            <input type="text" name="nama_dimensi" required maxlength="150"
-                                   value="{{ old('nama_dimensi', $dim->nama_dimensi) }}"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Tipe Kategori *</label>
-                            <select name="tipe_kategori" required @change="tipe = $event.target.value"
-                                    class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white">
-                                <option value="psikogram" @selected($dim->tipe_kategori === 'psikogram')>Psikogram</option>
-                                <option value="klinis" @selected($dim->tipe_kategori === 'klinis')>Klinis</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Arah Skor *</label>
-                            <select name="arah_skor" required
-                                    class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white">
-                                <option value="tinggi_baik" @selected($dim->arah_skor === 'tinggi_baik')>Tinggi = Baik</option>
-                                <option value="rendah_baik" @selected($dim->arah_skor === 'rendah_baik')>Rendah = Baik</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Urutan</label>
-                            <input type="number" name="urutan" min="0"
-                                   value="{{ old('urutan', $dim->urutan) }}"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-[13px] font-semibold text-foreground mb-1.5">Durasi (detik) — hanya untuk IST</label>
-                            <input type="number" name="durasi_detik" min="0" placeholder="kosongkan = pakai default 420"
-                                   value="{{ old('durasi_detik', $dim->durasi_detik) }}"
-                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-[13px] font-semibold text-foreground mb-1.5">Deskripsi Aspek</label>
-                        <textarea name="deskripsi_aspek" rows="2"
-                                  class="w-full rounded-lg border border-[#c0c8cb] px-3 py-2 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none">{{ old('deskripsi_aspek', $dim->deskripsi_aspek) }}</textarea>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button type="submit"
-                                class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
-                            <span class="material-symbols-outlined text-[18px]">save</span>
-                            Simpan
-                        </button>
-                        <button type="button" @click="editing = false"
-                                class="px-5 py-2.5 rounded-xl border border-[#c0c8cb] text-[#40484b] text-sm font-medium hover:bg-[#f2f4f6] transition-colors">
-                            Batal
-                        </button>
-                    </div>
-                </form>
-
-            </div>
-
-            {{-- Sub-section: Level Dimensi --}}
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-[14px] font-bold text-foreground flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
-                        Level Dimensi
-                    </h4>
-                    <button type="button"
-                            @click="addLevel()"
-                            class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-primary hover:text-primary/90 transition-colors">
-                        <span class="material-symbols-outlined text-[16px]">add</span>
-                        Tambah Level
-                    </button>
-                </div>
-
-                <form :action="`/admin/alat-tes/{{ $alatTes->id }}/dimensi/{{ $dim->id }}/level`"
-                      method="POST"
-                      @submit.prevent="
-                          levels.forEach((l, i) => l.urutan = i);
-                          let form = $el;
-                          let container = document.getElementById('level-hidden-{{ $dim->id }}');
-                          container.innerHTML = '';
-                          levels.forEach((l, i) => {
-                              ['label','skor_min','skor_max','urutan'].forEach(field => {
-                                  let inp = document.createElement('input');
-                                  inp.type = 'hidden';
-                                  inp.name = 'levels[' + i + '][' + field + ']';
-                                  inp.value = l[field];
-                                  container.appendChild(inp);
-                              });
-                          });
-                          form.submit();
-                      ">
-                    @csrf
-
-                    <div id="level-hidden-{{ $dim->id }}"></div>
-
-                    <div class="overflow-x-auto rounded-lg border border-[#e0e3e5]">
-                        <table class="w-full text-left text-sm border-collapse">
-                            <thead>
-                                <tr class="bg-[#f2f4f6] border-b border-[#e0e3e5]">
-                                    <th class="px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] w-16">Urut</th>
-                                    <th class="px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b]">Label</th>
-                                    <th class="px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] w-28">Skor Min</th>
-                                    <th class="px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] w-28">Skor Max</th>
-                                    <th class="px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-[#40484b] w-12"></th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#e0e3e5]/60">
-                                <template x-for="(level, idx) in levels" :key="idx">
-                                    <tr class="hover:bg-[#f2f4f6] transition-colors">
-                                        <td class="px-4 py-2.5 text-center text-[#40484b] font-medium" x-text="idx + 1"></td>
-                                        <td class="px-4 py-2.5">
-                                            <input type="text"
-                                                   :name="`levels[${idx}][label]`"
-                                                   x-model="level.label"
-                                                   required
-                                                   maxlength="50"
-                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                                        </td>
-                                        <td class="px-4 py-2.5">
-                                            <input type="number" step="0.01"
-                                                   :name="`levels[${idx}][skor_min]`"
-                                                   x-model.number="level.skor_min"
-                                                   required
-                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-right font-mono">
-                                        </td>
-                                        <td class="px-4 py-2.5">
-                                            <input type="number" step="0.01"
-                                                   :name="`levels[${idx}][skor_max]`"
-                                                   x-model.number="level.skor_max"
-                                                   required
-                                                   class="w-full rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm text-[#191c1e] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-right font-mono">
-                                        </td>
-                                        <td class="px-4 py-2.5 text-center">
-                                            <button type="button"
-                                                    @click="removeLevel(idx)"
-                                                    class="p-1 rounded text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
-                                                    :disabled="levels.length <= 1"
-                                                    :class="{ 'opacity-30 cursor-not-allowed': levels.length <= 1 }">
-                                                <span class="material-symbols-outlined text-[18px]">close</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="flex items-center justify-end gap-2 mt-3">
-                        <button type="submit"
-                                class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95">
-                            <span class="material-symbols-outlined text-[18px]">save</span>
-                            Simpan Level
-                        </button>
-                    </div>
-                </form>
-            </div>
-
+                </details>
+            @endforeach
         </div>
-    @empty
-        <div class="bg-white border border-[#e0e3e5] rounded-xl p-10 text-center">
-            <span class="material-symbols-outlined text-[40px] text-[#c0c8cb] mb-3">psychology</span>
-            <p class="text-[14px] text-[#40484b] font-semibold">Belum ada dimensi</p>
-            <p class="text-[12px] text-[#40484b]/70 mt-1">Tambahkan dimensi pertama menggunakan form di atas.</p>
-        </div>
-    @endforelse
+    @endif
 
+    {{-- MODAL TAMBAH / UBAH DIMENSI --}}
+    <x-ui.dialog show="modalForm" maxWidth="sm:max-w-2xl">
+        <div class="flex flex-col gap-2 pr-6">
+            <h2 class="text-lg font-semibold leading-none" x-text="mode === 'tambah' ? 'Tambah Dimensi' : 'Ubah Dimensi'"></h2>
+            <p class="text-sm text-muted-foreground">{{ $alatTes->nama }} ({{ $alatTes->kode }})</p>
+        </div>
+        <form method="POST" :action="mode === 'tambah' ? urlSimpan : urlDasar + '/' + form.id" class="grid gap-4 sm:grid-cols-2">
+            @csrf
+            <input type="hidden" name="_method" value="PUT" :disabled="mode === 'tambah'">
+            <input type="hidden" name="_form" :value="mode">
+            <input type="hidden" name="id" :value="form.id">
+
+            <x-ui.field label="Kode dimensi" for="d-kode" error="kode_dimensi" description="Dipakai di file CSV norma.">
+                <x-ui.input id="d-kode" name="kode_dimensi" required maxlength="50" x-model="form.kode_dimensi" class="font-mono" />
+            </x-ui.field>
+            <x-ui.field label="Nama dimensi" for="d-nama" error="nama_dimensi">
+                <x-ui.input id="d-nama" name="nama_dimensi" required maxlength="150" x-model="form.nama_dimensi" />
+            </x-ui.field>
+            <x-ui.field label="Tipe kategori" for="d-tipe" error="tipe_kategori">
+                <x-ui.select id="d-tipe" name="tipe_kategori" required x-model="form.tipe_kategori">
+                    @foreach ($tipeLabel as $nilai => $teks)<option value="{{ $nilai }}">{{ $teks }}</option>@endforeach
+                </x-ui.select>
+            </x-ui.field>
+            <x-ui.field label="Arah skor" for="d-arah" error="arah_skor">
+                <x-ui.select id="d-arah" name="arah_skor" required x-model="form.arah_skor">
+                    @foreach ($arahLabel as $nilai => $teks)<option value="{{ $nilai }}">{{ $teks }}</option>@endforeach
+                </x-ui.select>
+            </x-ui.field>
+            <x-ui.field label="Urutan" for="d-urut" error="urutan" description="Kosongkan untuk ditaruh paling akhir.">
+                <x-ui.input id="d-urut" name="urutan" type="number" min="0" x-model="form.urutan" placeholder="Otomatis" />
+            </x-ui.field>
+            <x-ui.field label="Durasi subtes (detik, opsional)" for="d-durasi" error="durasi_detik" description="Untuk subtes berwaktu seperti IST; kosong = 420 detik.">
+                <x-ui.input id="d-durasi" name="durasi_detik" type="number" min="0" x-model="form.durasi_detik" />
+            </x-ui.field>
+            <x-ui.field label="Deskripsi aspek (opsional)" for="d-desk" error="deskripsi_aspek" class="sm:col-span-2">
+                <x-ui.textarea id="d-desk" name="deskripsi_aspek" rows="2" x-model="form.deskripsi_aspek" />
+            </x-ui.field>
+            <x-ui.field label="Instruksi subtes (opsional)" for="d-instruksi" error="instruksi_subtes" class="sm:col-span-2" description="Ditampilkan ke peserta sebelum subtes dimulai.">
+                <x-ui.textarea id="d-instruksi" name="instruksi_subtes" rows="3" x-model="form.instruksi_subtes" />
+            </x-ui.field>
+
+            <div class="flex flex-col-reverse gap-2 sm:col-span-2 sm:flex-row sm:justify-end">
+                <x-ui.button variant="outline" @click="modalForm = false">Batal</x-ui.button>
+                <x-ui.button type="submit"><span class="material-symbols-outlined">save</span><span x-text="mode === 'tambah' ? 'Simpan dimensi' : 'Simpan perubahan'"></span></x-ui.button>
+            </div>
+        </form>
+    </x-ui.dialog>
+
+    @include('admin.alat-tes._konfirmasi')
 </div>
 
+<script>
+function kelolaDimensi(cfg) {
+    const kosong = () => ({ id: '', kode_dimensi: '', nama_dimensi: '', tipe_kategori: 'psikogram', arah_skor: 'tinggi_baik',
+        urutan: '', durasi_detik: '', deskripsi_aspek: '', instruksi_subtes: '' });
+    return {
+        ...cfg,
+        modalForm: false, mode: 'tambah', form: kosong(),
+        konfirmasi: { buka: false, judul: '', pesan: '', url: '', label: 'Hapus' },
+        init() { if (cfg.formAwal) this.bukaForm(cfg.formAwal.mode, cfg.formAwal.data); },
+        bukaForm(mode, data) { this.mode = mode; this.form = { ...kosong(), ...data }; this.modalForm = true; },
+        tanya(opsi) { this.konfirmasi = { label: 'Hapus', ...opsi, buka: true }; },
+    };
+}
+
+function editorLevel(awal, tipe) {
+    const salin = (x) => JSON.parse(JSON.stringify(x));
+    const bawaan = {
+        psikogram: ['R', 'K', 'C', 'B', 'BS'],
+        klinis: ['Normal', 'Perlu Perhatian', 'Signifikan'],
+    };
+    return {
+        levels: salin(awal),
+        get berubah() { return JSON.stringify(this.levels) !== JSON.stringify(awal); },
+        tambah() {
+            const akhir = this.levels.at(-1);
+            const mulai = akhir ? Number(akhir.skor_max) + 1 : 0;
+            this.levels.push({ label: '', skor_min: mulai, skor_max: mulai });
+        },
+        hapus(i) { if (this.levels.length > 1) this.levels.splice(i, 1); },
+        isiDefault() { this.levels = (bawaan[tipe] ?? bawaan.psikogram).map((label, i) => ({ label, skor_min: i, skor_max: i })); },
+        batal() { this.levels = salin(awal); },
+    };
+}
+</script>
 @endsection

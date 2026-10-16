@@ -50,6 +50,11 @@ class AlatTes extends Model
         return $this->hasMany(DimensiAlatTes::class, 'alat_tes_id');
     }
 
+    public function normaKonversi(): HasMany
+    {
+        return $this->hasMany(NormaKonversi::class, 'alat_tes_id');
+    }
+
     public function levelDimensi(): HasMany
     {
         return $this->hasMany(LevelDimensi::class, 'alat_tes_id');

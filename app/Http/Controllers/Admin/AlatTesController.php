@@ -22,31 +22,32 @@ class AlatTesController extends Controller
 {
     public function index(Request $request): View
     {
-        $perPage = $this->getPerPage($request, 10);
+        $perPage = $this->getPerPage($request, 12);
 
-        $totalSoal = \App\Models\Soal::count();
-        $totalAlat = AlatTes::count();
-        $alatPopuler = AlatTes::withCount('soal')->orderByDesc('soal_count')->first();
-
-        $alatTes = AlatTes::withCount('soal')
+        $alatTes = AlatTes::withCount(['soal', 'dimensiAlatTes', 'normaKonversi'])
             ->orderBy('nama')
             ->paginate($perPage)
             ->withQueryString();
 
         return view('admin.alat-tes.index', [
             'alatTes'       => $alatTes,
-            'totalSoal'     => $totalSoal,
-            'totalAlat'     => $totalAlat,
-            'alatPopuler'   => $alatPopuler,
+            'ringkasan'     => [
+                'alat'    => AlatTes::count(),
+                'aktif'   => AlatTes::where('is_aktif', true)->count(),
+                'soal'    => \App\Models\Soal::whereHas('alatTes')->count(),
+                'dimensi' => DimensiAlatTes::whereHas('alatTes')->count(),
+                'norma'   => NormaKonversi::whereIn('alat_tes_id', AlatTes::select('id'))->count(),
+            ],
             'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid', 'Mixed'],
+            // ?tambah=1 / ?ubah={id} → modal langsung terbuka (tautan lama /tambah & /{id}/edit diarahkan ke sini)
+            'bukaTambah'    => $request->boolean('tambah'),
+            'bukaUbah'      => $request->filled('ubah') ? AlatTes::find((int) $request->input('ubah')) : null,
         ]);
     }
 
-    public function tambah(): View
+    public function tambah(): RedirectResponse
     {
-        return view('admin.alat-tes.tambah', [
-            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid', 'Mixed'],
-        ]);
+        return redirect()->route('admin.alat-tes.index', ['tambah' => 1]);
     }
 
     public function simpan(SimpanAlatTesRequest $request): RedirectResponse
@@ -56,12 +57,13 @@ class AlatTesController extends Controller
         AlatTes::create([
             'nama' => $data['nama'],
             'kode' => $data['kode'],
+            'deskripsi' => $data['deskripsi'] ?? null,
             'format_dasar' => $data['format_dasar'],
             'pola_skoring' => $data['pola_skoring'],
             'jumlah_soal' => $data['jumlah_soal'] ?? null,
-            'durasi_total_menit' => $data['durasi_total_menit'],
+            'durasi_total_menit' => $data['durasi_total_menit'] ?? null,
             'batas_waktu_per_soal_aktif' => $request->boolean('batas_waktu_per_soal_aktif'),
-            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'],
+            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'] ?? null,
             'is_sensitif' => $request->boolean('is_sensitif'),
             'is_aktif' => true,
         ]);
@@ -71,14 +73,11 @@ class AlatTesController extends Controller
             ->with($this::FLASH_SUCCESS, "Alat tes '{$data['nama']}' berhasil disimpan.");
     }
 
-    public function edit(int $id): View
+    public function edit(int $id): RedirectResponse
     {
-        $alatTes = AlatTes::findOrFail($id);
+        AlatTes::findOrFail($id);
 
-        return view('admin.alat-tes.edit', [
-            'alatTes' => $alatTes,
-            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid', 'Mixed'],
-        ]);
+        return redirect()->route('admin.alat-tes.index', ['ubah' => $id]);
     }
 
     public function update(PerbaruiAlatTesRequest $request, int $id): RedirectResponse
@@ -89,12 +88,13 @@ class AlatTesController extends Controller
         $alatTes->update([
             'nama' => $data['nama'],
             'kode' => $data['kode'],
+            'deskripsi' => $data['deskripsi'] ?? null,
             'format_dasar' => $data['format_dasar'],
             'pola_skoring' => $data['pola_skoring'],
             'jumlah_soal' => $data['jumlah_soal'] ?? null,
-            'durasi_total_menit' => $data['durasi_total_menit'],
+            'durasi_total_menit' => $data['durasi_total_menit'] ?? null,
             'batas_waktu_per_soal_aktif' => $request->boolean('batas_waktu_per_soal_aktif'),
-            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'],
+            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'] ?? null,
             'is_sensitif' => $request->boolean('is_sensitif'),
         ]);
 

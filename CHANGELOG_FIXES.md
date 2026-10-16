@@ -4,6 +4,22 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #27 — Halaman Norma membingungkan: ribuan baris panjang → matriks per dimensi seperti buku manual
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `app/Http/Controllers/Admin/AlatTesController.php` (`norma()`), `resources/views/admin/alat-tes/norma.blade.php`, `tests/Feature/AlatTesHalamanTest.php` |
+| Masalah | User bingung membaca norma: IST 1.310 baris & EPPS 1.608 baris ditampilkan sebagai daftar berhalaman (65 halaman), padahal isinya tabel konversi seperti di buku manual |
+| Akar | Satu baris DB = satu sel tabel manual (dimensi × kelompok × skor mentah); tampilan menyalin struktur DB apa adanya |
+| Fix | Hanya tampilan: pilih dimensi lewat tab kode (SE, WA, …, IQ), lalu satu tabel per tahap dengan baris = skor mentah, kolom = kelompok, sel = skor hasil. Kepala & kolom skor mentah lengket saat digulir. Nama kelompok dibuat terbaca (USIA_21_25 → "Usia 21–25", EPPS 3/4 → "Dewasa pria/wanita"; EPPS 1/2 diabukan karena tidak dipakai `kelompokSegmen()`); dimensi IQ diberi judul alur "Tahap 1 RW → SW" dan "Tahap 2 SW → IQ"; kotak "Cara membaca". Import CSV dipindah ke panel lipat (terbuka otomatis bila import gagal) dengan arti tiap kolom. Tabel `norma_konversi` & semua lookup `ScoringEngineService` tidak disentuh. Alternatif penggabungan skor berurutan menjadi rentang dicek dan ditolak: hanya 2.969 → 2.665 baris (−10%) dengan risiko mengubah data |
+| Verifikasi | Tidak ada baris duplikat (dimensi, kelompok, tahap, min, max): 2.969 = 2.969 unik, jadi matriks tidak menimpa sel. Browser 1440px: IST SE 21 × 6 kolom (Usia 21–25 skor 0 → 68, sesuai DB); IQ tampil 2 tahap (18 baris × 6 kelompok, 68 baris × 1); EPPS ach 4 kolom dengan kelompok 1–2 abu. 375px `scrollWidth` 375 (tabel bergulir di dalam kotaknya). Test baru membuka norma setiap pasangan alat tes–dimensi dan mencocokkan setiap sel dengan baris DB-nya: `php artisan test` 27/27, 3.098 assertion |
+| Pelajaran | Sebelum mengusulkan "ringkas data", ukur dulu manfaatnya (di sini −10%) — sering yang perlu diringkas cuma penyajiannya. Ditemukan 51 baris norma milik alat tes yang sudah dihapus (soft delete); tidak tampil di mana pun, dibersihkan oleh `PurgeSoftDeletes` saat alat tes di-purge |
+| Log Keyword | norma, matriks, kelompok segmen, tahap, IQ, SW, buku manual, norma_konversi |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
 ### Fix #26 — Alat Tes: deskripsi tidak pernah tersimpan, dimensi baru selalu urutan 0, UI tidak konsisten
 
 | Field | Detail |

@@ -119,24 +119,35 @@ class AlatTesController extends Controller
     public function norma(Request $request, int $id): View
     {
         $alatTes = AlatTes::findOrFail($id);
-        $dimensi = \App\Models\DimensiAlatTes::where('alat_tes_id', $id)
-            ->orderBy('urutan')->get();
+        $dimensi = DimensiAlatTes::where('alat_tes_id', $id)->orderBy('urutan')->get();
         $jumlahNorma = NormaKonversi::where('alat_tes_id', $id)->count();
 
-        $perPage = $this->getPerPage($request, 25, [25, 50, 100, 250]);
-        $filterDimensi = $request->input('dimensi');
+        // Hanya dimensi yang punya norma yang jadi tab; jumlah baris per dimensi untuk label tab
+        $barisPerDimensi = NormaKonversi::where('alat_tes_id', $id)
+            ->selectRaw('dimensi_id, COUNT(*) as n')->groupBy('dimensi_id')->pluck('n', 'dimensi_id');
+        $dimensiNorma = $dimensi->filter(fn ($d) => isset($barisPerDimensi[$d->id]))->values();
+        $dipilih = $dimensiNorma->firstWhere('id', (int) $request->input('dimensi')) ?? $dimensiNorma->first();
 
-        $contohNorma = NormaKonversi::where('alat_tes_id', $id)
-            ->with('dimensi')
-            ->when($filterDimensi, fn($q) => $q->where('dimensi_id', $filterDimensi))
-            ->orderBy('dimensi_id')
-            ->orderBy('kelompok_segmen')
-            ->orderBy('skor_mentah_min')
-            ->paginate($perPage)
-            ->withQueryString();
+        // Matriks seperti buku manual: per tahap, baris = skor mentah, kolom = kelompok, sel = skor hasil.
+        // Hanya tampilan — data & lookup skoring tetap baris per baris di norma_konversi.
+        $matriks = [];
+        if ($dipilih) {
+            $semua = NormaKonversi::where('alat_tes_id', $id)->where('dimensi_id', $dipilih->id)
+                ->orderBy('tahap')->orderBy('skor_mentah_min')->orderBy('skor_mentah_max')
+                ->get(['kelompok_segmen', 'tahap', 'skor_mentah_min', 'skor_mentah_max', 'skor_hasil']);
+
+            foreach ($semua->groupBy('tahap') as $tahap => $baris) {
+                $kolom = $baris->pluck('kelompok_segmen')->unique()->sort(SORT_NATURAL)->values();
+                $sel = [];
+                foreach ($baris as $n) {
+                    $sel[$n->skor_mentah_min . '|' . $n->skor_mentah_max][$n->kelompok_segmen] = $n->skor_hasil;
+                }
+                $matriks[$tahap] = ['kolom' => $kolom, 'sel' => $sel, 'jumlah' => $baris->count()];
+            }
+        }
 
         return view('admin.alat-tes.norma', compact(
-            'alatTes', 'dimensi', 'jumlahNorma', 'contohNorma', 'perPage', 'filterDimensi'
+            'alatTes', 'dimensi', 'jumlahNorma', 'barisPerDimensi', 'dimensiNorma', 'dipilih', 'matriks'
         ));
     }
 

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AlatTes;
 use App\Models\DimensiAlatTes;
+use App\Models\NormaKonversi;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -27,6 +28,23 @@ class AlatTesHalamanTest extends TestCase
         $this->get("/admin/alat-tes/{$alat->id}/norma")->assertOk();
         $this->get('/admin/alat-tes/tambah')->assertRedirect(route('admin.alat-tes.index', ['tambah' => 1]));
         $this->get("/admin/alat-tes/{$alat->id}/edit")->assertRedirect(route('admin.alat-tes.index', ['ubah' => $alat->id]));
+    }
+
+    public function test_matriks_norma_memuat_setiap_baris_tanpa_mengubah_nilai(): void
+    {
+        $this->actingAs($this->admin());
+
+        foreach (NormaKonversi::whereIn('alat_tes_id', AlatTes::select('id'))->select('alat_tes_id', 'dimensi_id')->distinct()->get() as $pasangan) {
+            $matriks = $this->get("/admin/alat-tes/{$pasangan->alat_tes_id}/norma?dimensi={$pasangan->dimensi_id}")
+                ->assertOk()->viewData('matriks');
+            $baris = NormaKonversi::where('alat_tes_id', $pasangan->alat_tes_id)->where('dimensi_id', $pasangan->dimensi_id)->get();
+
+            $jumlahSel = collect($matriks)->sum(fn ($m) => collect($m['sel'])->sum(fn ($isi) => count($isi)));
+            $this->assertSame($baris->count(), $jumlahSel, "dimensi {$pasangan->dimensi_id}");
+            foreach ($baris as $n) {
+                $this->assertEquals($n->skor_hasil, $matriks[$n->tahap]['sel'][$n->skor_mentah_min . '|' . $n->skor_mentah_max][$n->kelompok_segmen]);
+            }
+        }
     }
 
     public function test_deskripsi_alat_tes_tersimpan(): void

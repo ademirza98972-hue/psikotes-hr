@@ -4,6 +4,22 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #24 — Halaman Akun Karyawan tidak konsisten & fitur import Excel tak punya tombol
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/akun-karyawan/index.blade.php` (tulis ulang), `app/Http/Controllers/Admin/DataKaryawanController.php` (`index` kirim `ringkasan`), `resources/views/components/ui/field.blade.php` (`content-start`), test baru `tests/Feature/AkunKaryawanHalamanTest.php` |
+| Masalah | Halaman memakai warna hex lepas (`#191c1e`, `#c0c8cb`, blue/violet/amber) dan header sticky `-mx-6` (melebar di ponsel karena `main` ber-padding `px-4`); tabel 8 kolom ber-scroll di dalam kotak `max-height`; modal Tambah & Ubah dua salinan form ~100 baris; reset password memakai `confirm()` browser; route `import` & `template` sudah ada di backend tetapi tidak ada tombol di UI |
+| Akar | Halaman belum dimigrasi ke komponen `x-ui.*` dan token brand (Fix #23 baru mencakup dashboard) |
+| Fix | Header + tombol Import Excel / Tambah Karyawan; strip ringkasan (total, aktif, nonaktif, belum ganti password) warna brand; toolbar filter dalam kartu dengan tombol Cari; tabel responsif (kolom ID/NIK/Departemen/Status disembunyikan bertahap, di ponsel info pindah ke bawah nama) tanpa wrapper overflow sehingga menu aksi (`x-ui.dropdown-menu`: aktif/nonaktifkan, reset password, hapus) tidak terpotong; satu `x-ui.dialog` form untuk tambah & ubah (dikelompokkan Identitas/Penempatan/Kontak); dialog konfirmasi bersama untuk reset password & hapus; dialog import (unduh template + unggah). Nama field, route, dan validasi tidak berubah |
+| Verifikasi | Browser superadmin 1440px & 375px: `scrollWidth` = `clientWidth` (375 = 375), tabel 358 ≤ kartu 359 setelah email diberi `break-all` (sebelumnya 366 > 359); ringkasan 28/25/3/16 sesuai data; Ubah baris 1 memuat posisi "Legal Manager" (sebelumnya kosong, lihat Pelajaran) dan PUT `/admin/akun-karyawan/13` berhasil; Tambah dengan ID duplikat kembali ke modal dengan "ID karyawan sudah terdaftar." dan posisi tetap terpilih; template unduh 200 (xlsx 6,8 KB); console tanpa error; emoji 0; `php artisan test` 19/19 |
+| Pelajaran | `x-model` pada `<select>` yang opsinya dimuat async tidak memilih ulang bila nilainya tidak berubah — kosongkan nilai dulu, pasang lagi setelah `$nextTick`. Menu dropdown di tabel butuh tabel tanpa `overflow-x-auto`; sembunyikan kolom bertahap, jangan andalkan scroll horizontal |
+| Log Keyword | akun karyawan, import excel, template, modal, dropdown aksi, x-model select posisi, responsif, 375px |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
 ### Fix #23 — Dashboard admin generik & warna lepas dari logo: rombak UI dengan palet Jhonlin Group
 
 | Field | Detail |

@@ -1,7 +1,7 @@
 {{-- Field shadcn: label + kontrol + deskripsi + pesan error validasi Laravel. --}}
 @props(['label' => null, 'for' => null, 'description' => null, 'error' => null])
 
-<div {{ $attributes->class('grid gap-2') }}>
+<div {{ $attributes->class('grid content-start gap-2') }}>
     @if ($label)
         <x-ui.label :for="$for">{{ $label }}</x-ui.label>
     @endif

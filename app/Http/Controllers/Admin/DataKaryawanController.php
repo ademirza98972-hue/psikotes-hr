@@ -55,6 +55,9 @@ class DataKaryawanController extends Controller
             'filterPosisi'    => $filterPosisi,
             'semuaDepartemen' => Departemen::orderBy('nama_departemen')->get(),
             'semuaPosisi'     => Posisi::when($filterDepartemen, fn ($q) => $q->where('departemen_id', $filterDepartemen))->orderBy('nama_posisi')->get(),
+            'ringkasan'       => User::where('tipe_akun', 'karyawan')
+                ->selectRaw("COUNT(*) as total, SUM(status = 'aktif') as aktif, SUM(status = 'nonaktif') as nonaktif, SUM(must_change_password = 1) as wajib_ganti")
+                ->first(),
         ]);
     }
 

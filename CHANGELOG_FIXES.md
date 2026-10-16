@@ -4,6 +4,22 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #28 — Bank Soal: ubah soal IST selalu gagal tanpa pesan, form ganda, UI tidak konsisten
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/bank-soal/index.blade.php` & `partials/kartu-soal.blade.php` (tulis ulang), `form.blade.php` baru (gantikan `tambah.blade.php` + `edit.blade.php` yang dihapus), `app/Http/Controllers/Admin/BankSoalController.php`, `routes/web.php`, `resources/views/admin/alat-tes/index.blade.php` (tombol Soal), test baru `tests/Feature/BankSoalHalamanTest.php` |
+| Masalah | (1) Simpan ubah soal IST (format Mixed, 176 soal) selalu ditolak: form edit tidak mengirim `tipe_format` padahal wajib, dan `kunci_jawaban` divalidasi `in:a,b,c,d,e` sehingga kunci isian ("35", JSON GE) ditolak. Form edit tidak menampilkan error, jadi gagalnya senyap. (2) Kalau lolos, update isian menulis `teks_soal = null` ke kolom NOT NULL (pasangan kata GE "mawar - melati" hilang/500). (3) Format Pilihan Ganda: form kirim `kunci` + `opsi[A..D]` tapi controller membaca `kunci_jawaban` + `opsi[a..e]` → kunci & opsi tak tersimpan. (4) Kode alat di kartu hardcode `EPPS`, alat lain tampil "?". (5) `tambah`/`edit` dua salinan 280 baris; hex lepas, header sticky `-mx-6`, `Swal`, tombol Import Excel mati. (6) Izin `soal.tambah/edit/hapus` ada di seeder tapi tidak dicek |
+| Akar | Form edit dan rules validasi Mixed berkembang terpisah; rules kunci hanya memikirkan tipe pilihan |
+| Fix | Satu `form.blade.php` untuk tambah & ubah (x-ui, Alpine `tipe`, bagian tak aktif di `<fieldset disabled>` sehingga hanya satu `kunci_jawaban` terkirim; kunci GE dirakit dengan urutan key asli `{"2":..,"1":..}`). Rules Mixed: kunci `in:a..e` hanya untuk tipe pilihan, isian `required|max:255`; `teks_soal` disimpan apa adanya. Pilihan Ganda pakai nama field yang sama dengan Mixed (a–d). Index: kartu alat tes (termasuk yang 0 soal), halaman per alat dengan kepala gaya Alat Tes, tab pindah alat, cari teks soal/opsi, saring subtes IST (rentang dari `SUBTES_IST`, salinan `ScoringEngineService`), kartu soal dengan badge subtes/tipe, penanda "Gambar belum diunggah", dialog hapus `_konfirmasi`. Route tambah/ubah/hapus diberi `izin:soal.*` (semua peran ber-`soal.lihat` sudah punya ketiganya). `mapSoalUntukView` dihapus, kartu membaca model langsung. Skala Likert (tak ada alat yang memakainya; enum `tipe_format` tak punya nilainya) kini menampilkan peringatan alih-alih form yang pasti gagal |
+| Verifikasi | Sebelum: PUT soal 379/439/455 dengan isian form lama → 3/3 ditolak (`tipe_format` wajib; 2 juga kunci). Sesudah: test simpan ulang isian_teks/isian_angka/pilihan_ganda IST lolos, teks/kunci/jumlah opsi identik. Browser superadmin: IST 176 kartu, subtes GE = nomor 61–76, FA 121 bertanda gambar belum diunggah (40 soal FA/WU tanpa gambar di DB); form soal 61 mengirim `kunci_jawaban` byte-identik dengan DB, simpan → redirect ke index, data tidak berubah. 375px `scrollWidth` 375 di 10 halaman (index, 3 alat, 2 edit, 3 tambah, alat tes). Hex lepas 0, console error 0. `php artisan test` 30/30, 3.138 assertion |
+| Pelajaran | Uji form edit dengan mengirim ulang isian apa adanya — "simpan tanpa perubahan harus lolos & tidak mengubah data" menangkap field wajib yang tidak dirender dan rules yang terlalu sempit sekaligus. Objek JS mengurutkan key angka (`{2:..,1:..}` jadi `{"1":..,"2":..}`), rakit string JSON manual bila urutan harus dipertahankan |
+| Log Keyword | bank soal, IST, Mixed, tipe_format wajib, kunci_jawaban in:a,b,c,d,e, isian GE, teks_soal null, Pilihan Ganda kunci, SUBTES_IST, izin soal.edit |
+| Deploy | `npm run build`, `php artisan view:clear`, `php artisan route:clear` |
+
+---
+
 ### Fix #27 — Halaman Norma membingungkan: ribuan baris panjang → matriks per dimensi seperti buku manual
 
 | Field | Detail |

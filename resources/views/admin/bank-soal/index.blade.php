@@ -2,180 +2,140 @@
 
 @section('content')
 @php
-    $warnaKode = [];
+    $u = auth()->user();
+    $bisaTambah = $u->hasIzin('soal.tambah');
+    $bisaUbah = $u->hasIzin('soal.edit');
+    $bisaHapus = $u->hasIzin('soal.hapus');
+    $angka = fn ($n) => number_format((int) $n, 0, ',', '.');
 @endphp
 
-<div class="space-y-6">
+<div class="mx-auto max-w-7xl space-y-6" x-data="{ konfirmasi: { buka: false, judul: '', pesan: '', url: '', label: 'Hapus' } }">
 
-    {{-- STICKY HEADER --}}
-    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5] space-y-4">
-    {{-- PAGE HEADER --}}
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-            <h2 class="text-[28px] leading-9 font-semibold text-foreground">Bank Soal</h2>
-            <p class="mt-0.5 text-[14px] text-[#40484b]">Kelola kumpulan instrumen tes psikologi.</p>
-        </div>
-        <div class="flex items-center gap-2">
-            @if(auth()->user()->hasIzin('soal.tambah'))
-            @if($alatTesTerpilih)
-                <a href="{{ route('admin.bank-soal.tambah', $alatTesTerpilih->id) }}"
-                   class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
-                    <span class="material-symbols-outlined text-[18px]">add</span>
-                    Tambah Soal
-                </a>
-            @else
-                {{-- Tampilkan tombol Tambah Soal tanpa filter (ambil dari alat tes pertama) --}}
-                @php $alatFirst = $alatTesSemua[0] ?? null; @endphp
-                @if($alatFirst)
-                <a href="{{ route('admin.bank-soal.tambah', $alatFirst->id) }}"
-                   class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap">
-                    <span class="material-symbols-outlined text-[18px]">add</span>
-                    Tambah Soal
-                </a>
-                @endif
-            @endif
-            @endif
-            {{-- TODO: implementasi import Excel saat backend siap --}}
-            <button type="button" disabled
-                    class="cursor-not-allowed rounded-xl bg-[#e6e8ea] px-4 py-2 text-sm font-semibold text-[#40484b] opacity-60 whitespace-nowrap">
-                <span class="material-symbols-outlined text-[18px]">upload_file</span>
-                Import Excel
-            </button>
-        </div>
+@if (! $alatTesTerpilih)
+    {{-- SEMUA ALAT TES --}}
+    <div class="space-y-1">
+        <h1 class="text-2xl font-semibold tracking-tight">Bank Soal</h1>
+        <p class="text-sm text-muted-foreground">Pilih alat tes untuk melihat, menambah, atau mengubah butir soalnya.</p>
     </div>
 
-    {{-- FILTER PILIH ALAT TES --}}
-    <div class="bg-white border border-[#e0e3e5] rounded-xl p-4">
-        <form method="GET" action="{{ route('admin.bank-soal.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div class="flex flex-1 flex-wrap items-end gap-2">
-                <div>
-                    <label for="alat_tes_id" class="block text-[11px] uppercase tracking-wider font-semibold text-[#40484b] mb-1">Filter Instrumen</label>
-                    <select id="alat_tes_id" name="alat_tes_id"
-                            class="block w-64 rounded-xl border border-[#c0c8cb] bg-white px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer">
-                        <option value="">Semua Instrumen</option>
-                        @foreach ($alatTesSemua as $alat)
-                            <option value="{{ $alat->id }}" @selected((int) request('alat_tes_id') === $alat->id)>
-                                {{ $alat->nama }} ({{ $alat->format_dasar }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <button type="submit" class="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95">
-                    Tampilkan Soal
-                </button>
-                @if (request('alat_tes_id'))
-                    <a href="{{ route('admin.bank-soal.index') }}"
-                       class="rounded-xl bg-[#f2f4f6] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#e6e8ea] whitespace-nowrap transition-colors">
-                        Reset
-                    </a>
-                @endif
-            </div>
-        </form>
-    </div>
-
-    </div>{{-- /STICKY HEADER --}}
-
-    {{-- TAMPILAN: MODE TERPILIH (satu alat tes) --}}
-    @if($alatTesTerpilih)
-        @php
-            $kodeAlat = '';
-            foreach (['EPPS'] as $k) {
-                if (str_contains($alatTesTerpilih->nama, $k)) {
-                    $kodeAlat = $k;
-                    break;
-                }
-            }
-        @endphp
-
-        {{-- HEADER ALAT TES TERPILIH --}}
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                @php
-                    $namaTampil = ($alatTesTerpilih->nama === $kodeAlat)
-                        ? 'Instrument ' . $kodeAlat
-                        : $alatTesTerpilih->nama;
-                @endphp
-                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ kode_badge_class($kodeAlat) }}">
-                    {{ $kodeAlat }}
-                </span>
-                <h2 class="text-base font-semibold text-[#191c1e]">{{ $namaTampil }}</h2>
-                <span class="inline-block rounded-full border border-[#c0c8cb] px-2.5 py-0.5 text-[11px] font-medium text-[#40484b]">
-                    {{ $alatTesTerpilih->format_dasar }}
-                </span>
-            </div>
-            <span class="text-[12px] text-[#40484b]">{{ count($daftarSoal) }} soal terdaftar</span>
-        </div>
-
-        @if (empty($daftarSoal))
-            <div class="bg-white border border-dashed border-[#c0c8cb] rounded-xl px-6 py-10 text-center text-sm text-[#40484b]">
-                Belum ada soal untuk alat tes ini.
-            </div>
-        @else
-            <div class="space-y-3">
-                @foreach ($daftarSoal as $idx => $soal)
-                    @include('admin.bank-soal.partials.kartu-soal', [
-                        'nomor'       => $idx + 1,
-                        'soal'        => $soal,
-                        'format'      => $alatTesTerpilih->format_dasar,
-                        'kodeAlat'    => $kodeAlat,
-                    ])
-                @endforeach
-            </div>
-        @endif
-
-    {{-- TAMPILAN: MODE SEMUA (tanpa filter) --}}
+    @if ($alatTesSemua->isEmpty())
+        <x-ui.card>
+            <x-ui.empty icon="quiz" title="Belum ada alat tes" description="Buat alat tes terlebih dahulu sebelum menyusun soal.">
+                <x-ui.button size="sm" :href="route('admin.alat-tes.index')"><span class="material-symbols-outlined">quiz</span>Ke Alat Tes</x-ui.button>
+            </x-ui.empty>
+        </x-ui.card>
     @else
-        @if(count($kelompokSoalSemua) === 0)
-            <div class="bg-white border border-dashed border-[#c0c8cb] rounded-xl px-6 py-12 text-center">
-                <span class="material-symbols-outlined text-[40px] text-[#c0c8cb] mb-3">quiz</span>
-                <p class="text-sm text-[#40484b]">Belum ada soal tersedia.</p>
-            </div>
-        @else
-            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                @foreach($kelompokSoalSemua as $alatId => $kelompok)
-                    @php
-                        $kodeAlat = '';
-                        foreach (['EPPS'] as $k) {
-                            if (str_contains($kelompok['alat']->nama, $k)) { $kodeAlat = $k; break; }
-                        }
-                        $namaTampilAll = ($kelompok['alat']->nama === $kodeAlat)
-                            ? 'Instrument ' . $kodeAlat
-                            : $kelompok['alat']->nama;
-                    @endphp
-                    <a href="{{ route('admin.bank-soal.index', ['alat_tes_id' => $alatId]) }}"
-                       class="flex items-center justify-between rounded-xl border border-[#e0e3e5] bg-white px-5 py-4 shadow-sm hover:shadow-md hover:border-primary/40 transition-all group">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-bold {{ kode_badge_class($kodeAlat) }}">
-                                {{ $kodeAlat ?: '?' }}
-                            </span>
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold text-[#191c1e] truncate">{{ $namaTampilAll }}</p>
-                                <p class="text-[11px] text-[#40484b]">{{ $kelompok['alat']->format_dasar }}</p>
-                            </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            @foreach ($alatTesSemua as $alat)
+                <a href="{{ route('admin.bank-soal.index', ['alat_tes_id' => $alat->id]) }}"
+                   class="group flex flex-col gap-4 rounded-xl border border-border bg-card p-5 shadow-sm transition-colors hover:border-primary/40">
+                    <div class="flex items-start gap-3">
+                        <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-ink font-mono text-sm font-semibold text-white">{{ $alat->kode }}</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="font-semibold leading-tight">{{ $alat->nama }}</p>
+                            <p class="mt-1 text-xs text-muted-foreground">{{ $alat->format_dasar }}</p>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0 ml-3">
-                            <span class="text-[13px] font-bold text-primary">{{ $kelompok['jumlahSoal'] }}</span>
-                            <span class="text-[11px] text-[#40484b]">soal</span>
-                            <span class="material-symbols-outlined text-[18px] text-[#c0c8cb] group-hover:text-primary transition-colors">chevron_right</span>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        @endif
+                        @if (! $alat->is_aktif)
+                            <x-ui.badge variant="secondary">Nonaktif</x-ui.badge>
+                        @endif
+                    </div>
+                    <div class="mt-auto flex items-end justify-between">
+                        <p><span class="text-2xl font-semibold tabular-nums">{{ $angka($alat->soal_count) }}</span> <span class="text-sm text-muted-foreground">soal</span></p>
+                        <span class="material-symbols-outlined text-muted-foreground transition-colors group-hover:text-primary">arrow_forward</span>
+                    </div>
+                </a>
+            @endforeach
+        </div>
     @endif
 
+@else
+    {{-- SATU ALAT TES --}}
+    @php
+        $alat = $alatTesTerpilih;
+        $isMixed = $alat->format_dasar === 'Mixed';
+        $tersaring = $cari !== '' || ($isMixed && $subtes !== '');
+    @endphp
+
+    <div class="space-y-4">
+        <a href="{{ route('admin.bank-soal.index') }}" class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>Semua bank soal
+        </a>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div class="flex min-w-0 items-start gap-4">
+                <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-ink font-mono text-sm font-semibold text-white">{{ $alat->kode }}</span>
+                <div class="min-w-0 space-y-1">
+                    <h1 class="text-2xl font-semibold tracking-tight">{{ $alat->nama }}</h1>
+                    <p class="text-sm text-muted-foreground">{{ $alat->format_dasar }} · {{ $angka($alat->soal_count) }} soal</p>
+                </div>
+            </div>
+            @if ($bisaTambah)
+                <x-ui.button :href="route('admin.bank-soal.tambah', $alat->id)">
+                    <span class="material-symbols-outlined">add</span>Tambah Soal
+                </x-ui.button>
+            @endif
+        </div>
+    </div>
+
+    {{-- TOOLBAR: pindah alat tes + saring --}}
+    <x-ui.card class="flex flex-col gap-3 p-3 lg:flex-row lg:items-center lg:justify-between">
+        <nav class="flex w-fit max-w-full items-center overflow-x-auto rounded-lg bg-muted p-[3px] text-sm font-medium text-muted-foreground" aria-label="Pilih alat tes">
+            @foreach ($alatTesSemua as $a)
+                @php $aktif = $a->id === $alat->id; @endphp
+                <a href="{{ route('admin.bank-soal.index', ['alat_tes_id' => $a->id]) }}" @if ($aktif) aria-current="page" @endif title="{{ $a->nama }}"
+                   class="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-md px-3 font-mono transition-all {{ $aktif ? 'bg-background text-foreground shadow-sm' : 'hover:text-foreground' }}">
+                    {{ $a->kode }}<span class="font-sans text-xs text-muted-foreground tabular-nums">{{ $a->soal_count }}</span>
+                </a>
+            @endforeach
+        </nav>
+        <form method="GET" action="{{ route('admin.bank-soal.index') }}" class="flex flex-wrap items-center gap-2">
+            <input type="hidden" name="alat_tes_id" value="{{ $alat->id }}">
+            <div class="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
+                <span class="material-symbols-outlined pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[18px] text-muted-foreground">search</span>
+                <x-ui.input type="search" name="cari" value="{{ $cari }}" placeholder="Cari teks soal atau opsi" class="pl-9" aria-label="Cari soal" />
+            </div>
+            @if ($isMixed)
+                <div class="w-40">
+                    <x-ui.select name="subtes" aria-label="Subtes" onchange="this.form.submit()">
+                        <option value="">Semua subtes</option>
+                        @foreach (\App\Http\Controllers\Admin\BankSoalController::SUBTES_IST as $kode => [$dari, $sampai])
+                            <option value="{{ $kode }}" @selected($subtes === $kode)>{{ $kode }} · {{ $dari }}–{{ $sampai }}</option>
+                        @endforeach
+                    </x-ui.select>
+                </div>
+            @endif
+            <x-ui.button type="submit" variant="secondary">Cari</x-ui.button>
+            @if ($tersaring)
+                <x-ui.button variant="ghost" :href="route('admin.bank-soal.index', ['alat_tes_id' => $alat->id])">Reset</x-ui.button>
+            @endif
+        </form>
+    </x-ui.card>
+
+    @if ($daftarSoal->isEmpty())
+        <x-ui.card>
+            @if ($tersaring)
+                <x-ui.empty icon="search_off" title="Tidak ada soal yang cocok" description="Ubah kata kunci atau pilihan subtes." />
+            @else
+                <x-ui.empty icon="format_list_numbered" title="Belum ada soal" description="Alat tes ini belum memiliki butir soal.">
+                    @if ($bisaTambah)
+                        <x-ui.button size="sm" :href="route('admin.bank-soal.tambah', $alat->id)"><span class="material-symbols-outlined">add</span>Tambah Soal</x-ui.button>
+                    @endif
+                </x-ui.empty>
+            @endif
+        </x-ui.card>
+    @else
+        @if ($tersaring)
+            <p class="text-sm text-muted-foreground">{{ $angka($daftarSoal->count()) }} dari {{ $angka($alat->soal_count) }} soal</p>
+        @endif
+        <div class="grid grid-cols-1 gap-4 {{ $alat->format_dasar === 'Grid' ? 'lg:grid-cols-2' : '' }}">
+            @foreach ($daftarSoal as $soal)
+                @include('admin.bank-soal.partials.kartu-soal')
+            @endforeach
+        </div>
+    @endif
+@endif
+
+    @if ($bisaHapus)
+        @include('admin.alat-tes._konfirmasi')
+    @endif
 </div>
 @endsection
-
-@push('scripts')
-<script>
-function confirmHapus(soalId, url) {
-    Swal.fire({
-        icon: 'warning', title: 'Hapus Soal?',
-        text: 'Soal ini akan dihapus secara permanen.',
-        showCancelButton: true, confirmButtonColor: '#00843D', cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
-    }).then(r => { if (r.isConfirmed) document.getElementById('hapus-soal-' + soalId).submit(); });
-}
-</script>
-@endpush

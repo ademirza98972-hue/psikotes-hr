@@ -136,7 +136,10 @@
                         <p class="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <span class="material-symbols-outlined text-[16px]">timer</span>{{ $durasi }}
                         </p>
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap gap-2">
+                            <x-ui.button variant="outline" size="sm" :href="route('admin.bank-soal.index', ['alat_tes_id' => $alat->id])">
+                                <span class="material-symbols-outlined">format_list_numbered</span>Soal
+                            </x-ui.button>
                             <x-ui.button variant="outline" size="sm" :href="route('admin.alat-tes.dimensi', $alat->id)">
                                 <span class="material-symbols-outlined">psychology</span>Dimensi
                             </x-ui.button>

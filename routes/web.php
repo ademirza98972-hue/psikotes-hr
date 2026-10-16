@@ -163,11 +163,11 @@ Route::middleware('auth')->group(function () {
     // BANK SOAL
     Route::prefix('admin/bank-soal')->name('admin.bank-soal.')->middleware('izin:soal.lihat,kategori_tes.kelola')->group(function () {
         Route::get('/', [BankSoalController::class, 'index'])->name('index');
-        Route::get('/tambah/{alatTesId}', [BankSoalController::class, 'tambah'])->whereNumber('alatTesId')->name('tambah');
-        Route::post('/{alatTesId}', [BankSoalController::class, 'simpan'])->whereNumber('alatTesId')->name('simpan');
-        Route::get('/{id}/edit', [BankSoalController::class, 'edit'])->whereNumber('id')->name('edit');
-        Route::put('/{id}', [BankSoalController::class, 'update'])->whereNumber('id')->name('update');
-        Route::delete('/{id}', [BankSoalController::class, 'hapus'])->whereNumber('id')->name('hapus');
+        Route::get('/tambah/{alatTesId}', [BankSoalController::class, 'tambah'])->whereNumber('alatTesId')->middleware('izin:soal.tambah')->name('tambah');
+        Route::post('/{alatTesId}', [BankSoalController::class, 'simpan'])->whereNumber('alatTesId')->middleware('izin:soal.tambah')->name('simpan');
+        Route::get('/{id}/edit', [BankSoalController::class, 'edit'])->whereNumber('id')->middleware('izin:soal.edit')->name('edit');
+        Route::put('/{id}', [BankSoalController::class, 'update'])->whereNumber('id')->middleware('izin:soal.edit')->name('update');
+        Route::delete('/{id}', [BankSoalController::class, 'hapus'])->whereNumber('id')->middleware('izin:soal.hapus')->name('hapus');
     });
 
     // PENJADWALAN TES

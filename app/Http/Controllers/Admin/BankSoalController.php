@@ -16,61 +16,69 @@ use Throwable;
 
 class BankSoalController extends Controller
 {
-    public function index(Request $request): View
+    // ponytail: salinan rentang di ScoringEngineService::scoreIST — ubah keduanya bila subtes IST bergeser
+    public const SUBTES_IST = [
+        'SE' => [1, 20], 'WA' => [21, 40], 'AN' => [41, 60], 'GE' => [61, 76], 'RA' => [77, 96],
+        'ZR' => [97, 116], 'FA' => [117, 136], 'WU' => [137, 156], 'ME' => [157, 176],
+    ];
+
+    public static function subtesIst(int $nomor): string
     {
-        $alatTesSemua = AlatTes::orderBy('nama')->get();
-
-        $idDipilih = (int) $request->query('alat_tes_id', 0);
-
-        $totalSemuaSoal = Soal::count();
-
-        $alatTesTerpilih = null;
-        $daftarSoal = [];
-        $kelompokSoalSemua = [];
-
-        if ($idDipilih > 0) {
-            $alatTesTerpilih = $alatTesSemua->firstWhere('id', $idDipilih);
-            if ($alatTesTerpilih) {
-                $soalRow = Soal::with(['alatTes', 'opsiJawaban.bobotOpsiDimensi.dimensi'])
-                    ->where('alat_tes_id', $idDipilih)
-                    ->orderBy('urutan')
-                    ->orderBy('id')
-                    ->get();
-                $daftarSoal = $soalRow->map(fn (Soal $s) => $this->mapSoalUntukView($s, $alatTesTerpilih->format_dasar))->all();
-            }
-        } else {
-            $counts = Soal::select('alat_tes_id', DB::raw('count(*) as jumlah'))
-                ->groupBy('alat_tes_id')
-                ->pluck('jumlah', 'alat_tes_id');
-
-            foreach ($alatTesSemua as $alat) {
-                $jumlah = $counts[$alat->id] ?? 0;
-                if ($jumlah === 0) continue;
-                $kelompokSoalSemua[$alat->id] = [
-                    'alat'       => $alat,
-                    'jumlahSoal' => $jumlah,
-                ];
+        foreach (self::SUBTES_IST as $kode => [, $maks]) {
+            if ($nomor <= $maks) {
+                return $kode;
             }
         }
 
-        return view('admin.bank-soal.index', [
-            'alatTesSemua'      => $alatTesSemua,
-            'kelompokSoalSemua' => $kelompokSoalSemua,
-            'alatTesTerpilih'   => $alatTesTerpilih,
-            'daftarSoal'        => $daftarSoal,
-            'totalSemuaSoal'    => $totalSemuaSoal,
-        ]);
+        return 'ME';
+    }
+
+    public function index(Request $request): View
+    {
+        $alatTesSemua = AlatTes::withCount('soal')->orderBy('nama')->get();
+        $alatTesTerpilih = $alatTesSemua->firstWhere('id', (int) $request->query('alat_tes_id'));
+        $daftarSoal = collect();
+        $cari = trim((string) $request->query('cari', ''));
+        $subtes = (string) $request->query('subtes', '');
+
+        if ($alatTesTerpilih) {
+            $daftarSoal = Soal::with('opsiJawaban.bobotOpsiDimensi.dimensi')
+                ->where('alat_tes_id', $alatTesTerpilih->id)
+                ->when($cari !== '', fn ($q) => $q->where(fn ($q) => $q
+                    ->where('teks_soal', 'like', "%{$cari}%")
+                    ->orWhereHas('opsiJawaban', fn ($q) => $q->where('teks_opsi', 'like', "%{$cari}%"))))
+                ->when($alatTesTerpilih->format_dasar === 'Mixed' && isset(self::SUBTES_IST[$subtes]),
+                    fn ($q) => $q->whereBetween('nomor', self::SUBTES_IST[$subtes]))
+                ->orderBy('urutan')
+                ->orderBy('id')
+                ->get();
+        }
+
+        return view('admin.bank-soal.index', compact('alatTesSemua', 'alatTesTerpilih', 'daftarSoal', 'cari', 'subtes'));
     }
 
     public function tambah(int $alatTesId): View
     {
         $alatTes = AlatTes::findOrFail($alatTesId);
+        $soal = new Soal(['nomor' => (int) Soal::where('alat_tes_id', $alatTes->id)->max('nomor') + 1, 'tipe_format' => 'pilihan_ganda']);
+
+        return $this->form($alatTes, $soal);
+    }
+
+    public function edit(int $id): View
+    {
+        $soal = Soal::with('opsiJawaban.bobotOpsiDimensi.dimensi')->findOrFail($id);
+
+        return $this->form(AlatTes::findOrFail($soal->alat_tes_id), $soal);
+    }
+
+    protected function form(AlatTes $alatTes, Soal $soal): View
+    {
         $dimensiList = DimensiAlatTes::where('alat_tes_id', $alatTes->id)
             ->orderBy('urutan')
             ->get(['id', 'kode_dimensi', 'nama_dimensi']);
-        $nomorBerikutnya = (int) (Soal::where('alat_tes_id', $alatTes->id)->max('nomor') ?? 0) + 1;
 
-        return view('admin.bank-soal.tambah', compact('alatTes', 'dimensiList', 'nomorBerikutnya'));
+        return view('admin.bank-soal.form', compact('alatTes', 'soal', 'dimensiList'));
     }
 
     public function simpan(Request $request, int $alatTesId): RedirectResponse
@@ -78,7 +86,7 @@ class BankSoalController extends Controller
         $alatTes = AlatTes::findOrFail($alatTesId);
         $format = $alatTes->format_dasar;
 
-        $rules = $this->soalRules($format);
+        $rules = $this->soalRules($format, $request->input('tipe_format'));
         $messages = $this->soalMessages($format);
         $attributes = $this->soalAttributes($format);
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), $rules, $messages, $attributes);
@@ -147,19 +155,17 @@ class BankSoalController extends Controller
                 return;
             }
 
-            // Mixed atau default
-            $tipeFormat = $request->input('tipe_format', 'pilihan_ganda');
+            // Mixed atau Pilihan Ganda
+            $tipeFormat = $validated['tipe_format'] ?? 'pilihan_ganda';
             $soal = Soal::create([
                 'alat_tes_id'   => $alatTes->id,
                 'nomor'         => $nomorBerikutnya,
-                'teks_soal'     => $validated['teks_soal'] ?? null,
+                'teks_soal'     => $validated['teks_soal'] ?? '',
                 'gambar_soal'   => $request->hasFile('gambar_soal')
                     ? $request->file('gambar_soal')->store('ist/soal', 'public')
                     : null,
                 'tipe_format'   => $tipeFormat,
-                'kunci_jawaban' => in_array($tipeFormat, ['isian_teks', 'isian_angka'])
-                    ? $validated['kunci_jawaban'] ?? null
-                    : $request->input('kunci_jawaban'),
+                'kunci_jawaban' => $validated['kunci_jawaban'] ?? null,
                 'urutan'        => $urutanBerikutnya,
             ]);
 
@@ -190,26 +196,13 @@ class BankSoalController extends Controller
             ->with($this::FLASH_SUCCESS, 'Soal berhasil ditambahkan.');
     }
 
-    public function edit(int $id): View
-    {
-        $soal = Soal::with(['alatTes', 'opsiJawaban.bobotOpsiDimensi.dimensi'])
-            ->findOrFail($id);
-        $format = $soal->alatTes->format_dasar ?? 'Pilihan Ganda';
-
-        $dimensiList = DimensiAlatTes::where('alat_tes_id', $soal->alat_tes_id)
-            ->orderBy('urutan')
-            ->get(['id', 'kode_dimensi', 'nama_dimensi']);
-
-        return view('admin.bank-soal.edit', compact('soal', 'format', 'dimensiList'));
-    }
-
     public function update(Request $request, int $id): RedirectResponse
     {
         $soal = Soal::with('alatTes')->findOrFail($id);
         $alatTes = $soal->alatTes;
         $format = $alatTes->format_dasar;
 
-        $rules = $this->soalRules($format);
+        $rules = $this->soalRules($format, $request->input('tipe_format'));
         $messages = $this->soalMessages($format);
         $attributes = $this->soalAttributes($format);
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), $rules, $messages, $attributes);
@@ -274,16 +267,14 @@ class BankSoalController extends Controller
             }
 
             if ($format === 'Mixed') {
-                $tipeFormat = $request->input('tipe_format', $soal->tipe_format);
+                $tipeFormat = $validated['tipe_format'];
                 $soal->update([
-                    'teks_soal'     => in_array($tipeFormat, ['isian_teks', 'isian_angka']) ? null : ($validated['teks_soal'] ?? null),
+                    'teks_soal'     => $validated['teks_soal'] ?? '',
                     'gambar_soal'   => $request->hasFile('gambar_soal')
                         ? $request->file('gambar_soal')->store('ist/soal', 'public')
                         : $soal->gambar_soal,
                     'tipe_format'   => $tipeFormat,
-                    'kunci_jawaban' => in_array($tipeFormat, ['isian_teks', 'isian_angka'])
-                        ? ($validated['kunci_jawaban'] ?? null)
-                        : $request->input('kunci_jawaban'),
+                    'kunci_jawaban' => $validated['kunci_jawaban'] ?? null,
                 ]);
 
                 if (in_array($tipeFormat, ['isian_teks', 'isian_angka'])) {
@@ -292,8 +283,8 @@ class BankSoalController extends Controller
                 }
             } else {
                 $soal->update([
-                    'teks_soal'     => $validated['teks_soal'] ?? null,
-                    'kunci_jawaban' => $validated['kunci_jawaban'] ?? $request->input('kunci_jawaban'),
+                    'teks_soal'     => $validated['teks_soal'],
+                    'kunci_jawaban' => $validated['kunci_jawaban'] ?? null,
                 ]);
 
                 if ($request->hasFile('gambar_soal')) {
@@ -365,82 +356,10 @@ class BankSoalController extends Controller
             ->with($this::FLASH_SUCCESS, 'Soal berhasil dihapus.');
     }
 
-    /**
-     * Bangun array sesuai key yang dipakai kartu-soal.blade.php:
-     *   Pilihan Ganda   → teks_soal, opsi[A..D], kunci
-     *   Skala Likert    → pernyataan, dimensi
-     *   Forced Choice   → pernyataan_a/b, dimensi_a/b (string nama dimensi)
-     */
-    protected function mapSoalUntukView(Soal $soal, ?string $format): array
+    protected function soalRules(string $format, ?string $tipe): array
     {
-        $format = $format ?? $soal->alatTes?->format_dasar;
+        $pilihan = in_array($tipe, ['pilihan_ganda', 'pilihan_gambar'], true);
 
-        if ($soal->tipe_format === 'grid') {
-            return [
-                'id'            => $soal->id,
-                'tipe_format'   => 'grid',
-                'format_dasar'  => 'Grid',
-                'teks_soal'     => $soal->teks_soal,
-            ];
-        }
-
-        if ($format === 'Pilihan Ganda') {
-            $opsi = $soal->opsiJawaban->sortBy('urutan')->values();
-            return [
-                'id'            => $soal->id,
-                'tipe_format'   => $soal->tipe_format ?? 'pilihan_ganda',
-                'teks_soal'     => $soal->teks_soal,
-                'opsi'          => [
-                    'A' => $opsi[0]->teks_opsi ?? '',
-                    'B' => $opsi[1]->teks_opsi ?? '',
-                    'C' => $opsi[2]->teks_opsi ?? '',
-                    'D' => $opsi[3]->teks_opsi ?? '',
-                ],
-                'kunci_jawaban' => $soal->kunci_jawaban,
-            ];
-        }
-
-        if ($format === 'Skala Likert') {
-            $dimensi = $soal->alatTes?->dimensiAlatTes->first();
-            return [
-                'id'            => $soal->id,
-                'tipe_format'   => $soal->tipe_format ?? 'skala_likert',
-                'pernyataan'    => $soal->teks_soal,
-                'dimensi'       => $dimensi?->nama_dimensi ?? '-',
-            ];
-        }
-
-        if ($format === 'Forced Choice') {
-            $opsi = $soal->opsiJawaban->sortBy('urutan')->values();
-            $dimensiA = $opsi[0]->bobotOpsiDimensi->first()?->dimensi?->nama_dimensi ?? '-';
-            $dimensiB = $opsi[1]->bobotOpsiDimensi->first()?->dimensi?->nama_dimensi ?? '-';
-
-            return [
-                'id'            => $soal->id,
-                'tipe_format'   => $soal->tipe_format ?? 'forced_choice',
-                'pernyataan_a'  => $opsi[0]->teks_opsi ?? '',
-                'dimensi_a'     => $dimensiA,
-                'pernyataan_b'  => $opsi[1]->teks_opsi ?? '',
-                'dimensi_b'     => $dimensiB,
-            ];
-        }
-
-        return [
-            'id'            => $soal->id,
-            'nomor'         => $soal->nomor,
-            'tipe_format'   => $soal->tipe_format ?? 'pilihan_ganda',
-            'teks_soal'     => $soal->teks_soal,
-            'gambar_soal'   => $soal->gambar_soal ?? null,
-            'opsi'          => $soal->opsiJawaban->sortBy('urutan')->values()->map(fn ($o) => [
-                'teks'   => $o->teks_opsi,
-                'gambar' => $o->gambar_opsi ?? null,
-            ])->toArray(),
-            'kunci_jawaban' => $soal->kunci_jawaban,
-        ];
-    }
-
-    protected function soalRules(string $format): array
-    {
         return match ($format) {
             'Grid'          => [
                 'teks_soal' => ['required', 'string'],
@@ -455,17 +374,18 @@ class BankSoalController extends Controller
                 'tipe_format'     => ['required', 'in:pilihan_ganda,pilihan_gambar,isian_teks,isian_angka'],
                 'teks_soal'       => ['required_if:tipe_format,pilihan_ganda,pilihan_gambar', 'nullable', 'string'],
                 'gambar_soal'     => ['nullable', 'image', 'max:2048'],
-                'kunci_jawaban'   => ['nullable', 'string', 'in:a,b,c,d,e'],
+                // pilihan: huruf opsi; isian: teks/angka, atau JSON {"2":[..],"1":[..]} untuk GE
+                'kunci_jawaban'   => $pilihan ? ['nullable', 'in:a,b,c,d,e'] : ['required', 'string', 'max:255'],
                 'opsi'            => ['nullable', 'array'],
                 'opsi.*'          => ['nullable', 'string', 'max:500'],
                 'gambar_opsi'     => ['nullable', 'array'],
                 'gambar_opsi.*'   => ['nullable', 'image', 'max:2048'],
             ],
             default         => [
-                'teks_soal' => ['required', 'string'],
-                'kunci'     => ['nullable', 'string', 'in:A,B,C,D'],
-                'opsi'      => ['required', 'array', 'min:2'],
-                'opsi.*'    => ['required', 'string'],
+                'teks_soal'     => ['required', 'string'],
+                'kunci_jawaban' => ['nullable', 'in:a,b,c,d'],
+                'opsi'          => ['required', 'array:a,b,c,d', 'min:2'],
+                'opsi.*'        => ['required', 'string', 'max:500'],
             ],
         };
     }
@@ -483,14 +403,15 @@ class BankSoalController extends Controller
             'Mixed'         => [
                 'gambar_soal.image'     => 'File harus berupa gambar.',
                 'gambar_soal.max'       => 'Ukuran gambar maksimal 2 MB.',
-                'kunci_jawaban.in'      => 'Kunci jawaban harus a, b, c, d, atau e.',
+                'kunci_jawaban.in'       => 'Kunci jawaban harus a, b, c, d, atau e.',
+                'kunci_jawaban.required' => 'Kunci jawaban wajib diisi untuk soal isian.',
                 'opsi.*.max'            => 'Setiap opsi maksimal 500 karakter.',
                 'gambar_opsi.*.image'   => 'File opsi harus berupa gambar.',
                 'gambar_opsi.*.max'     => 'Ukuran gambar opsi maksimal 2 MB.',
             ],
             default         => [
                 'teks_soal.required' => 'Pernyataan wajib diisi.',
-                'kunci.in'           => 'Kunci jawaban harus A, B, C, atau D.',
+                'kunci_jawaban.in'   => 'Kunci jawaban harus A, B, C, atau D.',
                 'opsi.required'      => 'Minimal satu opsi jawaban wajib diisi.',
                 'opsi.min'           => 'Minimal :min opsi jawaban.',
                 'opsi.*.required'    => 'Opsi jawaban wajib diisi.',
@@ -511,13 +432,14 @@ class BankSoalController extends Controller
                 'dimensi_b'    => 'dimensi B',
             ],
             'Mixed'         => [
+                'tipe_format'   => 'tipe soal',
                 'teks_soal'     => 'pertanyaan',
                 'gambar_soal'   => 'gambar soal',
                 'kunci_jawaban' => 'kunci jawaban',
                 'opsi.*'        => 'opsi jawaban',
                 'gambar_opsi.*' => 'gambar opsi',
             ],
-            default         => ['teks_soal' => 'pernyataan'],
+            default         => ['teks_soal' => 'pertanyaan', 'opsi.*' => 'opsi jawaban'],
         };
 
         return $attributes;

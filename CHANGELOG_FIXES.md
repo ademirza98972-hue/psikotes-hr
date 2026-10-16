@@ -4,6 +4,420 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #29 — Penjadwalan Tes: peserta selesai bisa dihapus (hasil hilang), calon peserta termasuk akun ditolak, jumlah_peserta melenceng, UI tidak konsisten
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/penjadwalan-tes/{index,detail}.blade.php` (tulis ulang), partial baru `_form.blade.php` (modal tambah/ubah + dialog konfirmasi), hapus `tambah.blade.php` & `edit.blade.php`, `app/Http/Controllers/Admin/PenjadwalanTesController.php`, `app/Http/Requests/{Simpan,Perbarui}SesiTesRequest.php`, `TambahPesertaSesiRequest.php`, test baru `tests/Feature/PenjadwalanTesHalamanTest.php` |
+| Masalah | (1) Tombol hapus peserta tersedia juga untuk peserta yang sudah Selesai; `peserta_sesi_tes` dihapus permanen, `log_aktivitas_tes` ikut terhapus (cascade), dan peserta hilang dari Hasil Tes. (2) Daftar calon peserta memuat semua karyawan/kandidat, termasuk 3 kandidat `ditolak`, 1 `menunggu_verifikasi`, 3 karyawan `nonaktif`. (3) `sesi_tes.jumlah_peserta` (dibaca Hasil Tes) dikelola dengan increment/decrement dan sudah melenceng: sesi 1 tercatat 8 padahal ada 10, sesi 2–4 juga selisih 2. (4) Ubah sesi boleh tanpa alat tes, padahal tambah mewajibkannya. (5) Tambah peserta menerima alat tes di luar sesi. (6) Filter tidak punya status "Belum Dimulai"; detail menampilkan `status` mentah, bukan `status_display` seperti index. (7) `tambah`/`edit` dua salinan form, hex & `style` inline, `confirm()` |
+| Akar | Hitungan peserta didenormalisasi tanpa sinkron ulang; aksi hapus peserta tidak membedakan status pengerjaan; kueri calon peserta hanya menyaring `tipe_akun` |
+| Fix | Hapus peserta ditolak (flash error) bila `status_pengerjaan` ≠ Belum Mengerjakan atau `waktu_mulai` terisi; di tabel tampil ikon gembok. Calon peserta hanya `status = aktif`. `jumlah_peserta` dihitung ulang dari data setiap tambah/keluarkan peserta. `alat_tes_ids` wajib saat ubah; tambah peserta menolak alat tes di luar sesi. Index: ringkasan 4 status (pintasan filter, kueri sama dengan `statusDisplay`), filter cari + status, kartu sesi (badge status, periode, departemen, kode alat, progres), dropdown Ubah/Hapus. Satu modal tambah/ubah (`_form`) dipakai index & detail; `/tambah` → `index?tambah=1`, `/{id}/edit` → `detail?ubah=1`; validasi gagal membuka ulang modal dengan isian lama. Detail: kepala + peringatan Draft, ringkasan peserta/progres, tabel peserta, panel tambah peserta Alpine (tab Karyawan/Kandidat dengan jumlah, cari nama/email, pilih semua yang tampil, pilihan di tab lain tetap terkirim, alat tes sesi tercentang default) |
+| Verifikasi | Ringkasan 3 aktif / 0 belum dimulai / 3 draft / 20 selesai = 26 sesi di DB; tiap filter status hanya memuat sesi dengan `status_display` itu (test). Sesi 1: 24 karyawan + 7 kandidat aktif sebagai calon, 2 baris peserta Selesai terkunci, memilih 7 kandidat lalu pindah ke tab Karyawan → 7 `user_ids[]` tetap terkirim. Modal ubah sesi 2 mengirim data identik DB → simpan, redirect ke detail dengan flash Berhasil. Tambah tanpa alat tes → modal terbuka lagi, nama/tanggal tetap, pesan "alat tes wajib diisi". 375px: 0 elemen melewati layar di index, detail 1/2/26 dan kedua modal (sebelumnya panel tambah peserta 413px karena nama alat panjang). Console error 0. `php artisan test` 36/36 |
+| Pelajaran | (a) `@js()` tidak dikompilasi di atribut komponen `x-ui.*` (keluar mentah, Alpine error "calon is not defined"); pakai `{{ Js::from() }}`. (b) Atribut Alpine tanpa nilai pada komponen (`@keydown.enter.prevent`) dirender Blade jadi `="@keydown.enter.prevent"` sehingga Alpine SyntaxError; beri `=""`. (c) `grid` tanpa `grid-cols-*` membuat kolom `auto` yang melebar ke konten terpanjang; `truncate` baru bekerja dengan `grid-cols-1`/`min-w-0`. (d) Kolom hitungan denormalisasi: hitung ulang dari sumber, jangan increment |
+| Log Keyword | penjadwalan tes, sesi tes, peserta, hapus peserta selesai, cascade log_aktivitas_tes, jumlah_peserta, calon peserta ditolak nonaktif, status_display, Belum Dimulai, @js atribut komponen, keydown.enter.prevent |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
+### Fix #28 — Bank Soal: ubah soal IST selalu gagal tanpa pesan, form ganda, UI tidak konsisten
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/bank-soal/index.blade.php` & `partials/kartu-soal.blade.php` (tulis ulang), `form.blade.php` baru (gantikan `tambah.blade.php` + `edit.blade.php` yang dihapus), `app/Http/Controllers/Admin/BankSoalController.php`, `routes/web.php`, `resources/views/admin/alat-tes/index.blade.php` (tombol Soal), test baru `tests/Feature/BankSoalHalamanTest.php` |
+| Masalah | (1) Simpan ubah soal IST (format Mixed, 176 soal) selalu ditolak: form edit tidak mengirim `tipe_format` padahal wajib, dan `kunci_jawaban` divalidasi `in:a,b,c,d,e` sehingga kunci isian ("35", JSON GE) ditolak. Form edit tidak menampilkan error, jadi gagalnya senyap. (2) Kalau lolos, update isian menulis `teks_soal = null` ke kolom NOT NULL (pasangan kata GE "mawar - melati" hilang/500). (3) Format Pilihan Ganda: form kirim `kunci` + `opsi[A..D]` tapi controller membaca `kunci_jawaban` + `opsi[a..e]` → kunci & opsi tak tersimpan. (4) Kode alat di kartu hardcode `EPPS`, alat lain tampil "?". (5) `tambah`/`edit` dua salinan 280 baris; hex lepas, header sticky `-mx-6`, `Swal`, tombol Import Excel mati. (6) Izin `soal.tambah/edit/hapus` ada di seeder tapi tidak dicek |
+| Akar | Form edit dan rules validasi Mixed berkembang terpisah; rules kunci hanya memikirkan tipe pilihan |
+| Fix | Satu `form.blade.php` untuk tambah & ubah (x-ui, Alpine `tipe`, bagian tak aktif di `<fieldset disabled>` sehingga hanya satu `kunci_jawaban` terkirim; kunci GE dirakit dengan urutan key asli `{"2":..,"1":..}`). Rules Mixed: kunci `in:a..e` hanya untuk tipe pilihan, isian `required|max:255`; `teks_soal` disimpan apa adanya. Pilihan Ganda pakai nama field yang sama dengan Mixed (a–d). Index: kartu alat tes (termasuk yang 0 soal), halaman per alat dengan kepala gaya Alat Tes, tab pindah alat, cari teks soal/opsi, saring subtes IST (rentang dari `SUBTES_IST`, salinan `ScoringEngineService`), kartu soal dengan badge subtes/tipe, penanda "Gambar belum diunggah", dialog hapus `_konfirmasi`. Route tambah/ubah/hapus diberi `izin:soal.*` (semua peran ber-`soal.lihat` sudah punya ketiganya). `mapSoalUntukView` dihapus, kartu membaca model langsung. Skala Likert (tak ada alat yang memakainya; enum `tipe_format` tak punya nilainya) kini menampilkan peringatan alih-alih form yang pasti gagal |
+| Verifikasi | Sebelum: PUT soal 379/439/455 dengan isian form lama → 3/3 ditolak (`tipe_format` wajib; 2 juga kunci). Sesudah: test simpan ulang isian_teks/isian_angka/pilihan_ganda IST lolos, teks/kunci/jumlah opsi identik. Browser superadmin: IST 176 kartu, subtes GE = nomor 61–76, FA 121 bertanda gambar belum diunggah (40 soal FA/WU tanpa gambar di DB); form soal 61 mengirim `kunci_jawaban` byte-identik dengan DB, simpan → redirect ke index, data tidak berubah. 375px `scrollWidth` 375 di 10 halaman (index, 3 alat, 2 edit, 3 tambah, alat tes). Hex lepas 0, console error 0. `php artisan test` 30/30, 3.138 assertion |
+| Pelajaran | Uji form edit dengan mengirim ulang isian apa adanya — "simpan tanpa perubahan harus lolos & tidak mengubah data" menangkap field wajib yang tidak dirender dan rules yang terlalu sempit sekaligus. Objek JS mengurutkan key angka (`{2:..,1:..}` jadi `{"1":..,"2":..}`), rakit string JSON manual bila urutan harus dipertahankan |
+| Log Keyword | bank soal, IST, Mixed, tipe_format wajib, kunci_jawaban in:a,b,c,d,e, isian GE, teks_soal null, Pilihan Ganda kunci, SUBTES_IST, izin soal.edit |
+| Deploy | `npm run build`, `php artisan view:clear`, `php artisan route:clear` |
+
+---
+
+### Fix #27 — Halaman Norma membingungkan: ribuan baris panjang → matriks per dimensi seperti buku manual
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `app/Http/Controllers/Admin/AlatTesController.php` (`norma()`), `resources/views/admin/alat-tes/norma.blade.php`, `tests/Feature/AlatTesHalamanTest.php` |
+| Masalah | User bingung membaca norma: IST 1.310 baris & EPPS 1.608 baris ditampilkan sebagai daftar berhalaman (65 halaman), padahal isinya tabel konversi seperti di buku manual |
+| Akar | Satu baris DB = satu sel tabel manual (dimensi × kelompok × skor mentah); tampilan menyalin struktur DB apa adanya |
+| Fix | Hanya tampilan: pilih dimensi lewat tab kode (SE, WA, …, IQ), lalu satu tabel per tahap dengan baris = skor mentah, kolom = kelompok, sel = skor hasil. Kepala & kolom skor mentah lengket saat digulir. Nama kelompok dibuat terbaca (USIA_21_25 → "Usia 21–25", EPPS 3/4 → "Dewasa pria/wanita"; EPPS 1/2 diabukan karena tidak dipakai `kelompokSegmen()`); dimensi IQ diberi judul alur "Tahap 1 RW → SW" dan "Tahap 2 SW → IQ"; kotak "Cara membaca". Import CSV dipindah ke panel lipat (terbuka otomatis bila import gagal) dengan arti tiap kolom. Tabel `norma_konversi` & semua lookup `ScoringEngineService` tidak disentuh. Alternatif penggabungan skor berurutan menjadi rentang dicek dan ditolak: hanya 2.969 → 2.665 baris (−10%) dengan risiko mengubah data |
+| Verifikasi | Tidak ada baris duplikat (dimensi, kelompok, tahap, min, max): 2.969 = 2.969 unik, jadi matriks tidak menimpa sel. Browser 1440px: IST SE 21 × 6 kolom (Usia 21–25 skor 0 → 68, sesuai DB); IQ tampil 2 tahap (18 baris × 6 kelompok, 68 baris × 1); EPPS ach 4 kolom dengan kelompok 1–2 abu. 375px `scrollWidth` 375 (tabel bergulir di dalam kotaknya). Test baru membuka norma setiap pasangan alat tes–dimensi dan mencocokkan setiap sel dengan baris DB-nya: `php artisan test` 27/27, 3.098 assertion |
+| Pelajaran | Sebelum mengusulkan "ringkas data", ukur dulu manfaatnya (di sini −10%) — sering yang perlu diringkas cuma penyajiannya. Ditemukan 51 baris norma milik alat tes yang sudah dihapus (soft delete); tidak tampil di mana pun, dibersihkan oleh `PurgeSoftDeletes` saat alat tes di-purge |
+| Log Keyword | norma, matriks, kelompok segmen, tahap, IQ, SW, buku manual, norma_konversi |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
+### Fix #26 — Alat Tes: deskripsi tidak pernah tersimpan, dimensi baru selalu urutan 0, UI tidak konsisten
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/alat-tes/{index,dimensi,norma}.blade.php` (tulis ulang), partial baru `_kepala.blade.php` & `_konfirmasi.blade.php`, hapus `tambah.blade.php` & `edit.blade.php`, `app/Http/Controllers/Admin/AlatTesController.php`, `app/Http/Requests/{Simpan,Perbarui}AlatTesRequest.php`, `app/Models/AlatTes.php` (relasi `normaKonversi`), `resources/views/vendor/pagination/tailwind.blade.php`, test baru `tests/Feature/AlatTesHalamanTest.php` |
+| Masalah | (1) Form alat tes punya kolom Deskripsi, tetapi `deskripsi` tidak ada di `rules()` maupun `create/update` → isian dibuang diam-diam (EPPS masih `null`). (2) Form tambah dimensi mengirim `urutan=0` sebagai nilai bawaan, sehingga fallback `max+1` di controller tidak pernah jalan. (3) `instruksi_subtes` (terisi di 9 dimensi IST) divalidasi tetapi tidak ada di form, jadi tak bisa dilihat/diedit. (4) Kartu "Aktif" menampilkan total alat, bukan `is_aktif`. (5) Halaman `tambah`/`edit` alat tes menduplikasi modal dan tidak ditautkan. (6) Dimensi & norma memakai hex lepas dan `confirm()`/`Swal` |
+| Akar | Form dan request validasi berkembang terpisah; nilai bawaan input `urutan` menimpa logika "taruh di akhir" |
+| Fix | `deskripsi` masuk rules + disimpan; input urutan dikosongkan (placeholder "Otomatis"); `instruksi_subtes` ditambahkan ke modal dimensi; ringkasan pakai hitungan nyata (alat, aktif, soal, dimensi, baris norma). Index jadi kartu per instrumen (kode, format, pola, deskripsi, soal/dimensi/norma, durasi, tombol Dimensi & Norma); satu modal tambah/ubah, `/tambah` & `/{id}/edit` redirect ke `index?tambah=1` / `?ubah={id}`. Dimensi: kepala bersama + tab Dimensi/Norma, daftar `<details>` (PAPI 27 dimensi tidak lagi memanjang), editor level dengan penanda "Belum disimpan" + Batalkan, modal ubah dimensi, dialog hapus. Norma: area unggah, peringatan "ganti semua" yang menyebut jumlah baris, panduan kolom, tabel ringkas (min–maks digabung). Paginasi bersama diberi `flex-wrap` (norma 65 halaman melebar 9px di 375px). Controller juga memakai `?? null` untuk `durasi_total_menit`/`batas_waktu_per_soal_detik` (sebelumnya 500 bila field tidak dikirim) |
+| Verifikasi | Browser superadmin 1440px: 4 kartu (EPPS 225/17/1.608, IST 176/10/1.310, KRP 50/4/0, PAPI 90/27/0), ringkasan 4/541/58/2.918; `/2/edit` membuka modal terisi; simpan deskripsi "UJI DESKRIPSI" → DB terisi (lalu dikembalikan ke `null`); modal dimensi IST SE menampilkan instruksi 145 karakter & durasi 420; editor level: "Level bawaan" → 5 level + badge, "Batalkan" → kembali 0 (tidak disimpan ke data asli karena simpan level me-reset `level_id` hasil skor). 375px: index, dimensi IST/PAPI, norma `scrollWidth` 375. Emoji 0. `php artisan test` 26/26 (3 test baru: render + redirect, deskripsi tersimpan, dimensi tanpa urutan = maks+1) |
+| Pelajaran | Jangan menaruh `"..."` di dalam `{{ }}` pada atribut komponen `x-ui.*` yang berkutip ganda — parser tag komponen Blade terpotong dan muncul `ParseError: unexpected endif` jauh dari baris penyebab; pakai string kutip tunggal. Saat menguji form Alpine via JS, ubah state dan submit di dua langkah terpisah — `x-model` baru menulis ke DOM di tick berikutnya |
+| Log Keyword | alat tes, deskripsi tidak tersimpan, urutan dimensi 0, instruksi_subtes, level dimensi, norma CSV, ParseError endif, Js::from kutip ganda, paginasi flex-wrap |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
+### Fix #25 — Halaman Akun Kandidat tidak konsisten, halaman tambah/ubah ganda, baris "menunggu" melebar di ponsel
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/data-kandidat/index.blade.php` (tulis ulang), hapus `admin/data-kandidat/{tambah,ubah}.blade.php`, `app/Http/Controllers/Admin/DataKandidatController.php` (`ringkasan`, `bukaTambah`/`bukaUbah`, status `nonaktif` boleh difilter, `tambah()`/`ubah()` jadi redirect), `tests/Feature/SeederCekTest.php`, test baru `tests/Feature/AkunKandidatHalamanTest.php` |
+| Masalah | Sama dengan Akun Karyawan sebelum Fix #24 (hex lepas, header sticky `-mx-6`, tabel ber-scroll, dua salinan form modal); ditambah dua halaman terpisah `tambah.blade.php` (226 baris) dan `ubah.blade.php` (234 baris) yang menduplikasi form modal: `ubah` tidak ditautkan dari mana pun, `tambah` hanya dari tombol dashboard |
+| Akar | Form kandidat pernah dibuat sebagai halaman lalu dipindah ke modal tanpa membuang versi halaman |
+| Fix | Pola Fix #24: ringkasan 4 sel (total, menunggu, aktif, ditolak) yang sekaligus jadi pintasan filter status; toolbar filter; tabel responsif; tombol Setujui/Tolak tampil di baris "menunggu verifikasi" (baris disorot amber), aksi lain di dropdown; satu dialog form tambah/ubah (Identitas / Lamaran / Akun & kontak, password wajib hanya saat tambah); satu dialog konfirmasi untuk setujui/tolak/hapus. `/tambah` dan `/{id}/ubah` kini redirect ke `index?tambah=1` / `index?ubah={id}` yang langsung membuka modal, jadi tautan lama tetap jalan. Nama field, route POST/PUT, dan validasi tidak berubah |
+| Verifikasi | Browser superadmin: 1440px rapi; 375px `scrollWidth` 375, tabel 358 ≤ kartu 359; baris "menunggu" sempat 414 > 359 (4 tombol sejajar), setelah aksi jadi grid 2 kolom di ponsel = 358. Ringkasan 17/1/13/3 sesuai data; `/tambah` membuka modal (password required = true); `/20/ubah` membuka modal terisi (Finance / Chief Financial Officer / 1999-05-15, password required = false) dan simpan memberi toast "Berhasil"; tambah dengan email duplikat + konfirmasi password beda kembali ke modal dengan 2 pesan error, departemen & posisi tetap. Emoji 0; `php artisan test` 22/22 |
+| Pelajaran | Saat memindah form ke modal, hapus halaman lamanya dan ubah route-nya jadi redirect; dua salinan form pasti divergen. Kolom aksi yang jumlah tombolnya berbeda per status harus diuji pada baris dengan tombol terbanyak |
+| Log Keyword | akun kandidat, data-kandidat, verifikasi, setujui, tolak, modal, redirect tambah ubah, 375px |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
+### Fix #24 — Halaman Akun Karyawan tidak konsisten & fitur import Excel tak punya tombol
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/akun-karyawan/index.blade.php` (tulis ulang), `app/Http/Controllers/Admin/DataKaryawanController.php` (`index` kirim `ringkasan`), `resources/views/components/ui/field.blade.php` (`content-start`), test baru `tests/Feature/AkunKaryawanHalamanTest.php` |
+| Masalah | Halaman memakai warna hex lepas (`#191c1e`, `#c0c8cb`, blue/violet/amber) dan header sticky `-mx-6` (melebar di ponsel karena `main` ber-padding `px-4`); tabel 8 kolom ber-scroll di dalam kotak `max-height`; modal Tambah & Ubah dua salinan form ~100 baris; reset password memakai `confirm()` browser; route `import` & `template` sudah ada di backend tetapi tidak ada tombol di UI |
+| Akar | Halaman belum dimigrasi ke komponen `x-ui.*` dan token brand (Fix #23 baru mencakup dashboard) |
+| Fix | Header + tombol Import Excel / Tambah Karyawan; strip ringkasan (total, aktif, nonaktif, belum ganti password) warna brand; toolbar filter dalam kartu dengan tombol Cari; tabel responsif (kolom ID/NIK/Departemen/Status disembunyikan bertahap, di ponsel info pindah ke bawah nama) tanpa wrapper overflow sehingga menu aksi (`x-ui.dropdown-menu`: aktif/nonaktifkan, reset password, hapus) tidak terpotong; satu `x-ui.dialog` form untuk tambah & ubah (dikelompokkan Identitas/Penempatan/Kontak); dialog konfirmasi bersama untuk reset password & hapus; dialog import (unduh template + unggah). Nama field, route, dan validasi tidak berubah |
+| Verifikasi | Browser superadmin 1440px & 375px: `scrollWidth` = `clientWidth` (375 = 375), tabel 358 ≤ kartu 359 setelah email diberi `break-all` (sebelumnya 366 > 359); ringkasan 28/25/3/16 sesuai data; Ubah baris 1 memuat posisi "Legal Manager" (sebelumnya kosong, lihat Pelajaran) dan PUT `/admin/akun-karyawan/13` berhasil; Tambah dengan ID duplikat kembali ke modal dengan "ID karyawan sudah terdaftar." dan posisi tetap terpilih; template unduh 200 (xlsx 6,8 KB); console tanpa error; emoji 0; `php artisan test` 19/19 |
+| Pelajaran | `x-model` pada `<select>` yang opsinya dimuat async tidak memilih ulang bila nilainya tidak berubah — kosongkan nilai dulu, pasang lagi setelah `$nextTick`. Menu dropdown di tabel butuh tabel tanpa `overflow-x-auto`; sembunyikan kolom bertahap, jangan andalkan scroll horizontal |
+| Log Keyword | akun karyawan, import excel, template, modal, dropdown aksi, x-model select posisi, responsif, 375px |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+**Revisi Fix #24 (2026-10-16, laporan user):** kartu ringkasan Akun Karyawan tidak bisa diklik untuk filter, beda dengan Akun Kandidat (Fix #25). Kartu dijadikan tautan filter `?status=aktif|nonaktif|wajib_ganti` (filter lain ikut terbawa, kartu terpilih bergaris hijau), ditambah select Status di toolbar; `DataKaryawanController::index` memfilter lewat `user.status` / `user.must_change_password`. Verifikasi: browser, kartu Nonaktif = 3 dan tabel 3 baris; Belum ganti password = 16 dan footer "dari 16 karyawan"; 375px `scrollWidth` 375; test baru membandingkan angka kartu dengan total hasil filter untuk ketiga status; `php artisan test` 23/23. Catatan: sempat muncul 500 `rename(...storage/framework/views...): Access is denied` tepat setelah `view:clear` — kunci file Windows saat kompilasi view, hilang setelah muat ulang, bukan dari kode.
+
+---
+
+### Fix #23 — Dashboard admin generik & warna lepas dari logo: rombak UI dengan palet Jhonlin Group
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/css/app.css` (token `--brand-*`, `.bg-brand-gradient`), `resources/views/admin/dashboard.blade.php` (tulis ulang tampilan), `resources/views/layouts/panel.blade.php` (latar #f6f7f9, garis gradasi di atas sidebar) |
+| Masalah | Dashboard tampak generik (shadcn polos, abu semua); warna tidak mengikuti logo (hanya hijau, indigo `#2E3192` tak tepat); tabel Sesi Aktif & Hasil Terbaru di ponsel bergantung pada scroll horizontal di dalam kartu; KPI 1 kolom di 375px memanjang ~4 layar |
+| Akar | Tidak ada token palet brand; warna dipilih per elemen (emerald/amber/zinc Tailwind) |
+| Fix | Palet diambil dari sampel piksel `public/images/logo.png`: hijau `#00A651` (swoosh), indigo `#2D3194`, biru `#114D8B`, teal `#00737D` (gradasi wordmark), plus ink `#171A4D` dan `--brand-gradient`. Dashboard: hero ink dengan motif lengkung (gema swoosh), ringkasan kalimat dari data asli, cincin tingkat penyelesaian SVG; KPI berwarna urut gradasi logo (2 kolom di ponsel); status pengerjaan = bar komposisi + legenda; grafik tren warna brand (hijau / biru per seri); Sesi Aktif & Hasil Terbaru jadi daftar grid responsif (tanpa tabel); ringkasan pengguna jadi 4 kartu ikon. Ikon Material Symbols saja, nol emoji. Controller & query tidak diubah |
+| Verifikasi | Browser (preview `laravel`, superadmin): 1440px `scrollWidth` main 1146 = `clientWidth` 1146; 375px `scrollWidth` 375 = 375, tidak ada elemen melewati tepi; angka sama dengan data (3 sesi berjalan, 42 peserta, 25 selesai = 60%, 16 tidak selesai, 1 kandidat menunggu, 16 peringatan); console tanpa error; scan emoji di view = 0; `php artisan test` 17/17 (termasuk `DashboardAdminTest` HR Viewer tanpa tombol verifikasi) |
+| Pelajaran | Warna brand harus satu sumber token (`--brand-*`) dan diambil dari logo, bukan ditebak; daftar di kartu sempit lebih baik grid responsif daripada tabel ber-scroll |
+| Log Keyword | dashboard, palet logo, brand, warna, hero, KPI, responsif, 375px, gradasi |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+**Revisi Fix #23 (2026-10-16, permintaan user):** Ringkasan Pengguna dipindah dari paling bawah ke tepat di bawah kartu KPI, dipadatkan jadi satu kartu 4 sel (2x2 di ponsel, 4 kolom di desktop). Verifikasi: 1440px dan 375px `scrollWidth` = `clientWidth`, angka sama (28 karyawan, 17 kandidat, 3 nonaktif, 5 admin); test 17/17.
+
+---
+
+### Fix #22 — Laporan PAPI: grafik radar JavaScript tidak ikut PDF, tanpa kontrol kelengkapan, 3 salinan kode
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | partial baru `admin/hasil-tes/partials/papi.blade.php`, `app/helpers.php` (`faktor_papi()`), `app/Http/Controllers/Admin/HasilTesController.php` (hapus `buildPapScores` yang tak terpakai), view `admin/hasil-tes/{detail,print,pdf}` |
+| Masalah | Grafik radar PAPI memakai Chart.js (JavaScript) → tidak muncul di PDF dompdf; laporan tidak memeriksa kelengkapan jawaban sehingga sesi rusak (mis. 82/90, 18/90) tetap tampil seolah normal; data faktor (nama, kode DB, kelompok) disalin di 3 view (layar 163 baris, cetak 144, pdf 34 + array global) |
+| Akar | Tampilan dibuat per view tanpa komponen bersama; kontrol "Total Atas/Bawah harus 45" dari Papi Kostick.xls tidak diterapkan |
+| Fix | Partial bersama: (A) tabel 20 faktor per aspek (Arah Kerja … Ketaatan) dengan skor, batang 0–9, interpretasi kolom Analisis Excel; (B) roda profil SVG 20 jari-jari skala 0–9 (tampil di layar, cetak, dan dompdf); (C) kontrol total atas (G L I T V S R D C E) & bawah (N A P X B O Z K F W) masing-masing 45 dengan peringatan bila tidak lengkap. Satu sumber data faktor `faktor_papi()` |
+| Verifikasi | Sesi 4 user 10: 45/45 "Lengkap", Z=6 → "Mudah menyesuaikan diri", K=7 → "Agresi pribadi…" sesuai ambang Excel; skor faktor cocok dengan hitung ulang Python dari kunci Excel (Fix #17). 30 render (10 sesi × layar/cetak/pdf) tanpa error; teks PDF memuat tabel, label roda, dan "45 / 45". `php artisan test` 17/17 |
+| Pelajaran | Kontrol kelengkapan yang ada di patokan (total 210 EPPS, 45/45 PAPI) wajib ikut tampil di laporan agar data rusak tidak terbaca sebagai hasil sah |
+| Log Keyword | PAPI, roda profil, radar, Chart.js, dompdf, total atas bawah 45, faktor_papi, laporan |
+| Deploy | `php artisan view:clear` |
+
+**Revisi Fix #22 (2026-10-16, laporan user dari screenshot sesi 20 user 18):** roda profil terlihat seperti jarum tanpa struktur, dan faktor E = 10 (mustahil, maksimal 9; data rusak, lihat Fix #17) membuat batang keluar kolom dan titik menembus lingkaran. Roda dibuat ulang: 7 sektor aspek berwarna (isian tipis + pita tepi + nama aspek), cincin 1–9 (5 & 9 tegas), huruf faktor di tepi, nilai di setiap titik. Skor > 9 dibatasi di cincin terluar, ditandai merah, dan Kontrol Jawaban menyebut "Skor melebihi 9 pada faktor E = 10 — data jawaban tidak valid". Verifikasi: screenshot sesi 20/18 (data rusak) & 4/10 (45/45, layar + cetak); teks PDF memuat nama aspek dan pesan kontrol; 33 render tanpa error; test 17/17.
+
+---
+
+### Fix #21 — Laporan IST tanpa skor RW/SW & profil, subtes WU salah label "Kecerdasan Umum"
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | partial baru `admin/hasil-tes/partials/ist.blade.php`, `app/helpers.php` (`subtes_ist()`), `app/Http/Controllers/Admin/HasilTesController.php` (`kelompok_norma`, nama aspek ringkasan), view `admin/hasil-tes/{detail,print,pdf}` |
+| Masalah | Lampiran IST hanya centang SR/R/C/T/ST; RW/SW tersembunyi di bagian "Lihat skor detail" (layar) dan tidak ada di cetak/PDF; tidak ada profil subtes; norma usia yang dipakai tidak disebut. Label aspek buatan: WU (Würfelaufgaben = soal kubus/spasial) disebut "Kecerdasan Umum", FA disebut "Daya Kreativitas", ZR "Berpikir Praktis". Kesimpulan IST ganda dengan Ringkasan Evaluasi |
+| Akar | Psikogram IST meniru template perusahaan lama tanpa acuan nama subtes Amthauer; tiga view punya salinan blok IST sendiri (layar 156 baris, cetak 100, pdf 74) |
+| Fix | Partial bersama: (A) tabel 9 subtes — kode + nama Jerman/Indonesia, aspek yang diukur + kelompok (Verbal/Numerik/Figural/Ingatan), RW, SW, kategori (patokan IST_Norma_Usia.xls), baris Jumlah RW → IQ → klasifikasi; (B) profil SW SVG (pita Sedang 95–104, garis rata-rata 100, titik berwarna per kategori); (C) tabel klasifikasi IQ dengan baris peserta disorot. Norma usia (mis. "usia 21–25 tahun") diambil dari `ScoringEngineService::kelompokSegmen()` pada tanggal tes. Nama aspek ringkasan diselaraskan (WU = kemampuan ruang) |
+| Verifikasi | Sesi 1 user 7 (norma 21–25): SE RW3→SW76, WA 3→74, AN 3→83, GE 1→72, RA 11→105, ZR 13→108, FA 4→81, WU 5→86, ME 4→84, jumlah RW 47 → SW 82 → IQ 73 Borderline — semua cocok dengan tabel "USIA 21 - 25" & "Norma IQ" Sofware IST.xlsx. 27 render (9 sesi × layar/cetak/pdf) tanpa error, screenshot layar & cetak dicek, teks PDF memuat ketiga bagian. `php artisan test` 17/17 |
+| Pelajaran | Nama & arti subtes psikotes harus mengikuti manual alat tesnya; label "versi perusahaan" boleh ditambahkan, bukan menggantikan |
+| Log Keyword | IST, RW, SW, profil IST, taraf kecerdasan, klasifikasi IQ, WU kubus, norma usia, laporan |
+| Deploy | `php artisan view:clear` |
+
+---
+
+### Fix #20 — Laporan Kraepelin mentah ala Excel (7 desimal, tanpa interpretasi), grafik tidak ikut PDF, regresi beda dengan skor
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `app/Http/Controllers/Admin/HasilTesController.php` (`buildGridExtra`, ringkasan Kraepelin), partial baru `admin/hasil-tes/partials/kraepelin.blade.php`, view `admin/hasil-tes/{detail,print,pdf}` |
+| Masalah | Uji Kraepelin lengkap via browser (kandidat1, sesi 69, 50 kolom; kolom 1 dibiarkan habis waktu). Laporan menampilkan istilah Excel mentah ("speed factor", "ausdeur factor"), y(0) = 13.8987755, kategori tanpa penjelasan; grafik Chart.js (JavaScript) sehingga tidak muncul di PDF dompdf. `buildGridExtra` menghitung regresi hanya atas kolom tersimpan, berbeda dengan skor KETAHANAN (N = 50, kolom kosong = 0) bila ada kolom tak tersimpan |
+| Akar | View meniru lembar Excel apa adanya; tiga view punya blok Grid sendiri-sendiri (detail 149 baris, print 120, pdf 88) |
+| Fix | Partial bersama: (A) rekap skoring sesuai kotak SCORING lembar jawab (Mean/Panker, Range + kolom tertinggi/terendah, Av. Deviation/Janker, Sum of errors, Sum of skippeds, Tianker, Hanker = y(50) − y(0) + tren), angka 2 desimal format Indonesia; (B) grafik kerja SVG (titik per kolom + garis tren regresi) di `<img>` data-URI → tampil di layar, cetak, dan dompdf; (C) tabel interpretasi 4 faktor dengan teks per kategori. `buildGridExtra` memakai N = jumlah kolom soal & kolom kosong = 0 (sama dengan `scoreGrid`), tren menurun hanya bila selisih < 0 (Kraepelin.xls). Ringkasan: satuan jelas + peringatan jumlah kolom tanpa jawaban benar |
+| Verifikasi | Sesi 69: 50 kolom, 755 benar, 43 salah, 0 terlampaui; 69 input "0" (63 benar — dulu dihitung terlewat, lihat Fix #17). Hitung ulang Python dari y per kolom: Panker 15,1 · Janker 1,22 · Hanker 2,36 · Range 18 = sama persis dengan laporan. 27 render (9 sesi × detail/print/pdf) tanpa error; teks PDF memuat "Kolom ke-" (SVG ter-render dompdf). Screenshot layar & cetak dicek. `php artisan test` 17/17 |
+| Pelajaran | Grafik untuk dokumen cetak/PDF jangan bergantung JavaScript — SVG statis tampil sama di semua keluaran. Rumus tampilan harus memanggil definisi yang sama dengan rumus skor (N kolom) |
+| Log Keyword | Kraepelin, Panker, Janker, Hanker, Tianker, grafik kerja, SVG, dompdf, regresi, buildGridExtra, laporan |
+| Deploy | `php artisan view:clear` |
+
+---
+
+### Fix #19 — Laporan hasil tes berisi teks contoh & EPPS tanpa skor: format laporan standar
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `app/Http/Controllers/Admin/HasilTesController.php` (`susunRingkasan`, identitas), `app/Services/FormatHasilEppsService.php` (`NAMA_KEBUTUHAN`, `INTERPRETASI`), partial baru `admin/hasil-tes/partials/{epps,ringkasan}.blade.php`, view `admin/hasil-tes/{detail,print,pdf}` |
+| Masalah | Uji EPPS lengkap via browser (kandidat1, sesi 58): laporan menulis "Rekrutmen Staff Finance Batch 1", tanggal TTD "28 Juli 2026", dan **Ringkasan Evaluasi yang sama untuk semua peserta** ("taraf kecerdasan umum baik…") padahal peserta hanya tes EPPS. Posisi/Departemen selalu "—". Tabel EPPS hanya centang tanpa RS/persentil, nama kebutuhan asli tidak tampil, tanpa grafik profil. Seksi PSIKOGRAM kosong tetap tampil. Di halaman cetak, seksi EPPS **tidak pernah muncul** (`nama_alat_tes === 'EPPS'`, padahal namanya "EPPS (Edwards…)"). `catatan_hr` dicetak dengan `<br />` mentah |
+| Akar | View dibuat dari mockup dengan teks statis; tiga view (layar/cetak/pdf) menyalin array & markup sendiri-sendiri sehingga berbeda isi |
+| Fix | Identitas dari data (posisi & departemen dari profil, tujuan tes per jenis peserta, pemeriksa = admin login, tanggal cetak = hari ini). Ringkasan disusun dari skor tiap alat tes (EPPS: kebutuhan tinggi/rendah + konsistensi; IST: IQ, klasifikasi, aspek kuat/lemah; Kraepelin: 4 faktor; PAPI: 3 faktor tertinggi) + kontrol kelengkapan dari Excel (EPPS total 210, PAPI total 90). Partial EPPS dipakai 3 view: tabel No/Aspek (nama asli)/RS/Persentil/Kategori/Interpretasi, grafik profil persentil dengan pita Sedang 17–84, kotak validitas (konsistensi x/15 + kontrol 210). Partial ringkasan: ringkasan, kesimpulan dari Catatan HR, tanda tangan. PSIKOGRAM hanya tampil bila ada isinya |
+| Verifikasi | 18 render (6 peserta × detail/print/pdf) tanpa error. Sesi 58: "EPPS: kebutuhan menonjol pada Kreativitas… Konsistensi 7 dari 15 (Sangat Rendah)", tabel 15 baris, kontrol "210 dari 210". Sesi 10 user 31 (4 jawaban): "hanya 4 dari 210 soal terskor — hasil belum dapat ditafsirkan". Sesi 22 user 18 (data rusak Fix #17): "PAPI hanya 82 dari 90". Screenshot layar & cetak dicek; teks PDF dompdf memuat semua seksi. `php artisan test` 17/17 |
+| Pelajaran | Teks laporan psikologi tidak boleh statis — narasi yang sama untuk semua peserta menyesatkan. Satu komponen dipakai bersama oleh layar/cetak/pdf agar tidak berbeda |
+| Log Keyword | laporan hasil tes, ringkasan evaluasi, teks contoh, EPPS persentil, grafik profil, validitas, print EPPS tidak muncul, partial |
+| Deploy | `php artisan view:clear` |
+
+---
+
+### Fix #18 — Peserta bisa membuka Hasil Tes, Alat Tes, Bank Soal & Penjadwalan admin
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `routes/web.php`, `app/Http/Middleware/CekIzin.php`, `tests/Feature/SmokeHalamanTest.php` |
+| Masalah | Login sebagai kandidat (kandidat1@test.com) lalu buka `/admin/hasil-tes/1/7` → laporan hasil psikotes peserta lain tampil penuh. Sama untuk `/admin/alat-tes`, `/admin/bank-soal` (kunci jawaban!), `/admin/penjadwalan-tes`, `/admin/aktivitas` |
+| Akar | Grup rute tersebut hanya dibungkus `auth`, tanpa middleware `izin:` — padahal kode izin `hasil_tes.lihat` & `soal.lihat` sudah ada dan dipakai menu sidebar (menu tersembunyi, URL tetap terbuka) |
+| Fix | `izin:hasil_tes.lihat` di grup hasil-tes; `izin:soal.lihat,kategori_tes.kelola` di alat-tes/bank-soal/penjadwalan; `izin:dashboard.lihat` di aktivitas. `CekIzin` menerima beberapa izin (cukup salah satu, sama dengan aturan sidebar) |
+| Verifikasi | Browser: kandidat → `/admin/hasil-tes/1/7` & `/admin/penjadwalan-tes` = 403 "Anda tidak punya akses"; super admin tetap bisa buka hasil sesi 58. Test baru `test_peserta_ditolak_dari_semua_halaman_admin` (semua GET `admin/*` + 3 URL berparameter); `php artisan test` 17/17 |
+| Pelajaran | Menyembunyikan menu ≠ mengamankan halaman. Setiap grup rute admin wajib punya middleware izin; test smoke peserta-vs-admin menjaga ini |
+| Log Keyword | 403, izin, CekIzin, hasil_tes.lihat, soal.lihat, kandidat buka admin, akses tanpa izin |
+| Deploy | `php artisan route:clear` (bila route di-cache) |
+
+---
+
+### Fix #17 — Skoring tidak sesuai patokan "4 ALAT TES.zip": kunci EPPS buatan, IQ IST belum dikonversi, Kraepelin "0" = terlewat, jawaban tersimpan ke soal salah
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `app/Services/ScoringEngineService.php`, `app/Http/Controllers/PengerjaanTesController.php`, `app/helpers.php`, `routes/console.php` (cmd `psikotes:hitung-ulang`), `database/migrations/2026_10_16_000001_koreksi_skoring_sesuai_patokan.php`, seeder `EppsSoalSeeder`/`EppsSeeder`/`EppsNormaSeeder`/`EppsLevelSeeder`/`ISTSeeder`/`KraepelinLevelSeeder`, `data/norma_epps_full.csv`, view `admin/hasil-tes/{detail,print,pdf}`, `peserta/pengerjaan-soal`, hapus `EppsKonsistensiSoalSeeder` & `EppsSimulasiKonsistensiSeeder`, test `SkoringPatokanTest` |
+| Masalah | **EPPS**: 221/225 item dipetakan ke kebutuhan yang salah (soal 1 "menolong teman" dihitung *ach*); skor konsistensi tidak pernah dihitung; kategori 0-10/11-30/31-70/71-90/91-100; soal 7–12 punya 4 opsi (2 asli + "Pilihan A/B" tanpa bobot); kebutuhan skor 0 tidak tersimpan; nama int/suc salah (Introjection/Success). **IST**: dimensi IQ berisi SW total (mis. 132) bukan IQ (148); kunci 18/93/96 salah; 6 kunci GE menyimpang dari "Kunci Soal 4"; 3 sel norma salah ketik & WA usia 51–60 RW 19–20 kosong → SW 0; klasifikasi IQ & kategori subtes beda dari patokan. **Kraepelin**: jawaban "0" (4+6) dihitung terlewat & tidak dihitung salah; pita level kecepatan berlubang (8.5 → tanpa kategori); pembagi = jumlah kolom tersimpan, bukan 50. **PAPI**: interpretasi cetak memakai skala R/K/C/B/T & teks karangan; data radar di print tidak sesuai urutan label. **Simpan jawaban**: 90/90 jawaban PAPI user 18 sesi 21 (dan 11 lain) tersimpan dengan opsi milik soal lain |
+| Akar | Kunci EPPS di seeder dibuat mekanis (loop i×j), bukan dari EPPS.xls; `dispatch()` tidak memanggil `scoreConsistency`; seeder konsistensi lama menimpa soal 7–12; tahap "Norma IQ" (SW→IQ) di Sofware IST.xlsx tidak diimplementasikan; query `jawaban_peserta = 0` dianggap kosong; `jawab()` memakai soal dari `current_step` session tanpa memastikan opsi yang dikirim milik soal itu (klik ganda/back/2 tab menggeser langkah) |
+| Fix | Kunci EPPS = EPPS.xls (`EppsSoalSeeder::KUNCI`, 15 soal diagonal tak diskor, total 210) + 15 pasangan konsistensi (`duplikat_dari_soal_id`), con dihitung di `dispatch`; kategori persentil ≤3/≤16/≤84/≤96; typo het 544→54. IST: `normaTerdekat()` 2 tahap (JUMLAH per usia → "Norma IQ"), kunci 18=e, 93=24, 96=3 (diselesaikan dari isi soal), `ISTSeeder::KUNCI_GE` sesuai Kunci Soal 4 + variasi ejaan IST_Norma_Usia.xls, typo norma AN/GE diperbaiki, WA 51–60 RW19–20=135; helper `klasifikasi_iq()`/`kategori_subtes_ist()`. Kraepelin: rumus Kraepelin.xls (N=50, kolom kosong y=0), salah = `is_benar=0`, terlampaui = `MAX(baris)-COUNT`. PAPI: `interpretasi_papi()` dari kolom Analisis Papi Kostick.xls. `jawab()` menolak `soal_id`/opsi yang tidak sesuai soal aktif |
+| Verifikasi | Skrip Python menghitung ulang semua hasil langsung dari rumus/tabel Excel: EPPS 80/80, IST 30/30, Kraepelin 28/28 cocok; PAPI 167/200 (33 sisanya = 3 sesi user 18 yang jawabannya sudah rusak tersimpan, tidak bisa dipulihkan). Kunci di DB vs Excel: EPPS 0 selisih, PAPI 0 selisih. `psikotes:hitung-ulang`: 172 kolom Kraepelin direkap, 25 hasil dihitung ulang, 0 gagal; berubah EPPS 45/80, PAPI 45/270, KRP 21/28, IST 20/30. `php artisan test` 16/16. Halaman detail/print/pdf dirender tanpa error |
+| Pelajaran | Kunci & norma psikotes wajib diambil dari file patokan lalu dicek otomatis (tes `SkoringPatokanTest`), jangan digenerate. Bila sumber patokan saling beda, pilih yang terbukti benar dari isi soal. Server tidak boleh percaya halaman yang dikirim klien sinkron dengan session |
+| Log Keyword | EPPS kunci, konsistensi con, persentil, IST IQ, Norma IQ, SW, GE, Kraepelin Panker Janker Hanker Tianker, terlampaui, PAPI interpretasi, opsi soal lain, current_step, hitung-ulang |
+| Deploy | Backup DB → `php artisan migrate` → `php artisan psikotes:hitung-ulang` → `php artisan view:clear`. Backup lokal: `storage/app/backup_sebelum_koreksi_skoring_2026-10-16.sql` |
+
+---
+
+### Fix #16 — Portal peserta: sidebar gelap beda sendiri & tidak responsif di HP
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-12 |
+| File | `layouts/panel.blade.php` (baru), `layouts/admin.blade.php`, `layouts/peserta.blade.php`, `peserta/dashboard.blade.php`, `tests/Feature/SmokeHalamanTest.php` |
+| Masalah | (1) Sidebar peserta gelap (CSS kustom ~150 baris) beda dari admin. (2) Di HP sidebar 280px selalu tampil dan memakan layar, tanpa tombol buka/tutup. (3) SweetAlert dimuat dari CDN. (4) 3 kartu statistik dashboard peserta terpotong di 375px ("Total Ditugas…") |
+| Akar | Dua layout ditulis terpisah; admin sudah pindah ke shadcn (Fix #8–#11), peserta tidak ikut. Grid `grid-cols-3` tanpa breakpoint |
+| Fix | Kerangka bersama `layouts.panel` (sidebar, topbar, notifikasi, flash); `admin`/`peserta` hanya menyusun menu lalu `@extends('layouts.panel')`. Peserta dapat drawer mobile + collapse desktop; SweetAlert CDN diganti `x-ui.notifikasi` (shim `window.Swal` menangani 4 dialog di halaman pengerjaan tes). Mode fokus (halaman tes) tetap tanpa sidebar, topbar menampilkan logo + judul. Grid kartu `grid-cols-1 sm:grid-cols-3` |
+| Verifikasi | `php artisan test` 14/14 (tes baru: dashboard/panduan/profil peserta render dengan `sb-item`). Browser: 1440px sidebar identik admin, collapse tersimpan; 375px sidebar tersembunyi, drawer terbuka via tombol, scrollWidth 375 = innerWidth; `Swal.fire(...)` buka dialog "Oke" → `isConfirmed: true`, 0 script SweetAlert; dashboard admin tetap sama (badge Data Terhapus 11) |
+| Pelajaran | Layout yang mirip harus berbagi satu kerangka — kalau tidak, satu sisi tertinggal saat redesain |
+| Log Keyword | layout peserta, sidebar, panel, mobile, drawer, SweetAlert, Swal shim, modeFokus |
+| Deploy | `npm run build && php artisan view:clear` |
+
+---
+
+### Fix #15 — Dashboard admin: status peserta menyesatkan, tombol verifikasi 403 untuk HR Viewer, warna teal sisa
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-12 |
+| File | `DashboardController.php`, `admin/dashboard.blade.php`, `AppServiceProvider.php`, `resources/js/app.js`, `package.json`, `resources/css/app.css`, 59 view (recolor), `tests/Feature/DashboardAdminTest.php` |
+| Masalah | (1) Saat 0 sesi berjalan, dashboard menampilkan "Sedang Mengerjakan 3", "Belum mulai 26 (48%)", deskripsi "sesi tes aktif"; peserta sesi Draft ikut terhitung; grafik (25) ≠ KPI. (2) HR Viewer melihat tombol Setujui/Tolak & "Lihat kandidat lainnya" → klik 403. (3) Kartu "Data Karyawan Tanpa Akun" selalu 0. (4) 674 kode teal `#2C5F6F` di 42+ file tidak ikut tema hijau |
+| Akar | (1) Status dihitung hanya dari `waktu_mulai`, tanpa melihat apakah sesinya masih berjalan; filter Draft tidak ada. (2) View tidak cek `pengguna.verifikasi`/`pengguna.lihat`. (3) Sejak Fix #1 akun karyawan dibuat otomatis → konsep usang. (4) Warna di-hardcode per halaman |
+| Fix | (1) Status per sesi: berjalan = `status='Aktif' AND tanggal_selesai >= hari ini` → Sedang/Belum mulai; selain itu → **Tidak selesai** (kategori baru); Draft dikecualikan di KPI, grafik, hasil terbaru. (2) Tombol digating izin. (3) Diganti "Karyawan Nonaktif" (akun buatan HR, belum bisa login) + jumlah belum ganti password. (4) Skrip recolor: class `-[#2C5F6F]`→`-primary`, hover gelap→`-primary/90`, header tabel gelap→token `muted`. Juga: Chart.js CDN → npm (chunk lazy 196KB, offline-safe), `puppeteer` (tak terpakai) dihapus, locale Carbon `id` dipindah ke `AppServiceProvider` (global), N+1 kandidat menunggu, kartu tanpa izin bukan link `#` |
+| Verifikasi | `DashboardAdminTest`: kode lama 0/2, baru 2/2. Total `php artisan test` 13/13. Data nyata: Selesai 23 · Sedang 0 · Belum 0 · Tidak selesai 16 (dulu 25/3/26), grafik 23 = KPI 23. Recolor 921 penggantian, sisa `#2C5F6F` = 0, smoke semua halaman admin tanpa 5xx |
+| Pelajaran | Status "belum/sedang" tidak bermakna tanpa konteks periode sesi. Sembunyikan aksi yang tidak diizinkan, jangan biarkan berakhir 403. Penulisan file via Python di Windows bisa gagal `Errno 22` saat file dikunci server — cek isi file sesudahnya |
+| Log Keyword | dashboard, status pengerjaan, tidak selesai, Draft, HR Viewer, pengguna.verifikasi, recolor, #2C5F6F, Chart.js, puppeteer, setLocale |
+| Deploy | `npm install && npm run build && php artisan view:clear` |
+
+---
+
+### Fix #14 — Redesain halaman auth (hijau Jhonlin): `php artisan test` mati & pesan validasi register berbahasa Inggris
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-12 |
+| File | `phpunit.xml`, `app/Http/Requests/RegisterRequest.php`, `resources/views/layouts/auth.blade.php`, `resources/views/auth/*.blade.php`, `components/ui/{input,select,alert,input-password}.blade.php`, `resources/css/app.css`, `admin/dashboard.blade.php` |
+| Masalah | (1) `php artisan test` berhenti: `Test directory "tests/Unit" not found`. (2) Register NIK salah → "The nik KTP field must be 16 digits." (Inggris), pesan lain diawali huruf kecil |
+| Akar | (1) **Regresi Fix #13**: `tests/Unit` dihapus tapi testsuite `Unit` di `phpunit.xml` tidak ikut dihapus. (2) `RegisterRequest::messages()` tidak punya terjemahan `digits/integer/exists/date` (APP_LOCALE=en) dan memakai `:attribute`, bukan `:Attribute` |
+| Fix | (1) Hapus testsuite `Unit`. (2) Tambah 4 pesan + pakai `:Attribute`. Sekaligus: `--primary` shadcn → hijau Jhonlin `#00843D` (logo `#00A651` digelapkan, kontras putih 4.8:1 AA); 5 halaman auth ditulis ulang pakai `x-ui.*`; error field tampil inline (`aria-invalid`); grafik dashboard ambil warna dari `--primary` |
+| Verifikasi | `php artisan test` 11/11 lulus. Browser 1440px & 375px: 5 halaman auth 200, tanpa scroll horizontal (scrollWidth 375 = innerWidth); submit register invalid → 8 pesan Indonesia, baris grid tetap sejajar (`items-start`); toggle password jalan; login admin akun uji → dashboard hijau |
+| Pelajaran | Saat menghapus folder test, cek `phpunit.xml`. Atribut Alpine `:type` di tag `<x-ui.*>` dievaluasi Blade sebagai PHP — pakai `x-bind:type` |
+| Log Keyword | phpunit, tests/Unit, digits, :Attribute, auth, login, register, hijau, primary |
+| Deploy | `npm run build && php artisan view:clear` |
+
+---
+
+### Fix #13 — Audit kebersihan: seeder rusak, kolom redundan kandidat, kode & relasi mati
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-12 |
+| File | `database/seeders/DummyDataSeeder.php`, `app/Models/DataKaryawan.php`, `app/Models/ProfilKandidat.php`, `DataKandidatController.php`, `HasilTesController.php`, `admin/data-kandidat/index.blade.php`, 8 model (relasi mati), `AlatTesController.php`, `DashboardController.php`, `PengerjaanTesController.php`, migration `2026_10_12_000001_bersihkan_kolom_dan_tabel_tidak_terpakai.php`, `tests/Feature/SmokeHalamanTest.php`, `tests/Feature/SeederCekTest.php` |
+| Masalah | (1) `php artisan db:seed` gagal: `Unknown column 'nama_karyawan' in 'field list'`. (2) `profil_kandidat.departemen` (string nama) NULL untuk 9 dari 17 kandidat (semua yang daftar sendiri) → modal Ubah kandidat tidak memilih departemen; basi bila departemen di-rename. (3) Banyak kode tak terpakai |
+| Akar | (1) Fix #1 memindahkan nama/departemen/jabatan ke `users`/FK, tapi `DummyDataSeeder` tetap menulis kolom lama; commit e9a6c32 malah menambah kolom hantu itu ke `$fillable` sehingga error pindah ke SQL. (2) Departemen disimpan dua kali (string + `posisi.departemen_id`), hanya alur admin yang mengisi string. (3) Sisa refactor |
+| Fix | (1) Seeder buat karyawan seperti alur HR (`users` + `data_karyawan.user_id`, login via `id_karyawan`); `$fillable` dibersihkan. (2) Departemen kandidat diturunkan dari `profilKandidat.posisi.departemen`; kolom di-drop via migration. (3) Hapus method mati `AlatTesController::restore` (tanpa route; restore lewat Data Terhapus), `DashboardController::mulaiTes`, `PengerjaanTesController::getSesiPeserta`, 21 relasi Eloquent tak dipakai; drop tabel kosong `interpretasi_teks`, `standar_kompetensi_posisi` |
+| Verifikasi | `php artisan test`: 12/12 lulus (baseline 10/10). `SeederCekTest` tanpa fix seeder 1/2, dengan fix 2/2 (dalam transaksi, DB asli tidak berubah — dicek 0 baris sisa). Smoke semua route GET `admin/*` tanpa 5xx; `php artisan view:cache` sukses. Relasi semua model divalidasi terhadap skema DB (kolom FK/pivot ada) |
+| Pelajaran | Setelah ubah skema, jalankan `migrate:fresh --seed` — seeder ikut rusak diam-diam. Jangan tambah kolom ke `$fillable` untuk membungkam error. Cek pemakaian relasi lewat nama relasi (`with('x.y')`), bukan hanya nama kelas: `bidang_laporan` tampak tak terpakai padahal dipakai psikogram |
+| Log Keyword | seeder, nama_karyawan, fillable, profil_kandidat.departemen, redundan, relasi mati, dead code |
+| Deploy | `php artisan migrate` (drop kolom `profil_kandidat.departemen` + 2 tabel kosong) |
+
+---
+
+### Fix #12 — Login super admin membuka halaman peserta: precedence OR di query login peserta
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-11 |
+| File | `app/Http/Controllers/AutentikasiController.php`, `tests/Feature/LoginPortalTest.php` (baru) |
+| Masalah | Super admin login lewat `/login` (portal peserta) berhasil masuk dan diarahkan ke `/peserta/dashboard` |
+| Akar | (1) `loginPeserta`: `where(email)->orWhere(id_karyawan)->whereIn(tipe_akun)` jadi SQL `email = ? OR (id_karyawan = ? AND tipe_akun IN …)` → filter tipe akun tidak berlaku untuk pencocokan email, akun `custom` (admin) lolos. (2) `loginAdmin`: `redirect()->intended()` memakai `url.intended` sisa akses `/peserta/...` sebelum login → admin dibuang ke halaman peserta |
+| Fix | (1) Bungkus email/id_karyawan dalam closure `where(fn ($q) => …)`. (2) Buang `url.intended` sebelum redirect admin bila path bukan `/admin` |
+| Verifikasi | `php artisan test --filter=LoginPortalTest`: tanpa fix 0/2 lulus (tidak ada error session; redirect `/peserta/dashboard`), dengan fix 2/2 lulus. Tes pakai `DatabaseTransactions` (password super admin di-rollback) |
+| Pelajaran | Kombinasi `orWhere` + filter lain WAJIB dibungkus closure. `intended()` lintas portal harus difilter per prefix |
+| Log Keyword | login, super admin, peserta, orWhere, precedence, intended, tipe_akun |
+| Deploy | Tidak perlu build; cukup deploy file PHP |
+
+---
+
+### Fix #11 — Dashboard/notifikasi shadcn: konten keluar kartu & tombol Batal nyangkut
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-07 |
+| File | `resources/views/admin/dashboard.blade.php`, `resources/views/components/ui/notifikasi.blade.php` (branch `ui-shadcn`) |
+| Masalah | (1) Baris "Peringatan Integritas" melebar keluar kartu di desktop; di layar 390px seluruh halaman scroll horizontal (scrollWidth 551 > 390). (2) Dialog pemberitahuan (tanpa batal) yang dibuka tepat setelah dialog konfirmasi masih menampilkan tombol "Batal" |
+| Akar | (1) Container `grid` tanpa `grid-cols-*` → track `auto` ikut lebar konten `truncate`/tabel `whitespace-nowrap`. (2) `x-show` pada tombol tidak sempat diterapkan saat dialog ditutup & dibuka di tick yang sama |
+| Fix | (1) List → `flex flex-col`; grid responsif → `grid grid-cols-1 … xl:grid-cols-3` (minmax(0,1fr)). (2) Ganti `x-show` → `:hidden` (preflight Tailwind v4 `[hidden]{display:none!important}`) |
+| Verifikasi | 0 elemen melewati batas kartu di 1440px; main 390/390 di mobile, tabel scroll di dalam kartu; urutan konfirmasi→info→konfirmasi: tombol `[Batal, Ya, Hapus]` → `[Mengerti]` → `[Batal, Ya]`; 18 halaman admin GET + 6 halaman detail render 200 di layout baru |
+| Pelajaran | Setiap `grid` yang anaknya berisi teks panjang/tabel wajib `grid-cols-1` (atau flex-col). Untuk tampil/sembunyi yang dibuka-tutup cepat, pakai `:hidden` |
+| Log Keyword | overflow, grid-cols-1, truncate, x-show, Batal, konfirmasi |
+| Deploy | `npm run build && php artisan view:clear` |
+
+---
+
+### Fix #10 — Label grafik dashboard berbahasa Inggris
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-06 |
+| File | `app/Http/Controllers/DashboardController.php` |
+| Masalah | Sumbu grafik "Pendaftaran 7 Hari" tampil "Wed, 30 Sep … Tue, 06 Oct", padahal tanggal header sudah "Selasa, 6 Oktober 2026" |
+| Akar | `Carbon::setLocale('id')` dipanggil setelah loop label (`translatedFormat('D, d M')`); `APP_LOCALE=en` jadi label memakai locale default |
+| Fix | Pindahkan `Carbon::setLocale('id')` ke sebelum loop label |
+| Verifikasi | Render /admin/dashboard: labels `["Rab, 30 Sep",…,"Sel, 06 Okt"]`, header tetap "Selamat malam, Super Admin" + tanggal Indonesia |
+| Pelajaran | `setLocale` di tengah method hanya berlaku untuk baris sesudahnya — taruh di awal |
+| Log Keyword | `translatedFormat`, `setLocale`, label grafik |
+| Deploy | — |
+
+---
+
+### Fix #9 — Komponen UI shadcn: tombol Edit mati & override class tidak berlaku
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-06 |
+| File | `resources/views/admin/alat-tes/index.blade.php`, `resources/views/components/ui/*` (branch `ui-shadcn`) |
+| Masalah | (1) Klik Edit di tabel Alat Tes tidak membuka dialog. (2) `class="w-36"` / `whitespace-normal` yang dikirim ke `<x-ui.input>` / `<x-ui.td>` tidak berpengaruh → input tetap lebar penuh, tabel scroll horizontal (scrollWidth 1367 > 1110) |
+| Akar | (1) `@js(...)` di dalam atribut komponen Blade (`<x-ui.button @click="...@js(..)">`) **tidak dikompilasi** — terkirim mentah ke browser → JS error. (2) `$attributes->class()` hanya menggabung class; `w-full` bawaan vs `w-36` → yang menang ditentukan urutan CSS, bukan urutan atribut |
+| Fix | (1) Di atribut komponen pakai `{{ Js::from($x) }}`; `@js` hanya boleh di elemen HTML biasa. (2) Override class bawaan komponen pakai suffix important Tailwind v4: `w-36!`, `whitespace-normal!` |
+| Verifikasi | Dialog Edit terbuka & terisi (kode IST, format Mixed, durasi 90, action `/admin/alat-tes/5`); tabel muat tanpa scroll di 1280px; Escape menutup dialog |
+| Pelajaran | Saat migrasi halaman ke `<x-ui.*>`: grep `@js` di dalam tag `<x-` dan pakai `!` untuk menimpa class bawaan komponen |
+| Log Keyword | `@js`, `x-ui`, Js::from, class override, `!` |
+| Deploy | `npm run build && php artisan view:clear` |
+
+---
+
+### Fix #8 — Rollback migrasi admin Filament → kembali ke Tailwind
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-06 |
+| File | Semua perubahan sejak commit `f96adf8` (app/Filament, composer.json/lock, routes/web.php, User.php, views filament, dll.) |
+| Masalah | Migrasi panel admin ke Filament v3 memunculkan banyak regresi (Kelola Dimensi level kosong, Alpine tidak jalan, redirect ke `/livewire/update` 405, layout grid tidak ter-compile, login admin nonaktif lolos) dan UI tidak sesuai sistem lama |
+| Akar | Fitur admin lama (Alpine + Blade custom) tidak bisa dipetakan 1:1 ke komponen Filament; tiap halaman custom perlu ditulis ulang |
+| Fix | `git stash push -u` (stash: "backup: migrasi Filament") → working tree kembali ke `f96adf8`; `composer install` (vendor/filament terhapus); `.env` APP_LOCALE=en; `optimize:clear` |
+| Verifikasi | `vendor/filament` tidak ada; 80 route `admin.*` kembali; `/login` 200, `/admin/login` 200 ("Login Admin"), halaman admin tanpa sesi → 302 ke `/login` |
+| Pelajaran | Migrasi UI besar dikerjakan di branch terpisah dan di-commit bertahap, bukan langsung di `main` tanpa commit |
+| Log Keyword | Filament, rollback, stash |
+| Deploy | `composer install && php artisan optimize:clear`. Pulihkan Filament: `git stash apply stash@{0}` lalu `composer install` |
+
+---
+
+### Fix #7 — Randomisasi opsi jawaban A-E dihapus, hanya urutan soal yang diacak
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-09-02 |
+| File | `PengerjaanTesController.php` |
+| Masalah | Opsi jawaban A-E ikut diacak per peserta, padahal soal standar psikotes memiliki kunci jawaban tetap per posisi opsi |
+| Akar | `getOrCreateOpsiOrder()` + blok shuffle opsi salah diimplementasikan dari awal |
+| Fix | Hapus method `getOrCreateOpsiOrder()` dan seluruh blok randomisasi opsi; urutan soal tetap diacak |
+| Verifikasi | Soal ditampilkan A-E sesuai urutan DB, urutan soal antar peserta berbeda |
+| Pelajaran | Randomisasi soal ≠ randomisasi opsi; untuk tes psikologi terstandar, posisi opsi tidak boleh berubah |
+
+---
+
+### Fix #6 — Timer hafalan-ME reset ke 3:00 saat refresh halaman
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-09-02 |
+| File | `resources/views/peserta/hafalan-me.blade.php` |
+| Masalah | Timer selalu mulai dari 3:00 saat peserta refresh, seolah waktu hafalan belum berjalan |
+| Akar | Timer hanya memakai `DURASI * 1000` setTimeout tanpa menyimpan kapan mulai; setiap load halaman dianggap fresh start |
+| Fix | Simpan timestamp mulai ke `sessionStorage` dengan key `hafalan_me_start_{sesiId}`; sisa waktu dihitung dari `Date.now() - startTs`; jika waktu sudah habis saat load, langsung submit |
+| Verifikasi | Refresh saat timer 1:30 → halaman reload, timer lanjut dari ~1:30 |
+| Pelajaran | Timer berbasis `setTimeout` tidak survive reload; selalu pakai timestamp epoch + `sessionStorage` untuk timer yang harus persist |
+
+---
+
+### Fix #5 — Tombol "Lanjut" hafalan-ME tidak aktif + error 405 saat timer habis
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-09-02 |
+| File | `resources/views/peserta/hafalan-me.blade.php`, `resources/views/peserta/pengerjaan-soal.blade.php` |
+| Masalah | (1) Timer menunjukkan 0:00 tapi tombol "Lanjut ke Soal" tetap disabled dan tidak bisa diklik. (2) Setelah timer habis muncul error 405 Method Not Allowed |
+| Akar | (1) `form.submit()` tidak memicu event `submit` → `_monitor_tes` AJAX handler tidak intercept → browser submit native → halaman navigasi keluar fullscreen. `setTimeout` untuk enable tombol terpicu bersamaan dengan timer habis sehingga racing condition. (2) `swapContent` di `navigatePost` tidak ada guard `!res.ok`; saat server return non-redirect (misal CSRF 419), `window.location.href` di-set ke POST URL yang sama → browser GET ke URL POST → 405 |
+| Fix | Ganti `form.submit()` → `form.requestSubmit()` agar event submit terpicu dan `_monitor_tes` bisa intercept. Tambah guard `if (!res.ok) { window.location.reload(); return; }` di `navigatePost`. Tambah `data-panduan-form` ke form hafalan-ME agar `swapContent` mengenalinya sebagai panduan page |
+| Verifikasi | Timer habis → form submit via AJAX → body swap tanpa keluar fullscreen. Tombol enable setelah waktu habis |
+| Pelajaran | `form.submit()` dan `form.requestSubmit()` berbeda: yang pertama bypass event listener. Selalu pakai `requestSubmit()` jika ada handler di event `submit` |
+
+---
+
+### Fix #4 — Fullscreen keluar saat transisi subtes 8→9 (IST hafalan-ME)
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-09-02 |
+| File | `resources/views/peserta/hafalan-me.blade.php`, `resources/views/peserta/pengerjaan-soal.blade.php` |
+| Masalah | Berpindah dari subtes 8 (WU) ke subtes 9 (ME) menyebabkan browser keluar dari fullscreen |
+| Akar | `swapContent` mendeteksi "panduan page" via atribut `data-panduan-form` pada form. `hafalan-me.blade.php` tidak memiliki atribut ini, sehingga `swapContent` tidak AJAX-swap melainkan navigasi biasa (`window.location.href`) yang me-reload halaman dan mengakhiri sesi fullscreen |
+| Fix | Tambahkan `data-panduan-form` ke `<form id="form-lanjut">` di `hafalan-me.blade.php` |
+| Verifikasi | Transisi WU → ME tetap dalam fullscreen; body swap via AJAX berjalan normal |
+| Pelajaran | Setiap halaman interstitial (panduan/hafalan) yang diakses via AJAX swap harus memiliki `data-panduan-form` pada form submit-nya |
+
+---
+
 ### Fix #3 — Sisa referensi `profilKaryawan` setelah refactor: 500 error di Hasil Tes & Pengerjaan Tes
 
 | Field | Detail |

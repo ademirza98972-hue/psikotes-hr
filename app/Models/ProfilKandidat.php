@@ -16,7 +16,6 @@ class ProfilKandidat extends Model
         'user_id',
         'no_hp',
         'jenis_kelamin',
-        'departemen',
         'posisi_id',
         'pendidikan_terakhir',
         'nik_kandidat',

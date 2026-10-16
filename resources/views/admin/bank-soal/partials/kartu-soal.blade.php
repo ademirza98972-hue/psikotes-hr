@@ -1,176 +1,100 @@
-@php $id = 'kartu-' . $nomor; @endphp
-<div id="{{ $id }}" class="bg-white border border-[#e0e3e5] rounded-xl p-5 hover:shadow-md transition-shadow relative group">
-
-    <div class="flex justify-between items-start mb-4">
-        <div class="flex items-center gap-3">
-            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold {{ kode_badge_class($kodeAlat) }}">
-                {{ $kodeAlat ?? '?' }}
-            </span>
-            <span class="text-[12px] text-[#40484b]">No. {{ str_pad($nomor, 3, '0', STR_PAD_LEFT) }}</span>
+{{-- Satu butir soal. Butuh $soal (Soal + opsiJawaban.bobotOpsiDimensi.dimensi), $alat, $bisaUbah, $bisaHapus. --}}
+@php
+    $tipe = $soal->tipe_format;
+    $opsi = $soal->opsiJawaban->sortBy('urutan')->values();
+    $kunci = strtolower((string) $soal->kunci_jawaban);
+    $labelTipe = [
+        'pilihan_ganda' => 'Pilihan ganda', 'pilihan_gambar' => 'Pilihan gambar', 'isian_teks' => 'Isian teks',
+        'isian_angka' => 'Isian angka', 'forced_choice' => 'Forced choice', 'grid' => 'Deret angka', 'memori' => 'Memori',
+    ];
+    $kurangGambar = $tipe === 'pilihan_gambar' && ! $soal->gambar_soal && $opsi->whereNotNull('gambar_opsi')->isEmpty();
+@endphp
+<x-ui.card class="p-5">
+    <div class="mb-4 flex items-start gap-3">
+        <span class="flex h-7 min-w-10 shrink-0 items-center justify-center rounded-md bg-muted px-2 font-mono text-xs font-semibold tabular-nums">{{ str_pad($soal->nomor, 3, '0', STR_PAD_LEFT) }}</span>
+        <div class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5 pt-0.5">
+            @if ($alat->format_dasar === 'Mixed')
+                <x-ui.badge variant="outline" class="font-mono">{{ \App\Http\Controllers\Admin\BankSoalController::subtesIst($soal->nomor) }}</x-ui.badge>
+            @endif
+            <x-ui.badge variant="secondary">{{ $labelTipe[$tipe] ?? $tipe }}</x-ui.badge>
+            @if ($kurangGambar)
+                <x-ui.badge variant="warning"><span class="material-symbols-outlined text-[14px]">image_not_supported</span>Gambar belum diunggah</x-ui.badge>
+            @endif
         </div>
-        <div class="flex gap-1">
-            <a href="{{ route('admin.bank-soal.edit', $soal['id']) }}"
-               class="p-1.5 rounded-lg text-[#40484b] hover:bg-[#f2f4f6] hover:text-[#2C5F6F] transition-colors"
-               title="Edit soal">
-                <span class="material-symbols-outlined text-[18px]">edit</span>
-            </a>
-            <button type="button" onclick="confirmHapus({{ $soal['id'] }}, '{{ route('admin.bank-soal.hapus', $soal['id']) }}')"
-                    class="p-1.5 rounded-lg text-[#40484b] hover:bg-rose-50 hover:text-rose-600 transition-colors"
-                    title="Hapus soal">
-                <span class="material-symbols-outlined text-[18px]">delete</span>
-            </button>
-            <form id="hapus-soal-{{ $soal['id'] }}" method="POST" action="{{ route('admin.bank-soal.hapus', $soal['id']) }}" class="hidden">
-                @csrf
-                @method('DELETE')
-            </form>
-        </div>
+        @if ($bisaUbah || $bisaHapus)
+            <div class="-mr-2 -mt-1 flex shrink-0">
+                @if ($bisaUbah)
+                    <x-ui.button variant="ghost" size="icon-sm" :href="route('admin.bank-soal.edit', $soal->id)" title="Ubah soal">
+                        <span class="material-symbols-outlined">edit</span><span class="sr-only">Ubah soal nomor {{ $soal->nomor }}</span>
+                    </x-ui.button>
+                @endif
+                @if ($bisaHapus)
+                    <x-ui.button variant="ghost" size="icon-sm" class="hover:text-destructive" title="Hapus soal"
+                        @click="konfirmasi = { buka: true, label: 'Hapus', judul: 'Hapus soal nomor {{ $soal->nomor }}', pesan: 'Soal ini tidak akan muncul lagi di sesi tes. Jawaban peserta yang sudah tersimpan tetap ada.', url: {{ Js::from(route('admin.bank-soal.hapus', $soal->id)) }} }">
+                        <span class="material-symbols-outlined">delete</span><span class="sr-only">Hapus soal nomor {{ $soal->nomor }}</span>
+                    </x-ui.button>
+                @endif
+            </div>
+        @endif
     </div>
 
+    @if ($tipe === 'grid')
+        <p class="overflow-x-auto rounded-lg border border-border bg-muted/50 px-3 py-2 font-mono text-sm tracking-[0.2em]">{{ str_replace(',', ' ', $soal->teks_soal) }}</p>
+        <p class="mt-2 text-xs text-muted-foreground">{{ count(explode(',', $soal->teks_soal)) }} angka per kolom</p>
 
-    @if (($soal['tipe_format'] ?? '') === 'grid')
-        <div style="font-family: monospace; font-size: 13px; color: #374151; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; letter-spacing: 2px;">
-            {{ $soal['teks_soal'] }}
-        </div>
-        <p class="text-[11px] text-[#919eab] mt-1.5">
-            {{ count(explode(',', $soal['teks_soal'])) }} angka per kolom
-        </p>
-    @elseif ($format === 'Pilihan Ganda')
-        <p class="text-[16px] leading-relaxed text-[#191c1e]">{{ $soal['teks_soal'] }}</p>
-        <ul class="mt-4 space-y-2">
-            @foreach (['A','B','C','D'] as $i => $huruf)
-                @php $opsi = $soal['opsi'][$i] ?? ''; @endphp
-                <li class="flex items-center gap-3 rounded-xl border {{ $soal['kunci_jawaban'] === $huruf ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-[#e0e3e5] bg-white' }} px-4 py-3 text-sm transition-colors hover:border-[#2C5F6F]/50">
-                    <span class="flex items-center justify-center w-6 h-6 rounded-full border {{ $soal['kunci_jawaban'] === $huruf ? 'border-[#2C5F6F] bg-[#2C5F6F] text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-bold shrink-0">
-                        {{ $huruf }}
-                    </span>
-                    <span class="{{ $soal['kunci_jawaban'] === $huruf ? 'font-semibold text-[#191c1e]' : 'text-[#40484b]' }}">{{ $opsi }}</span>
-                    @if ($soal['kunci_jawaban'] === $huruf)
-                        <span class="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#2C5F6F]">
-                            <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                            Kunci
-                        </span>
+    @elseif ($tipe === 'forced_choice')
+        <div class="grid items-stretch gap-3 md:grid-cols-[1fr_auto_1fr]">
+            @foreach ([0 => 'A', 1 => 'B'] as $i => $huruf)
+                @php $o = $opsi->get($i); $dimensi = $o?->bobotOpsiDimensi->first()?->dimensi; @endphp
+                @if ($i === 1)
+                    <span class="self-center text-center text-xs font-medium text-muted-foreground">atau</span>
+                @endif
+                <div class="flex flex-col gap-2 rounded-lg border border-border p-3">
+                    <p class="text-xs font-semibold text-muted-foreground">Pernyataan {{ $huruf }}</p>
+                    <p class="flex-1 text-sm">{{ $o?->teks_opsi ?? '–' }}</p>
+                    @if ($dimensi)
+                        <x-ui.badge variant="outline" title="{{ $dimensi->nama_dimensi }}"><span class="font-mono">{{ $dimensi->kode_dimensi }}</span><span class="max-w-48 truncate text-muted-foreground">{{ $dimensi->nama_dimensi }}</span></x-ui.badge>
+                    @else
+                        <x-ui.badge variant="warning">Belum ada dimensi</x-ui.badge>
                     @endif
-                </li>
+                </div>
             @endforeach
-        </ul>
-
-    @elseif ($format === 'Skala Likert')
-        <p class="text-[16px] leading-relaxed text-[#191c1e]">"{{ $soal['pernyataan'] }}"</p>
-        <div class="mt-3">
-            <span class="inline-block rounded-lg bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">
-                Dimensi: {{ $soal['dimensi'] }}
-            </span>
-        </div>
-        {{-- Preview skala Likert 5 poin --}}
-        <div class="mt-4">
-            <div class="flex justify-between px-2 mb-2">
-                @php $labelSkala = ['Sangat Tidak Setuju', 'Tidak Setuju', 'Netral', 'Setuju', 'Sangat Setuju']; @endphp
-                @foreach ($labelSkala as $label)
-                    <span class="text-[10px] text-[#40484b] text-center whitespace-nowrap">{{ $label }}</span>
-                @endforeach
-            </div>
-            <div class="relative flex items-center justify-between px-8">
-                <div class="absolute left-10 right-10 h-[2px] bg-[#c0c8cb] -z-10"></div>
-                @for($i = 0; $i < 5; $i++)
-                    <div class="w-5 h-5 rounded-full border-2 border-[#c0c8cb] bg-white hover:border-[#2C5F6F] transition-colors cursor-pointer"></div>
-                @endfor
-            </div>
         </div>
 
-    @elseif ($format === 'Forced Choice')
-        <p class="text-[11px] uppercase tracking-widest text-[#40484b] mb-3">Pilih satu pernyataan yang paling menggambarkan diri Anda</p>
-        <div class="flex flex-col md:flex-row gap-4">
-            <div class="flex-1 p-4 rounded-xl border-2 border-[#e0e3e5] hover:border-[#2C5F6F]/50 bg-[#f7f9fb] cursor-pointer transition-all flex items-start gap-3">
-                <div class="mt-0.5 w-5 h-5 rounded-full border-2 border-[#c0c8cb] flex-shrink-0"></div>
-                <div>
-                    <span class="font-bold text-[#00303c] block mb-1 text-sm">Pernyataan A</span>
-                    <p class="text-[14px] text-[#40484b]">{{ $soal['pernyataan_a'] }}</p>
-                    <span class="mt-2 inline-block rounded-lg bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-                        {{ $soal['dimensi_a'] }}
-                    </span>
-                </div>
-            </div>
-            <div class="flex items-center justify-center text-[#c0c8cb] italic text-sm font-semibold shrink-0">VS</div>
-            <div class="flex-1 p-4 rounded-xl border-2 border-[#e0e3e5] hover:border-[#2C5F6F]/50 bg-[#f7f9fb] cursor-pointer transition-all flex items-start gap-3">
-                <div class="mt-0.5 w-5 h-5 rounded-full border-2 border-[#c0c8cb] flex-shrink-0"></div>
-                <div>
-                    <span class="font-bold text-[#00303c] block mb-1 text-sm">Pernyataan B</span>
-                    <p class="text-[14px] text-[#40484b]">{{ $soal['pernyataan_b'] }}</p>
-                    <span class="mt-2 inline-block rounded-lg bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-                        {{ $soal['dimensi_b'] }}
-                    </span>
-                </div>
-            </div>
-        </div>
-    @elseif ($format === 'Mixed')
-        @php
-            $tipeFormat = $soal['tipe_format'] ?? 'pilihan_ganda';
-            $subtesLabel = match(true) {
-                $soal['nomor'] <= 20  => 'SE',
-                $soal['nomor'] <= 40  => 'WA',
-                $soal['nomor'] <= 60  => 'AN',
-                $soal['nomor'] <= 76  => 'GE',
-                $soal['nomor'] <= 96  => 'RA',
-                $soal['nomor'] <= 116 => 'ZR',
-                $soal['nomor'] <= 136 => 'FA',
-                $soal['nomor'] <= 156 => 'WU',
-                default               => 'ME',
-            };
-            $warnaTipe = [
-                'pilihan_ganda'  => 'bg-blue-50 text-blue-700',
-                'isian_teks'     => 'bg-violet-50 text-violet-700',
-                'isian_angka'    => 'bg-orange-50 text-orange-700',
-                'pilihan_gambar' => 'bg-rose-50 text-rose-700',
-                'memori'         => 'bg-teal-50 text-teal-700',
-            ];
-        @endphp
-
-        <div class="flex items-center gap-2 mb-3">
-            <span class="rounded-lg bg-purple-50 px-2.5 py-1 text-[11px] font-bold text-purple-700">{{ $subtesLabel }}</span>
-            <span class="rounded-lg {{ $warnaTipe[$tipeFormat] ?? 'bg-slate-50 text-slate-700' }} px-2.5 py-1 text-[11px] font-semibold">{{ $tipeFormat }}</span>
-        </div>
-
-        <p class="text-[15px] leading-relaxed text-[#191c1e] mb-3">{{ $soal['teks_soal'] }}</p>
-
-        @if ($tipeFormat === 'pilihan_gambar')
-            @if (!empty($soal['gambar_soal']))
-                <img src="{{ asset('storage/' . $soal['gambar_soal']) }}" class="h-20 max-w-xs rounded-lg border border-slate-200 object-contain mb-3">
-            @else
-                <div class="mb-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-[12px] text-slate-400 text-center">Gambar soal belum diupload</div>
-            @endif
+    @else
+        @if ($soal->teks_soal !== '')
+            <p class="text-sm leading-relaxed">{{ $soal->teks_soal }}</p>
+        @endif
+        @if ($soal->gambar_soal)
+            <img src="{{ asset('storage/' . $soal->gambar_soal) }}" alt="Gambar soal nomor {{ $soal->nomor }}" class="mt-3 h-28 max-w-full rounded-lg border border-border object-contain">
         @endif
 
-        @if (in_array($tipeFormat, ['pilihan_ganda', 'pilihan_gambar']) && !empty($soal['opsi']))
-            <ul class="space-y-1.5">
-                @foreach ($soal['opsi'] as $idx => $opsiTeks)
-                    @php $huruf = chr(65 + $idx); $hurufLower = strtolower($huruf); @endphp
-                    <li class="flex items-center gap-2 rounded-lg border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-[#2C5F6F] bg-[#2C5F6F]/5' : 'border-[#e0e3e5]' }} px-3 py-2 text-sm">
-                        <span class="flex items-center justify-center w-5 h-5 rounded-full border {{ strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower ? 'border-[#2C5F6F] bg-[#2C5F6F] text-white' : 'border-[#c0c8cb] text-[#40484b]' }} text-[11px] font-semibold">{{ $huruf }}</span>
-                        @if (!empty($opsiTeks['gambar']))
-                            <img src="{{ asset('storage/' . $opsiTeks['gambar']) }}" class="h-16 max-w-[120px] rounded border border-slate-200 object-contain">
+        @if (in_array($tipe, ['isian_teks', 'isian_angka']))
+            @php $kunciGe = json_decode((string) $soal->kunci_jawaban, true); @endphp
+            <div class="mt-3 grid gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+                @if (is_array($kunciGe))
+                    <p><span class="text-emerald-700">2 poin:</span> {{ implode(', ', $kunciGe['2'] ?? []) ?: '–' }}</p>
+                    <p><span class="text-emerald-700">1 poin:</span> {{ implode(', ', $kunciGe['1'] ?? []) ?: '–' }}</p>
+                @else
+                    <p><span class="text-emerald-700">Kunci:</span> <span class="font-medium">{{ $soal->kunci_jawaban ?? '–' }}</span></p>
+                @endif
+            </div>
+        @elseif ($opsi->isNotEmpty())
+            <ul class="mt-3 grid gap-2 sm:grid-cols-2 {{ $opsi->count() > 4 ? 'lg:grid-cols-5' : 'lg:grid-cols-4' }}">
+                @foreach ($opsi as $i => $o)
+                    @php $benar = $kunci === chr(97 + $i); @endphp
+                    <li class="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm {{ $benar ? 'border-emerald-300 bg-emerald-50' : 'border-border' }}">
+                        <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold {{ $benar ? 'bg-emerald-600 text-white' : 'bg-muted text-muted-foreground' }}">{{ chr(65 + $i) }}</span>
+                        @if ($o->gambar_opsi)
+                            <img src="{{ asset('storage/' . $o->gambar_opsi) }}" alt="Opsi {{ chr(65 + $i) }}" class="h-12 max-w-24 rounded border border-border object-contain">
                         @endif
-                        <span>{{ $opsiTeks['teks'] ?? $opsiTeks }}</span>
-                        @if (strtolower($soal['kunci_jawaban'] ?? '') === $hurufLower)
-                            <span class="ml-auto text-[11px] font-semibold text-[#2C5F6F]">Kunci</span>
+                        <span class="min-w-0 flex-1 {{ $o->teks_opsi === '' ? 'italic text-muted-foreground' : '' }}">{{ $o->teks_opsi !== '' ? $o->teks_opsi : 'Tanpa teks' }}</span>
+                        @if ($benar)
+                            <span class="material-symbols-outlined text-[18px] text-emerald-600" title="Kunci jawaban">check_circle</span>
                         @endif
                     </li>
                 @endforeach
             </ul>
-        @elseif (in_array($tipeFormat, ['isian_teks', 'isian_angka']))
-            @php
-                $kunciRaw = $soal['kunci_jawaban'] ?? '-';
-                $isGEKartu = isset($soal['nomor']) && $soal['nomor'] >= 61 && $soal['nomor'] <= 76;
-                $geKunci = $isGEKartu ? json_decode($kunciRaw, true) : null;
-            @endphp
-            <div class="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-sm text-slate-600 space-y-1">
-                @if($isGEKartu && is_array($geKunci))
-                    <div><span class="text-slate-400">2 poin:</span> <strong>{{ implode(', ', $geKunci['2'] ?? []) ?: '-' }}</strong></div>
-                    <div><span class="text-slate-400">1 poin:</span> <strong>{{ implode(', ', $geKunci['1'] ?? []) ?: '-' }}</strong></div>
-                @else
-                    Jawaban: <strong>{{ $kunciRaw }}</strong>
-                @endif
-            </div>
         @endif
     @endif
-
-</div>
+</x-ui.card>

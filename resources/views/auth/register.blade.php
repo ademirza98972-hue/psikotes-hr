@@ -1,265 +1,131 @@
-@extends('layouts.auth', ['judulHalaman' => 'Daftar Akun', 'showVisual' => false])
+@extends('layouts.auth', ['judulHalaman' => 'Daftar Akun', 'showVisual' => false, 'lebarKartu' => 'max-w-2xl'])
 
-@section('tambahan_head')
-<style>
-    .no-visual-panel .login-panel { max-width: 680px; }
-</style>
-@endsection
+@php
+    $field = fn (string $nama) => $errors->has($nama) ? 'true' : null;
+    $posisiPerDepartemen = $posisi->groupBy(fn ($p) => $p->departemen?->nama_departemen ?? 'Lainnya');
+@endphp
 
 @section('content')
-<div x-data="{ showPwd: false, showPwdConfirm: false }" class="space-y-6">
-
-    <div class="space-y-1">
-        <h2 class="font-body font-semibold text-2xl text-on-surface">Buat Akun Baru</h2>
-        <p class="font-body text-sm text-on-surface-variant">Lengkapi data di bawah untuk membuat akun.</p>
+<div class="grid gap-6">
+    <div class="grid gap-1.5">
+        <h1 class="text-2xl font-semibold tracking-tight">Daftar sebagai kandidat</h1>
+        <p class="text-sm text-muted-foreground">Lengkapi data berikut. Akun aktif setelah diverifikasi oleh HR.</p>
     </div>
 
-    @if ($errors->any())
-    <div class="rounded-sm border border-rose-600 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-        <ul class="list-disc space-y-1 pl-5">
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-
-    <form method="POST" action="{{ route('register') }}" class="space-y-5">
+    <form method="POST" action="{{ route('register') }}" class="grid gap-6">
         @csrf
-
         <input type="hidden" name="tipe_akun" value="kandidat">
 
-        {{-- Field Kandidat --}}
-        <div class="space-y-4 border-t border-surface-variant pt-4">
-            <p class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant">Data Diri</p>
-
-            {{-- Nama + NIK --}}
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="name_kandidat">Nama Lengkap</label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="name_kandidat"
-                            name="name"
-                            type="text"
-                            value="{{ old('name') }}"
-                            placeholder="Nama lengkap sesuai KTP"
-                            class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors"
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">person</span>
-                    </div>
-                    @error('name')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
+        <fieldset class="grid gap-4">
+            <legend class="mb-4 flex items-center gap-2 text-sm font-medium">
+                <span class="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs text-primary">1</span>
+                Data diri
+            </legend>
+            <div class="grid items-start gap-4 sm:grid-cols-2">
+                <div class="grid gap-2">
+                    <x-ui.label for="name">Nama lengkap</x-ui.label>
+                    <x-ui.input id="name" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"
+                                placeholder="Sesuai KTP" class="h-10!" :aria-invalid="$field('name')" />
+                    @error('name')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
                 </div>
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="nik_kandidat">NIK KTP <span class="text-rose-600">*</span></label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="nik_kandidat"
-                            name="nik_kandidat"
-                            type="text"
-                            value="{{ old('nik_kandidat') }}"
-                            maxlength="16"
-                            inputmode="numeric"
-                            pattern="[0-9]{16}"
-                            placeholder="16 digit NIK"
-                            class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('nik_kandidat') border-rose-500 @else border-surface-variant @enderror"
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">badge</span>
-                    </div>
-                    @error('nik_kandidat')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
+                <div class="grid gap-2">
+                    <x-ui.label for="nik_kandidat">NIK KTP</x-ui.label>
+                    <x-ui.input id="nik_kandidat" name="nik_kandidat" value="{{ old('nik_kandidat') }}" required
+                                maxlength="16" inputmode="numeric" pattern="[0-9]{16}" title="16 digit angka"
+                                placeholder="16 digit NIK" class="h-10!" :aria-invalid="$field('nik_kandidat')" />
+                    @error('nik_kandidat')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
+                </div>
+                <div class="grid gap-2">
+                    <x-ui.label for="tanggal_lahir">Tanggal lahir <span class="font-normal text-muted-foreground">(opsional)</span></x-ui.label>
+                    <x-ui.input id="tanggal_lahir" name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir') }}"
+                                class="h-10!" :aria-invalid="$field('tanggal_lahir')" />
+                    @error('tanggal_lahir')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
+                </div>
+                <div class="grid gap-2">
+                    <x-ui.label for="jenis_kelamin">Jenis kelamin</x-ui.label>
+                    <x-ui.select id="jenis_kelamin" name="jenis_kelamin" required class="h-10!" :aria-invalid="$field('jenis_kelamin')">
+                        <option value="">Pilih</option>
+                        <option value="L" @selected(old('jenis_kelamin') === 'L')>Laki-laki</option>
+                        <option value="P" @selected(old('jenis_kelamin') === 'P')>Perempuan</option>
+                    </x-ui.select>
+                    @error('jenis_kelamin')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
                 </div>
             </div>
+        </fieldset>
 
-            {{-- Tanggal Lahir + Jenis Kelamin --}}
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="tanggal_lahir_kandidat">Tanggal Lahir</label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="tanggal_lahir_kandidat"
-                            name="tanggal_lahir"
-                            type="date"
-                            value="{{ old('tanggal_lahir') }}"
-                            class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors"
-                        >
-                    </div>
-                    @error('tanggal_lahir')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
-                </div>
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="jenis_kelamin_kandidat">Jenis Kelamin</label>
-                    <div class="relative">
-                        <select
-                            id="jenis_kelamin_kandidat"
-                            name="jenis_kelamin"
-                            class="w-full px-4 py-3 pr-10 bg-white border rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none @error('jenis_kelamin') border-rose-500 @else border-surface-variant @enderror"
-                        >
-                            <option value="">-- Pilih --</option>
-                            <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                            <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                        </select>
-                        <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
-                    </div>
-                    @error('jenis_kelamin')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
-                </div>
-            </div>
+        <x-ui.separator />
 
-            {{-- Email + No HP --}}
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="email_kandidat">Email</label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="email_kandidat"
-                            name="email"
-                            type="email"
-                            value="{{ old('email') }}"
-                            autocomplete="email"
-                            placeholder="nama@email.com"
-                            class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('email') border-rose-500 @else border-surface-variant @enderror"
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">mail</span>
-                    </div>
-                    @error('email')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
+        <fieldset class="grid gap-4">
+            <legend class="mb-4 flex items-center gap-2 text-sm font-medium">
+                <span class="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs text-primary">2</span>
+                Kontak &amp; lamaran
+            </legend>
+            <div class="grid items-start gap-4 sm:grid-cols-2">
+                <div class="grid gap-2">
+                    <x-ui.label for="email">Email</x-ui.label>
+                    <x-ui.input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="email"
+                                placeholder="nama@email.com" class="h-10!" :aria-invalid="$field('email')" />
+                    @error('email')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
                 </div>
-                <div class="space-y-1.5">
-                    <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="no_hp_kandidat">No HP</label>
-                    <div class="relative focused-input group">
-                        <input
-                            id="no_hp_kandidat"
-                            name="no_hp"
-                            type="text"
-                            value="{{ old('no_hp') }}"
-                            autocomplete="tel"
-                            placeholder="08xxxxxxxxxx"
-                            class="w-full px-4 py-3 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('no_hp') border-rose-500 @else border-surface-variant @enderror"
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">smartphone</span>
-                    </div>
-                    @error('no_hp')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
+                <div class="grid gap-2">
+                    <x-ui.label for="no_hp">No. HP</x-ui.label>
+                    <x-ui.input id="no_hp" name="no_hp" type="tel" value="{{ old('no_hp') }}" required autocomplete="tel"
+                                placeholder="08xxxxxxxxxx" class="h-10!" :aria-invalid="$field('no_hp')" />
+                    @error('no_hp')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
                 </div>
-            </div>
-
-            {{-- Posisi (full width) --}}
-            <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="posisi_dilamar">Posisi yang Dilamar</label>
-                <div class="relative">
-                    <select
-                        id="posisi_dilamar"
-                        name="posisi_dilamar"
-                        class="w-full px-4 py-3 pr-10 bg-white border rounded-sm text-sm font-body focus:outline-none focus:border-psikotes transition-colors appearance-none @error('posisi_dilamar') border-rose-500 @else border-surface-variant @enderror"
-                    >
-                        <option value="">-- Pilih Posisi --</option>
-                        @php $currentDept = null; @endphp
-                        @foreach($posisi as $p)
-                            @if($p->departemen && $p->departemen->id !== $currentDept)
-                                @php $currentDept = $p->departemen->id; @endphp
-                                <optgroup label="{{ $p->departemen->nama_departemen }}">
-                            @endif
-                                <option value="{{ $p->id }}" {{ old('posisi_dilamar') == $p->id ? 'selected' : '' }}>
-                                    {{ $p->nama_posisi }}
-                                </option>
-                            @if(!$loop->last && (!$posisi[$loop->index + 1]->departemen || $posisi[$loop->index + 1]->departemen->id !== $currentDept))
-                                </optgroup>
-                            @endif
-                            @if($loop->last)
-                                </optgroup>
-                            @endif
+                <div class="grid gap-2">
+                    <x-ui.label for="posisi_dilamar">Posisi yang dilamar</x-ui.label>
+                    <x-ui.select id="posisi_dilamar" name="posisi_dilamar" required class="h-10!" :aria-invalid="$field('posisi_dilamar')">
+                        <option value="">Pilih posisi</option>
+                        @foreach ($posisiPerDepartemen as $departemen => $daftar)
+                            <optgroup label="{{ $departemen }}">
+                                @foreach ($daftar as $p)
+                                    <option value="{{ $p->id }}" @selected(old('posisi_dilamar') == $p->id)>{{ $p->nama_posisi }}</option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
-                    </select>
-                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant text-[18px]">expand_more</span>
+                    </x-ui.select>
+                    @error('posisi_dilamar')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
                 </div>
-                @error('posisi_dilamar')
-                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                @else
-                    <p class="font-body text-xs text-on-surface-variant mt-1">Isi posisi yang dilamar.</p>
-                @enderror
+                <div class="grid gap-2">
+                    <x-ui.label for="pendidikan_terakhir">Pendidikan terakhir</x-ui.label>
+                    <x-ui.input id="pendidikan_terakhir" name="pendidikan_terakhir" value="{{ old('pendidikan_terakhir') }}" required
+                                placeholder="Contoh: S1 Teknik Informatika" class="h-10!" :aria-invalid="$field('pendidikan_terakhir')" />
+                    @error('pendidikan_terakhir')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
+                </div>
             </div>
+        </fieldset>
 
-            {{-- Pendidikan (full width) --}}
-            <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="pendidikan_terakhir">Pendidikan Terakhir</label>
-                <div class="relative focused-input group">
-                    <input
-                        id="pendidikan_terakhir"
-                        name="pendidikan_terakhir"
-                        type="text"
-                        value="{{ old('pendidikan_terakhir') }}"
-                        placeholder="Contoh: S1 Teknik Informatika"
-                        class="w-full px-4 py-3 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors"
-                    >
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-psikotes transition-colors">school</span>
-                </div>
-                @error('pendidikan_terakhir')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
-            </div>
-        </div>
+        <x-ui.separator />
 
-        {{-- Password + Konfirmasi (2-kolom) --}}
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="password">Password</label>
-                <div class="relative focused-input group">
-                    <input
-                        id="password"
-                        name="password"
-                        :type="showPwd ? 'text' : 'password'"
-                        required
-                        minlength="8"
-                        autocomplete="new-password"
-                        placeholder="Minimal 8 karakter"
-                        class="w-full px-4 py-3 pr-10 bg-white border rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors @error('password') border-rose-500 @else border-surface-variant @enderror"
-                    >
-                    <button type="button" @click="showPwd = !showPwd"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant hover:text-on-surface transition-colors flex items-center">
-                        <span class="material-symbols-outlined text-lg" x-text="showPwd ? 'visibility_off' : 'visibility'"></span>
-                    </button>
+        <fieldset class="grid gap-4">
+            <legend class="mb-4 flex items-center gap-2 text-sm font-medium">
+                <span class="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs text-primary">3</span>
+                Keamanan akun
+            </legend>
+            <div class="grid items-start gap-4 sm:grid-cols-2">
+                <div class="grid gap-2">
+                    <x-ui.label for="password">Password</x-ui.label>
+                    <x-ui.input-password id="password" name="password" required minlength="8" autocomplete="new-password"
+                                         placeholder="Minimal 8 karakter" class="h-10!" :aria-invalid="$field('password')" />
+                    @error('password')<p class="text-sm text-destructive">{{ $message }}</p>@enderror
                 </div>
-                @error('password')
-                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                @else
-                    <p class="font-body text-xs text-on-surface-variant mt-1">Minimal 8 karakter.</p>
-                @enderror
-            </div>
-            <div class="space-y-1.5">
-                <label class="font-body text-xs font-medium uppercase tracking-tight text-on-surface-variant" for="password_confirmation">Konfirmasi Password</label>
-                <div class="relative focused-input group">
-                    <input
-                        id="password_confirmation"
-                        name="password_confirmation"
-                        :type="showPwdConfirm ? 'text' : 'password'"
-                        required
-                        minlength="8"
-                        autocomplete="new-password"
-                        placeholder="Ulangi password"
-                        class="w-full px-4 py-3 pr-10 bg-white border border-surface-variant rounded-sm text-sm font-body placeholder:text-outline-variant focus:outline-none focus:border-psikotes transition-colors"
-                    >
-                    <button type="button" @click="showPwdConfirm = !showPwdConfirm"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant hover:text-on-surface transition-colors flex items-center">
-                        <span class="material-symbols-outlined text-lg" x-text="showPwdConfirm ? 'visibility_off' : 'visibility'"></span>
-                    </button>
+                <div class="grid gap-2">
+                    <x-ui.label for="password_confirmation">Ulangi password</x-ui.label>
+                    <x-ui.input-password id="password_confirmation" name="password_confirmation" required minlength="8"
+                                         autocomplete="new-password" placeholder="Ketik ulang password" class="h-10!" />
                 </div>
             </div>
-        </div>
+        </fieldset>
 
-        <button type="submit"
-            class="w-full bg-psikotes text-white font-body font-semibold text-sm py-3.5 rounded-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm shadow-psikotes/20">
-            <span>Daftar</span>
-            <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
-        </button>
+        <x-ui.button type="submit" size="lg" class="w-full">
+            Buat akun <span class="material-symbols-outlined">arrow_forward</span>
+        </x-ui.button>
     </form>
 
-    <div class="text-center text-sm text-on-surface-variant">
+    <p class="text-center text-sm text-muted-foreground">
         Sudah punya akun?
-        <a href="{{ route('login') }}" class="text-psikotes font-semibold hover:underline">Masuk di sini</a>
-    </div>
-
-    <div class="pt-6 border-t border-surface-variant">
-        <p class="font-body text-sm text-on-surface-variant text-center">
-            Membutuhkan bantuan akses? <a href="#" class="text-psikotes font-medium hover:underline">Hubungi IT Support</a>
-        </p>
-    </div>
+        <a href="{{ route('login') }}" class="font-medium text-primary underline-offset-4 hover:underline">Masuk</a>
+    </p>
 </div>
-
-<style>
-    [x-cloak] { display: none !important; }
-</style>
 @endsection

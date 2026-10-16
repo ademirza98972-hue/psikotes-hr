@@ -1,4 +1,4 @@
-@extends('layouts.peserta', ['judulHalaman' => 'Panduan Kraepelin'])
+@extends('layouts.peserta', ['judulHalaman' => 'Panduan Kraepelin', 'modeFokus' => true])
 
 @section('content')
 @php
@@ -29,7 +29,7 @@ if ($adaTimerTotal && $adaTimerKolom) {
             <span class="material-symbols-outlined text-[14px]">calculate</span>
             <span class="text-[11px] font-bold uppercase tracking-wider">Kraepelin — Kecepatan & Ketelitian</span>
         </div>
-        <h2 class="text-[22px] font-semibold text-[#00303c]">Tes Penjumlahan Kraepelin</h2>
+        <h2 class="text-[22px] font-semibold text-foreground">Tes Penjumlahan Kraepelin</h2>
         <div class="flex flex-wrap items-center gap-3 mt-2">
             <span class="inline-flex items-center gap-1 text-[12px] text-[#40484b]">
                 <span class="material-symbols-outlined text-[14px]">view_column</span>
@@ -46,7 +46,7 @@ if ($adaTimerTotal && $adaTimerKolom) {
     {{-- Cara Pengerjaan --}}
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Cara Pengerjaan</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Cara Pengerjaan</p>
         </div>
         <div class="px-6 py-5 space-y-3">
             <p class="text-[14px] text-[#191c1e] leading-relaxed">
@@ -65,7 +65,7 @@ if ($adaTimerTotal && $adaTimerKolom) {
     {{-- Yang Perlu Diperhatikan --}}
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Yang Perlu Diperhatikan</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Yang Perlu Diperhatikan</p>
         </div>
         <div class="divide-y divide-[#f0f2f3]">
             @php
@@ -91,7 +91,7 @@ if ($adaTimerTotal && $adaTimerKolom) {
     {{-- Contoh --}}
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Contoh</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Contoh</p>
         </div>
         <div class="px-6 py-5">
             <p class="text-[12px] text-[#71787c] mb-5">Pengerjaan dimulai dari pasangan angka paling <strong>bawah</strong>, naik ke atas satu per satu:</p>
@@ -139,14 +139,15 @@ if ($adaTimerTotal && $adaTimerKolom) {
             </div>
 
             <div class="mt-5 rounded-lg bg-[#f7f9fb] border border-[#e0e3e5] px-4 py-3 flex items-start gap-2">
-                <span class="material-symbols-outlined text-[15px] text-[#2C5F6F] shrink-0 mt-0.5">info</span>
+                <span class="material-symbols-outlined text-[15px] text-primary shrink-0 mt-0.5">info</span>
                 <p class="text-[12px] text-[#40484b] leading-relaxed">Dua angka yang disorot kuning adalah pasangan yang sedang dikerjakan. Masukkan angka satuan dari jumlahnya menggunakan keypad di layar.</p>
             </div>
         </div>
     </div>
 
     {{-- Tombol Mulai --}}
-    <form method="POST" action="{{ route('peserta.tes.panduan-kraepelin-mulai', $sesiId) }}">
+    <form method="POST" action="{{ route('peserta.tes.panduan-kraepelin-mulai', $sesiId) }}"
+          data-panduan-form>
         @csrf
         <button type="submit"
                 class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition-all active:scale-95"
@@ -160,4 +161,5 @@ if ($adaTimerTotal && $adaTimerKolom) {
     </form>
 
 </div>
+@include('peserta._monitor_tes')
 @endsection

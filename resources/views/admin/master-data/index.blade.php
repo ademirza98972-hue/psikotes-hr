@@ -22,7 +22,7 @@
 
             @can('departemen.kelola')
                 <button @click="openTambahDepartemen()"
-                        class="rounded-md bg-[#2C5F6F] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#234853]">
+                        class="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary/90">
                     + Tambah
                 </button>
             @endcan
@@ -43,7 +43,7 @@
         @else
             <form method="GET" action="{{ route('admin.master-data.index') }}" class="mb-4">
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari departemen..."
-                       class="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                       class="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
             </form>
 
             <div class="overflow-x-auto">
@@ -94,7 +94,7 @@
 
             @can('posisi.kelola')
                 <button @click="openTambahPosisi()"
-                        class="rounded-md bg-[#2C5F6F] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#234853]">
+                        class="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary/90">
                     + Tambah
                 </button>
             @endcan
@@ -115,7 +115,7 @@
         @else
             <form method="GET" action="{{ route('admin.master-data.index') }}" class="mb-4">
                 <input type="text" name="q_posisi" value="{{ request('q_posisi') }}" placeholder="Cari posisi..."
-                       class="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                       class="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
             </form>
 
             <div class="overflow-x-auto">
@@ -185,14 +185,14 @@
                     <label class="block text-sm font-medium text-slate-700">Nama Departemen</label>
                     <input type="text" name="nama_departemen" required maxlength="100"
                            placeholder="Contoh: HR & GA"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                 </div>
 
                 <div class="flex justify-end gap-2">
                     <button type="button" @click="closeModal('modal-departemen')"
                             class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</button>
                     <button type="submit"
-                            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853]">Simpan</button>
+                            class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90">Simpan</button>
                 </div>
             </form>
         </div>
@@ -217,14 +217,14 @@
                     <label class="block text-sm font-medium text-slate-700">Nama Departemen</label>
                     <input type="text" name="nama_departemen" required maxlength="100"
                            id="edit-departemen-nama"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                 </div>
 
                 <div class="flex justify-end gap-2">
                     <button type="button" @click="closeModal('modal-edit-departemen')"
                             class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</button>
                     <button type="submit"
-                            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853]">Simpan</button>
+                            class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90">Simpan</button>
                 </div>
             </form>
         </div>
@@ -258,13 +258,13 @@
                     <label class="block text-sm font-medium text-slate-700">Nama Posisi</label>
                     <input type="text" name="nama_posisi" required maxlength="100"
                            placeholder="Contoh: Staff Administrasi"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Departemen</label>
                     <select name="departemen_id" required
-                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                         <option value="">-- Pilih Departemen --</option>
                         @foreach(\App\Models\Departemen::orderBy('nama_departemen')->get() as $dept)
                             <option value="{{ $dept->id }}">{{ $dept->nama_departemen }}</option>
@@ -276,7 +276,7 @@
                     <button type="button" @click="closeModal('modal-posisi')"
                             class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</button>
                     <button type="submit"
-                            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853]">Simpan</button>
+                            class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90">Simpan</button>
                 </div>
             </form>
         </div>
@@ -301,14 +301,14 @@
                     <label class="block text-sm font-medium text-slate-700">Nama Posisi</label>
                     <input type="text" name="nama_posisi" required maxlength="100"
                            id="edit-posisi-nama"
-                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                           class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Departemen</label>
                     <select name="departemen_id" required
                             id="edit-posisi-departemen"
-                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                         <option value="">-- Pilih Departemen --</option>
                         @foreach(\App\Models\Departemen::orderBy('nama_departemen')->get() as $dept)
                             <option value="{{ $dept->id }}">{{ $dept->nama_departemen }}</option>
@@ -320,7 +320,7 @@
                     <button type="button" @click="closeModal('modal-edit-posisi')"
                             class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">Batal</button>
                     <button type="submit"
-                            class="rounded-md bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#234853]">Simpan</button>
+                            class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90">Simpan</button>
                 </div>
             </form>
         </div>

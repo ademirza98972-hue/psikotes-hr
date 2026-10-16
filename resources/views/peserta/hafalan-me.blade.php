@@ -1,30 +1,30 @@
-@extends('layouts.peserta', ['judulHalaman' => 'Hafalan ME — IST'])
+@extends('layouts.peserta', ['judulHalaman' => 'Hafalan ME — IST', 'modeFokus' => true])
 
 @section('content')
 <div class="max-w-2xl mx-auto">
 
     {{-- Header --}}
     <div class="mb-6">
-        <div class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F]/10 px-3 py-1.5 mb-3">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">IST — Subtes ME</span>
+        <div class="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1.5 mb-3">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-primary">IST — Subtes ME</span>
         </div>
-        <h2 class="text-[22px] font-semibold text-[#00303c]">Fase Hafalan</h2>
+        <h2 class="text-[22px] font-semibold text-foreground">Fase Hafalan</h2>
         <p class="mt-1 text-[13px] text-[#40484b]">Hafalkan kata-kata di bawah ini. Setelah waktu habis, Anda akan menjawab soal berdasarkan hafalan ini.</p>
     </div>
 
     {{-- Timer --}}
-    <div class="mb-6 rounded-xl border border-[#2C5F6F]/30 bg-[#2C5F6F]/5 px-6 py-4 flex items-center justify-between">
+    <div class="mb-6 rounded-xl border border-primary/30 bg-primary/5 px-6 py-4 flex items-center justify-between">
         <div>
-            <p class="text-[12px] font-semibold uppercase tracking-wider text-[#2C5F6F]">Waktu Hafalan</p>
+            <p class="text-[12px] font-semibold uppercase tracking-wider text-primary">Waktu Hafalan</p>
             <p class="text-[11px] text-[#40484b] mt-0.5">Halaman akan berpindah otomatis saat waktu habis</p>
         </div>
-        <div id="timer-display" class="text-[32px] font-bold tabular-nums text-[#2C5F6F]">3:00</div>
+        <div id="timer-display" class="text-[32px] font-bold tabular-nums text-primary">3:00</div>
     </div>
 
     {{-- Daftar Hafalan --}}
     <div class="rounded-xl border border-[#e0e3e5] bg-white shadow-sm overflow-hidden">
         <div class="border-b border-[#e0e3e5] px-6 py-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-[#2C5F6F]">Daftar Kata</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary">Daftar Kata</p>
         </div>
         <div class="divide-y divide-[#e0e3e5]">
             @php
@@ -60,14 +60,15 @@
     </div>
 
     {{-- Form submit (dipakai JS setelah timer habis) --}}
-    <form id="form-lanjut" method="POST" action="{{ route('peserta.tes.hafalan-me-selesai', $sesiId) }}" class="hidden">
+    <form id="form-lanjut" method="POST" action="{{ route('peserta.tes.hafalan-me-selesai', $sesiId) }}" class="hidden"
+          data-panduan-form>
         @csrf
     </form>
 
     {{-- Tombol manual (untuk darurat) --}}
     <div class="mt-4 text-center">
-        <button id="btn-lanjut" onclick="document.getElementById('form-lanjut').submit()"
-                class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-6 py-2.5 text-sm font-semibold text-white opacity-30 cursor-not-allowed transition-all"
+        <button id="btn-lanjut" onclick="sessionStorage.removeItem('hafalan_me_start_{{ $sesiId }}'); document.getElementById('form-lanjut').requestSubmit()"
+                class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white opacity-30 cursor-not-allowed transition-all"
                 disabled>
             <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
             Lanjut ke Soal
@@ -82,14 +83,31 @@
 <script>
 (function () {
     const DURASI = 180; // 3 menit
-    let sisa = DURASI;
+    const KEY    = 'hafalan_me_start_{{ $sesiId }}';
     const display = document.getElementById('timer-display');
     const btn = document.getElementById('btn-lanjut');
+
+    // Ambil atau simpan timestamp mulai hafalan
+    let startTs = parseInt(sessionStorage.getItem(KEY) || '0', 10);
+    if (!startTs) {
+        startTs = Date.now();
+        sessionStorage.setItem(KEY, startTs);
+    }
+    let sisa = Math.max(0, DURASI - Math.floor((Date.now() - startTs) / 1000));
 
     function format(s) {
         const m = Math.floor(s / 60);
         const detik = s % 60;
         return m + ':' + String(detik).padStart(2, '0');
+    }
+
+    display.textContent = format(sisa);
+
+    // Waktu sudah habis sebelum halaman dimuat (reload terlambat)
+    if (sisa === 0) {
+        sessionStorage.removeItem(KEY);
+        document.getElementById('form-lanjut').requestSubmit();
+        return;
     }
 
     const interval = setInterval(() => {
@@ -98,22 +116,24 @@
 
         if (sisa <= 30) {
             display.classList.add('text-rose-600');
-            display.classList.remove('text-[#2C5F6F]');
+            display.classList.remove('text-primary');
         }
 
         if (sisa <= 0) {
             clearInterval(interval);
             display.textContent = '0:00';
-            document.getElementById('form-lanjut').submit();
+            sessionStorage.removeItem(KEY);
+            document.getElementById('form-lanjut').requestSubmit();
         }
     }, 1000);
 
-    // Aktifkan tombol manual setelah timer habis (atau jika JS sudah jalan)
+    // Aktifkan tombol manual setelah timer habis
     setTimeout(() => {
         btn.disabled = false;
         btn.classList.remove('opacity-30', 'cursor-not-allowed');
-        btn.classList.add('hover:bg-[#1E414C]', 'active:scale-95');
-    }, DURASI * 1000);
+        btn.classList.add('hover:bg-primary/90', 'active:scale-95');
+    }, sisa * 1000);
 })();
 </script>
+@include('peserta._monitor_tes')
 @endpush

@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
             CfitNormaSeeder::class,
             EppsSeeder::class,
             EppsSoalSeeder::class,
-            EppsKonsistensiSoalSeeder::class,
             EppsNormaSeeder::class,
             EppsLevelSeeder::class,
             PapikostikSeeder::class,

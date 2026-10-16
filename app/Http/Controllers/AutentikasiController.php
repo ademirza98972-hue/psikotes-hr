@@ -33,9 +33,8 @@ class AutentikasiController extends Controller
         $identifier = $request->input('identifier');
         $password   = $request->input('password');
 
-        // Cari user berdasarkan email atau id_karyawan
-        $user = User::where('email', $identifier)
-            ->orWhere('id_karyawan', $identifier)
+        // Kurung wajib: tanpa closure, OR membuat akun admin lolos lewat email
+        $user = User::where(fn ($q) => $q->where('email', $identifier)->orWhere('id_karyawan', $identifier))
             ->whereIn('tipe_akun', ['kandidat', 'karyawan'])
             ->first();
 
@@ -100,6 +99,11 @@ class AutentikasiController extends Controller
         }
 
         $request->session()->regenerate();
+
+        // URL intended sisa sesi peserta (/peserta/...) jangan dipakai untuk admin
+        if (! str_starts_with(parse_url($request->session()->get('url.intended', ''), PHP_URL_PATH) ?? '', '/admin')) {
+            $request->session()->forget('url.intended');
+        }
 
         return redirect()->intended($this->tujuanDashboard());
     }

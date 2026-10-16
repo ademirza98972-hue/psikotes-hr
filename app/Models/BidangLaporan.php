@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BidangLaporan extends Model
 {
@@ -16,9 +15,4 @@ class BidangLaporan extends Model
         'nama',
         'urutan',
     ];
-
-    public function dimensiBidangLaporan(): HasMany
-    {
-        return $this->hasMany(DimensiBidangLaporan::class, 'bidang_laporan_id');
-    }
 }

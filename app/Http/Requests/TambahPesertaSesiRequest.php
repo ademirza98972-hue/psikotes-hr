@@ -28,4 +28,12 @@ class TambahPesertaSesiRequest extends FormRequest
             'min'      => ':attribute minimal :min item.',
         ];
     }
+
+    public function attributes(): array
+    {
+        return [
+            'user_ids' => 'peserta',
+            'alat_tes_ids' => 'alat tes',
+        ];
+    }
 }

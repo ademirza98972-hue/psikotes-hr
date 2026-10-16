@@ -32,9 +32,4 @@ class NormaKonversi extends Model
     {
         return $this->belongsTo(DimensiAlatTes::class, 'dimensi_id', 'id');
     }
-
-    public function sumberDimensi(): BelongsTo
-    {
-        return $this->belongsTo(DimensiAlatTes::class, 'sumber_dimensi_id', 'id');
-    }
 }

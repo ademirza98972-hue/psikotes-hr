@@ -60,21 +60,6 @@ class AlatTes extends Model
         return $this->hasMany(LevelDimensi::class, 'alat_tes_id');
     }
 
-    public function gridInputPeserta(): HasMany
-    {
-        return $this->hasMany(GridInputPeserta::class, 'alat_tes_id');
-    }
-
-    public function hasilKolomGrid(): HasMany
-    {
-        return $this->hasMany(HasilKolomGrid::class, 'alat_tes_id');
-    }
-
-    public function hasilSkorPeserta(): HasMany
-    {
-        return $this->hasMany(HasilSkorPeserta::class, 'alat_tes_id');
-    }
-
     public function pesertaSesiTes()
     {
         return $this->belongsToMany(SesiTes::class, 'alat_tes_sesi_tes', 'alat_tes_id', 'sesi_tes_id');

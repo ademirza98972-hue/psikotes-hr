@@ -26,10 +26,9 @@ class HasilTesController extends Controller
         $sesiList = SesiTes::with([
             'departemen',
             'alatTes',
-            'pesertaSesiTesRecords.user.dataKaryawan.departemen',
-            'pesertaSesiTesRecords.user.dataKaryawan.posisi',
-            'pesertaSesiTesRecords.user.profilKandidat.posisi',
-            'pesertaSesiTesRecords.alatTes',
+            'pesertaSesiTesRecords' => fn ($q) => $q
+                ->with(['user.dataKaryawan.departemen', 'user.dataKaryawan.posisi', 'user.profilKandidat.posisi.departemen', 'alatTes'])
+                ->withCount(['logAktivitas as log_mencurigakan_count' => fn ($q) => $q->where('mencurigakan', true)]),
         ])
             ->orderByDesc('tanggal_mulai')
             ->get();
@@ -45,14 +44,9 @@ class HasilTesController extends Controller
             'jumlah_peserta'     => $sesi->jumlah_peserta,
         ])->all();
 
-        $hasilPeserta = [];
-        foreach ($sesiList as $sesi) {
-            if ($sesi->pesertaSesiTesRecords->isNotEmpty()) {
-                $hasilPeserta[$sesi->id] = true;
-            }
-        }
         if (!$selectedSesiId && $sesiList->isNotEmpty()) {
-            $selectedSesiId = $sesiList->first(fn($s) => ($hasilPeserta[$s->id] ?? false))?->id ?? $sesiList->first()->id;
+            $selectedSesiId = $sesiList->first(fn($s) => $s->pesertaSesiTesRecords->isNotEmpty())?->id
+                ?? $sesiList->first()->id;
         }
 
         $hasilTes = [];
@@ -63,19 +57,9 @@ class HasilTesController extends Controller
                     continue;
                 }
 
-                $departemen = '—';
-                $posisi = '—';
                 $dk = $user->dataKaryawan;
-                if ($dk) {
-                    $departemen = $dk->departemen?->nama_departemen ?? '—';
-                    $posisi = $dk->posisi?->nama_posisi ?? '—';
-                } else {
-                    $kandidat = $user->profilKandidat;
-                    if ($kandidat) {
-                        $departemen = $kandidat->departemen ?? '—';
-                        $posisi = $kandidat->posisi?->nama_posisi ?? '—';
-                    }
-                }
+                $departemen = $dk?->departemen?->nama_departemen ?? $user->profilKandidat?->posisi?->departemen?->nama_departemen ?? '—';
+                $posisi     = $dk?->posisi?->nama_posisi ?? $user->profilKandidat?->posisi?->nama_posisi ?? '—';
 
                 $alatTesKode = $peserta->alatTes?->pluck('kode')->join(', ') ?: '—';
 
@@ -89,7 +73,8 @@ class HasilTesController extends Controller
                     'status_pengerjaan'  => $peserta->status_pengerjaan,
                     'tanggal_pengerjaan' => $peserta->tanggal_pengerjaan,
                     'hasil_alat_tes'     => [],
-                    'alat_tes_kode'      => $alatTesKode,
+                    'alat_tes_kode'           => $alatTesKode,
+                    'log_mencurigakan_count'  => $peserta->log_mencurigakan_count ?? 0,
                 ];
             }
         }
@@ -108,13 +93,19 @@ class HasilTesController extends Controller
 
         $currentUser = auth()->user();
         $bisaLihatSensitif = $currentUser->hasIzin('hasil_tes.lihat_sensitif');
+        // Posisi dilamar (kandidat) / posisi karyawan; departemen mengikuti posisi
+        $posisi = $user->profilKandidat?->posisi ?? $user->dataKaryawan?->posisi;
 
         $hasilTes = [
             'nama_peserta'       => $user->name,
             'no_peserta'         => 'HT-' . $sesiId . '-' . str_pad((string) $pesertaId, 3, '0', STR_PAD_LEFT),
             'jenis_peserta'      => ucfirst($user->tipe_akun ?? '—'),
-            'departemen'         => '—',
-            'posisi'             => '—',
+            'departemen'         => $posisi?->departemen?->nama_departemen
+                                    ?? $user->dataKaryawan?->departemen?->nama_departemen ?? '—',
+            'posisi'             => $posisi?->nama_posisi ?? '—',
+            'tujuan_tes'         => $user->tipe_akun === 'karyawan' ? 'Asesmen Karyawan' : 'Seleksi Karyawan Baru',
+            'pemeriksa'          => $currentUser->name,
+            'tanggal_cetak'      => now()->toDateString(),
             'tanggal_pengerjaan' => $pesertaSesi?->tanggal_pengerjaan,
             'catatan_hr'         => $pesertaSesi?->catatan_hr,
             'peserta_id'         => $pesertaId,
@@ -149,6 +140,11 @@ class HasilTesController extends Controller
                 'format_dasar'             => $alatTes->format_dasar,
                 'durasi_pengerjaan_aktual' => '—',
                 'skor_ringkas'             => $skorRingkas,
+                // Kelompok norma yang dipakai saat skoring (IST: usia pada tanggal tes)
+                'kelompok_norma'           => $alatTes->kode === 'IST'
+                    ? app(\App\Services\ScoringEngineService::class)->kelompokSegmen(
+                        $user, $alatTes, $pesertaSesi?->tanggal_pengerjaan ? \Carbon\Carbon::parse($pesertaSesi->tanggal_pengerjaan) : null)
+                    : null,
             ];
 
             if ($alatTes->format_dasar === 'Grid') {
@@ -168,16 +164,22 @@ class HasilTesController extends Controller
                 $hasilAlatTes[$lastIndex]['grid_hanker']      = $gridExtra['hanker'];
                 $hasilAlatTes[$lastIndex]['grid_titikTertinggi'] = $gridExtra['titikTertinggi'];
                 $hasilAlatTes[$lastIndex]['grid_titikTerendah']  = $gridExtra['titikTerendah'];
+                $hasilAlatTes[$lastIndex]['grid_range']       = $gridExtra['range'];
             }
         }
 
-        $hasilTes['hasil_alat_tes'] = $hasilAlatTes;
-        $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps(
-            $hasilTes['hasil_alat_tes'], $pesertaId, $sesiId
-        );
+        $hasilTes['hasil_alat_tes'] = $this->injectHasilEpps($hasilAlatTes, $pesertaId, $sesiId);
         $psikogram = $this->hitungPsikogram($hasilTes['hasil_alat_tes']);
+        $hasilTes['ringkasan'] = $this->susunRingkasan($hasilTes['hasil_alat_tes']);
 
-        return compact('sesi', 'user', 'hasilTes', 'psikogram', 'bisaLihatSensitif');
+        $logMencurigakan = $pesertaSesi
+            ? \App\Models\LogAktivitasTes::where('peserta_sesi_tes_id', $pesertaSesi->id)
+                ->where('mencurigakan', true)
+                ->orderBy('created_at')
+                ->get()
+            : collect();
+
+        return compact('sesi', 'user', 'hasilTes', 'psikogram', 'bisaLihatSensitif', 'logMencurigakan');
     }
 
     public function detail(int $sesiId, int $pesertaId): View
@@ -185,7 +187,7 @@ class HasilTesController extends Controller
         extract($this->buildHasilTesData($sesiId, $pesertaId));
 
         return view('admin.hasil-tes.detail', compact(
-            'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
+            'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif', 'logMencurigakan'
         ));
     }
 
@@ -211,59 +213,51 @@ class HasilTesController extends Controller
     public function printView(int $sesiId, int $pesertaId): View
     {
         extract($this->buildHasilTesData($sesiId, $pesertaId));
-        $papScores = $this->buildPapScores($hasilTes['hasil_alat_tes']);
 
         return view('admin.hasil-tes.print', compact(
-            'hasilTes', 'sesi', 'papScores', 'psikogram', 'bisaLihatSensitif'
+            'hasilTes', 'sesi', 'psikogram', 'bisaLihatSensitif'
         ));
     }
 
+    /**
+     * Data grafik & rekap Kraepelin, sama dengan rumus Kraepelin.xls / ScoringEngineService::scoreGrid:
+     * x = 1..N kolom (N = jumlah kolom soal), kolom tanpa jawaban bernilai y = 0.
+     */
     private function buildGridExtra(int $userId, int $sesiId, int $alatTesId): array
     {
         $perKolom = HasilKolomGrid::where('user_id', $userId)
             ->where('sesi_tes_id', $sesiId)
             ->where('alat_tes_id', $alatTesId)
-            ->orderBy('kolom_ke')
-            ->get(['kolom_ke', 'jumlah_benar', 'jumlah_salah', 'jumlah_kelewat']);
+            ->pluck('jumlah_benar', 'kolom_ke');
 
-        $chartData = $perKolom->map(fn($r) => [
-            'kolom' => $r->kolom_ke,
-            'benar' => (int) $r->jumlah_benar,
-        ])->all();
+        $n = max(\App\Models\Soal::where('alat_tes_id', $alatTesId)->count(), (int) $perKolom->keys()->max());
+        $y = collect(range(1, max(1, $n)))->mapWithKeys(fn ($x) => [$x => (int) ($perKolom[$x] ?? 0)]);
 
-        $n = $perKolom->count();
-        $hanker = ['y0' => 0, 'y50' => 0, 'delta' => 0, 'trend' => 'stabil'];
-        $titikTertinggi = null;
-        $titikTerendah = null;
+        $chartData = $y->map(fn ($v, $x) => ['kolom' => $x, 'benar' => $v])->values()->all();
+        $titikTertinggi = ['kolom' => $y->search($y->max()), 'benar' => $y->max()];
+        $titikTerendah  = ['kolom' => $y->search($y->min()), 'benar' => $y->min()];
 
-        if ($n > 0) {
-            $sorted = $perKolom->sortByDesc('jumlah_benar')->values();
-            $titikTertinggi = ['kolom' => (int) $sorted[0]->kolom_ke, 'benar' => (int) $sorted[0]->jumlah_benar];
-            $titikTerendah  = ['kolom' => (int) $sorted[$n - 1]->kolom_ke, 'benar' => (int) $sorted[$n - 1]->jumlah_benar];
-        }
+        $sumX = $y->keys()->sum();
+        $sumY = $y->sum();
+        $sumXY = $y->map(fn ($v, $x) => $x * $v)->sum();
+        $sumX2 = $y->keys()->map(fn ($x) => $x * $x)->sum();
+        $denom = $n * $sumX2 - $sumX * $sumX;
+        $b = $denom != 0 ? ($n * $sumXY - $sumX * $sumY) / $denom : 0;
+        $a = $sumY / $n - $b * $sumX / $n;
+        $delta = 50 * $b;
 
-        if ($n > 1) {
-            $sumX = $sumY = $sumXY = $sumX2 = 0;
-            foreach ($perKolom as $row) {
-                $x = (float) $row->kolom_ke;
-                $y = (float) $row->jumlah_benar;
-                $sumX += $x; $sumY += $y; $sumXY += $x * $y; $sumX2 += $x * $x;
-            }
-            $denom = $n * $sumX2 - $sumX * $sumX;
-            $b = $denom != 0 ? ($n * $sumXY - $sumX * $sumY) / $denom : 0;
-            $a = ($sumY / $n) - $b * ($sumX / $n);
-            $y0    = round($a, 7);
-            $y50   = round($a + 50 * $b, 7);
-            $delta = round($y50 - $y0, 7);
-            $hanker = [
-                'y0'    => $y0,
-                'y50'   => $y50,
-                'delta' => $delta,
-                'trend' => $delta > 0.0001 ? 'meningkat' : ($delta < -0.0001 ? 'menurun' : 'stabil'),
-            ];
-        }
-
-        return ['chart' => $chartData, 'hanker' => $hanker, 'titikTertinggi' => $titikTertinggi, 'titikTerendah' => $titikTerendah];
+        return [
+            'chart'          => $chartData,
+            'hanker'         => [
+                'a' => $a, 'b' => $b,
+                'y0' => round($a, 2), 'y50' => round($a + 50 * $b, 2), 'delta' => round($delta, 2),
+                // Kraepelin.xls: y(50) − y(0) < 0 → menurun, selain itu meningkat
+                'trend' => $delta < 0 ? 'menurun' : 'meningkat',
+            ],
+            'range'          => $y->max() - $y->min(),
+            'titikTertinggi' => $titikTertinggi,
+            'titikTerendah'  => $titikTerendah,
+        ];
     }
 
     public function simpanCatatan(SimpanCatatanHasilTesRequest $request, int $sesiId, int $pesertaId): RedirectResponse
@@ -280,15 +274,7 @@ class HasilTesController extends Controller
 
     protected function injectHasilEpps(array $hasilAlatPeserta, int $userId, int $sesiId): array
     {
-        $adaEpps = false;
-        foreach ($hasilAlatPeserta as $alat) {
-            if (($alat['nama_alat_tes'] ?? null) === 'EPPS') {
-                $adaEpps = true;
-                break;
-            }
-        }
-
-        if (!$adaEpps) {
+        if (!collect($hasilAlatPeserta)->contains('nama_alat_tes', 'EPPS')) {
             return $hasilAlatPeserta;
         }
 
@@ -308,28 +294,91 @@ class HasilTesController extends Controller
             ];
         })->all();
 
-        $hasilBaru = [];
-        foreach ($hasilAlatPeserta as $alat) {
-            if (($alat['nama_alat_tes'] ?? null) === 'EPPS') {
-                $alat['skor_ringkas'] = $skorRingkasBaru;
-            }
-            $hasilBaru[] = $alat;
-        }
-
-        return $hasilBaru;
+        return collect($hasilAlatPeserta)->map(fn($alat) =>
+            ($alat['nama_alat_tes'] ?? null) === 'EPPS'
+                ? array_merge($alat, ['skor_ringkas' => $skorRingkasBaru])
+                : $alat
+        )->all();
     }
 
-    protected function buildPapScores(array $hasilAlatPeserta): array
+    /**
+     * Ringkasan evaluasi per alat tes, disusun dari skor yang benar-benar dimiliki peserta
+     * (bukan teks baku). Kesimpulan akhir tetap ditulis HR/psikolog.
+     */
+    protected function susunRingkasan(array $hasilAlatPeserta): array
     {
-        $scores = [];
+        $kalimat = [];
+        $daftar = fn (array $x) => count($x) > 1
+            ? implode(', ', array_slice($x, 0, -1)) . ' dan ' . end($x)
+            : ($x[0] ?? '');
+
         foreach ($hasilAlatPeserta as $alat) {
-            if (!str_contains(strtoupper($alat['nama_alat_tes'] ?? ''), 'PAPIKOSTIK')) continue;
-            foreach ($alat['skor_ringkas'] ?? [] as $row) {
-                $kode = trim(explode(' - ', $row['dimensi'] ?? '')[0] ?? '');
-                if ($kode) $scores[$kode] = $row;
+            $nama = $alat['nama_alat_tes'] ?? '';
+            $skor = collect($alat['skor_ringkas'] ?? [])
+                ->keyBy(fn ($s) => trim(explode(' - ', $s['dimensi'] ?? '')[0]));
+            if ($skor->isEmpty()) {
+                continue;
+            }
+
+            if (str_contains(strtoupper($nama), 'EPPS')) {
+                // Kontrol EPPS.xls: total skor 15 kebutuhan harus 210
+                $total = (int) $skor->except('con')->sum(fn ($s) => (float) $s['skor_mentah']);
+                if ($total !== 210) {
+                    $kalimat[] = "EPPS: hanya {$total} dari 210 soal terskor — hasil belum dapat ditafsirkan, periksa kelengkapan pengerjaan.";
+                    continue;
+                }
+                $label = fn ($kode) => FormatHasilEppsService::NAMA_KEBUTUHAN[$kode][0] ?? $kode;
+                $tinggi = $skor->filter(fn ($s, $k) => $k !== 'con' && in_array($s['kategori'], ['Tinggi', 'Sangat Tinggi']))
+                    ->sortByDesc('skor_skala')->keys()->map($label)->all();
+                $rendah = $skor->filter(fn ($s, $k) => $k !== 'con' && in_array($s['kategori'], ['Rendah', 'Sangat Rendah']))
+                    ->sortBy('skor_skala')->keys()->map($label)->all();
+
+                $teks = 'EPPS: ' . ($tinggi ? 'kebutuhan menonjol pada ' . $daftar($tinggi) . '. ' : 'tidak ada kebutuhan yang menonjol. ')
+                    . ($rendah ? 'Kebutuhan rendah pada ' . $daftar($rendah) . '. ' : '')
+                    . (count($tinggi) + count($rendah) < 15 ? 'Kebutuhan lainnya berada pada taraf sedang.' : '');
+                if ($con = $skor->get('con')) {
+                    $teks .= ' Konsistensi jawaban ' . (int) $con['skor_mentah'] . ' dari 15 (' . ($con['kategori'] ?? '-') . ')'
+                        . (in_array($con['kategori'], ['Rendah', 'Sangat Rendah']) ? ' — hasil EPPS perlu ditafsirkan dengan hati-hati.' : '.');
+                }
+                $kalimat[] = $teks;
+            } elseif (str_contains(strtoupper($nama), 'IST')) {
+                $aspek = ['SE' => 'penalaran praktis (SE)', 'WA' => 'pemahaman kata (WA)', 'AN' => 'fleksibilitas berpikir (AN)',
+                    'GE' => 'abstraksi verbal (GE)', 'RA' => 'berhitung praktis (RA)', 'ZR' => 'berpikir induktif-numerik (ZR)',
+                    'FA' => 'visualisasi bentuk (FA)', 'WU' => 'kemampuan ruang (WU)', 'ME' => 'daya ingat (ME)'];
+                $kat = fn ($kode) => kategori_subtes_ist((float) ($skor->get($kode)['skor_skala'] ?? 0));
+                $kuat = collect($aspek)->filter(fn ($n, $k) => in_array($kat($k), ['T', 'ST']))->values()->all();
+                $lemah = collect($aspek)->filter(fn ($n, $k) => in_array($kat($k), ['SR', 'R']))->values()->all();
+                $iq = (float) ($skor->get('IQ')['skor_skala'] ?? 0);
+
+                $kalimat[] = 'IST: IQ ' . number_format($iq, 0) . ' (' . klasifikasi_iq($iq) . ').'
+                    . ($kuat ? ' Aspek kuat: ' . $daftar($kuat) . '.' : '')
+                    . ($lemah ? ' Aspek yang perlu dikembangkan: ' . $daftar($lemah) . '.' : '');
+            } elseif (($alat['format_dasar'] ?? '') === 'Grid') {
+                $angka = fn ($kode) => str_replace('.', ',', rtrim(rtrim(number_format((float) ($skor[$kode]['skor_skala'] ?? 0), 2, '.', ''), '0'), '.'));
+                $kat = fn ($kode) => strtolower($skor[$kode]['kategori'] ?? '-');
+                $kosong = collect($alat['grid_chart'] ?? [])->where('benar', 0)->count();
+                $kalimat[] = 'Kraepelin: kecepatan kerja ' . $kat('KECEPATAN') . ' (rata-rata ' . $angka('KECEPATAN') . ' benar per kolom), '
+                    . 'ketelitian ' . $kat('KETELITIAN') . ' (' . $angka('KETELITIAN') . ' salah/terlampaui), '
+                    . 'keajegan ' . $kat('KEAJEGAN') . ' (simpangan ' . $angka('KEAJEGAN') . '), '
+                    . 'ketahanan ' . $kat('KETAHANAN') . ' (tren ' . (($alat['grid_hanker']['delta'] ?? 0) < 0 ? 'menurun' : 'meningkat') . ' ' . $angka('KETAHANAN') . ').'
+                    . ($kosong ? " Terdapat {$kosong} kolom tanpa jawaban benar — perhatikan saat menafsirkan." : '');
+            } elseif (str_contains(strtoupper($nama), 'PAPIKOSTIK')) {
+                $kelompok = ['ARAH_KERJA', 'KEPEMIMPINAN', 'AKTIVITAS', 'PERGAULAN', 'GAYA_KERJA', 'SIFAT', 'KETAATAN'];
+                $top = $skor->except($kelompok)->sortByDesc(fn ($s) => (float) $s['skor_mentah'])->take(3)
+                    ->map(fn ($s) => trim(explode(' - ', $s['dimensi'])[1] ?? $s['dimensi']) . ' (' . (int) $s['skor_mentah'] . ')')
+                    ->values()->all();
+                // Kontrol Papi Kostick.xls: total 20 faktor harus 90 (45 atas + 45 bawah)
+                $total = (int) $skor->except($kelompok)->sum(fn ($s) => (float) $s['skor_mentah']);
+                $kalimat[] = $total === 90
+                    ? 'PAPI Kostick: kecenderungan paling kuat pada ' . $daftar($top) . '.'
+                    : "PAPI Kostick: hanya {$total} dari 90 soal terskor — hasil belum dapat ditafsirkan, periksa kelengkapan pengerjaan.";
+            } elseif ($iq = $skor->get('IQ')) {
+                $nilai = (float) ($iq['skor_skala'] ?? 0);
+                $kalimat[] = $nama . ': IQ ' . number_format($nilai, 0) . ' (' . klasifikasi_iq($nilai) . ').';
             }
         }
-        return $scores;
+
+        return $kalimat;
     }
 
     protected function hitungPsikogram(array $hasilAlatPeserta): array
@@ -406,14 +455,12 @@ class HasilTesController extends Controller
     {
         $alatAktif = \App\Models\AlatTes::where('is_aktif', true)
             ->whereNull('deleted_at')
+            ->with(['dimensiAlatTes' => fn($q) => $q->with(['bidangLaporan.bidangLaporan', 'levelDimensi'])->orderBy('urutan')])
             ->get(['id', 'nama']);
 
         $map = [];
         foreach ($alatAktif as $alat) {
-            $dimensinya = DimensiAlatTes::where('alat_tes_id', $alat->id)
-                ->with(['bidangLaporan.bidangLaporan', 'levelDimensi'])
-                ->orderBy('urutan')
-                ->get();
+            $dimensinya = $alat->dimensiAlatTes;
 
             if ($dimensinya->isEmpty()) {
                 continue;

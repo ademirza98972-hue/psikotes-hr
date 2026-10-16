@@ -1,486 +1,409 @@
 @extends('layouts.admin', ['judulHalaman' => 'Akun Karyawan'])
 
 @section('content')
-<div x-data="{
-    modalHapus: false, idHapus: null, namaHapus: '',
-    modalTambah: false,
-    modalUbah: false,
-    ubah: { id: '', id_karyawan: '', nik: '', nama: '', jenis_kelamin: '', tanggal_lahir: '', pendidikan_terakhir: '', departemen_id: '', posisi_id: '', email: '', no_hp: '' },
-    openUbah(data) {
-        this.ubah = data;
-        this.modalUbah = true;
-    },
-    posisiList: [],
-    posisiUbahList: [],
-    async loadPosisi(deptId, target) {
-        if (!deptId) { this[target] = []; return; }
-        const res = await fetch(`/api/posisi/daftar/${deptId}`);
-        this[target] = await res.json();
-    }
-}"
-x-init="
-    @if(old('_form') === 'tambah') $nextTick(() => { modalTambah = true; }); @endif
-    @if(old('_form') === 'ubah') $nextTick(() => { openUbah({
-        id: '{{ (int)old('id',0) }}',
-        id_karyawan: @js(old('id_karyawan','')),
-        nik: @js(old('nik_karyawan','')),
-        nama: @js(old('nama_karyawan','')),
-        jenis_kelamin: @js(old('jenis_kelamin','')),
-        tanggal_lahir: @js(old('tanggal_lahir','')),
-        pendidikan_terakhir: @js(old('pendidikan_terakhir','')),
-        departemen_id: @js(old('departemen_id','')),
-        posisi_id: @js(old('posisi_id','')),
-        email: @js(old('email','')),
-        no_hp: @js(old('no_hp','')),
-    }); }); @endif
-">
+@php
+    $saya = auth()->user();
+    $bisaTambah = $saya->hasIzin('pengguna.tambah');
+    $bisaEdit = $saya->hasIzin('pengguna.edit');
+    $bisaHapus = $saya->hasIzin('pengguna.hapus');
+    $adaFilter = $kataKunci || $filterDepartemen || $filterPosisi || $filterStatus;
+    $pilihanStatus = ['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif', 'wajib_ganti' => 'Belum ganti password'];
+    $angka = fn ($n) => number_format((int) $n, 0, ',', '.');
 
-    {{-- STICKY HEADER --}}
-    <div class="sticky top-0 z-30 bg-[#f7f9fb] -mx-6 px-6 pt-6 pb-4 border-b border-[#e0e3e5]">
-        <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-                <h1 class="text-xl font-bold text-[#191c1e]">Daftar Akun Karyawan</h1>
-                <p class="mt-1 text-sm text-[#40484b]">Kelola data dan akun seluruh karyawan perusahaan.</p>
-            </div>
-            @if(auth()->user()->hasIzin('pengguna.tambah'))
-                <button type="button" @click="modalTambah = true"
-                   class="inline-flex items-center gap-2 rounded-lg bg-[#2C5F6F] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#234853] transition-colors active:scale-[0.98]">
-                    <span class="material-symbols-outlined text-[18px]">person_add</span>
-                    Tambah Karyawan
-                </button>
-            @endif
+    // Isian form saat validasi gagal → modal dibuka lagi dengan data terakhir
+    $formLama = old('_form') ? [
+        'mode' => old('_form'),
+        'data' => [
+            'id' => (string) old('id', ''), 'id_karyawan' => old('id_karyawan', ''), 'nik' => old('nik_karyawan', ''),
+            'nama' => old('nama_karyawan', ''), 'jenis_kelamin' => old('jenis_kelamin', ''), 'tanggal_lahir' => old('tanggal_lahir', ''),
+            'pendidikan_terakhir' => old('pendidikan_terakhir', ''), 'departemen_id' => (string) old('departemen_id', ''),
+            'posisi_id' => (string) old('posisi_id', ''), 'email' => old('email', ''), 'no_hp' => old('no_hp', ''),
+        ],
+    ] : null;
+@endphp
+
+<div class="mx-auto max-w-7xl space-y-6"
+     x-data="akunKaryawan({
+         posisiUrl: @js(route('api.posisi.daftar', ['departemen' => '__D__'])),
+         urlSimpan: @js(route('admin.akun-karyawan.simpan')),
+         urlDasar: @js(url('admin/akun-karyawan')),
+         formLama: @js($formLama),
+         importGagal: @js($errors->has('file_excel')),
+     })">
+
+    {{-- HEADER --}}
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div class="space-y-1">
+            <h1 class="text-2xl font-semibold tracking-tight">Akun Karyawan</h1>
+            <p class="text-sm text-muted-foreground">Kelola data dan akses login seluruh karyawan perusahaan.</p>
         </div>
+        @if ($bisaTambah)
+            <div class="flex flex-wrap gap-2">
+                <x-ui.button variant="outline" @click="modalImport = true">
+                    <span class="material-symbols-outlined">upload_file</span>Import Excel
+                </x-ui.button>
+                <x-ui.button @click="bukaTambah()">
+                    <span class="material-symbols-outlined">person_add</span>Tambah Karyawan
+                </x-ui.button>
+            </div>
+        @endif
+    </div>
 
-        <form method="GET" action="{{ route('admin.akun-karyawan.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div class="flex flex-1 flex-wrap items-end gap-2">
-                <div class="relative flex-1 min-w-[200px]">
-                    <span class="absolute inset-y-0 left-3 flex items-center text-[#71787c]">
-                        <span class="material-symbols-outlined text-[18px]">search</span>
+    {{-- RINGKASAN: tiap sel sekaligus pintasan filter status (sama dengan Akun Kandidat) --}}
+    <x-ui.card class="overflow-hidden">
+        <div class="grid grid-cols-2 gap-px bg-border lg:grid-cols-4">
+            @foreach ([
+                ['Total karyawan', $ringkasan->total, 'badge', 'text-brand-indigo bg-brand-indigo/10', null],
+                ['Aktif', $ringkasan->aktif, 'check_circle', 'text-brand-green-deep bg-brand-green/10', 'aktif'],
+                ['Nonaktif', $ringkasan->nonaktif, 'person_off', 'text-zinc-600 bg-zinc-100', 'nonaktif'],
+                ['Belum ganti password', $ringkasan->wajib_ganti, 'key', 'text-brand-blue bg-brand-blue/10', 'wajib_ganti'],
+            ] as [$judul, $nilai, $ikon, $warna, $status])
+                @php $terpilih = $filterStatus === $status; @endphp
+                <a href="{{ route('admin.akun-karyawan.index', array_filter(['status' => $status, 'departemen' => $filterDepartemen, 'posisi' => $filterPosisi, 'cari' => $kataKunci])) }}"
+                   @if ($terpilih) aria-current="true" @endif
+                   class="relative flex items-center gap-3 bg-card px-4 py-4 transition-colors hover:bg-muted/40 sm:px-5">
+                    @if ($terpilih)<span class="absolute inset-x-0 bottom-0 h-0.5 bg-brand-green" aria-hidden="true"></span>@endif
+                    <span class="hidden size-9 shrink-0 items-center justify-center rounded-lg sm:flex {{ $warna }}">
+                        <span class="material-symbols-outlined text-[20px]">{{ $ikon }}</span>
                     </span>
-                    <input type="text" name="cari" value="{{ $kataKunci }}"
-                        placeholder="Cari nama atau NIK..."
-                        class="w-full rounded-lg border border-[#c0c8cb] py-2 pl-9 pr-4 text-sm text-[#191c1e] placeholder-[#71787c] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all">
-                </div>
-                <div class="relative min-w-[180px]">
-                    <select name="departemen" onchange="this.form.submit()"
-                        class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
-                        <option value="">Semua Departemen</option>
-                        @foreach ($semuaDepartemen as $item)
-                            <option value="{{ $item->id }}" @if($filterDepartemen == $item->id) selected @endif>{{ $item->nama_departemen }}</option>
-                        @endforeach
-                    </select>
-                    <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#71787c]">
-                        <span class="material-symbols-outlined text-[18px]">expand_more</span>
-                    </span>
-                </div>
-                <div class="relative min-w-[180px]">
-                    <select name="posisi" onchange="this.form.submit()"
-                        class="appearance-none w-full rounded-lg border border-[#c0c8cb] py-2 pl-4 pr-10 text-sm text-[#191c1e] outline-none focus:border-[#2C5F6F] focus:ring-1 focus:ring-[#2C5F6F]/30 transition-all cursor-pointer bg-white">
-                        <option value="">Semua Posisi</option>
-                        @foreach ($semuaPosisi as $item)
-                            <option value="{{ $item->id }}" @if($filterPosisi == $item->id) selected @endif>{{ $item->nama_posisi }}</option>
-                        @endforeach
-                    </select>
-                    <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#71787c]">
-                        <span class="material-symbols-outlined text-[18px]">expand_more</span>
-                    </span>
-                </div>
-                @if($kataKunci || $filterDepartemen || $filterPosisi)
-                    <a href="{{ route('admin.akun-karyawan.index') }}"
-                       class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors whitespace-nowrap">
-                        Reset Filter
-                    </a>
+                    <div class="min-w-0">
+                        <p class="truncate text-xs font-medium text-muted-foreground">{{ $judul }}</p>
+                        <p class="text-xl font-semibold tabular-nums">{{ $angka($nilai) }}</p>
+                    </div>
+                </a>
+            @endforeach
+        </div>
+    </x-ui.card>
+
+    {{-- DAFTAR --}}
+    <x-ui.card>
+        <form method="GET" action="{{ route('admin.akun-karyawan.index') }}"
+              class="grid gap-2 border-b border-border p-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_12rem_12rem_12rem_auto]">
+            <div class="relative sm:col-span-2 lg:col-span-1">
+                <span class="material-symbols-outlined pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[18px] text-muted-foreground">search</span>
+                <x-ui.input type="search" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama atau NIK" aria-label="Cari nama atau NIK" class="pl-9" />
+            </div>
+            <x-ui.select name="status" aria-label="Filter status" onchange="this.form.submit()">
+                <option value="">Semua status</option>
+                @foreach ($pilihanStatus as $nilai => $label)
+                    <option value="{{ $nilai }}" @selected($filterStatus === $nilai)>{{ $label }}</option>
+                @endforeach
+            </x-ui.select>
+            <x-ui.select name="departemen" aria-label="Filter departemen" onchange="this.form.submit()">
+                <option value="">Semua departemen</option>
+                @foreach ($semuaDepartemen as $item)
+                    <option value="{{ $item->id }}" @selected($filterDepartemen == $item->id)>{{ $item->nama_departemen }}</option>
+                @endforeach
+            </x-ui.select>
+            <x-ui.select name="posisi" aria-label="Filter posisi" onchange="this.form.submit()">
+                <option value="">Semua posisi</option>
+                @foreach ($semuaPosisi as $item)
+                    <option value="{{ $item->id }}" @selected($filterPosisi == $item->id)>{{ $item->nama_posisi }}</option>
+                @endforeach
+            </x-ui.select>
+            <div class="flex gap-2">
+                <x-ui.button type="submit" variant="secondary" class="flex-1 lg:flex-none">Cari</x-ui.button>
+                @if ($adaFilter)
+                    <x-ui.button variant="ghost" :href="route('admin.akun-karyawan.index')" class="flex-1 lg:flex-none">
+                        <span class="material-symbols-outlined">close</span>Reset
+                    </x-ui.button>
                 @endif
             </div>
         </form>
-    </div>{{-- /STICKY HEADER --}}
 
-    <div class="mt-4 rounded-xl border border-[#e0e3e5] bg-white overflow-hidden shadow-sm">
-        <div style="overflow: auto; max-height: calc(100vh - 300px);">
-            <table class="w-full text-left border-collapse">
-                <caption class="sr-only">Daftar Akun Karyawan</caption>
-                <thead style="position: sticky; top: 0; z-index: 5;">
-                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">ID Karyawan</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">NIK</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Nama Karyawan</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Departemen</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider" style="color:#7db8c2;">Posisi</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;">Status Akun</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right" style="color:#7db8c2;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-[#e0e3e5]">
-                    @forelse ($data as $dk)
-                        @php
-                            $u = $dk->user;
-                            $inisial = strtoupper(mb_substr(explode(' ', $u?->name ?? '?')[0], 0, 2));
-                            $warnaStatus = match($u?->status) {
-                                'aktif'    => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                'nonaktif' => 'bg-[#f2f4f6] text-[#40484b] border-[#c0c8cb]',
-                                default    => 'bg-amber-50 text-amber-700 border-amber-200',
-                            };
-                            $labelStatus = match($u?->status) {
-                                'aktif'    => 'Aktif',
-                                'nonaktif' => 'Nonaktif',
-                                default    => '—',
-                            };
-                            $dotColor = match($u?->status) {
-                                'aktif'    => 'bg-emerald-600',
-                                'nonaktif' => 'bg-[#40484b]',
-                                default    => 'bg-amber-500',
-                            };
-                            $avatarBg = match(hexdec(substr(md5($u?->name ?? ''), 0, 6)) % 4) {
-                                0 => 'bg-[#2C5F6F]/10 text-[#2C5F6F]',
-                                1 => 'bg-blue-100 text-blue-700',
-                                2 => 'bg-violet-100 text-violet-700',
-                                default => 'bg-amber-100 text-amber-700',
-                            };
-                        @endphp
-                        <tr class="hover:bg-[#f7f9fb] transition-colors group">
-                            <td class="px-4 py-4 text-sm text-[#71787c] tabular-nums text-center">{{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
-                            <td class="px-4 py-4 text-sm font-mono font-semibold text-[#2C5F6F]">
-                                {{ $u?->id_karyawan ?? '—' }}
-                            </td>
-                            <td class="px-6 py-4 text-sm font-mono text-[#40484b]">
-                                {{ $dk->nik_karyawan }}
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold {{ $avatarBg }}">
-                                        {{ $inisial }}
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-semibold text-[#191c1e]">{{ $u?->name ?? '—' }}</p>
-                                        <p class="text-[11px] text-[#40484b]">{{ $u?->email ?? 'Tanpa email' }}</p>
-                                    </div>
+        {{-- Tanpa pembungkus overflow agar menu aksi tidak terpotong; kolom sekunder disembunyikan di layar sempit --}}
+        <table class="w-full text-sm">
+            <caption class="sr-only">Daftar akun karyawan</caption>
+            <thead>
+                <tr class="border-b border-border">
+                    <x-ui.th class="hidden w-12 pl-5 text-center lg:table-cell">No.</x-ui.th>
+                    <x-ui.th class="pl-4 lg:pl-3">Karyawan</x-ui.th>
+                    <x-ui.th class="hidden md:table-cell">ID Karyawan</x-ui.th>
+                    <x-ui.th class="hidden xl:table-cell">NIK</x-ui.th>
+                    <x-ui.th class="hidden md:table-cell">Departemen &amp; Posisi</x-ui.th>
+                    <x-ui.th class="hidden sm:table-cell">Status</x-ui.th>
+                    <x-ui.th class="pr-4 text-right"><span class="sr-only">Aksi</span></x-ui.th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($data as $dk)
+                    @php
+                        $u = $dk->user;
+                        [$labelStatus, $varianStatus, $titik] = match ($u?->status) {
+                            'aktif' => ['Aktif', 'success', 'bg-emerald-600'],
+                            'nonaktif' => ['Nonaktif', 'secondary', 'bg-zinc-400'],
+                            default => [$u ? ucfirst(str_replace('_', ' ', $u->status)) : 'Tanpa akun', 'warning', 'bg-amber-500'],
+                        };
+                        $badgeStatus = '<span class="size-1.5 rounded-full ' . $titik . '"></span>' . $labelStatus;
+                        $akunSendiri = $u?->id === $saya->id;
+                        $nama = $u?->name ?? $dk->nik_karyawan;
+                    @endphp
+                    <tr class="border-b border-border transition-colors last:border-0 hover:bg-muted/40">
+                        <x-ui.td class="hidden pl-5 text-center tabular-nums text-muted-foreground lg:table-cell">{{ $data->firstItem() + $loop->index }}</x-ui.td>
+                        <x-ui.td class="whitespace-normal! pl-4 lg:pl-3">
+                            <div class="flex items-center gap-3">
+                                <x-ui.avatar :name="$u?->name ?? '?'" size="size-9" />
+                                <div class="min-w-0">
+                                    <p class="font-medium">{{ $u?->name ?? '—' }}</p>
+                                    <p class="break-all text-xs text-muted-foreground">{{ $u?->email ?? 'Tanpa email' }}</p>
+                                    {{-- info kolom tersembunyi di ponsel --}}
+                                    <p class="mt-1 text-xs text-muted-foreground md:hidden">
+                                        <span class="font-mono text-foreground">{{ $u?->id_karyawan ?? '—' }}</span> · {{ $dk->posisi?->nama_posisi ?? '—' }}
+                                    </p>
+                                    <x-ui.badge :variant="$varianStatus" class="mt-1.5 sm:hidden">{!! $badgeStatus !!}</x-ui.badge>
                                 </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-[#40484b]">{{ $dk->departemen?->nama_departemen ?? '—' }}</td>
-                            <td class="px-6 py-4 text-sm text-[#40484b]">{{ $dk->posisi?->nama_posisi ?? '—' }}</td>
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex flex-col items-center gap-1">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $warnaStatus }}">
-                                        <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }} mr-1.5"></span>
-                                        {{ $labelStatus }}
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right">
+                            </div>
+                        </x-ui.td>
+                        <x-ui.td class="hidden font-mono text-xs font-medium md:table-cell">{{ $u?->id_karyawan ?? '—' }}</x-ui.td>
+                        <x-ui.td class="hidden font-mono text-xs text-muted-foreground xl:table-cell">{{ $dk->nik_karyawan }}</x-ui.td>
+                        <x-ui.td class="hidden whitespace-normal! md:table-cell">
+                            <p>{{ $dk->departemen?->nama_departemen ?? '—' }}</p>
+                            <p class="text-xs text-muted-foreground">{{ $dk->posisi?->nama_posisi ?? '—' }}</p>
+                        </x-ui.td>
+                        <x-ui.td class="hidden sm:table-cell">
+                            <x-ui.badge :variant="$varianStatus">{!! $badgeStatus !!}</x-ui.badge>
+                        </x-ui.td>
+                        <x-ui.td class="pl-1 pr-4 text-right sm:pl-3">
+                            @if ($bisaEdit || ($bisaHapus && ! $akunSendiri))
                                 <div class="flex items-center justify-end gap-1">
-                                    @if(auth()->user()->hasIzin('pengguna.edit'))
-                                        <button type="button"
-                                                @click="openUbah({
-                                                    id: '{{ $dk->id }}',
-                                                    id_karyawan: @js($u?->id_karyawan ?? ''),
-                                                    nik: @js($dk->nik_karyawan),
-                                                    nama: @js($u?->name ?? ''),
-                                                    jenis_kelamin: @js($dk->jenis_kelamin ?? ''),
-                                                    tanggal_lahir: @js($dk->tanggal_lahir?->format('Y-m-d') ?? ''),
-                                                    pendidikan_terakhir: @js($dk->pendidikan_terakhir ?? ''),
-                                                    departemen_id: '{{ $dk->departemen_id }}',
-                                                    posisi_id: '{{ $dk->posisi_id }}',
-                                                    email: @js($u?->email ?? ''),
-                                                    no_hp: @js($dk->no_hp ?? ''),
-                                                })"
-                                                class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                title="Edit">
-                                            <span class="material-symbols-outlined text-[20px]">edit_square</span>
-                                        </button>
+                                    @if ($bisaEdit)
+                                        <x-ui.button variant="ghost" size="icon-sm" title="Ubah data"
+                                            @click="bukaUbah({{ Js::from([
+                                                'id' => (string) $dk->id, 'id_karyawan' => $u?->id_karyawan ?? '', 'nik' => $dk->nik_karyawan,
+                                                'nama' => $u?->name ?? '', 'jenis_kelamin' => $dk->jenis_kelamin ?? '',
+                                                'tanggal_lahir' => $dk->tanggal_lahir?->format('Y-m-d') ?? '', 'pendidikan_terakhir' => $dk->pendidikan_terakhir ?? '',
+                                                'departemen_id' => (string) $dk->departemen_id, 'posisi_id' => (string) $dk->posisi_id,
+                                                'email' => $u?->email ?? '', 'no_hp' => $dk->no_hp ?? '',
+                                            ]) }})">
+                                            <span class="material-symbols-outlined">edit</span>
+                                            <span class="sr-only">Ubah {{ $nama }}</span>
+                                        </x-ui.button>
                                     @endif
-                                    @if(auth()->user()->hasIzin('pengguna.edit') && $u?->id !== auth()->id())
-                                        <form method="POST" action="{{ route('admin.akun-karyawan.toggle-status', $dk->id) }}" class="inline">
-                                            @csrf @method('PATCH')
-                                            <button type="submit"
-                                                    class="p-2 rounded-lg text-[#40484b] hover:text-[#2C5F6F] hover:bg-[#2C5F6F]/10 transition-colors"
-                                                    title="{{ $u?->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}">
-                                                <span class="material-symbols-outlined text-[18px]">{{ $u?->status === 'aktif' ? 'block' : 'check_circle' }}</span>
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{{ route('admin.akun-karyawan.reset-password', $dk->id) }}" class="inline">
-                                            @csrf
-                                            <button type="submit"
-                                                    onclick="return confirm('Reset password {{ addslashes($u?->name ?? '') }} ke ID Karyawan ({{ $u?->id_karyawan ?? '' }})?')"
-                                                    class="p-2 rounded-lg text-amber-600 hover:bg-amber-50 transition-colors"
-                                                    title="Reset Password ke ID Karyawan">
-                                                <span class="material-symbols-outlined text-[18px]">lock_reset</span>
-                                            </button>
-                                        </form>
-                                    @endif
-                                    @if(auth()->user()->hasIzin('pengguna.hapus') && $u?->id !== auth()->id())
-                                        <button type="button"
-                                                @click="modalHapus = true; idHapus = {{ $dk->id }}; namaHapus = '{{ addslashes($u?->name ?? $dk->nik_karyawan) }}'"
-                                                class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors"
-                                                title="Hapus">
-                                            <span class="material-symbols-outlined text-[20px]">delete</span>
-                                        </button>
+                                    @if (! $akunSendiri && $u)
+                                        <x-ui.dropdown-menu width="w-56">
+                                            <x-slot:trigger>
+                                                <x-ui.button variant="ghost" size="icon-sm" title="Aksi lainnya">
+                                                    <span class="material-symbols-outlined">more_vert</span>
+                                                    <span class="sr-only">Aksi lainnya untuk {{ $nama }}</span>
+                                                </x-ui.button>
+                                            </x-slot:trigger>
+                                            @if ($bisaEdit)
+                                                <form method="POST" action="{{ route('admin.akun-karyawan.toggle-status', $dk->id) }}">
+                                                    @csrf @method('PATCH')
+                                                    <x-ui.dropdown-item type="submit" :icon="$u->status === 'aktif' ? 'block' : 'check_circle'">
+                                                        {{ $u->status === 'aktif' ? 'Nonaktifkan akun' : 'Aktifkan akun' }}
+                                                    </x-ui.dropdown-item>
+                                                </form>
+                                                <x-ui.dropdown-item icon="lock_reset"
+                                                    @click="tanya({ judul: 'Reset password', pesan: {{ Js::from('Password ' . $nama . ' akan dikembalikan ke ID Karyawan (' . ($u->id_karyawan ?? '-') . ') dan wajib diganti saat login berikutnya.') }}, url: {{ Js::from(route('admin.akun-karyawan.reset-password', $dk->id)) }}, label: 'Reset password' })">
+                                                    Reset password
+                                                </x-ui.dropdown-item>
+                                            @endif
+                                            @if ($bisaHapus)
+                                                <x-ui.separator class="-mx-1 my-1 w-auto!" />
+                                                <x-ui.dropdown-item icon="delete" variant="destructive"
+                                                    @click="tanya({ judul: 'Hapus karyawan', pesan: {{ Js::from('Data dan akun ' . $nama . ' akan dipindahkan ke Data Terhapus.') }}, url: {{ Js::from(route('admin.akun-karyawan.hapus', $dk->id)) }}, method: 'DELETE', label: 'Hapus', bahaya: true })">
+                                                    Hapus
+                                                </x-ui.dropdown-item>
+                                            @endif
+                                        </x-ui.dropdown-menu>
                                     @endif
                                 </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="px-6 py-14 text-center">
-                                @if($kataKunci || $filterDepartemen || $filterPosisi)
-                                    <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">search_off</span>
-                                    <p class="text-[14px] font-medium text-[#40484b] mb-1">Tidak ada hasil yang cocok</p>
-                                    <a href="{{ route('admin.akun-karyawan.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Reset Filter</a>
-                                @else
-                                    <span class="material-symbols-outlined block mb-3" style="font-size:40px; color:#c0c8cb;">group</span>
-                                    <p class="text-[14px] font-medium text-[#40484b] mb-1">Belum Ada Data Karyawan</p>
-                                    @if(auth()->user()->hasIzin('pengguna.tambah'))
-                                        <button type="button" @click="modalTambah = true" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95 mt-3">
-                                            <span class="material-symbols-outlined text-[16px]">add</span>
-                                            Tambah Karyawan
-                                        </button>
+                            @endif
+                        </x-ui.td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7">
+                            @if ($adaFilter)
+                                <x-ui.empty icon="search_off" title="Tidak ada hasil yang cocok" description="Ubah kata kunci atau filter pencarian.">
+                                    <x-ui.button variant="outline" size="sm" :href="route('admin.akun-karyawan.index')">Reset filter</x-ui.button>
+                                </x-ui.empty>
+                            @else
+                                <x-ui.empty icon="group" title="Belum ada data karyawan" description="Tambahkan karyawan satu per satu atau impor dari file Excel.">
+                                    @if ($bisaTambah)
+                                        <x-ui.button size="sm" @click="bukaTambah()"><span class="material-symbols-outlined">person_add</span>Tambah Karyawan</x-ui.button>
                                     @endif
-                                @endif
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                                </x-ui.empty>
+                            @endif
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
 
-        <div class="border-t border-[#e0e3e5] px-6 py-4 flex flex-wrap items-center justify-between gap-3">
-            <p class="text-[12px] text-[#71787c]">
-                Menampilkan
-                <span class="font-semibold text-[#191c1e]">{{ $data->firstItem() ?? 0 }}</span>–<span class="font-semibold text-[#191c1e]">{{ $data->lastItem() ?? 0 }}</span>
-                dari <span class="font-semibold text-[#191c1e]">{{ $data->total() }}</span> data
+        <div class="flex flex-col items-center justify-between gap-3 border-t border-border px-4 py-3 sm:flex-row">
+            <p class="text-xs text-muted-foreground">
+                Menampilkan <span class="font-medium text-foreground tabular-nums">{{ $data->firstItem() ?? 0 }}–{{ $data->lastItem() ?? 0 }}</span>
+                dari <span class="font-medium text-foreground tabular-nums">{{ $angka($data->total()) }}</span> karyawan
             </p>
-            @if($data->hasPages())
-                {{ $data->links() }}
-            @endif
+            {{ $data->onEachSide(1)->links() }}
         </div>
-    </div>
+    </x-ui.card>
 
-    {{-- MODAL TAMBAH --}}
-    <template x-teleport="body">
-        <div x-show="modalTambah" x-cloak
-             style="background:rgba(0,0,0,0.4);backdrop-filter:blur(4px)"
-             class="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto">
-            <div class="my-6 w-full max-w-xl bg-white rounded-xl shadow-2xl overflow-hidden" @click.outside="modalTambah = false">
-                <div class="flex items-center justify-between px-4 py-2.5 border-b border-[#e0e3e5]">
-                    <div>
-                        <h3 class="text-sm font-semibold text-[#191c1e]">Tambah Karyawan</h3>
-                        <p class="text-[11px] text-[#71787c]">ID Karyawan digunakan sebagai password awal.</p>
-                    </div>
-                    <button type="button" @click="modalTambah = false" class="text-[#71787c] hover:text-[#191c1e] p-1">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
+    {{-- MODAL TAMBAH / UBAH (satu form, dua mode) --}}
+    <x-ui.dialog show="modalForm" maxWidth="sm:max-w-2xl">
+        <div class="flex flex-col gap-2 pr-6">
+            <h2 class="text-lg font-semibold leading-none" x-text="mode === 'tambah' ? 'Tambah Karyawan' : 'Ubah Data Karyawan'"></h2>
+            <p class="text-sm text-muted-foreground" x-text="mode === 'tambah' ? 'Akun dibuat otomatis dengan ID Karyawan sebagai password awal.' : 'Perubahan langsung berlaku pada akun login karyawan.'"></p>
+        </div>
+        <form method="POST" :action="mode === 'tambah' ? urlSimpan : urlDasar + '/' + form.id" class="grid gap-5">
+            @csrf
+            <input type="hidden" name="_method" value="PUT" :disabled="mode === 'tambah'">
+            <input type="hidden" name="_form" :value="mode">
+            <input type="hidden" name="id" :value="form.id">
+
+            <fieldset class="grid gap-4 sm:grid-cols-2">
+                <legend class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Identitas</legend>
+                <x-ui.field label="Nama lengkap" for="f-nama" error="nama_karyawan" class="sm:col-span-2">
+                    <x-ui.input id="f-nama" name="nama_karyawan" required maxlength="255" x-model="form.nama" autocomplete="off" />
+                </x-ui.field>
+                <x-ui.field label="ID Karyawan" for="f-id" error="id_karyawan" description="Dipakai untuk login dan password awal.">
+                    <x-ui.input id="f-id" name="id_karyawan" required maxlength="30" x-model="form.id_karyawan" placeholder="Contoh: KRY-001" class="font-mono" />
+                </x-ui.field>
+                <x-ui.field label="NIK" for="f-nik" error="nik_karyawan">
+                    <x-ui.input id="f-nik" name="nik_karyawan" required maxlength="30" x-model="form.nik" inputmode="numeric" class="font-mono" />
+                </x-ui.field>
+                <x-ui.field label="Jenis kelamin" for="f-jk" error="jenis_kelamin">
+                    <x-ui.select id="f-jk" name="jenis_kelamin" required x-model="form.jenis_kelamin">
+                        <option value="">Pilih</option>
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </x-ui.select>
+                </x-ui.field>
+                <x-ui.field label="Tanggal lahir" for="f-tgl" error="tanggal_lahir">
+                    <x-ui.input id="f-tgl" name="tanggal_lahir" type="date" required x-model="form.tanggal_lahir" />
+                </x-ui.field>
+            </fieldset>
+
+            <fieldset class="grid gap-4 sm:grid-cols-2">
+                <legend class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Penempatan</legend>
+                <x-ui.field label="Departemen" for="f-dept" error="departemen_id">
+                    <x-ui.select id="f-dept" name="departemen_id" required x-model="form.departemen_id" @change="muatPosisi(true)">
+                        <option value="">Pilih departemen</option>
+                        @foreach ($semuaDepartemen as $dept)
+                            <option value="{{ $dept->id }}">{{ $dept->nama_departemen }}</option>
+                        @endforeach
+                    </x-ui.select>
+                </x-ui.field>
+                <x-ui.field label="Posisi" for="f-posisi" error="posisi_id">
+                    <x-ui.select id="f-posisi" name="posisi_id" required x-model="form.posisi_id" ::disabled="!form.departemen_id">
+                        <option value="" x-text="form.departemen_id ? 'Pilih posisi' : 'Pilih departemen dulu'"></option>
+                        <template x-for="p in posisiList" :key="p.id">
+                            <option :value="String(p.id)" x-text="p.nama_posisi"></option>
+                        </template>
+                    </x-ui.select>
+                </x-ui.field>
+                <x-ui.field label="Pendidikan terakhir (opsional)" for="f-pend" error="pendidikan_terakhir" class="sm:col-span-2">
+                    <x-ui.input id="f-pend" name="pendidikan_terakhir" maxlength="255" x-model="form.pendidikan_terakhir" placeholder="Contoh: S1 Teknik Informatika" />
+                </x-ui.field>
+            </fieldset>
+
+            <fieldset class="grid gap-4 sm:grid-cols-2">
+                <legend class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Kontak</legend>
+                <x-ui.field label="Email (opsional)" for="f-email" error="email">
+                    <x-ui.input id="f-email" name="email" type="email" maxlength="255" x-model="form.email" placeholder="nama@perusahaan.com" />
+                </x-ui.field>
+                <x-ui.field label="No. HP (opsional)" for="f-hp" error="no_hp">
+                    <x-ui.input id="f-hp" name="no_hp" type="tel" maxlength="30" x-model="form.no_hp" placeholder="08xxxxxxxxxx" />
+                </x-ui.field>
+            </fieldset>
+
+            <x-ui.alert icon="info" x-show="mode === 'tambah'">
+                Karyawan login memakai ID Karyawan sebagai password awal dan wajib menggantinya saat login pertama.
+            </x-ui.alert>
+
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <x-ui.button variant="outline" @click="modalForm = false">Batal</x-ui.button>
+                <x-ui.button type="submit"><span class="material-symbols-outlined">save</span><span x-text="mode === 'tambah' ? 'Simpan karyawan' : 'Simpan perubahan'"></span></x-ui.button>
+            </div>
+        </form>
+    </x-ui.dialog>
+
+    {{-- MODAL IMPORT --}}
+    @if ($bisaTambah)
+        <x-ui.dialog show="modalImport" title="Import Karyawan dari Excel" description="Tambahkan banyak karyawan sekaligus memakai template yang disediakan.">
+            <form method="POST" action="{{ route('admin.akun-karyawan.import') }}" enctype="multipart/form-data" class="grid gap-4">
+                @csrf
+                <ol class="grid gap-3 text-sm">
+                    <li class="flex gap-3">
+                        <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-indigo/10 text-xs font-semibold text-brand-indigo">1</span>
+                        <div class="grid gap-2">
+                            <p>Unduh template, lalu isi satu baris untuk setiap karyawan.</p>
+                            <x-ui.button variant="outline" size="sm" :href="route('admin.akun-karyawan.template')" class="w-fit">
+                                <span class="material-symbols-outlined">download</span>Unduh template (.xlsx)
+                            </x-ui.button>
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-indigo/10 text-xs font-semibold text-brand-indigo">2</span>
+                        <x-ui.field label="Pilih file yang sudah diisi" for="f-excel" error="file_excel" description="Format .xlsx atau .xls, maksimal 5 MB. NIK yang sudah terdaftar akan dilewati." class="flex-1">
+                            <x-ui.input id="f-excel" name="file_excel" type="file" required accept=".xlsx,.xls"
+                                        class="h-auto py-1.5 file:mr-3 file:rounded file:border-0 file:bg-muted file:px-2 file:py-1 file:text-sm file:font-medium" />
+                        </x-ui.field>
+                    </li>
+                </ol>
+                <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <x-ui.button variant="outline" @click="modalImport = false">Batal</x-ui.button>
+                    <x-ui.button type="submit"><span class="material-symbols-outlined">upload</span>Import</x-ui.button>
                 </div>
-                <form method="POST" action="{{ route('admin.akun-karyawan.simpan') }}">
-                    @csrf
-                    <input type="hidden" name="_form" value="tambah">
-                    <div class="px-4 py-3 space-y-2 max-h-[75vh] overflow-y-auto">
-                        @php $inp = 'w-full rounded-md border border-[#c0c8cb] px-2.5 py-1.5 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20'; @endphp
-                        @php $lbl = 'block text-[11px] font-medium text-[#40484b] mb-0.5'; @endphp
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="{{ $lbl }}">Nama Lengkap <span class="text-rose-500">*</span></label>
-                                <input name="nama_karyawan" type="text" required value="{{ old('nama_karyawan') }}" class="{{ $inp }} @error('nama_karyawan') border-rose-400 @enderror">
-                                @error('nama_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">ID Karyawan <span class="text-rose-500">*</span></label>
-                                <input name="id_karyawan" type="text" required value="{{ old('id_karyawan') }}" placeholder="Contoh: KRY-001" class="{{ $inp }} @error('id_karyawan') border-rose-400 @enderror">
-                                @error('id_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                        </div>
-                        <div>
-                            <label class="{{ $lbl }}">NIK Karyawan <span class="text-rose-500">*</span></label>
-                            <input name="nik_karyawan" type="text" required value="{{ old('nik_karyawan') }}" class="{{ $inp }} @error('nik_karyawan') border-rose-400 @enderror">
-                            @error('nik_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="{{ $lbl }}">Jenis Kelamin <span class="text-rose-500">*</span></label>
-                                <select name="jenis_kelamin" required class="{{ $inp }} @error('jenis_kelamin') border-rose-400 @enderror">
-                                    <option value="">Pilih</option>
-                                    <option value="L" @if(old('jenis_kelamin')=='L') selected @endif>Laki-laki</option>
-                                    <option value="P" @if(old('jenis_kelamin')=='P') selected @endif>Perempuan</option>
-                                </select>
-                                @error('jenis_kelamin')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">Tanggal Lahir <span class="text-rose-500">*</span></label>
-                                <input name="tanggal_lahir" type="date" required value="{{ old('tanggal_lahir') }}" class="{{ $inp }} @error('tanggal_lahir') border-rose-400 @enderror">
-                                @error('tanggal_lahir')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                        </div>
-                        <div x-data="{ deptId: '{{ old('departemen_id') }}' }" class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="{{ $lbl }}">Departemen <span class="text-rose-500">*</span></label>
-                                <select name="departemen_id" required x-model="deptId" @change="loadPosisi($event.target.value, 'posisiList')" class="{{ $inp }} @error('departemen_id') border-rose-400 @enderror">
-                                    <option value="">Pilih Departemen</option>
-                                    @foreach ($semuaDepartemen as $dept)
-                                        <option value="{{ $dept->id }}" @if(old('departemen_id')==$dept->id) selected @endif>{{ $dept->nama_departemen }}</option>
-                                    @endforeach
-                                </select>
-                                @error('departemen_id')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">Posisi <span class="text-rose-500">*</span></label>
-                                <select name="posisi_id" required class="{{ $inp }} @error('posisi_id') border-rose-400 @enderror">
-                                    <option value="">Pilih Posisi</option>
-                                    <template x-for="p in posisiList" :key="p.id">
-                                        <option :value="p.id" x-text="p.nama_posisi"></option>
-                                    </template>
-                                </select>
-                                @error('posisi_id')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div>
-                                <label class="{{ $lbl }}">Pendidikan Terakhir</label>
-                                <input name="pendidikan_terakhir" type="text" value="{{ old('pendidikan_terakhir') }}" class="{{ $inp }}">
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">No. HP</label>
-                                <input name="no_hp" type="text" value="{{ old('no_hp') }}" class="{{ $inp }}">
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">Email <span class="text-[#71787c] font-normal">(opsional)</span></label>
-                                <input name="email" type="email" value="{{ old('email') }}" placeholder="—" class="{{ $inp }} @error('email') border-rose-400 @enderror">
-                                @error('email')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-2 rounded-md bg-blue-50 border border-blue-200 px-3 py-2 text-[11px] text-blue-700">
-                            <span class="material-symbols-outlined text-[13px] mt-0.5 shrink-0">info</span>
-                            <span>ID Karyawan digunakan sebagai password awal. Karyawan wajib ganti password saat login pertama.</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-2 px-4 py-2.5 bg-[#f7f9fb] border-t border-[#e0e3e5]">
-                        <button type="button" @click="modalTambah = false"
-                                class="rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
-                        <button type="submit"
-                                class="rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">Simpan</button>
-                    </div>
-                </form>
+            </form>
+        </x-ui.dialog>
+    @endif
+
+    {{-- MODAL KONFIRMASI (reset password, hapus) --}}
+    <x-ui.dialog show="konfirmasi.buka" maxWidth="sm:max-w-md">
+        <div class="flex gap-4">
+            <span class="flex size-10 shrink-0 items-center justify-center rounded-full"
+                  :class="konfirmasi.bahaya ? 'bg-destructive/10 text-destructive' : 'bg-brand-blue/10 text-brand-blue'">
+                <span class="material-symbols-outlined text-[20px]" x-text="konfirmasi.bahaya ? 'delete' : 'lock_reset'"></span>
+            </span>
+            <div class="grid gap-1.5 pr-4">
+                <h2 class="text-lg font-semibold leading-tight" x-text="konfirmasi.judul"></h2>
+                <p class="text-sm text-muted-foreground" x-text="konfirmasi.pesan"></p>
             </div>
         </div>
-    </template>
-
-    {{-- MODAL UBAH --}}
-    <template x-teleport="body">
-        <div x-show="modalUbah" x-cloak
-             style="background:rgba(0,0,0,0.4);backdrop-filter:blur(4px)"
-             class="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto">
-            <div class="my-6 w-full max-w-xl bg-white rounded-xl shadow-2xl overflow-hidden" @click.outside="modalUbah = false">
-                <div class="flex items-center justify-between px-4 py-2.5 border-b border-[#e0e3e5]">
-                    <h3 class="text-sm font-semibold text-[#191c1e]">Edit Data Karyawan</h3>
-                    <button type="button" @click="modalUbah = false" class="text-[#71787c] hover:text-[#191c1e] p-1">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
-                </div>
-                <form method="POST" :action="`{{ url('admin/akun-karyawan') }}/${ubah.id}`">
-                    @csrf @method('PUT')
-                    <input type="hidden" name="_form" value="ubah">
-                    <input type="hidden" name="id" :value="ubah.id">
-                    <div class="px-4 py-3 space-y-2 max-h-[75vh] overflow-y-auto">
-                        @php $inp = 'w-full rounded-md border border-[#c0c8cb] px-2.5 py-1.5 text-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]/20'; @endphp
-                        @php $lbl = 'block text-[11px] font-medium text-[#40484b] mb-0.5'; @endphp
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="{{ $lbl }}">Nama Lengkap <span class="text-rose-500">*</span></label>
-                                <input name="nama_karyawan" type="text" required :value="ubah.nama" class="{{ $inp }}">
-                                @error('nama_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">ID Karyawan <span class="text-rose-500">*</span></label>
-                                <input name="id_karyawan" type="text" required :value="ubah.id_karyawan" class="{{ $inp }}">
-                                @error('id_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                            </div>
-                        </div>
-                        <div>
-                            <label class="{{ $lbl }}">NIK Karyawan <span class="text-rose-500">*</span></label>
-                            <input name="nik_karyawan" type="text" required :value="ubah.nik" class="{{ $inp }}">
-                            @error('nik_karyawan')<p class="text-[10px] text-rose-500">{{ $message }}</p>@enderror
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="{{ $lbl }}">Jenis Kelamin <span class="text-rose-500">*</span></label>
-                                <select name="jenis_kelamin" required class="{{ $inp }}">
-                                    <option value="L" :selected="ubah.jenis_kelamin === 'L'">Laki-laki</option>
-                                    <option value="P" :selected="ubah.jenis_kelamin === 'P'">Perempuan</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">Tanggal Lahir <span class="text-rose-500">*</span></label>
-                                <input name="tanggal_lahir" type="date" required :value="ubah.tanggal_lahir" class="{{ $inp }}">
-                            </div>
-                        </div>
-                        <div x-data="{ deptId: ubah.departemen_id }" x-init="$watch('ubah.departemen_id', v => { deptId = v; loadPosisi(v, 'posisiUbahList'); }); if(ubah.departemen_id) loadPosisi(ubah.departemen_id, 'posisiUbahList');" class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="{{ $lbl }}">Departemen <span class="text-rose-500">*</span></label>
-                                <select name="departemen_id" required x-model="deptId" @change="loadPosisi($event.target.value, 'posisiUbahList')" class="{{ $inp }}">
-                                    <option value="">Pilih Departemen</option>
-                                    @foreach ($semuaDepartemen as $dept)
-                                        <option value="{{ $dept->id }}">{{ $dept->nama_departemen }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">Posisi <span class="text-rose-500">*</span></label>
-                                <select name="posisi_id" required class="{{ $inp }}">
-                                    <option value="">Pilih Posisi</option>
-                                    <template x-for="p in posisiUbahList" :key="p.id">
-                                        <option :value="p.id" :selected="p.id == ubah.posisi_id" x-text="p.nama_posisi"></option>
-                                    </template>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div>
-                                <label class="{{ $lbl }}">Pendidikan Terakhir</label>
-                                <input name="pendidikan_terakhir" type="text" :value="ubah.pendidikan_terakhir" class="{{ $inp }}">
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">No. HP</label>
-                                <input name="no_hp" type="text" :value="ubah.no_hp" class="{{ $inp }}">
-                            </div>
-                            <div>
-                                <label class="{{ $lbl }}">Email <span class="text-[#71787c] font-normal">(opsional)</span></label>
-                                <input name="email" type="email" :value="ubah.email" placeholder="—" class="{{ $inp }}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-2 px-4 py-2.5 bg-[#f7f9fb] border-t border-[#e0e3e5]">
-                        <button type="button" @click="modalUbah = false"
-                                class="rounded-lg border border-[#c0c8cb] px-3 py-1.5 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
-                        <button type="submit"
-                                class="rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#234853] transition-colors">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </template>
-
-    {{-- MODAL HAPUS --}}
-    <template x-teleport="body">
-        <div x-show="modalHapus" x-cloak
-             style="background:rgba(0,0,0,0.3);backdrop-filter:blur(5px)"
-             class="fixed inset-0 z-50 flex items-center justify-center px-4">
-            <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" @click.outside="modalHapus = false">
-                <h3 class="text-base font-semibold text-[#191c1e]">Hapus Data Karyawan</h3>
-                <p class="mt-2 text-sm text-[#40484b]">
-                    Apakah Anda yakin ingin menghapus <span class="font-semibold text-[#191c1e]" x-text="namaHapus"></span>?
-                    Data dan akun karyawan ini akan dihapus.
-                </p>
-                <div class="mt-6 flex justify-end gap-2">
-                    <button type="button" @click="modalHapus = false"
-                            class="rounded-lg border border-[#c0c8cb] px-4 py-2 text-sm font-medium text-[#40484b] hover:bg-[#f2f4f6] transition-colors">Batal</button>
-                    <form :action="`{{ url('admin/akun-karyawan') }}/${idHapus}`" method="POST">
-                        @csrf @method('DELETE')
-                        <button type="submit"
-                                class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 transition-colors">Hapus</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </template>
+        <form method="POST" :action="konfirmasi.url" class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            @csrf
+            <input type="hidden" name="_method" :value="konfirmasi.method">
+            <x-ui.button variant="outline" @click="konfirmasi.buka = false">Batal</x-ui.button>
+            <x-ui.button type="submit" ::class="konfirmasi.bahaya && 'bg-destructive hover:bg-destructive/90'" x-text="konfirmasi.label"></x-ui.button>
+        </form>
+    </x-ui.dialog>
 </div>
 
-<style>[x-cloak] { display: none !important; }</style>
+<script>
+function akunKaryawan(cfg) {
+    const kosong = () => ({ id: '', id_karyawan: '', nik: '', nama: '', jenis_kelamin: '', tanggal_lahir: '', pendidikan_terakhir: '',
+        departemen_id: '', posisi_id: '', email: '', no_hp: '' });
+    return {
+        ...cfg,
+        modalForm: false, modalImport: cfg.importGagal, mode: 'tambah', form: kosong(), posisiList: [],
+        konfirmasi: { buka: false, judul: '', pesan: '', url: '', method: 'POST', label: '', bahaya: false },
+        init() {
+            if (cfg.formLama) this.bukaForm(cfg.formLama.mode, cfg.formLama.data);
+        },
+        bukaTambah() { this.bukaForm('tambah', kosong()); },
+        bukaUbah(data) { this.bukaForm('ubah', data); },
+        bukaForm(mode, data) {
+            this.mode = mode;
+            this.form = { ...kosong(), ...data };
+            this.muatPosisi();
+            this.modalForm = true;
+        },
+        // reset = departemen diganti user → posisi lama tidak berlaku
+        async muatPosisi(reset = false) {
+            const pilihan = reset ? '' : this.form.posisi_id;
+            this.posisiList = [];
+            this.form.posisi_id = ''; // nilai baru dipasang ulang setelah opsi ada, agar x-model memilihnya
+            if (!this.form.departemen_id) return;
+            const res = await fetch(this.posisiUrl.replace('__D__', this.form.departemen_id));
+            this.posisiList = await res.json();
+            await this.$nextTick();
+            this.form.posisi_id = String(pilihan);
+        },
+        tanya(opsi) { this.konfirmasi = { method: 'POST', bahaya: false, ...opsi, buka: true }; },
+    };
+}
+</script>
 @endsection

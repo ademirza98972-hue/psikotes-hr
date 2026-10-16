@@ -35,19 +35,9 @@ class DimensiAlatTes extends Model
         return $this->hasMany(BobotOpsiDimensi::class, 'dimensi_id');
     }
 
-    public function normaKonversi(): HasMany
-    {
-        return $this->hasMany(NormaKonversi::class, 'dimensi_id');
-    }
-
     public function komponenPenyusun(): HasMany
     {
         return $this->hasMany(DimensiTurunanKomponen::class, 'dimensi_turunan_id');
-    }
-
-    public function bagianDariTurunan(): HasMany
-    {
-        return $this->hasMany(DimensiTurunanKomponen::class, 'dimensi_komponen_id');
     }
 
     public function levelDimensi(): HasMany
@@ -55,23 +45,8 @@ class DimensiAlatTes extends Model
         return $this->hasMany(LevelDimensi::class, 'dimensi_id');
     }
 
-    public function interpretasiTeks(): HasMany
-    {
-        return $this->hasMany(InterpretasiTeks::class, 'dimensi_id');
-    }
-
     public function bidangLaporan(): HasMany
     {
         return $this->hasMany(DimensiBidangLaporan::class, 'dimensi_id');
-    }
-
-    public function hasilSkorPeserta(): HasMany
-    {
-        return $this->hasMany(HasilSkorPeserta::class, 'dimensi_id');
-    }
-
-    public function standarKompetensiPosisi(): HasMany
-    {
-        return $this->hasMany(StandarKompetensiPosisi::class, 'dimensi_id');
     }
 }

@@ -9,7 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CekIzin
 {
-    public function handle(Request $request, Closure $next, string $kodeIzin): Response
+    /** `izin:a,b` = cukup punya salah satu izin (sama dengan aturan menu sidebar). */
+    public function handle(Request $request, Closure $next, string ...$kodeIzin): Response
     {
         if (! Auth::check()) {
             $routeLogin = str_starts_with($request->path(), 'admin') ? 'login.admin' : 'login';
@@ -18,8 +19,8 @@ class CekIzin
 
         $pengguna = Auth::user();
 
-        if (! $pengguna->hasIzin($kodeIzin)) {
-            return $this->tolakAkses($request, $kodeIzin);
+        if (! collect($kodeIzin)->contains(fn ($kode) => $pengguna->hasIzin($kode))) {
+            return $this->tolakAkses($request, implode(',', $kodeIzin));
         }
 
         return $next($request);

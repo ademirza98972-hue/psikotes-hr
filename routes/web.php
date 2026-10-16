@@ -6,9 +6,11 @@ use App\Http\Controllers\Admin\DataKandidatController;
 use App\Http\Controllers\Admin\DataKaryawanController;
 use App\Http\Controllers\Admin\DataTerhapusController;
 use App\Http\Controllers\Admin\HasilTesController;
+use App\Http\Controllers\Admin\DepartemenController;
 use App\Http\Controllers\Admin\PeranController;
 use App\Http\Controllers\Admin\PenjadwalanTesController;
 use App\Http\Controllers\Admin\PenggunaAdminController;
+use App\Http\Controllers\Admin\PosisiController;
 use App\Http\Controllers\AutentikasiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengerjaanTesController;
@@ -19,8 +21,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Shared posisi API available to all authenticated users and guests
-Route::get('api/posisi/daftar/{departemen}', [\App\Http\Controllers\Admin\PosisiController::class, 'daftarByDepartemen'])->name('api.posisi.daftar');
+Route::get('api/posisi/daftar/{departemen}', [PosisiController::class, 'daftarByDepartemen'])->name('api.posisi.daftar');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AutentikasiController::class, 'tampilkanLoginPeserta'])->name('login');
@@ -43,14 +44,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/keluar', [AutentikasiController::class, 'logout'])->name('logout');
 
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->middleware('izin:dashboard.lihat')->name('admin.dashboard');
-    Route::get('/admin/aktivitas', [DashboardController::class, 'aktivitas'])->name('admin.aktivitas.index');
+    Route::get('/admin/aktivitas', [DashboardController::class, 'aktivitas'])->middleware('izin:dashboard.lihat')->name('admin.aktivitas.index');
     Route::get('/peserta/dashboard', [DashboardController::class, 'peserta'])->middleware('paksa-ganti-password')->name('peserta.dashboard');
     Route::get('/peserta/panduan', [DashboardController::class, 'panduan'])->name('peserta.panduan');
 
-    // Route untuk instruksi tes (baru)
     Route::get('/peserta/tes/{sesiId}/instruksi', [DashboardController::class, 'instruksi'])->name('peserta.tes.instruksi');
-
-    // Route untuk halaman pengerjaan tes (sekarang mengarah ke PengerjaanTesController)
     Route::get('/peserta/tes/{sesiId}', [PengerjaanTesController::class, 'kerjakan'])->name('peserta.tes.kerjakan');
     Route::post('/peserta/tes/{sesiId}/jawab', [PengerjaanTesController::class, 'jawab'])->name('peserta.tes.jawab');
     Route::post('/peserta/tes/{sesiId}/timeout-sesi', [PengerjaanTesController::class, 'timeoutSesi'])->name('peserta.tes.timeout-sesi');
@@ -67,11 +65,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/peserta/tes/{sesiId}/panduan-kraepelin/mulai', [PengerjaanTesController::class, 'panduanKraepelinMulai'])->name('peserta.tes.panduan-kraepelin-mulai');
     Route::get('/peserta/tes/{sesiId}/panduan-papi', [PengerjaanTesController::class, 'panduanPapi'])->name('peserta.tes.panduan-papi');
     Route::post('/peserta/tes/{sesiId}/panduan-papi/mulai', [PengerjaanTesController::class, 'panduanPapiMulai'])->name('peserta.tes.panduan-papi-mulai');
+    Route::post('/peserta/tes/{sesiId}/log-aktivitas', [PengerjaanTesController::class, 'logAktivitas'])->name('peserta.tes.logAktivitas');
 
     Route::prefix('admin/akun-karyawan')->name('admin.akun-karyawan.')->group(function () {
         Route::get('/', [DataKaryawanController::class, 'index'])->middleware('izin:pengguna.lihat')->name('index');
         Route::post('/', [DataKaryawanController::class, 'simpan'])->middleware('izin:pengguna.tambah')->name('simpan');
-        Route::put('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('data_karyawan')->name('perbarui');
+        Route::put('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('data_karyawan');
         Route::patch('/{data_karyawan}', [DataKaryawanController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('data_karyawan')->name('perbarui');
         Route::delete('/{data_karyawan}', [DataKaryawanController::class, 'hapus'])->middleware('izin:pengguna.hapus')->whereNumber('data_karyawan')->name('hapus');
         Route::patch('/{data_karyawan}/toggle-status', [DataKaryawanController::class, 'toggleStatus'])->middleware('izin:pengguna.edit')->whereNumber('data_karyawan')->name('toggle-status');
@@ -85,15 +84,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/tambah', [PenggunaAdminController::class, 'tambah'])->name('tambah');
         Route::post('/', [PenggunaAdminController::class, 'simpan'])->name('simpan');
         Route::get('/{pengguna_admin}/ubah', [PenggunaAdminController::class, 'ubah'])->whereNumber('pengguna_admin')->name('ubah');
-        Route::put('/{pengguna_admin}', [PenggunaAdminController::class, 'perbarui'])->whereNumber('pengguna_admin')->name('perbarui');
+        Route::put('/{pengguna_admin}', [PenggunaAdminController::class, 'perbarui'])->whereNumber('pengguna_admin');
         Route::patch('/{pengguna_admin}', [PenggunaAdminController::class, 'perbarui'])->whereNumber('pengguna_admin')->name('perbarui');
         Route::delete('/{pengguna_admin}', [PenggunaAdminController::class, 'hapus'])->whereNumber('pengguna_admin')->name('hapus');
         Route::patch('/{pengguna_admin}/toggle-status', [PenggunaAdminController::class, 'toggleStatus'])->whereNumber('pengguna_admin')->name('toggle-status');
     });
 
-    // =========================================
-    // PROFIL (semua user)
-    // =========================================
+    // PROFIL
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil.index');
     Route::put('/profil', [ProfilController::class, 'perbarui'])->name('profil.perbarui');
     Route::put('/profil/password', [ProfilController::class, 'ubahPassword'])->name('profil.ubah-password');
@@ -104,7 +101,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/tambah', [DataKandidatController::class, 'tambah'])->middleware('izin:pengguna.tambah')->name('tambah');
         Route::post('/', [DataKandidatController::class, 'simpan'])->middleware('izin:pengguna.tambah')->name('simpan');
         Route::get('/{kandidat}/ubah', [DataKandidatController::class, 'ubah'])->middleware('izin:pengguna.edit')->whereNumber('kandidat')->name('ubah');
-        Route::put('/{kandidat}', [DataKandidatController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('kandidat')->name('perbarui');
+        Route::put('/{kandidat}', [DataKandidatController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('kandidat');
         Route::patch('/{kandidat}', [DataKandidatController::class, 'perbarui'])->middleware('izin:pengguna.edit')->whereNumber('kandidat')->name('perbarui');
         Route::delete('/{kandidat}', [DataKandidatController::class, 'hapus'])->middleware('izin:pengguna.hapus')->whereNumber('kandidat')->name('hapus');
         Route::post('/{kandidat}/approve', [DataKandidatController::class, 'approve'])->middleware('izin:pengguna.verifikasi')->whereNumber('kandidat')->name('approve');
@@ -112,24 +109,20 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{kandidat}/toggle-status', [DataKandidatController::class, 'toggleStatus'])->middleware('izin:pengguna.edit')->whereNumber('kandidat')->name('toggle-status');
     });
 
-    // =========================================
-    // DEPARTEMEN (standalone)
-    // =========================================
+    // DEPARTEMEN
     Route::prefix('admin/departemen')->name('admin.departemen.')->middleware('izin:departemen.kelola')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\DepartemenController::class, 'index'])->name('index');
-        Route::post('/', [\App\Http\Controllers\Admin\DepartemenController::class, 'store'])->name('store');
-        Route::patch('/{departemen}', [\App\Http\Controllers\Admin\DepartemenController::class, 'update'])->name('update');
-        Route::delete('/{departemen}', [\App\Http\Controllers\Admin\DepartemenController::class, 'destroy'])->name('destroy');
+        Route::get('/', [DepartemenController::class, 'index'])->name('index');
+        Route::post('/', [DepartemenController::class, 'store'])->name('store');
+        Route::patch('/{departemen}', [DepartemenController::class, 'update'])->name('update');
+        Route::delete('/{departemen}', [DepartemenController::class, 'destroy'])->name('destroy');
     });
 
-    // =========================================
-    // POSISI (standalone)
-    // =========================================
+    // POSISI
     Route::prefix('admin/posisi')->name('admin.posisi.')->middleware('izin:posisi.kelola')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\PosisiController::class, 'index'])->name('index');
-        Route::post('/', [\App\Http\Controllers\Admin\PosisiController::class, 'store'])->name('store');
-        Route::patch('/{posisi}', [\App\Http\Controllers\Admin\PosisiController::class, 'update'])->name('update');
-        Route::delete('/{posisi}', [\App\Http\Controllers\Admin\PosisiController::class, 'destroy'])->name('destroy');
+        Route::get('/', [PosisiController::class, 'index'])->name('index');
+        Route::post('/', [PosisiController::class, 'store'])->name('store');
+        Route::patch('/{posisi}', [PosisiController::class, 'update'])->name('update');
+        Route::delete('/{posisi}', [PosisiController::class, 'destroy'])->name('destroy');
     });
 
 
@@ -138,15 +131,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/tambah', [PeranController::class, 'tambah'])->middleware('izin:peran.kelola')->name('tambah');
         Route::post('/', [PeranController::class, 'simpan'])->middleware('izin:peran.kelola')->name('simpan');
         Route::get('/{peran}/ubah', [PeranController::class, 'ubah'])->middleware('izin:peran.kelola')->whereNumber('peran')->name('ubah');
-        Route::put('/{peran}', [PeranController::class, 'perbarui'])->middleware('izin:peran.kelola')->whereNumber('peran')->name('perbarui');
+        Route::put('/{peran}', [PeranController::class, 'perbarui'])->middleware('izin:peran.kelola')->whereNumber('peran');
         Route::patch('/{peran}', [PeranController::class, 'perbarui'])->middleware('izin:peran.kelola')->whereNumber('peran')->name('perbarui');
         Route::delete('/{peran}', [PeranController::class, 'hapus'])->middleware('izin:peran.kelola')->whereNumber('peran')->name('hapus');
     });
 
-    // =========================================
-    // ALAT TES 
-    // =========================================
-    Route::prefix('admin/alat-tes')->name('admin.alat-tes.')->group(function () {
+    // ALAT TES
+    Route::prefix('admin/alat-tes')->name('admin.alat-tes.')->middleware('izin:soal.lihat,kategori_tes.kelola')->group(function () {
         Route::get('/', [AlatTesController::class, 'index'])->name('index');
         Route::get('/tambah', [AlatTesController::class, 'tambah'])->name('tambah');
         Route::post('/', [AlatTesController::class, 'simpan'])->name('simpan');
@@ -169,22 +160,18 @@ Route::middleware('auth')->group(function () {
             ->whereNumber(['id', 'dimensiId'])->name('simpanLevel');
     });
 
-    // =========================================
     // BANK SOAL
-    // =========================================
-    Route::prefix('admin/bank-soal')->name('admin.bank-soal.')->group(function () {
+    Route::prefix('admin/bank-soal')->name('admin.bank-soal.')->middleware('izin:soal.lihat,kategori_tes.kelola')->group(function () {
         Route::get('/', [BankSoalController::class, 'index'])->name('index');
-        Route::get('/tambah/{alatTesId}', [BankSoalController::class, 'tambah'])->whereNumber('alatTesId')->name('tambah');
-        Route::post('/{alatTesId}', [BankSoalController::class, 'simpan'])->whereNumber('alatTesId')->name('simpan');
-        Route::get('/{id}/edit', [BankSoalController::class, 'edit'])->whereNumber('id')->name('edit');
-        Route::put('/{id}', [BankSoalController::class, 'update'])->whereNumber('id')->name('update');
-        Route::delete('/{id}', [BankSoalController::class, 'hapus'])->whereNumber('id')->name('hapus');
+        Route::get('/tambah/{alatTesId}', [BankSoalController::class, 'tambah'])->whereNumber('alatTesId')->middleware('izin:soal.tambah')->name('tambah');
+        Route::post('/{alatTesId}', [BankSoalController::class, 'simpan'])->whereNumber('alatTesId')->middleware('izin:soal.tambah')->name('simpan');
+        Route::get('/{id}/edit', [BankSoalController::class, 'edit'])->whereNumber('id')->middleware('izin:soal.edit')->name('edit');
+        Route::put('/{id}', [BankSoalController::class, 'update'])->whereNumber('id')->middleware('izin:soal.edit')->name('update');
+        Route::delete('/{id}', [BankSoalController::class, 'hapus'])->whereNumber('id')->middleware('izin:soal.hapus')->name('hapus');
     });
 
-    // =========================================
     // PENJADWALAN TES
-    // =========================================
-    Route::prefix('admin/penjadwalan-tes')->name('admin.penjadwalan-tes.')->group(function () {
+    Route::prefix('admin/penjadwalan-tes')->name('admin.penjadwalan-tes.')->middleware('izin:soal.lihat,kategori_tes.kelola')->group(function () {
         Route::get('/', [PenjadwalanTesController::class, 'index'])->name('index');
         Route::get('/tambah', [PenjadwalanTesController::class, 'tambah'])->name('tambah');
         Route::post('/', [PenjadwalanTesController::class, 'simpan'])->name('simpan');
@@ -196,20 +183,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [PenjadwalanTesController::class, 'hapus'])->whereNumber('id')->name('hapus');
     });
 
-    // =========================================
-    // DATA TERHAPUS (TRASH)
-    // =========================================
+    // DATA TERHAPUS
     Route::prefix('admin/data-terhapus')->name('admin.data-terhapus.')->middleware('izin:data_terhapus.kelola')->group(function () {
         Route::get('/', [DataTerhapusController::class, 'index'])->name('index');
         Route::post('/pulihkan/{jenis}/{id}', [DataTerhapusController::class, 'pulihkan'])->whereNumber('id')->name('pulihkan');
         Route::post('/hapus-permanen/{jenis}/{id}', [DataTerhapusController::class, 'hapusPermanen'])->whereNumber('id')->name('hapus-permanen');
     });
 
-    // =========================================
-    // =========================================
     // HASIL TES
-    // =========================================
-    Route::prefix('admin/hasil-tes')->name('admin.hasil-tes.')->group(function () {
+    Route::prefix('admin/hasil-tes')->name('admin.hasil-tes.')->middleware('izin:hasil_tes.lihat')->group(function () {
         Route::get('/', [HasilTesController::class, 'index'])->name('index');
         Route::get('/{sesiId}/{pesertaId}', [HasilTesController::class, 'detail'])->name('detail');
         Route::get('/{sesiId}/{pesertaId}/pdf', [HasilTesController::class, 'exportPdf'])

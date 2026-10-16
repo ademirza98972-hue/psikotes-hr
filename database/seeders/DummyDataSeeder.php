@@ -3,11 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\DataKaryawan;
-use App\Models\Departemen;
 use App\Models\Peran;
 use App\Models\Posisi;
 use App\Models\ProfilKandidat;
-use App\Models\ProfilKaryawan;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -18,20 +16,26 @@ class DummyDataSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            $this->seedDataKaryawan();
-            $this->seedAkunKaryawan();
+            $this->seedKaryawan();
             $this->seedKandidat();
             $this->seedStaffAdmin();
         });
     }
 
     /**
-     * 1. DATA KARYAWAN (master data NIK) - 10 records
-     *  - 5 status 'belum_terpakai', 5 status 'sudah_terpakai'
+     * 1. KARYAWAN - 10 akun (users + data_karyawan), sama seperti alur tambah karyawan oleh HR
+     *  - Login pakai id_karyawan (format tahun+urut), password "password"
      *  - Posisi harus sesuai dengan departemen-nya (FK valid)
      */
-    private function seedDataKaryawan(): void
+    private function seedKaryawan(): void
     {
+        $peranKaryawan = Peran::where('nama_peran', 'Karyawan')->first();
+
+        if (! $peranKaryawan) {
+            $this->command->error('Peran "Karyawan" tidak ditemukan.');
+            return;
+        }
+
         $namaKaryawan = [
             'Budi Santoso',
             'Siti Rahayu',
@@ -49,107 +53,49 @@ class DummyDataSeeder extends Seeder
         $created = 0;
 
         foreach ($namaKaryawan as $index => $nama) {
+            $idKaryawan = date('Y').str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT);
+
+            if (User::where('id_karyawan', $idKaryawan)->exists()) {
+                continue;
+            }
+
             $nomorUrut = str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT);
-            // NIK 16 digit: 3201 + DDMMYY(tahun pakai 1990-1995) + 4 digit urut + 4 digit random
-            $tahunLahir = str_pad((string) (1990 + $index), 2, '0', STR_PAD_LEFT);
+            // NIK 16 digit: 3201 + DDMMYY(tahun pakai 1990-1999) + 4 digit urut
+            $tahunLahir = substr((string) (1990 + $index), -2);
             $bulan = str_pad((string) (1 + ($index % 12)), 2, '0', STR_PAD_LEFT);
             $tanggal = str_pad((string) (1 + ($index % 28)), 2, '0', STR_PAD_LEFT);
-            $acak = str_pad((string) random_int(1000, 9999), 4, '0', STR_PAD_LEFT);
-            $nik = $prefixNik.$tanggal.$bulan.$tahunLahir.$nomorUrut.$acak;
+            $nik = $prefixNik.$tanggal.$bulan.$tahunLahir.$nomorUrut;
 
-            // Pilih departemen random, lalu pilih posisi yang sesuai departemen-nya
-            $departemen = Departemen::inRandomOrder()->first();
-            $posisi = Posisi::where('departemen_id', $departemen->id)
-                ->inRandomOrder()
-                ->first();
+            // Posisi random; departemen ikut departemen posisi tersebut
+            $posisi = Posisi::whereNotNull('departemen_id')->inRandomOrder()->first();
 
-            $status = $index < 5 ? 'belum_terpakai' : 'sudah_terpakai';
+            $user = User::create([
+                'name' => $nama,
+                'email' => 'karyawan'.($index + 1).'@test.com',
+                'id_karyawan' => $idKaryawan,
+                'password' => Hash::make('password'),
+                'tipe_akun' => 'karyawan',
+                'peran_id' => $peranKaryawan->id,
+                'status' => 'aktif',
+            ]);
 
             DataKaryawan::create([
+                'user_id' => $user->id,
                 'nik_karyawan' => $nik,
-                'nama_karyawan' => $nama,
-                'departemen' => $departemen->nama_departemen,
-                'jabatan' => $posisi->nama_posisi,
-                'status' => $status,
-                'departemen_id' => $departemen->id,
+                'jenis_kelamin' => $index % 2 ? 'P' : 'L',
+                'tanggal_lahir' => (1990 + $index)."-{$bulan}-{$tanggal}",
+                'departemen_id' => $posisi->departemen_id,
                 'posisi_id' => $posisi->id,
             ]);
 
             $created++;
         }
 
-        $this->command->info("[1] Data Karyawan: {$created} record dibuat (5 belum_terpakai, 5 sudah_terpakai).");
+        $this->command->info("[1] Karyawan: {$created} user + data_karyawan dibuat.");
     }
 
     /**
-     * 2. AKUN KARYAWAN (users + profil_karyawan) - 5 akun
-     *  - Mengambil 5 data_karyawan berstatus 'sudah_terpakai' yang belum punya akun.
-     *  - Nama & NIK harus MATCH PERSIS dengan data_karyawan (agar lolos validasi sistem).
-     */
-    private function seedAkunKaryawan(): void
-    {
-        $peranKaryawan = Peran::where('nama_peran', 'Karyawan')->first();
-
-        if (! $peranKaryawan) {
-            $this->command->error('Peran "Karyawan" tidak ditemukan.');
-            return;
-        }
-
-        // Ambil data_karyawan sudah_terpakai yang belum punya profil_karyawan
-        $kandidatMaster = DataKaryawan::where('status', 'sudah_terpakai')
-            ->whereDoesntHave('pengguna')
-            ->orderBy('id')
-            ->limit(5)
-            ->get();
-
-        if ($kandidatMaster->count() < 5) {
-            $this->command->warn("Akun Karyawan: hanya menemukan {$kandidatMaster->count()} data_karyawan 'sudah_terpakai' yang tersedia.");
-        }
-
-        $noHpSamples = [
-            '081234567890',
-            '081298765432',
-            '085711223344',
-            '087812345678',
-            '081377889900',
-        ];
-
-        $created = 0;
-        foreach ($kandidatMaster as $index => $master) {
-            $email = 'karyawan'.($index + 1).'@test.com';
-
-            // Skip jika email sudah ada (idempotent-ish)
-            if (User::where('email', $email)->exists()) {
-                continue;
-            }
-
-            $user = User::create([
-                'name' => $master->nama_karyawan,
-                'email' => $email,
-                'password' => Hash::make('password'),
-                'no_hp' => $noHpSamples[$index] ?? '081200000000',
-                'tipe_akun' => 'karyawan',
-                'peran_id' => $peranKaryawan->id,
-                'status' => 'aktif',
-            ]);
-
-            ProfilKaryawan::create([
-                'user_id' => $user->id,
-                'data_karyawan_id' => $master->id,
-                'nama_karyawan' => $master->nama_karyawan,
-                'nik_karyawan' => $master->nik_karyawan,
-                'departemen' => $master->departemen,
-                'jabatan' => $master->jabatan,
-            ]);
-
-            $created++;
-        }
-
-        $this->command->info("[2] Akun Karyawan: {$created} user + profil_karyawan dibuat.");
-    }
-
-    /**
-     * 3. DATA KANDIDAT (users + profil_kandidat) - 8 akun
+     * 2. DATA KANDIDAT (users + profil_kandidat) - 8 akun
      *  - 3 aktif, 3 menunggu_verifikasi, 2 ditolak
      *  - posisi_dilamar = nama posisi (string)
      */
@@ -216,7 +162,6 @@ class DummyDataSeeder extends Seeder
                 'name' => $nama,
                 'email' => $email,
                 'password' => Hash::make('password'),
-                'no_hp' => '0857'.str_pad((string) random_int(10000000, 99999999), 8, '0', STR_PAD_LEFT),
                 'tipe_akun' => 'kandidat',
                 'peran_id' => $peranKandidat->id,
                 'status' => $distribusiStatus[$index],
@@ -232,11 +177,11 @@ class DummyDataSeeder extends Seeder
             $created++;
         }
 
-        $this->command->info("[3] Kandidat: {$created} user + profil_kandidat (3 aktif, 3 menunggu_verifikasi, 2 ditolak).");
+        $this->command->info("[2] Kandidat: {$created} user + profil_kandidat (3 aktif, 3 menunggu_verifikasi, 2 ditolak).");
     }
 
     /**
-     * 4. AKUN STAFF/ADMIN tambahan (tipe_akun = custom)
+     * 3. AKUN STAFF/ADMIN tambahan (tipe_akun = custom)
      *  - 1 Admin HR, 1 HR Viewer, 1 Admin HR lagi
      *  - TIDAK membuat akun Super Admin baru
      */
@@ -278,7 +223,6 @@ class DummyDataSeeder extends Seeder
                 'name' => $row['name'],
                 'email' => $row['email'],
                 'password' => Hash::make('password'),
-                'no_hp' => '0813'.str_pad((string) random_int(10000000, 99999999), 8, '0', STR_PAD_LEFT),
                 'tipe_akun' => 'custom',
                 'peran_id' => $row['peran_id'],
                 'status' => 'aktif',
@@ -287,6 +231,6 @@ class DummyDataSeeder extends Seeder
             $created++;
         }
 
-        $this->command->info("[4] Staff/Admin: {$created} user (2 Admin HR, 1 HR Viewer).");
+        $this->command->info("[3] Staff/Admin: {$created} user (2 Admin HR, 1 HR Viewer).");
     }
 }

@@ -22,32 +22,32 @@ class AlatTesController extends Controller
 {
     public function index(Request $request): View
     {
-        $perPage = $this->getPerPage($request, 10);
+        $perPage = $this->getPerPage($request, 12);
 
-        // Compute stats before paginating
-        $totalSoal = AlatTes::withCount('soal')->get()->sum('soal_count');
-        $totalAlat = AlatTes::count();
-        $alatPopuler = AlatTes::withCount('soal')->orderByDesc('soal_count')->first();
-
-        $alatTes = AlatTes::withCount('soal')
+        $alatTes = AlatTes::withCount(['soal', 'dimensiAlatTes', 'normaKonversi'])
             ->orderBy('nama')
             ->paginate($perPage)
             ->withQueryString();
 
         return view('admin.alat-tes.index', [
             'alatTes'       => $alatTes,
-            'totalSoal'     => $totalSoal,
-            'totalAlat'     => $totalAlat,
-            'alatPopuler'   => $alatPopuler,
+            'ringkasan'     => [
+                'alat'    => AlatTes::count(),
+                'aktif'   => AlatTes::where('is_aktif', true)->count(),
+                'soal'    => \App\Models\Soal::whereHas('alatTes')->count(),
+                'dimensi' => DimensiAlatTes::whereHas('alatTes')->count(),
+                'norma'   => NormaKonversi::whereIn('alat_tes_id', AlatTes::select('id'))->count(),
+            ],
             'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid', 'Mixed'],
+            // ?tambah=1 / ?ubah={id} → modal langsung terbuka (tautan lama /tambah & /{id}/edit diarahkan ke sini)
+            'bukaTambah'    => $request->boolean('tambah'),
+            'bukaUbah'      => $request->filled('ubah') ? AlatTes::find((int) $request->input('ubah')) : null,
         ]);
     }
 
-    public function tambah(): View
+    public function tambah(): RedirectResponse
     {
-        return view('admin.alat-tes.tambah', [
-            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid', 'Mixed'],
-        ]);
+        return redirect()->route('admin.alat-tes.index', ['tambah' => 1]);
     }
 
     public function simpan(SimpanAlatTesRequest $request): RedirectResponse
@@ -57,12 +57,13 @@ class AlatTesController extends Controller
         AlatTes::create([
             'nama' => $data['nama'],
             'kode' => $data['kode'],
+            'deskripsi' => $data['deskripsi'] ?? null,
             'format_dasar' => $data['format_dasar'],
             'pola_skoring' => $data['pola_skoring'],
             'jumlah_soal' => $data['jumlah_soal'] ?? null,
-            'durasi_total_menit' => $data['durasi_total_menit'],
+            'durasi_total_menit' => $data['durasi_total_menit'] ?? null,
             'batas_waktu_per_soal_aktif' => $request->boolean('batas_waktu_per_soal_aktif'),
-            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'],
+            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'] ?? null,
             'is_sensitif' => $request->boolean('is_sensitif'),
             'is_aktif' => true,
         ]);
@@ -72,14 +73,11 @@ class AlatTesController extends Controller
             ->with($this::FLASH_SUCCESS, "Alat tes '{$data['nama']}' berhasil disimpan.");
     }
 
-    public function edit(int $id): View
+    public function edit(int $id): RedirectResponse
     {
-        $alatTes = AlatTes::findOrFail($id);
+        AlatTes::findOrFail($id);
 
-        return view('admin.alat-tes.edit', [
-            'alatTes' => $alatTes,
-            'pilihanFormat' => ['Pilihan Ganda', 'Skala Likert', 'Forced Choice', 'Grid', 'Mixed'],
-        ]);
+        return redirect()->route('admin.alat-tes.index', ['ubah' => $id]);
     }
 
     public function update(PerbaruiAlatTesRequest $request, int $id): RedirectResponse
@@ -90,12 +88,13 @@ class AlatTesController extends Controller
         $alatTes->update([
             'nama' => $data['nama'],
             'kode' => $data['kode'],
+            'deskripsi' => $data['deskripsi'] ?? null,
             'format_dasar' => $data['format_dasar'],
             'pola_skoring' => $data['pola_skoring'],
             'jumlah_soal' => $data['jumlah_soal'] ?? null,
-            'durasi_total_menit' => $data['durasi_total_menit'],
+            'durasi_total_menit' => $data['durasi_total_menit'] ?? null,
             'batas_waktu_per_soal_aktif' => $request->boolean('batas_waktu_per_soal_aktif'),
-            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'],
+            'batas_waktu_per_soal_detik' => $data['batas_waktu_per_soal_detik'] ?? null,
             'is_sensitif' => $request->boolean('is_sensitif'),
         ]);
 
@@ -117,38 +116,38 @@ class AlatTesController extends Controller
             ->with($this::FLASH_SUCCESS, "Alat tes '{$nama}' berhasil dihapus.");
     }
 
-    public function restore(int $id): RedirectResponse
-    {
-        $alatTes = AlatTes::withTrashed()->findOrFail($id);
-        $nama = $alatTes->nama;
-        $alatTes->restore();
-
-        return redirect()
-            ->route('admin.alat-tes.index')
-            ->with($this::FLASH_SUCCESS, "Alat tes '{$nama}' berhasil dipulihkan.");
-    }
-
     public function norma(Request $request, int $id): View
     {
         $alatTes = AlatTes::findOrFail($id);
-        $dimensi = \App\Models\DimensiAlatTes::where('alat_tes_id', $id)
-            ->orderBy('urutan')->get();
+        $dimensi = DimensiAlatTes::where('alat_tes_id', $id)->orderBy('urutan')->get();
         $jumlahNorma = NormaKonversi::where('alat_tes_id', $id)->count();
 
-        $perPage = $this->getPerPage($request, 25, [25, 50, 100, 250]);
-        $filterDimensi = $request->input('dimensi');
+        // Hanya dimensi yang punya norma yang jadi tab; jumlah baris per dimensi untuk label tab
+        $barisPerDimensi = NormaKonversi::where('alat_tes_id', $id)
+            ->selectRaw('dimensi_id, COUNT(*) as n')->groupBy('dimensi_id')->pluck('n', 'dimensi_id');
+        $dimensiNorma = $dimensi->filter(fn ($d) => isset($barisPerDimensi[$d->id]))->values();
+        $dipilih = $dimensiNorma->firstWhere('id', (int) $request->input('dimensi')) ?? $dimensiNorma->first();
 
-        $contohNorma = NormaKonversi::where('alat_tes_id', $id)
-            ->with('dimensi')
-            ->when($filterDimensi, fn($q) => $q->where('dimensi_id', $filterDimensi))
-            ->orderBy('dimensi_id')
-            ->orderBy('kelompok_segmen')
-            ->orderBy('skor_mentah_min')
-            ->paginate($perPage)
-            ->withQueryString();
+        // Matriks seperti buku manual: per tahap, baris = skor mentah, kolom = kelompok, sel = skor hasil.
+        // Hanya tampilan — data & lookup skoring tetap baris per baris di norma_konversi.
+        $matriks = [];
+        if ($dipilih) {
+            $semua = NormaKonversi::where('alat_tes_id', $id)->where('dimensi_id', $dipilih->id)
+                ->orderBy('tahap')->orderBy('skor_mentah_min')->orderBy('skor_mentah_max')
+                ->get(['kelompok_segmen', 'tahap', 'skor_mentah_min', 'skor_mentah_max', 'skor_hasil']);
+
+            foreach ($semua->groupBy('tahap') as $tahap => $baris) {
+                $kolom = $baris->pluck('kelompok_segmen')->unique()->sort(SORT_NATURAL)->values();
+                $sel = [];
+                foreach ($baris as $n) {
+                    $sel[$n->skor_mentah_min . '|' . $n->skor_mentah_max][$n->kelompok_segmen] = $n->skor_hasil;
+                }
+                $matriks[$tahap] = ['kolom' => $kolom, 'sel' => $sel, 'jumlah' => $baris->count()];
+            }
+        }
 
         return view('admin.alat-tes.norma', compact(
-            'alatTes', 'dimensi', 'jumlahNorma', 'contohNorma', 'perPage', 'filterDimensi'
+            'alatTes', 'dimensi', 'jumlahNorma', 'barisPerDimensi', 'dimensiNorma', 'dipilih', 'matriks'
         ));
     }
 
@@ -160,7 +159,6 @@ class AlatTesController extends Controller
         $baris = array_map('str_getcsv', file($file->getRealPath()));
         $header = array_map('trim', array_shift($baris));
 
-        // Validasi header CSV
         $headerWajib = ['dimensi_kode','kelompok_segmen','tahap',
                         'skor_mentah_min','skor_mentah_max','skor_hasil'];
         $headerKurang = array_diff($headerWajib, $header);
@@ -170,7 +168,6 @@ class AlatTesController extends Controller
             ]);
         }
 
-        // Ambil semua dimensi alat tes ini untuk lookup kode → id
         $dimensiMap = \App\Models\DimensiAlatTes::where('alat_tes_id', $id)
             ->pluck('id', 'kode_dimensi');
 

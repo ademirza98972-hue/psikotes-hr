@@ -33,36 +33,45 @@ class PenjadwalanTesController extends Controller
 
         $query->when($cari, fn($q) => $q->where('nama_sesi', 'like', '%' . $cari . '%'));
 
-        match ($filterStatus) {
-            'Draft'    => $query->where('status', 'Draft'),
-            'Aktif'    => $query->where('status', '!=', 'Draft')
-                                ->where('tanggal_mulai', '<=', $today)
-                                ->where('tanggal_selesai', '>=', $today),
-            'Selesai'  => $query->where('status', '!=', 'Draft')
-                                ->where('tanggal_selesai', '<', $today),
-            default    => null,
+        // Sama dengan SesiTes::statusDisplay, tapi dalam bentuk query
+        $saringStatus = fn ($q, ?string $status) => match ($status) {
+            'Draft'         => $q->where('status', 'Draft'),
+            'Belum Dimulai' => $q->where('status', '!=', 'Draft')->where('tanggal_mulai', '>', $today),
+            'Aktif'         => $q->where('status', '!=', 'Draft')
+                                 ->where('tanggal_mulai', '<=', $today)
+                                 ->where('tanggal_selesai', '>=', $today),
+            'Selesai'       => $q->where('status', '!=', 'Draft')->where('tanggal_selesai', '<', $today),
+            default         => $q,
         };
+        $saringStatus($query, $filterStatus);
 
         $penjadwalan = $query->orderByDesc('tanggal_mulai')
             ->paginate($perPage)
             ->withQueryString();
 
+        $ringkasan = collect(['Aktif', 'Belum Dimulai', 'Draft', 'Selesai'])
+            ->mapWithKeys(fn ($st) => [$st => $saringStatus(SesiTes::query(), $st)->count()]);
+
         return view('admin.penjadwalan-tes.index', [
             'penjadwalan'  => $penjadwalan,
             'cari'         => $cari,
             'filterStatus' => $filterStatus,
-        ]);
+            'ringkasan'    => $ringkasan,
+            'bukaTambah'   => $request->boolean('tambah'),
+        ] + $this->pilihanForm());
     }
 
-    public function tambah(): View
+    protected function pilihanForm(): array
     {
-        $daftarAlatTes = AlatTes::where('is_aktif', true)->orderBy('nama')->get();
-        $daftarDepartemen = Departemen::orderBy('nama_departemen')->get();
+        return [
+            'daftarAlatTes'    => AlatTes::where('is_aktif', true)->orderBy('nama')->get(),
+            'daftarDepartemen' => Departemen::orderBy('nama_departemen')->get(),
+        ];
+    }
 
-        return view('admin.penjadwalan-tes.tambah', [
-            'daftarAlatTes' => $daftarAlatTes,
-            'daftarDepartemen' => $daftarDepartemen,
-        ]);
+    public function tambah(): RedirectResponse
+    {
+        return redirect()->route('admin.penjadwalan-tes.index', ['tambah' => 1]);
     }
 
     public function simpan(SimpanSesiTesRequest $request): RedirectResponse
@@ -95,7 +104,7 @@ class PenjadwalanTesController extends Controller
             ->with($this::FLASH_SUCCESS, 'Sesi penjadwalan berhasil dihapus.');
     }
 
-    public function detail(int $id): View
+    public function detail(Request $request, int $id): View
     {
         $sesi = SesiTes::with([
             'departemen',
@@ -106,21 +115,23 @@ class PenjadwalanTesController extends Controller
 
         $sudahPeserta = $sesi->pesertaSesiTesRecords->pluck('user_id');
 
+        // Hanya akun aktif: kandidat menunggu/ditolak dan karyawan nonaktif tidak bisa login mengerjakan tes
         $daftarUser = User::whereIn('tipe_akun', ['karyawan', 'kandidat'])
+            ->where('status', 'aktif')
             ->whereNotIn('id', $sudahPeserta)
             ->orderBy('name')
-            ->get();
+            ->get(['id', 'name', 'email', 'tipe_akun']);
 
-        return view('admin.penjadwalan-tes.detail', compact('sesi', 'daftarUser'));
+        return view('admin.penjadwalan-tes.detail', [
+            'sesi'      => $sesi,
+            'daftarUser' => $daftarUser,
+            'bukaUbah'  => $request->boolean('ubah'),
+        ] + $this->pilihanForm());
     }
 
-    public function edit(int $id): View
+    public function edit(int $id): RedirectResponse
     {
-        $sesi = SesiTes::with(['alatTes', 'departemen'])->findOrFail($id);
-        $daftarAlatTes = AlatTes::where('is_aktif', true)->orderBy('nama')->get();
-        $daftarDepartemen = Departemen::orderBy('nama_departemen')->get();
-
-        return view('admin.penjadwalan-tes.edit', compact('sesi', 'daftarAlatTes', 'daftarDepartemen'));
+        return redirect()->route('admin.penjadwalan-tes.detail', ['id' => $id, 'ubah' => 1]);
     }
 
     public function update(PerbaruiSesiTesRequest $request, int $id): RedirectResponse
@@ -146,16 +157,22 @@ class PenjadwalanTesController extends Controller
     {
         $validated = $request->validated();
 
-        $sesi = SesiTes::findOrFail($id);
+        $sesi = SesiTes::with('alatTes')->findOrFail($id);
+        if (array_diff($validated['alat_tes_ids'], $sesi->alatTes->pluck('id')->all())) {
+            return back()->withErrors(['alat_tes_ids' => 'Alat tes harus dipilih dari alat tes sesi ini.'])->withInput();
+        }
         $ditambahkan = 0;
         $sudahAda = 0;
 
         DB::transaction(function () use ($validated, $sesi, &$ditambahkan, &$sudahAda) {
+            $sudahTerdaftar = PesertaSesiTes::where('sesi_tes_id', $sesi->id)
+                ->whereIn('user_id', $validated['user_ids'])
+                ->pluck('user_id')
+                ->flip()
+                ->all();
+
             foreach ($validated['user_ids'] as $userId) {
-                $existing = PesertaSesiTes::where('sesi_tes_id', $sesi->id)
-                    ->where('user_id', $userId)
-                    ->first();
-                if ($existing) {
+                if (isset($sudahTerdaftar[$userId])) {
                     $sudahAda++;
                     continue;
                 }
@@ -172,7 +189,7 @@ class PenjadwalanTesController extends Controller
                 }
                 $ditambahkan++;
             }
-            $sesi->increment('jumlah_peserta', $ditambahkan);
+            $this->sinkronJumlahPeserta($sesi);
         });
 
         $pesan = "$ditambahkan peserta berhasil ditambahkan.";
@@ -191,11 +208,22 @@ class PenjadwalanTesController extends Controller
             ->where('user_id', $userId)
             ->firstOrFail();
 
+        // Menghapus baris ini ikut menghapus log aktivitas (cascade) dan menghilangkan peserta dari Hasil Tes
+        if ($peserta->status_pengerjaan !== 'Belum Mengerjakan' || $peserta->waktu_mulai) {
+            return back()->with($this::FLASH_ERROR, 'Peserta sudah mulai atau selesai mengerjakan; hasilnya tidak bisa dihapus dari sesi.');
+        }
+
         $peserta->delete();
-        SesiTes::findOrFail($id)->decrement('jumlah_peserta');
+        $this->sinkronJumlahPeserta(SesiTes::findOrFail($id));
 
         return redirect()
             ->route('admin.penjadwalan-tes.detail', $id)
             ->with($this::FLASH_SUCCESS, 'Peserta berhasil dihapus.');
+    }
+
+    // jumlah_peserta dibaca halaman Hasil Tes; hitung ulang dari data, bukan increment, supaya selisih lama ikut pulih
+    protected function sinkronJumlahPeserta(SesiTes $sesi): void
+    {
+        $sesi->update(['jumlah_peserta' => $sesi->pesertaSesiTesRecords()->count()]);
     }
 }

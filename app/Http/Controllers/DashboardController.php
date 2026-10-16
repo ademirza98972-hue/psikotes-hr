@@ -3,56 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\DataKaryawan;
 use App\Models\Peran;
 use App\Models\SesiTes;
 use App\Models\AlatTes;
+use App\Models\LogAktivitasTes;
 use App\Models\PesertaSesiTes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    /**
-     * Data peserta login sebenarnya (auth()->user()) atau fallback ke dummy
-     * RETURN OBJEK agar kompatibel dengan view yang menggunakan $pengguna->property
-     */
     private function getPesertaLoginSaatIni(): object
     {
         /** @var \App\Models\User $userAsli */
-        $userAsli = auth()->user(); // Ambil user asli yang sedang login
+        $userAsli = auth()->user();
 
-        if ($userAsli) {
-            // Gunakan data asli jika tersedia
-            return (object) [
-                'id' => $userAsli->id,
-                'name' => $userAsli->name,
-                'email' => $userAsli->email,
-                'tipe_akun' => $userAsli->tipe_akun ?? 'peserta',
-                'foto_profil' => $userAsli->foto_profil,
-                'status' => $userAsli->status ?? 'aktif',
-            ];
-        }
-
-        // Fallback data dummy jika belum ada auth sungguhan
         return (object) [
-            'id' => 1,
-            'name' => 'Budi Santoso',
-            'email' => 'budi.santoso@company.com',
-            'tipe_akun' => 'peserta',
-            'foto_profil' => null,
-            'status' => 'aktif',
+            'id' => $userAsli->id,
+            'name' => $userAsli->name,
+            'email' => $userAsli->email,
+            'tipe_akun' => $userAsli->tipe_akun ?? 'peserta',
+            'foto_profil' => $userAsli->foto_profil,
+            'status' => $userAsli->status ?? 'aktif',
         ];
     }
 
-    /**
-     * Data dummy sesi tes yang ditugaskan kepada peserta simulasi
-     * Minimal 3 sesi dengan status berbeda (Belum Mengerjakan, Sedang Berjalan, Selesai)
-     * Assignment bersifat per-individu, bukan paket bersama
-     */
-    private function getSesiTesDummy(): array
+    private function getSesiTes(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -109,40 +86,104 @@ class DashboardController extends Controller
         $kandidatAktif = User::where('tipe_akun', 'kandidat')->where('status', 'aktif')->count();
         $kandidatDitolak = User::where('tipe_akun', 'kandidat')->where('status', 'ditolak')->count();
         $totalAdminStaff = User::where('tipe_akun', 'custom')->count();
-        $totalDataKaryawan = DataKaryawan::count();
-        $nikBelumTerpakai = $totalDataKaryawan - $totalKaryawan;
+        // Akun karyawan buatan HR berstatus nonaktif sampai diaktifkan → belum bisa login
+        $karyawanNonaktif = User::where('tipe_akun', 'karyawan')->where('status', 'nonaktif')->count();
+        $karyawanWajibGantiPassword = User::where('tipe_akun', 'karyawan')->where('must_change_password', true)->count();
         $totalPeran = Peran::count();
 
-        // Kandidat menunggu (max 2, oldest first)
         $kandidatMenungguList = User::where('tipe_akun', 'kandidat')
             ->where('status', 'menunggu_verifikasi')
+            ->with('profilKandidat.posisi')
             ->orderBy('created_at', 'asc')
-            ->take(2)
+            ->take(5)
             ->get();
 
-        // Trend 7 hari terakhir
         $batas7Hari = Carbon::now()->subDays(7);
         $karyawanBaru7Hari = User::where('tipe_akun', 'karyawan')->where('created_at', '>=', $batas7Hari)->count();
-        $kandidatBaru7Hari = User::where('tipe_akun', 'kandidat')->where('created_at', '>=', $batas7Hari)->count();
-        $adminStaffBaru7Hari = User::where('tipe_akun', 'custom')->where('created_at', '>=', $batas7Hari)->count();
 
-        // Pendaftaran 7 hari terakhir (semua tipe_akun), dikelompokkan per tanggal
-        $rawPendaftaran = User::select(DB::raw('DATE(created_at) as tanggal'), DB::raw('COUNT(*) as total'))
-            ->where('created_at', '>=', $batas7Hari)
+        $hariIni = Carbon::today();
+
+        // Sesi tes: berjalan (dalam periode) & mendatang
+        $sesiAktif = SesiTes::where('status', 'Aktif')->whereDate('tanggal_selesai', '>=', $hariIni);
+        $jumlahSesiBerjalan = (clone $sesiAktif)->whereDate('tanggal_mulai', '<=', $hariIni)->count();
+        $jumlahSesiMendatang = (clone $sesiAktif)->whereDate('tanggal_mulai', '>', $hariIni)->count();
+        $daftarSesi = (clone $sesiAktif)
+            ->withCount([
+                'pesertaSesiTesRecords as total_peserta',
+                'pesertaSesiTesRecords as total_selesai' => fn ($q) => $q->where('status_pengerjaan', 'Selesai'),
+            ])
+            ->orderBy('tanggal_mulai')
+            ->take(5)
+            ->get();
+
+        // Status pengerjaan peserta di sesi terbit (bukan Draft). Yang belum selesai dibedakan
+        // menurut sesinya: masih berjalan (Aktif & belum lewat tanggal) → sedang/belum mulai,
+        // sudah berakhir (lewat tanggal atau ditutup 'Selesai') → tidak selesai
+        $berjalan = "(sesi_tes.status = 'Aktif' AND sesi_tes.tanggal_selesai >= ?)";
+        $tgl = $hariIni->toDateString();
+        $statusPeserta = PesertaSesiTes::join('sesi_tes', 'sesi_tes.id', '=', 'peserta_sesi_tes.sesi_tes_id')
+            ->whereNull('sesi_tes.deleted_at')
+            ->where('sesi_tes.status', '!=', 'Draft')
+            ->selectRaw("COUNT(*) as total,
+                SUM(status_pengerjaan = 'Selesai') as selesai,
+                SUM(status_pengerjaan <> 'Selesai' AND $berjalan AND waktu_mulai IS NOT NULL) as sedang,
+                SUM(status_pengerjaan <> 'Selesai' AND $berjalan AND waktu_mulai IS NULL) as belum,
+                SUM(status_pengerjaan <> 'Selesai' AND NOT $berjalan) as tidak_selesai", [$tgl, $tgl, $tgl])
+            ->first();
+        $pesertaTotal = (int) $statusPeserta->total;
+        $pesertaSelesai = (int) $statusPeserta->selesai;
+        $pesertaSedang = (int) $statusPeserta->sedang;
+        $pesertaBelum = (int) $statusPeserta->belum;
+        $pesertaTidakSelesai = (int) $statusPeserta->tidak_selesai;
+        $tingkatPenyelesaian = $pesertaTotal > 0 ? round($pesertaSelesai / $pesertaTotal * 100) : 0;
+
+        // Tren harian 90 hari: tes selesai & pendaftaran akun
+        $awalTren = $hariIni->copy()->subDays(89);
+        $sesiTerbit = fn ($q) => $q->where('status', '!=', 'Draft');
+        $rawSelesai = PesertaSesiTes::where('status_pengerjaan', 'Selesai')
+            ->whereHas('sesiTes', $sesiTerbit)
+            ->whereDate('tanggal_pengerjaan', '>=', $awalTren)
+            ->selectRaw('DATE(tanggal_pengerjaan) as tanggal, COUNT(*) as total')
             ->groupBy('tanggal')
-            ->pluck('total', 'tanggal')
-            ->toArray();
+            ->pluck('total', 'tanggal');
+        $rawPendaftaran = User::where('created_at', '>=', $awalTren)
+            ->selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
+            ->groupBy('tanggal')
+            ->pluck('total', 'tanggal');
 
-        $pendaftaran7Hari = [];
-        $labelTanggal = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $hari = Carbon::now()->subDays($i)->startOfDay();
+        $tren = ['label' => [], 'selesai' => [], 'pendaftaran' => []];
+        for ($hari = $awalTren->copy(); $hari->lte($hariIni); $hari->addDay()) {
             $key = $hari->format('Y-m-d');
-            $pendaftaran7Hari[] = (int) ($rawPendaftaran[$key] ?? 0);
-            $labelTanggal[] = $hari->translatedFormat('D, d M');
+            $tren['label'][] = $hari->translatedFormat('j M');
+            $tren['selesai'][] = (int) ($rawSelesai[$key] ?? 0);
+            $tren['pendaftaran'][] = (int) ($rawPendaftaran[$key] ?? 0);
         }
 
-        // Sapaan berdasarkan jam saat ini + tanggal lengkap Indonesia
+        // Hasil tes terbaru
+        $hasilTerbaru = PesertaSesiTes::where('status_pengerjaan', 'Selesai')
+            ->whereHas('sesiTes', $sesiTerbit)->whereHas('user')
+            ->with(['user:id,name,tipe_akun,foto_profil', 'sesiTes:id,nama_sesi', 'alatTes:alat_tes.id,kode'])
+            ->orderByDesc('tanggal_pengerjaan')->orderByDesc('updated_at')
+            ->take(5)
+            ->get();
+
+        // Peringatan integritas: peserta dengan log mencurigakan terbanyak/terbaru
+        $peringatan30Hari = LogAktivitasTes::where('mencurigakan', true)->where('created_at', '>=', now()->subDays(30))->count();
+        $pesertaMencurigakan = PesertaSesiTes::whereHas('sesiTes')->whereHas('user')
+            ->whereHas('logAktivitas', fn ($q) => $q->where('mencurigakan', true))
+            ->withCount(['logAktivitas as jumlah_peringatan' => fn ($q) => $q->where('mencurigakan', true)])
+            ->withMax(['logAktivitas as peringatan_terakhir' => fn ($q) => $q->where('mencurigakan', true)], 'created_at')
+            ->with(['user:id,name,foto_profil', 'sesiTes:id,nama_sesi'])
+            ->orderByDesc('peringatan_terakhir')
+            ->take(5)
+            ->get();
+        $rincianPeringatan = LogAktivitasTes::where('mencurigakan', true)
+            ->whereIn('peserta_sesi_tes_id', $pesertaMencurigakan->pluck('id'))
+            ->selectRaw('peserta_sesi_tes_id, tipe_kejadian, COUNT(*) as total')
+            ->groupBy('peserta_sesi_tes_id', 'tipe_kejadian')
+            ->get()
+            ->groupBy('peserta_sesi_tes_id');
+
         $jamSekarang = (int) Carbon::now()->hour;
         if ($jamSekarang >= 4 && $jamSekarang < 11) {
             $sapaan = 'Selamat pagi';
@@ -154,26 +195,34 @@ class DashboardController extends Controller
             $sapaan = 'Selamat malam';
         }
         $namaPengguna = $request->user()->name ?? 'Admin';
-        Carbon::setLocale('id');
         $tanggalHariIni = Carbon::now()->translatedFormat('l, j F Y');
 
         return view('admin.dashboard', compact(
-            'request',
             'totalKaryawan',
             'totalKandidat',
             'kandidatMenunggu',
             'kandidatAktif',
             'kandidatDitolak',
             'totalAdminStaff',
-            'nikBelumTerpakai',
+            'karyawanNonaktif',
+            'karyawanWajibGantiPassword',
             'totalPeran',
-            'totalDataKaryawan',
             'kandidatMenungguList',
             'karyawanBaru7Hari',
-            'kandidatBaru7Hari',
-            'adminStaffBaru7Hari',
-            'pendaftaran7Hari',
-            'labelTanggal',
+            'jumlahSesiBerjalan',
+            'jumlahSesiMendatang',
+            'daftarSesi',
+            'pesertaTotal',
+            'pesertaSelesai',
+            'pesertaSedang',
+            'pesertaBelum',
+            'pesertaTidakSelesai',
+            'tingkatPenyelesaian',
+            'tren',
+            'hasilTerbaru',
+            'peringatan30Hari',
+            'pesertaMencurigakan',
+            'rincianPeringatan',
             'sapaan',
             'namaPengguna',
             'tanggalHariIni'
@@ -205,11 +254,8 @@ class DashboardController extends Controller
 
     public function peserta(Request $request): View
     {
-        // Gunakan data peserta simulasi sementara
         $pengguna = $this->getPesertaLoginSaatIni();
-
-        // Ambil data sesi tes yang ditugaskan ke peserta ini
-        $sesiTes = $this->getSesiTesDummy();
+        $sesiTes = $this->getSesiTes();
 
         return view('peserta.dashboard', [
             'pengguna' => $pengguna,
@@ -298,10 +344,5 @@ class DashboardController extends Controller
             ->get(['kode', 'nama', 'deskripsi', 'format_dasar', 'durasi_total_menit', 'jumlah_soal']);
 
         return view('peserta.panduan', ['alatTes' => $alatTes]);
-    }
-
-    public function mulaiTes($sesiId)
-    {
-        return view('peserta.tes-placeholder');
     }
 }

@@ -39,6 +39,9 @@ class EppsNormaSeeder extends Seeder
             return;
         }
 
+        // Idempoten: ganti seluruh norma EPPS, jangan menumpuk duplikat saat dijalankan ulang.
+        NormaKonversi::where('alat_tes_id', $alatTes->id)->delete();
+
         $handle = fopen($csvPath, 'r');
         $header = fgetcsv($handle);
 

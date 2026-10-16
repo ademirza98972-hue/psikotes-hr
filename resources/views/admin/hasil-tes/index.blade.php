@@ -90,7 +90,7 @@
     },
     printPdf() {
         if (!this.checkedIds.length) {
-            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih minimal satu peserta untuk cetak PDF.', confirmButtonColor: '#2C5F6F' });
+            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih minimal satu peserta untuk cetak PDF.', confirmButtonColor: '#00843D' });
             return;
         }
         this.checkedIds.forEach(id => {
@@ -118,7 +118,7 @@ class="w-full">
                 </button>
                 <button type="button"
                         x-on:click="printPdf()"
-                        class="flex items-center px-4 py-2 bg-[var(--color-psikotes)] text-white rounded-xl text-sm font-semibold hover:bg-[#1e414c] transition-all shadow-sm">
+                        class="flex items-center px-4 py-2 bg-[var(--color-psikotes)] text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all shadow-sm">
                     <span class="material-symbols-outlined mr-2 text-[18px]">download</span>
                     Cetak PDF Terpilih
                 </button>
@@ -223,17 +223,17 @@ class="w-full">
             <div style="overflow: auto; max-height: calc(100vh - 300px);">
                 <table class="w-full text-left border-collapse">
                     <thead style="position: sticky; top: 0; z-index: 5;">
-                        <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
+                        <tr style="background: var(--muted); border-bottom: 1px solid var(--border);">
                             <th class="py-4 px-6 w-12">
                                 <input type="checkbox"
                                        class="w-4 h-4 rounded border-[var(--color-outline-variant)] text-[var(--color-psikotes)] focus:ring-[var(--color-psikotes)] cursor-pointer"
                                        @change="toggleAll($event.target.checked)">
                             </th>
-                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">PESERTA</th>
-                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">DEPARTEMEN / POSISI</th>
-                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">ALAT TES</th>
-                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">STATUS</th>
-                            <th class="py-4 px-6 text-right text-xs font-semibold tracking-widest uppercase" style="color: #7db8c2;">AKSI</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: var(--muted-foreground);">PESERTA</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: var(--muted-foreground);">DEPARTEMEN / POSISI</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: var(--muted-foreground);">ALAT TES</th>
+                            <th class="py-4 px-4 text-xs font-semibold tracking-widest uppercase" style="color: var(--muted-foreground);">STATUS</th>
+                            <th class="py-4 px-6 text-right text-xs font-semibold tracking-widest uppercase" style="color: var(--muted-foreground);">AKSI</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[var(--color-outline-variant)]/40">
@@ -284,16 +284,24 @@ class="w-full">
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-right">
-                                @if ($row['status_pengerjaan'] === 'Selesai')
-                                    <a href="{{ route('admin.hasil-tes.detail', [$row['sesi_id'], $row['peserta_id']]) }}"
-                                       class="bg-[var(--color-psikotes)] text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:shadow-md transition-all inline-block">
-                                        Lihat Hasil
-                                    </a>
-                                @else
-                                    <button class="bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)]/40 px-4 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed" disabled>
-                                        Lihat Hasil
-                                    </button>
-                                @endif
+                                <div class="flex items-center justify-end gap-2">
+                                    @if(($row['log_mencurigakan_count'] ?? 0) > 0)
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 border border-rose-200" title="Terdapat {{ $row['log_mencurigakan_count'] }} aktivitas mencurigakan">
+                                            <span class="material-symbols-outlined text-[13px]">warning</span>
+                                            {{ $row['log_mencurigakan_count'] }}
+                                        </span>
+                                    @endif
+                                    @if ($row['status_pengerjaan'] === 'Selesai')
+                                        <a href="{{ route('admin.hasil-tes.detail', [$row['sesi_id'], $row['peserta_id']]) }}"
+                                           class="bg-[var(--color-psikotes)] text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:shadow-md transition-all inline-block">
+                                            Lihat Hasil
+                                        </a>
+                                    @else
+                                        <button class="bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)]/40 px-4 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed" disabled>
+                                            Lihat Hasil
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @empty
@@ -326,12 +334,12 @@ class="w-full">
         <div x-show="sesiTerpilih" x-transition
              class="mt-5 flex items-stretch gap-0 rounded-2xl border border-[#e0e3e5] bg-white shadow-sm overflow-hidden">
             <div class="flex flex-1 items-center gap-3 px-5 py-4 border-r border-[#e0e3e5]">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#2C5F6F]/10">
-                    <span class="material-symbols-outlined text-[18px] text-[#2C5F6F]">percent</span>
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                    <span class="material-symbols-outlined text-[18px] text-primary">percent</span>
                 </div>
                 <div class="min-w-0">
                     <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Penyelesaian</p>
-                    <p class="text-2xl font-bold text-[#2C5F6F]" x-text="penyelesaianRate + '%'"></p>
+                    <p class="text-2xl font-bold text-primary" x-text="penyelesaianRate + '%'"></p>
                 </div>
             </div>
             <div class="flex flex-1 items-center gap-3 px-5 py-4 border-r border-[#e0e3e5]">
@@ -353,7 +361,7 @@ class="w-full">
                 <div class="flex-1 min-w-0">
                     <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Progres Kolektif</p>
                     <div class="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-                        <div class="h-full rounded-full bg-[#2C5F6F] transition-all" :style="'width: ' + penyelesaianRate + '%'"></div>
+                        <div class="h-full rounded-full bg-primary transition-all" :style="'width: ' + penyelesaianRate + '%'"></div>
                     </div>
                     <p class="mt-1 text-[11px] text-slate-500"><span x-text="selesaiCount"></span> dari <span x-text="totalPeserta"></span> peserta selesai</p>
                 </div>
@@ -385,7 +393,7 @@ class="w-full">
 
         {{-- Participant Grid --}}
         @php
-            $paletAvatar = ['#2C5F6F','#0891b2','#7c3aed','#db2777','#d97706','#16a34a','#dc2626','#9333ea','#0284c7','#c2410c'];
+            $paletAvatar = ['#00843D','#0891b2','#7c3aed','#db2777','#d97706','#16a34a','#dc2626','#9333ea','#0284c7','#c2410c'];
         @endphp
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
             @foreach ($pesertaByNama as $peserta)
@@ -408,7 +416,7 @@ class="w-full">
                         <div class="flex items-start justify-between gap-2">
                             <h4 class="text-[15px] font-bold text-slate-800 truncate leading-tight">{{ $peserta['nama_peserta'] }}</h4>
                             @if ($isKaryawan)
-                                <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-[#2C5F6F]/10 text-[#2C5F6F]">KARYAWAN</span>
+                                <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-primary/10 text-primary">KARYAWAN</span>
                             @else
                                 <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-700">KANDIDAT</span>
                             @endif
@@ -459,7 +467,7 @@ class="w-full">
                                 </a>
                             @else
                                 <a href="{{ route('admin.penjadwalan-tes.detail', $sesiRow['sesi_id']) }}"
-                                   class="shrink-0 inline-flex items-center gap-1 rounded-lg bg-[#2C5F6F] px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1E414C]">
+                                   class="shrink-0 inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-primary/90">
                                     <span class="material-symbols-outlined text-[13px]">visibility</span>
                                     Monitor
                                 </a>
@@ -534,7 +542,7 @@ class="w-full">
     }
     .select2-container--default.select2-container--open .select2-selection--single,
     .select2-container--default.select2-container--focus .select2-selection--single {
-        border-color: #2C5F6F;
+        border-color: #00843D;
         box-shadow: 0 0 0 2px rgba(44,95,111,0.2);
         outline: none;
     }
@@ -558,12 +566,12 @@ class="w-full">
         color: #40484b;
     }
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #2C5F6F;
+        background-color: #00843D;
         color: white;
     }
     .select2-container--default .select2-results__option[aria-selected=true] {
         background-color: #f2f4f6;
-        color: #2C5F6F;
+        color: #00843D;
         font-weight: 600;
     }
     .select2-selection__clear {

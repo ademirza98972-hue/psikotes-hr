@@ -41,6 +41,7 @@ class SimpanSesiTesRequest extends FormRequest
             'tanggal_mulai' => 'tanggal mulai',
             'tanggal_selesai' => 'tanggal selesai',
             'status' => 'status',
+            'alat_tes_ids' => 'alat tes',
         ];
     }
 }

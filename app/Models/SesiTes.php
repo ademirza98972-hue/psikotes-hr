@@ -63,19 +63,4 @@ class SesiTes extends Model
     {
         return $this->hasMany(JawabanPeserta::class, 'sesi_tes_id');
     }
-
-    public function gridInputPeserta()
-    {
-        return $this->hasMany(GridInputPeserta::class, 'sesi_tes_id');
-    }
-
-    public function hasilKolomGrid()
-    {
-        return $this->hasMany(HasilKolomGrid::class, 'sesi_tes_id');
-    }
-
-    public function hasilSkorPeserta()
-    {
-        return $this->hasMany(HasilSkorPeserta::class, 'sesi_tes_id');
-    }
 }

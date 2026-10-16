@@ -16,11 +16,11 @@
             <div class="flex flex-1 flex-wrap items-end gap-2">
                 {{-- Search --}}
                 <input type="text" name="cari" value="{{ $kataKunci }}" placeholder="Cari nama posisi..."
-                    class="block w-56 rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                    class="block w-56 rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
 
                 {{-- Filter Departemen --}}
                 <select name="departemen"
-                    class="rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                    class="rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                     <option value="">Semua Departemen</option>
                     @foreach ($departemen as $d)
                         <option value="{{ $d->id }}" @if($filterDepartemen == $d->id) selected @endif>{{ $d->nama_departemen }}</option>
@@ -43,7 +43,7 @@
             @auth
                 @if(auth()->user()->hasIzin('posisi.kelola'))
                     <button type="button" @click="openModal()"
-                            class="self-start rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1a4550] transition whitespace-nowrap">
+                            class="self-start rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1a4550] transition whitespace-nowrap">
                         + Tambah Posisi
                     </button>
                 @endif
@@ -56,11 +56,11 @@
         <div style="overflow: auto; max-height: calc(100vh - 300px);">
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
                 <thead style="position: sticky; top: 0; z-index: 5;">
-                    <tr style="background: #0f2230; border-bottom: 1px solid #0a1a25;">
-                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:#7db8c2;width:52px">No.</th>
-                        <th class="px-4 py-3" style="color: #7db8c2;">Posisi</th>
-                        <th class="px-4 py-3" style="color: #7db8c2;">Departemen</th>
-                        <th class="px-4 py-3 text-right" style="color: #7db8c2;">Aksi</th>
+                    <tr style="background: var(--muted); border-bottom: 1px solid var(--border);">
+                        <th class="px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style="color:var(--muted-foreground);width:52px">No.</th>
+                        <th class="px-4 py-3" style="color: var(--muted-foreground);">Posisi</th>
+                        <th class="px-4 py-3" style="color: var(--muted-foreground);">Departemen</th>
+                        <th class="px-4 py-3 text-right" style="color: var(--muted-foreground);">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -107,7 +107,7 @@
                                     <p class="text-[12px] text-[#71787c] mb-4">Tambahkan posisi jabatan untuk melengkapi data organisasi.</p>
                                     @auth
                                         @if(auth()->user()->hasIzin('posisi.kelola'))
-                                            <button type="button" @click="openModal()" class="inline-flex items-center gap-2 rounded-xl bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E414C] transition-all active:scale-95">
+                                            <button type="button" @click="openModal()" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-all active:scale-95">
                                                 <span class="material-symbols-outlined text-[16px]">add</span>
                                                 Tambah Posisi
                                             </button>
@@ -152,7 +152,7 @@
                         <div>
                             <label class="mb-1 block text-sm font-medium text-slate-700">Departemen</label>
                             <select name="departemen_id" x-model="selectedDepartemenId" required
-                                    class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                    class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                                 <option value="">-- Pilih Departemen --</option>
                                 @foreach($departemen as $dp)
                                 <option value="{{ $dp->id }}">{{ $dp->nama_departemen }}</option>
@@ -163,7 +163,7 @@
                         <div>
                             <label class="mb-1 block text-sm font-medium text-slate-700">Nama Posisi</label>
                             <input type="text" name="nama_posisi" x-model="nama" required
-                                   class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-[#2C5F6F] focus:outline-none focus:ring-1 focus:ring-[#2C5F6F]">
+                                   class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                             <template x-if="errors.nama_posisi">
                                 <span class="mt-1 block text-xs text-rose-600" x-text="errors.nama_posisi[0]"></span>
                             </template>
@@ -173,7 +173,7 @@
                     <div class="mt-5 flex gap-2 justify-end">
                         <button type="button" @click="showModal=false"
                                 class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Batal</button>
-                        <button type="submit" class="rounded-lg bg-[#2C5F6F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a4550] transition">Simpan</button>
+                        <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a4550] transition">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -206,7 +206,7 @@ function confirmHapus(id, nama) {
     Swal.fire({
         icon: 'warning', title: 'Hapus Posisi?',
         text: `Posisi "${nama}" akan dihapus.`,
-        showCancelButton: true, confirmButtonColor: '#2C5F6F', cancelButtonColor: '#d33',
+        showCancelButton: true, confirmButtonColor: '#00843D', cancelButtonColor: '#d33',
         confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
     }).then(r => {
         if (!r.isConfirmed) return;

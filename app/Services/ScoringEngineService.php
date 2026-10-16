@@ -179,14 +179,12 @@ class ScoringEngineService
             $skorMentahTotal += $benar;
         }
 
-        // IQ Total: sum of all 9 subtest RW (GE uses equivalent), lookup by age group
+        // IQ Total (patokan Sofware IST.xlsx): jumlah RW 9 subtes (GE pakai nilai konversi)
+        // → tahap 1: tabel JUMLAH per usia (RW → SW) → tahap 2: sheet "Norma IQ" (SW → IQ).
         if (isset($dimensiMap['IQ'])) {
-            $iqTotal = NormaKonversi::where('alat_tes_id', $alatTesId)
-                ->where('dimensi_id', $dimensiMap['IQ'])
-                ->where('kelompok_segmen', $kelompokSegmen)
-                ->where('skor_mentah_min', '<=', $skorMentahTotal)
-                ->where('skor_mentah_max', '>=', $skorMentahTotal)
-                ->value('skor_hasil') ?? 0;
+            $swTotal = $this->normaTerdekat($alatTesId, $dimensiMap['IQ'], $kelompokSegmen, 1, $skorMentahTotal);
+            $iqTotal = $swTotal === null ? 0
+                : ($this->normaTerdekat($alatTesId, $dimensiMap['IQ'], 'default', 2, $swTotal) ?? $swTotal);
 
             HasilSkorPeserta::updateOrCreate(
                 [
@@ -202,6 +200,27 @@ class ScoringEngineService
                 ]
             );
         }
+    }
+
+    /**
+     * Lookup norma; skor di luar rentang tabel memakai baris terdekat (batas bawah/atas tabel),
+     * bukan 0. Contoh: SW total 67 tidak ada di "Norma IQ" (73–140) → pakai IQ untuk SW 73.
+     */
+    private function normaTerdekat(int $alatTesId, int $dimensiId, string $segmen, int $tahap, float $skor): ?float
+    {
+        $q = fn () => NormaKonversi::where('alat_tes_id', $alatTesId)
+            ->where('dimensi_id', $dimensiId)
+            ->where('kelompok_segmen', $segmen)
+            ->where('tahap', $tahap);
+
+        $hasil = $q()->where('skor_mentah_min', '<=', $skor)->where('skor_mentah_max', '>=', $skor)->value('skor_hasil')
+            ?? match (true) {
+                $skor < (float) $q()->min('skor_mentah_min') => $q()->orderBy('skor_mentah_min')->value('skor_hasil'),
+                $skor > (float) $q()->max('skor_mentah_max') => $q()->orderByDesc('skor_mentah_max')->value('skor_hasil'),
+                default => null,
+            };
+
+        return $hasil === null ? null : (float) $hasil;
     }
 
     private function convertGeRawToEquivalent(int $rawGE): int
@@ -239,7 +258,19 @@ class ScoringEngineService
             ->with('opsiDipilih.bobotOpsiDimensi')
             ->get();
 
-        $tally = [];
+        // Semua dimensi yang punya bobot di alat tes ini mulai dari 0, supaya
+        // dimensi yang tidak pernah dipilih tetap tersimpan (skor 0) — bukan hilang.
+        $tally = DB::table('bobot_opsi_dimensi as b')
+            ->join('opsi_jawaban as o', 'o.id', '=', 'b.opsi_jawaban_id')
+            ->join('soal as s', 's.id', '=', 'o.soal_id')
+            ->where('s.alat_tes_id', $alatTesId)
+            ->whereNull('s.deleted_at')
+            ->where('b.bobot', '>', 0)
+            ->distinct()
+            ->pluck('b.dimensi_id')
+            ->mapWithKeys(fn ($id) => [$id => 0])
+            ->all();
+
         foreach ($jawaban as $j) {
             if (!$j->opsiDipilih || $j->opsiDipilih->bobotOpsiDimensi->isEmpty()) {
                 continue;
@@ -247,10 +278,7 @@ class ScoringEngineService
             foreach ($j->opsiDipilih->bobotOpsiDimensi as $bobot) {
                 if ($bobot->bobot > 0) {
                     $dimensiId = $bobot->dimensi_id;
-                    if (!isset($tally[$dimensiId])) {
-                        $tally[$dimensiId] = 0;
-                    }
-                    $tally[$dimensiId] += $bobot->bobot;
+                    $tally[$dimensiId] = ($tally[$dimensiId] ?? 0) + $bobot->bobot;
                 }
             }
         }
@@ -310,7 +338,7 @@ class ScoringEngineService
         $skorMentah = 0;
 
         foreach ($jawaban as $j) {
-            $soalAsli = Soal::where('id', $j->soal->duplikat_dari_soal_id)->first();
+            $soalAsli = Soal::find($j->soal->duplikat_dari_soal_id);
             if (!$soalAsli) {
                 continue;
             }
@@ -325,7 +353,8 @@ class ScoringEngineService
                 continue;
             }
 
-            if ($jawabanAsli->opsiDipilih->urutan === $j->opsiDipilih->urutan) {
+            if ($jawabanAsli->opsiDipilih && $j->opsiDipilih
+                && $jawabanAsli->opsiDipilih->urutan === $j->opsiDipilih->urutan) {
                 $skorMentah++;
             }
         }
@@ -432,32 +461,34 @@ class ScoringEngineService
             ->orderBy('kolom_ke')
             ->get();
 
-        $n = $rows->count();
-        if ($n === 0) {
+        if ($rows->isEmpty()) {
             return collect();
         }
 
-        $sumBenar = 0;
-        $sumSalah = 0;
-        $sumKelewat = 0;
+        // Patokan Kraepelin.xls: x = 1..N kolom, y = jumlah benar per kolom; kolom yang tidak
+        // sempat dikerjakan (tidak ada barisnya) bernilai y = 0, pembagi tetap N (=50).
+        $n = max(Soal::where('alat_tes_id', $alatTesId)->count(), (int) $rows->max('kolom_ke'));
+        $yPerKolom = $rows->pluck('jumlah_benar', 'kolom_ke');
+
+        $sumSalah = $rows->sum('jumlah_salah');
+        $sumKelewat = $rows->sum('jumlah_kelewat');
         $sumX = 0;
         $sumY = 0;
         $sumXY = 0;
         $sumX2 = 0;
 
-        foreach ($rows as $row) {
-            $x = (float) $row->kolom_ke;
-            $y = (float) $row->jumlah_benar;
-            $sumBenar += $row->jumlah_benar;
-            $sumSalah += $row->jumlah_salah;
-            $sumKelewat += $row->jumlah_kelewat;
+        for ($x = 1; $x <= $n; $x++) {
+            $y = (float) ($yPerKolom[$x] ?? 0);
             $sumX += $x;
             $sumY += $y;
             $sumXY += $x * $y;
             $sumX2 += $x * $x;
         }
 
-        $kecepatan = $n > 0 ? round($sumBenar / $n, 2) : 0.00;
+        // Panker (kecepatan) = Σy / N
+        $panker = $sumY / $n;
+        $kecepatan = round($panker, 2);
+        // Tianker (ketelitian) = jumlah salah + jumlah terlampaui
         $ketelitian = (int) ($sumSalah + $sumKelewat);
 
         $denominator = $n * $sumX2 - $sumX * $sumX;
@@ -466,16 +497,15 @@ class ScoringEngineService
         } else {
             $b = ($n * $sumXY - $sumX * $sumY) / $denominator;
         }
+        // Hanker (ketahanan) = y(50) − y(0) = 50·b dari regresi linier y = a + bx
         $ketaahanan = round($b * 50, 2);
 
-        $keajegan = 0.00;
-        if ($n > 0) {
-            $totalDeviasi = 0.00;
-            foreach ($rows as $row) {
-                $totalDeviasi += abs((float) $row->jumlah_benar - $kecepatan);
-            }
-            $keajegan = round($totalDeviasi / $n, 2);
+        // Janker (keajegan) = Σ|y − Panker| / N
+        $totalDeviasi = 0.00;
+        for ($x = 1; $x <= $n; $x++) {
+            $totalDeviasi += abs((float) ($yPerKolom[$x] ?? 0) - $panker);
         }
+        $keajegan = round($totalDeviasi / $n, 2);
 
         $results = collect([
             [
@@ -527,6 +557,73 @@ class ScoringEngineService
             ->value('id');
     }
 
+    /**
+     * Kelompok norma peserta untuk suatu alat tes.
+     * Forced choice (EPPS): 3 = General Adult (Men), 4 = General Adult (Women).
+     * IST: kelompok usia sheet "USIA xx - yy" (Sofware IST.xlsx); usia dihitung pada tanggal tes.
+     */
+    public function kelompokSegmen(\App\Models\User $user, \App\Models\AlatTes $alatTes, ?\DateTimeInterface $tanggalTes = null): string
+    {
+        if (strtolower(str_replace(' ', '_', $alatTes->format_dasar ?? '')) === 'forced_choice') {
+            $jenisKelamin = $user->dataKaryawan?->jenis_kelamin ?? $user->profilKandidat?->jenis_kelamin;
+
+            return $jenisKelamin === 'P' ? '4' : '3';
+        }
+
+        if ($alatTes->kode === 'IST') {
+            $tanggalLahir = $user->dataKaryawan?->tanggal_lahir ?? $user->profilKandidat?->tanggal_lahir;
+            $usia = $tanggalLahir
+                ? (int) \Carbon\Carbon::parse($tanggalLahir)->diffInYears($tanggalTes ?? now())
+                : 25;
+
+            // ponytail: patokan tidak punya norma <21 dan 46–50 → pakai kelompok terdekat yang tersedia
+            return match (true) {
+                $usia <= 25 => 'USIA_21_25',
+                $usia <= 30 => 'USIA_26_30',
+                $usia <= 35 => 'USIA_31_35',
+                $usia <= 40 => 'USIA_36_40',
+                $usia <= 45 => 'USIA_41_45',
+                default     => 'USIA_51_60',
+            };
+        }
+
+        return 'default';
+    }
+
+    /**
+     * Rekap satu kolom Kraepelin dari input per baris. Jawaban "0" sah (mis. 4+6 → 0);
+     * terlampaui = baris kosong yang dilompati sebelum baris terakhir yang diisi.
+     */
+    public function rekapKolomGrid(int $userId, int $sesiTesId, int $alatTesId, int $kolomKe): void
+    {
+        $stat = \App\Models\GridInputPeserta::where('user_id', $userId)
+            ->where('sesi_tes_id', $sesiTesId)
+            ->where('alat_tes_id', $alatTesId)
+            ->where('kolom_ke', $kolomKe)
+            ->selectRaw('
+                SUM(is_benar = 1) as jumlah_benar,
+                SUM(is_benar = 0) as jumlah_salah,
+                MAX(baris_ke) - COUNT(*) as jumlah_kelewat,
+                MIN(waktu_input) as waktu_min
+            ')->first();
+
+        $kolom = HasilKolomGrid::firstOrNew([
+            'user_id'     => $userId,
+            'sesi_tes_id' => $sesiTesId,
+            'alat_tes_id' => $alatTesId,
+            'kolom_ke'    => $kolomKe,
+        ]);
+        $kolom->fill([
+            'jumlah_benar'   => (int) ($stat->jumlah_benar ?? 0),
+            'jumlah_salah'   => (int) ($stat->jumlah_salah ?? 0),
+            'jumlah_kelewat' => (int) ($stat->jumlah_kelewat ?? 0),
+        ]);
+        if (! $kolom->exists) {
+            $kolom->waktu_pakai_detik = (int) max(0, now()->diffInSeconds($stat->waktu_min ?? now()));
+        }
+        $kolom->save();
+    }
+
     public function dispatch(
         int $userId,
         int $sesiTesId,
@@ -540,7 +637,12 @@ class ScoringEngineService
                 ? $this->scoreIST($userId, $sesiTesId, $alatTesId, $kelompokSegmen)
                 : $this->scoreKognitif($userId, $sesiTesId, $alatTesId),
             'ist'                  => $this->scoreIST($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
-            'forced_choice'        => $this->scoreForcedChoice($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
+            // EPPS: skor konsistensi (con) dihitung dari pasangan soal ulangan (duplikat_dari_soal_id)
+            'forced_choice'        => tap(
+                $this->scoreForcedChoice($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
+                fn () => DimensiAlatTes::where('alat_tes_id', $alatTesId)->where('kode_dimensi', 'con')->exists()
+                    && $this->scoreConsistency($userId, $sesiTesId, $alatTesId, $kelompokSegmen)
+            ),
             'forced_choice_rollup' => $this->scoreForcedChoiceRollup($userId, $sesiTesId, $alatTesId, $kelompokSegmen),
             'grid'                 => $this->scoreGrid($userId, $sesiTesId, $alatTesId),
             default                => throw new \InvalidArgumentException(

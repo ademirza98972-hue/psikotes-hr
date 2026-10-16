@@ -77,10 +77,8 @@ class DataTerhapusController extends Controller
 
     public function pulihkan(string $jenis, int $id): RedirectResponse
     {
-        $label = self::META[$jenis]['label'] ?? null;
-        if ($label === null) {
-            abort(404);
-        }
+        abort_unless(array_key_exists($jenis, self::META), 404);
+        $label = self::META[$jenis]['label'];
 
         $item = $this->buatQuery($jenis)->findOrFail($id);
         $item->restore();
@@ -115,10 +113,8 @@ class DataTerhapusController extends Controller
 
     public function hapusPermanen(string $jenis, int $id): RedirectResponse
     {
-        $label = self::META[$jenis]['label'] ?? null;
-        if ($label === null) {
-            abort(404);
-        }
+        abort_unless(array_key_exists($jenis, self::META), 404);
+        $label = self::META[$jenis]['label'];
 
         $item = $this->buatQuery($jenis)->findOrFail($id);
         $item->forceDelete();

@@ -25,7 +25,7 @@ class DataKandidatController extends Controller
         $filterStatus = $request->input('status');
         $filterPosisiId = $request->input('posisi');
 
-        $statusValid = ['menunggu_verifikasi', 'aktif', 'ditolak'];
+        $statusValid = ['menunggu_verifikasi', 'aktif', 'nonaktif', 'ditolak'];
         if (! in_array($filterStatus, $statusValid, true)) {
             $filterStatus = null;
         }
@@ -62,7 +62,6 @@ class DataKandidatController extends Controller
 
         $semuaPosisi = Posisi::orderBy('nama_posisi')->get();
         $daftarDepartemen = Departemen::orderBy('nama_departemen')->get();
-        $departemenMap = Departemen::pluck('id', 'nama_departemen');
 
         return view('admin.data-kandidat.index', [
             'kandidat' => $kandidat,
@@ -71,15 +70,20 @@ class DataKandidatController extends Controller
             'filterStatus' => $filterStatus,
             'filterPosisi' => $filterPosisiId,
             'daftarDepartemen' => $daftarDepartemen,
-            'departemenMap' => $departemenMap,
+            'ringkasan' => User::where('tipe_akun', 'kandidat')
+                ->selectRaw("COUNT(*) as total, SUM(status = 'menunggu_verifikasi') as menunggu, SUM(status = 'aktif') as aktif, SUM(status = 'ditolak') as ditolak")
+                ->first(),
+            // ?tambah=1 / ?ubah={id} → modal langsung terbuka (tautan lama /tambah & /{id}/ubah diarahkan ke sini)
+            'bukaTambah' => $request->boolean('tambah'),
+            'bukaUbah' => $request->filled('ubah')
+                ? User::with('profilKandidat.posisi')->where('tipe_akun', 'kandidat')->find((int) $request->input('ubah'))
+                : null,
         ]);
     }
 
-    public function tambah(): View
+    public function tambah(): RedirectResponse
     {
-        $departemen = Departemen::orderBy('nama_departemen')->get();
-
-        return view('admin.data-kandidat.tambah', compact('departemen'));
+        return redirect()->route('admin.data-kandidat.index', ['tambah' => 1]);
     }
 
     public function simpan(SimpanKandidatRequest $request): RedirectResponse
@@ -104,13 +108,11 @@ class DataKandidatController extends Controller
                 'status' => 'aktif',
             ]);
 
-            $departemen = Departemen::findOrFail($data['departemen']);
 
             ProfilKandidat::create([
                 'user_id' => $user->id,
                 'no_hp' => $data['no_hp'],
                 'jenis_kelamin' => $data['jenis_kelamin'],
-                'departemen' => $departemen->nama_departemen,
                 'posisi_id' => $data['posisi_dilamar'],
                 'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                 'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
@@ -123,22 +125,13 @@ class DataKandidatController extends Controller
             ->with($this::FLASH_SUCCESS, 'Akun kandidat berhasil ditambahkan.');
     }
 
-    public function ubah(int $id): View
+    public function ubah(int $id): RedirectResponse
     {
-        $kandidat = User::with('profilKandidat')->findOrFail($id);
+        $kandidat = User::findOrFail($id);
 
         abort_unless($kandidat->tipe_akun === 'kandidat', 404);
 
-        $departemen = Departemen::orderBy('nama_departemen')->get();
-
-        $currentDepartemenId = Departemen::where('nama_departemen', optional($kandidat->profilKandidat)->departemen)->value('id');
-
-        return view('admin.data-kandidat.ubah', [
-            'kandidat' => $kandidat,
-            'profilKandidat' => $kandidat->profilKandidat,
-            'departemen' => $departemen,
-            'currentDepartemenId' => $currentDepartemenId,
-        ]);
+        return redirect()->route('admin.data-kandidat.index', ['ubah' => $id]);
     }
 
     public function perbarui(PerbaruiKandidatRequest $request, int $id): RedirectResponse
@@ -161,14 +154,12 @@ class DataKandidatController extends Controller
 
             $kandidat->update($payload);
 
-            $departemen = Departemen::findOrFail($data['departemen']);
 
             $profil = $kandidat->profilKandidat;
             if ($profil) {
                 $profil->update([
                     'no_hp' => $data['no_hp'],
                     'jenis_kelamin' => $data['jenis_kelamin'],
-                    'departemen' => $departemen->nama_departemen,
                     'posisi_id' => $data['posisi_dilamar'],
                     'pendidikan_terakhir' => $data['pendidikan_terakhir'],
                     'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
@@ -205,36 +196,23 @@ class DataKandidatController extends Controller
 
     public function approve(int $id): RedirectResponse
     {
-        $kandidat = User::findOrFail($id);
-
-        abort_unless($kandidat->tipe_akun === 'kandidat', 404);
-
-        if ($kandidat->status !== 'menunggu_verifikasi') {
-            return back()->with('error', 'Hanya akun dengan status menunggu_verifikasi yang dapat diaktifkan.');
-        }
-
-        $kandidat->update(['status' => 'aktif']);
-
-        return redirect()
-            ->route('admin.data-kandidat.index')
-            ->with($this::FLASH_SUCCESS, 'Kandidat berhasil diaktifkan.');
+        return $this->ubahStatusKandidat($id, 'aktif', 'Kandidat berhasil diaktifkan.', 'diaktifkan');
     }
 
     public function tolak(int $id): RedirectResponse
     {
+        return $this->ubahStatusKandidat($id, 'ditolak', 'Kandidat berhasil ditolak. Data tetap disimpan.', 'ditolak');
+    }
+
+    private function ubahStatusKandidat(int $id, string $status, string $pesan, string $label): RedirectResponse
+    {
         $kandidat = User::findOrFail($id);
-
         abort_unless($kandidat->tipe_akun === 'kandidat', 404);
-
         if ($kandidat->status !== 'menunggu_verifikasi') {
-            return back()->with('error', 'Hanya akun dengan status menunggu_verifikasi yang dapat ditolak.');
+            return back()->with('error', "Hanya akun dengan status menunggu_verifikasi yang dapat di{$label}.");
         }
-
-        $kandidat->update(['status' => 'ditolak']);
-
-        return redirect()
-            ->route('admin.data-kandidat.index')
-            ->with($this::FLASH_SUCCESS, 'Kandidat berhasil ditolak. Data tetap disimpan.');
+        $kandidat->update(['status' => $status]);
+        return redirect()->route('admin.data-kandidat.index')->with($this::FLASH_SUCCESS, $pesan);
     }
 
     public function toggleStatus(int $id): RedirectResponse

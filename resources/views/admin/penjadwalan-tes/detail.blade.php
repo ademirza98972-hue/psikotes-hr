@@ -2,353 +2,198 @@
 
 @section('content')
 @php
-    $warnaStatus = [
-        'Draft'         => 'bg-slate-100 text-slate-600 border border-slate-200',
-        'Aktif'         => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-        'Selesai'       => 'bg-blue-50 text-blue-700 border border-blue-200',
-        'Belum Dimulai' => 'bg-amber-50 text-amber-700 border border-amber-200',
-    ];
-    $warnaStatusPengerjaan = [
-        'Belum Mengerjakan' => 'bg-slate-100 text-slate-600 border border-slate-200',
-        'Sedang Berjalan'   => 'bg-amber-50 text-amber-700 border border-amber-200',
-        'Selesai'           => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    ];
-    $bulanId = [
-        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
-    ];
-    $tglId = function ($iso) use ($bulanId) {
-        if (! $iso) return '-';
-        [$y, $m, $d] = explode('-', substr($iso, 0, 10));
-        return (int) $d . ' ' . $bulanId[(int) $m] . ' ' . $y;
+    $tgl = fn ($d) => $d?->locale('id')->translatedFormat('j M Y') ?? '–';
+    $status = $sesi->status_display;
+    $badgeStatus = ['Aktif' => 'success', 'Belum Dimulai' => 'warning', 'Draft' => 'secondary', 'Selesai' => 'outline'];
+    $badgePengerjaan = ['Belum Mengerjakan' => 'secondary', 'Selesai' => 'success'];
+    $peserta = $sesi->pesertaSesiTesRecords->sortBy(fn ($p) => $p->user?->name);
+    $total = $peserta->count();
+    $selesai = $peserta->where('status_pengerjaan', 'Selesai')->count();
+    $persen = $total ? round($selesai / $total * 100) : 0;
+    $ids = fn ($c) => $c->pluck('id')->map(fn ($i) => (string) $i)->values()->all();
+
+    $formAwal = match (true) {
+        old('_form') === 'ubah' => ['mode' => 'ubah', 'data' => [
+            'id' => (string) $sesi->id, 'nama_sesi' => old('nama_sesi', ''), 'tanggal_mulai' => old('tanggal_mulai', ''),
+            'tanggal_selesai' => old('tanggal_selesai', ''), 'status' => old('status', 'Draft'),
+            'departemen_ids' => array_map('strval', (array) old('departemen_ids', [])), 'alat_tes_ids' => array_map('strval', (array) old('alat_tes_ids', [])),
+        ]],
+        $bukaUbah => ['mode' => 'ubah', 'data' => null],
+        default => null,
     };
-    $pesertaSelesai = $sesi->pesertaSesiTesRecords->where('status_pengerjaan', 'Selesai')->count();
-    $pesertaTotal = $sesi->pesertaSesiTesRecords->count();
-    $persen = $pesertaTotal > 0
-        ? round(($pesertaSelesai / $pesertaTotal) * 100)
-        : 0;
+    $dataSesi = [
+        'id' => (string) $sesi->id, 'nama_sesi' => $sesi->nama_sesi, 'status' => $sesi->status === 'Draft' ? 'Draft' : 'Aktif',
+        'tanggal_mulai' => $sesi->tanggal_mulai?->format('Y-m-d') ?? '', 'tanggal_selesai' => $sesi->tanggal_selesai?->format('Y-m-d') ?? '',
+        'departemen_ids' => $ids($sesi->departemen), 'alat_tes_ids' => $ids($sesi->alatTes),
+    ];
+    if ($formAwal && $formAwal['data'] === null) $formAwal['data'] = $dataSesi;
+
+    $calon = $daftarUser->map(fn ($u) => ['id' => (string) $u->id, 'nama' => $u->name, 'email' => $u->email, 'tipe' => $u->tipe_akun])->values();
 @endphp
 
-<div class="space-y-6">
+<div class="mx-auto max-w-7xl space-y-6"
+     x-data="kelolaSesi({ urlSimpan: @js(route('admin.penjadwalan-tes.simpan')), urlDasar: @js(url('admin/penjadwalan-tes')), formAwal: @js($formAwal),
+                          semuaDept: @js($ids($daftarDepartemen)) })">
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h2 class="text-lg font-bold text-[#191c1e]">{{ $sesi->nama_sesi }}</h2>
-            <p class="mt-0.5 text-sm text-[#41484b]">Detail sesi penjadwalan dan manajemen peserta.</p>
-        </div>
-        <a href="{{ route('admin.penjadwalan-tes.index') }}"
-           class="inline-flex items-center gap-1 text-primary font-semibold text-sm hover:opacity-80 transition-opacity">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-            Kembali
+    {{-- KEPALA --}}
+    <div class="space-y-4">
+        <a href="{{ route('admin.penjadwalan-tes.index') }}" class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>Semua penjadwalan
         </a>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div class="min-w-0 space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                    <h1 class="text-2xl font-semibold tracking-tight">{{ $sesi->nama_sesi }}</h1>
+                    <x-ui.badge :variant="$badgeStatus[$status] ?? 'outline'">{{ $status }}</x-ui.badge>
+                </div>
+                <p class="text-sm text-muted-foreground">{{ $tgl($sesi->tanggal_mulai) }} – {{ $tgl($sesi->tanggal_selesai) }} · {{ $sesi->departemen->pluck('nama_departemen')->join(', ') ?: 'Lintas departemen' }}</p>
+            </div>
+            <x-ui.button variant="outline" @click="bukaForm('ubah', {{ Js::from($dataSesi) }})">
+                <span class="material-symbols-outlined">edit</span>Ubah sesi
+            </x-ui.button>
+        </div>
     </div>
 
+    @if ($status === 'Draft')
+        <x-ui.alert variant="warning" icon="visibility_off" title="Sesi masih Draft">Peserta belum bisa melihat atau mengerjakan sesi ini. Ubah status menjadi Aktif bila sudah siap.</x-ui.alert>
+    @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-        {{-- KOLOM KIRI: INFO SESI --}}
-        <div class="lg:col-span-1 space-y-5">
-            <section class="rounded-xl border border-[#c1c7cb] bg-white p-5 shadow-sm">
-                <div class="flex items-start justify-between mb-4">
-                    <h3 class="text-base font-semibold text-[#191c1e]">Informasi Sesi</h3>
-                    <span class="px-3 py-1 rounded-full text-[11px] font-bold border {{ $warnaStatus[$sesi->status] ?? 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                        {{ $sesi->status }}
-                    </span>
+    {{-- RINGKASAN --}}
+    <x-ui.card class="overflow-hidden">
+        <div class="grid grid-cols-2 gap-px bg-border lg:grid-cols-4">
+            @foreach ([['Peserta', $total, 'groups'], ['Selesai', $selesai, 'task_alt'], ['Belum mengerjakan', $total - $selesai, 'hourglass_empty']] as [$judul, $nilai, $ikon])
+                <div class="flex items-center gap-3 bg-card px-4 py-4 sm:px-5">
+                    <span class="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground sm:flex"><span class="material-symbols-outlined text-[20px]">{{ $ikon }}</span></span>
+                    <div><p class="text-xs font-medium text-muted-foreground">{{ $judul }}</p><p class="text-xl font-semibold tabular-nums">{{ $nilai }}</p></div>
                 </div>
-
-                <div class="space-y-3 mb-5">
-                    <div class="flex items-center gap-2 text-[#41484b] text-sm">
-                        <span class="material-symbols-outlined text-[18px]">business</span>
-                        <span>Departemen: <strong class="text-[#191c1e]">{{ $sesi->departemen->pluck('nama_departemen')->join(', ') ?: '—' }}</strong></span>
-                    </div>
-                    <div class="flex items-center gap-2 text-[#41484b] text-sm">
-                        <span class="material-symbols-outlined text-[18px]">calendar_today</span>
-                        <span>Periode: <strong class="text-[#191c1e]">{{ $tglId($sesi->tanggal_mulai) }} – {{ $tglId($sesi->tanggal_selesai) }}</strong></span>
-                    </div>
+            @endforeach
+            <div class="grid content-center gap-2 bg-card px-4 py-4 sm:px-5">
+                <div class="flex items-center justify-between text-xs"><span class="font-medium text-muted-foreground">Progres</span><span class="font-semibold tabular-nums">{{ $persen }}%</span></div>
+                <x-ui.progress :value="$persen" />
+                <div class="flex flex-wrap gap-1">
+                    @forelse ($sesi->alatTes as $alat)
+                        <x-ui.badge variant="outline" class="font-mono" title="{{ $alat->nama }}">{{ $alat->kode }}</x-ui.badge>
+                    @empty
+                        <x-ui.badge variant="warning">Belum ada alat tes</x-ui.badge>
+                    @endforelse
                 </div>
-
-                <div class="mb-5">
-                    <p class="text-[11px] font-semibold uppercase tracking-wider text-[#41484b] mb-2">ALAT TES:</p>
-                    <div class="flex flex-wrap gap-2">
-                        @forelse ($sesi->alatTes as $alat)
-                            <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ kode_badge_class($alat->kode, 'soft') }}">
-                                {{ $alat->kode ?? $alat->nama }}
-                            </span>
-                        @empty
-                            <span class="text-xs text-[#919eab]">— belum dipilih</span>
-                        @endforelse
-                    </div>
-                </div>
-
-                <div class="mb-5">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-[#41484b]">Progres Peserta: <span class="font-bold text-[#191c1e]">{{ $pesertaSelesai }}/{{ $pesertaTotal }}</span> selesai</span>
-                        <span class="text-sm font-bold text-primary">{{ $persen }}%</span>
-                    </div>
-                    <div class="w-full h-2 bg-[#e6e8ea] rounded-full overflow-hidden">
-                        <div class="h-full rounded-full transition-all" style="width: {{ $persen }}%; background-color: #00843D;"></div>
-                    </div>
-                </div>
-
-                <a href="{{ route('admin.penjadwalan-tes.edit', $sesi->id) }}"
-                   class="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 transition-colors">
-                    <span class="material-symbols-outlined text-[18px]">edit</span>
-                    Edit Sesi
-                </a>
-            </section>
+            </div>
         </div>
+    </x-ui.card>
 
-        {{-- KOLOM KANAN: MANAJEMEN PESERTA --}}
-        <div class="lg:col-span-2 space-y-5">
+    <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
 
-            {{-- Form Tambah Peserta --}}
-            <section class="rounded-xl border border-[#c1c7cb] bg-white p-5 shadow-sm">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="material-symbols-outlined text-primary">person_add</span>
-                    <h3 class="text-base font-semibold text-[#191c1e]">Tambah Peserta</h3>
-                </div>
-
-
-                <form method="POST"
-                      action="{{ route('admin.penjadwalan-tes.tambahPeserta', $sesi->id) }}"
-                      class="space-y-4">
-                    @csrf
-
-                    <div class="flex gap-3 mb-4">
-                        <div class="flex rounded-xl border border-[#e0e3e5] overflow-hidden text-sm">
-                            <button type="button" id="btn-karyawan"
-                                    onclick="filterTipe('karyawan')"
-                                    class="px-4 py-2 font-semibold bg-primary text-white transition-colors">
-                                Karyawan
-                            </button>
-                            <button type="button" id="btn-kandidat"
-                                    onclick="filterTipe('kandidat')"
-                                    class="px-4 py-2 font-semibold bg-white text-[#40484b] transition-colors">
-                                Kandidat
-                            </button>
-                        </div>
-                        <div class="relative flex-1">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2
-                                         -translate-y-1/2 text-[#40484b] text-[18px]">search</span>
-                            <input type="text" id="cari-peserta"
-                                   oninput="filterPeserta()"
-                                   onkeydown="return event.key !== 'Enter'"
-                                   placeholder="Cari nama..."
-                                   class="w-full pl-9 pr-4 py-2 bg-[#f2f4f6] border border-[#e0e3e5]
-                                          rounded-xl text-sm text-[#191c1e] outline-none
-                                          focus:ring-2 focus:ring-primary/40 focus:border-primary">
-                        </div>
-                    </div>
-
-                    <div class="border border-[#e0e3e5] rounded-xl overflow-hidden mb-4">
-                        <div class="bg-[#f2f4f6] px-4 py-2.5 flex items-center gap-3
-                                    border-b border-[#e0e3e5]">
-                            <input type="checkbox" id="select-all"
-                                   onchange="toggleSelectAll(this)"
-                                   class="h-4 w-4 rounded border-[#c0c8cb] text-primary
-                                          focus:ring-primary">
-                            <label for="select-all"
-                                   class="text-[12px] font-semibold text-[#40484b] uppercase
-                                          tracking-wider cursor-pointer">
-                                Pilih Semua
-                            </label>
-                            <span id="counter-terpilih"
-                                  class="ml-auto text-[12px] text-primary font-semibold">
-                                0 dipilih
-                            </span>
-                        </div>
-                        <div id="daftar-user" class="max-h-64 overflow-y-auto divide-y divide-[#e0e3e5]/60">
-                            @forelse ($daftarUser as $user)
-                                <label id="row-{{ $user->id }}"
-                                       data-tipe="{{ $user->tipe_akun }}"
-                                       data-nama="{{ strtolower($user->name) }}"
-                                       class="flex items-center gap-3 px-4 py-3 hover:bg-[#f2f4f6]
-                                              transition-colors cursor-pointer user-row">
-                                    <input type="checkbox" name="user_ids[]"
-                                           value="{{ $user->id }}"
-                                           onchange="updateCounter()"
-                                           class="h-4 w-4 rounded border-[#c0c8cb] text-primary
-                                                  focus:ring-primary user-checkbox">
-                                    <div>
-                                        <p class="text-sm font-semibold text-[#191c1e]">
-                                            {{ $user->name }}
-                                        </p>
-                                        <p class="text-[11px] text-[#40484b]">
-                                            {{ ucfirst($user->tipe_akun) }}
-                                        </p>
+        {{-- DAFTAR PESERTA --}}
+        <x-ui.card>
+            <x-ui.card-header class="py-5" title="Peserta" description="Status pengerjaan tiap peserta pada sesi ini." />
+            @if ($peserta->isEmpty())
+                <x-ui.empty icon="group_add" title="Belum ada peserta" description="Pilih karyawan atau kandidat di panel Tambah peserta." />
+            @else
+                <x-ui.table class="border-t border-border">
+                    <thead><tr class="border-b border-border">
+                        <x-ui.th class="pl-6">Nama</x-ui.th><x-ui.th>Alat tes</x-ui.th><x-ui.th>Status</x-ui.th><x-ui.th class="pr-6"><span class="sr-only">Aksi</span></x-ui.th>
+                    </tr></thead>
+                    <tbody>
+                        @foreach ($peserta as $p)
+                            @php $terkunci = $p->status_pengerjaan !== 'Belum Mengerjakan' || $p->waktu_mulai; @endphp
+                            <tr class="border-b border-border last:border-0 hover:bg-muted/40">
+                                <x-ui.td class="pl-6">
+                                    <p class="font-medium">{{ $p->user?->name ?? 'Akun terhapus' }}</p>
+                                    <p class="text-xs capitalize text-muted-foreground">{{ $p->user?->tipe_akun ?? '–' }}</p>
+                                </x-ui.td>
+                                <x-ui.td>
+                                    <div class="flex flex-wrap gap-1">
+                                        @forelse ($p->alatTes as $alat)
+                                            <x-ui.badge variant="outline" class="font-mono">{{ $alat->kode }}</x-ui.badge>
+                                        @empty
+                                            <span class="text-muted-foreground">–</span>
+                                        @endforelse
                                     </div>
-                                </label>
-                            @empty
-                                <p class="px-4 py-6 text-center text-sm text-[#40484b]">
-                                    Tidak ada user tersedia.
-                                </p>
-                            @endforelse
-                        </div>
-                    </div>
+                                </x-ui.td>
+                                <x-ui.td><x-ui.badge :variant="$badgePengerjaan[$p->status_pengerjaan] ?? 'warning'">{{ $p->status_pengerjaan }}</x-ui.badge></x-ui.td>
+                                <x-ui.td class="pr-6 text-right">
+                                    @if ($terkunci)
+                                        <span class="material-symbols-outlined text-[18px] text-muted-foreground" title="Sudah mulai mengerjakan; tidak bisa dihapus">lock</span>
+                                    @else
+                                        <x-ui.button variant="ghost" size="icon-sm" class="hover:text-destructive" title="Keluarkan dari sesi"
+                                            @click="tanya({ judul: 'Keluarkan peserta', label: 'Keluarkan', pesan: {{ Js::from(($p->user?->name ?? 'Peserta') . ' akan dikeluarkan dari sesi ini dan tidak bisa mengerjakan tesnya.') }}, url: {{ Js::from(route('admin.penjadwalan-tes.hapusPeserta', [$sesi->id, $p->user_id])) }} })">
+                                            <span class="material-symbols-outlined">person_remove</span><span class="sr-only">Keluarkan {{ $p->user?->name }}</span>
+                                        </x-ui.button>
+                                    @endif
+                                </x-ui.td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </x-ui.table>
+            @endif
+        </x-ui.card>
 
-                    <div class="mb-4">
-                        <p class="text-[12px] font-semibold text-[#40484b] uppercase
-                                  tracking-wider mb-2">
-                            Alat Tes yang Dikerjakan <span class="text-rose-500">*</span>
-                        </p>
-                        @if ($sesi->alatTes->isEmpty())
-                            <p class="text-xs text-[#919eab] italic">Sesi ini belum memiliki alat tes. Tambahkan alat tes melalui Edit Sesi.</p>
-                        @else
-                            <div class="space-y-2">
-                                @foreach ($sesi->alatTes as $alat)
-                                    <label class="flex items-center gap-3 p-3 rounded-xl
-                                                  border border-[#e0e3e5] bg-[#f2f4f6]
-                                                  cursor-pointer hover:border-primary/40
-                                                  transition-colors">
-                                        <input type="checkbox" name="alat_tes_ids[]"
-                                               value="{{ $alat->id }}"
-                                               class="h-4 w-4 rounded border-[#c0c8cb]
-                                                      text-primary focus:ring-primary">
-                                        <div>
-                                            <p class="text-sm font-semibold text-[#191c1e]">
-                                                {{ $alat->nama }}
-                                            </p>
-                                            <p class="text-[11px] text-[#40484b]">
-                                                {{ $alat->format_dasar }}
-                                            </p>
-                                        </div>
-                                    </label>
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-
-                    <button type="submit"
-                            class="w-full flex items-center justify-center gap-2
-                                   bg-primary hover:bg-primary/90 text-white
-                                   rounded-xl px-4 py-2.5 text-sm font-semibold
-                                   transition-all active:scale-95"
-                            {{ $sesi->alatTes->isEmpty() ? 'disabled' : '' }}>
-                        <span class="material-symbols-outlined text-[18px]">person_add</span>
-                        Tambah Peserta Terpilih
-                    </button>
-                </form>
-            </section>
-
-            {{-- Tabel Peserta --}}
-            <section class="rounded-xl border border-[#c1c7cb] bg-white p-5 shadow-sm">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="material-symbols-outlined text-primary">groups</span>
-                    <h3 class="text-base font-semibold text-[#191c1e]">Daftar Peserta</h3>
+        {{-- TAMBAH PESERTA --}}
+        <x-ui.card class="lg:sticky lg:top-4"
+            x-data="{ calon: {{ Js::from($calon) }}, tipe: 'karyawan', cari: '', pilih: {{ Js::from(array_map('strval', (array) old('user_ids', []))) }},
+                      get tampil() { const q = this.cari.toLowerCase(); return this.calon.filter(u => u.tipe === this.tipe && (u.nama + ' ' + u.email).toLowerCase().includes(q)); },
+                      get semuaTerpilih() { return this.tampil.length > 0 && this.tampil.every(u => this.pilih.includes(u.id)); },
+                      togglSemua() { const id = this.tampil.map(u => u.id); this.pilih = this.semuaTerpilih ? this.pilih.filter(i => !id.includes(i)) : [...new Set([...this.pilih, ...id])]; } }">
+            <x-ui.card-header class="py-5" title="Tambah peserta" description="Hanya akun aktif yang belum terdaftar di sesi ini." />
+            <form method="POST" action="{{ route('admin.penjadwalan-tes.tambahPeserta', $sesi->id) }}" class="grid grid-cols-1 gap-4 border-t border-border p-6">
+                @csrf
+                <div class="grid grid-cols-2 rounded-lg bg-muted p-[3px] text-sm font-medium text-muted-foreground" role="tablist">
+                    @foreach (['karyawan' => 'Karyawan', 'kandidat' => 'Kandidat'] as $nilai => $label)
+                        <button type="button" role="tab" @click="tipe = '{{ $nilai }}'" :aria-selected="tipe === '{{ $nilai }}'"
+                                :class="tipe === '{{ $nilai }}' ? 'bg-background text-foreground shadow-sm' : 'hover:text-foreground'"
+                                class="h-8 rounded-md transition-all">{{ $label }} <span class="text-xs tabular-nums text-muted-foreground" x-text="calon.filter(u => u.tipe === '{{ $nilai }}').length"></span></button>
+                    @endforeach
+                </div>
+                <div class="relative">
+                    <span class="material-symbols-outlined pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[18px] text-muted-foreground">search</span>
+                    <x-ui.input type="search" x-model="cari" @keydown.enter.prevent="" placeholder="Cari nama atau email" class="pl-9" aria-label="Cari calon peserta" />
                 </div>
 
-                @if ($sesi->pesertaSesiTesRecords->isEmpty())
-                    <div class="rounded-xl border border-dashed border-[#c1c7cb] px-6 py-10 text-center text-sm text-[#41484b]">
-                        Belum ada peserta pada sesi ini.
+                <div class="overflow-hidden rounded-lg border border-border">
+                    <label class="flex cursor-pointer items-center gap-3 border-b border-border bg-muted/50 px-3 py-2 text-xs font-medium">
+                        <x-ui.checkbox ::checked="semuaTerpilih" @change="togglSemua()" ::disabled="!tampil.length" />
+                        Pilih semua yang tampil
+                        <span class="ml-auto text-primary" x-text="pilih.length + ' dipilih'"></span>
+                    </label>
+                    <div class="max-h-72 overflow-y-auto">
+                        <template x-for="u in tampil" :key="u.id">
+                            <label class="flex cursor-pointer items-center gap-3 border-b border-border px-3 py-2 last:border-0 hover:bg-muted/40">
+                                <x-ui.checkbox name="user_ids[]" ::value="u.id" x-model="pilih" />
+                                <span class="min-w-0"><span class="block truncate text-sm font-medium" x-text="u.nama"></span><span class="block truncate text-xs text-muted-foreground" x-text="u.email"></span></span>
+                            </label>
+                        </template>
+                        <p x-show="!tampil.length" class="px-3 py-6 text-center text-sm text-muted-foreground"
+                           x-text="cari ? 'Tidak ada yang cocok.' : 'Semua akun ' + tipe + ' aktif sudah terdaftar.'"></p>
                     </div>
-                @else
-                    <div class="overflow-x-auto -mx-2">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="text-left text-[11px] font-semibold uppercase tracking-wider text-[#41484b] border-b border-[#e0e3e5]">
-                                    <th class="px-3 py-3">Nama</th>
-                                    <th class="px-3 py-3">Tipe</th>
-                                    <th class="px-3 py-3">Alat Tes</th>
-                                    <th class="px-3 py-3">Status</th>
-                                    <th class="px-3 py-3 text-right">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#e0e3e5]">
-                                @foreach ($sesi->pesertaSesiTesRecords as $peserta)
-                                    <tr>
-                                        <td class="px-3 py-3 font-semibold text-[#191c1e]">{{ $peserta->user?->name ?? '—' }}</td>
-                                        <td class="px-3 py-3 text-[#41484b]">{{ ucfirst($peserta->user?->tipe_akun ?? '-') }}</td>
-                                        <td class="px-3 py-3">
-                                            <div class="flex flex-wrap gap-1.5">
-                                                @forelse ($peserta->alatTes as $alat)
-                                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ kode_badge_class($alat->kode, 'soft') }}">
-                                                        {{ $alat->kode ?? $alat->nama }}
-                                                    </span>
-                                                @empty
-                                                    <span class="text-xs text-[#919eab]">—</span>
-                                                @endforelse
-                                            </div>
-                                        </td>
-                                        <td class="px-3 py-3">
-                                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border {{ $warnaStatusPengerjaan[$peserta->status_pengerjaan] ?? 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                                                {{ $peserta->status_pengerjaan }}
-                                            </span>
-                                        </td>
-                                        <td class="px-3 py-3 text-right">
-                                            <form method="POST"
-                                                  action="{{ route('admin.penjadwalan-tes.hapusPeserta', [$sesi->id, $peserta->user_id]) }}"
-                                                  onsubmit="return confirm('Hapus peserta {{ addslashes($peserta->user?->name ?? '') }} dari sesi ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 text-sm font-semibold transition-colors">
-                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </section>
-        </div>
+                </div>
+                {{-- peserta terpilih di tab lain tetap terkirim --}}
+                <template x-for="id in pilih.filter(i => !tampil.some(u => u.id === i))" :key="id"><input type="hidden" name="user_ids[]" :value="id"></template>
+                @foreach (['user_ids', 'user_ids.*'] as $e)
+                    @error($e)<p class="text-xs font-medium text-destructive">{{ $message }}</p>@enderror
+                @endforeach
+
+                <div class="grid grid-cols-1 gap-2">
+                    <x-ui.label>Alat tes yang dikerjakan</x-ui.label>
+                    @forelse ($sesi->alatTes as $alat)
+                        <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-border px-3 py-2 transition-colors has-checked:border-primary has-checked:bg-primary/5">
+                            <x-ui.checkbox name="alat_tes_ids[]" value="{{ $alat->id }}" :checked="in_array((string) $alat->id, array_map('strval', (array) old('alat_tes_ids', $ids($sesi->alatTes))), true)" />
+                            <span class="font-mono text-xs font-semibold">{{ $alat->kode }}</span><span class="min-w-0 truncate text-sm">{{ $alat->nama }}</span>
+                        </label>
+                    @empty
+                        <x-ui.alert variant="warning" icon="quiz">Sesi ini belum punya alat tes. Tambahkan lewat Ubah sesi.</x-ui.alert>
+                    @endforelse
+                    @foreach (['alat_tes_ids', 'alat_tes_ids.*'] as $e)
+                        @error($e)<p class="text-xs font-medium text-destructive">{{ $message }}</p>@enderror
+                    @endforeach
+                </div>
+
+                <x-ui.button type="submit" ::disabled="!pilih.length || {{ $sesi->alatTes->isEmpty() ? 'true' : 'false' }}">
+                    <span class="material-symbols-outlined">person_add</span><span x-text="pilih.length ? 'Tambahkan ' + pilih.length + ' peserta' : 'Pilih peserta dulu'"></span>
+                </x-ui.button>
+            </form>
+        </x-ui.card>
     </div>
 
+    @include('admin.penjadwalan-tes._form')
 </div>
-
-<script>
-let tipeAktif = 'karyawan';
-
-function filterTipe(tipe) {
-    tipeAktif = tipe;
-    const btnK = document.getElementById('btn-karyawan');
-    const btnC = document.getElementById('btn-kandidat');
-    btnK.classList.toggle('bg-primary', tipe === 'karyawan');
-    btnK.classList.toggle('text-white', tipe === 'karyawan');
-    btnK.classList.toggle('bg-white', tipe !== 'karyawan');
-    btnK.classList.toggle('text-[#40484b]', tipe !== 'karyawan');
-    btnC.classList.toggle('bg-primary', tipe === 'kandidat');
-    btnC.classList.toggle('text-white', tipe === 'kandidat');
-    btnC.classList.toggle('bg-white', tipe !== 'kandidat');
-    btnC.classList.toggle('text-[#40484b]', tipe !== 'kandidat');
-    filterPeserta();
-}
-
-function filterPeserta() {
-    const q = document.getElementById('cari-peserta').value.toLowerCase();
-    document.querySelectorAll('.user-row').forEach(row => {
-        const tipeMatch = row.dataset.tipe === tipeAktif;
-        const namaMatch = row.dataset.nama.includes(q);
-        row.style.display = (tipeMatch && namaMatch) ? '' : 'none';
-    });
-    updateCounter();
-}
-
-function toggleSelectAll(cb) {
-    document.querySelectorAll('.user-checkbox').forEach(chk => {
-        const row = chk.closest('.user-row');
-        if (row.style.display !== 'none') {
-            chk.checked = cb.checked;
-        }
-    });
-    updateCounter();
-}
-
-function updateCounter() {
-    const n = document.querySelectorAll('.user-checkbox:checked').length;
-    document.getElementById('counter-terpilih').textContent = n + ' dipilih';
-    const visibleCheckboxes = document.querySelectorAll(
-        '.user-row:not([style*="display: none"]) .user-checkbox'
-    );
-    document.getElementById('select-all').checked =
-        n > 0 && n === visibleCheckboxes.length;
-}
-
-document.addEventListener('DOMContentLoaded', () => filterTipe('karyawan'));
-</script>
-
 @endsection

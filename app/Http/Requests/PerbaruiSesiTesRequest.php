@@ -20,7 +20,7 @@ class PerbaruiSesiTesRequest extends FormRequest
             'departemen_ids.*' => 'exists:departemen,id',
             'tanggal_mulai'  => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'alat_tes_ids'   => 'nullable|array',
+            'alat_tes_ids'   => 'required|array|min:1',
             'alat_tes_ids.*' => 'exists:alat_tes,id',
             'status'         => 'required|' . Rule::in(['Draft', 'Aktif', 'Selesai']),
         ];
@@ -30,6 +30,7 @@ class PerbaruiSesiTesRequest extends FormRequest
     {
         return [
             'required' => ':attribute wajib diisi.',
+            'min'      => ':attribute minimal :min item.',
         ];
     }
 
@@ -40,6 +41,7 @@ class PerbaruiSesiTesRequest extends FormRequest
             'tanggal_mulai' => 'tanggal mulai',
             'tanggal_selesai' => 'tanggal selesai',
             'status' => 'status',
+            'alat_tes_ids' => 'alat tes',
         ];
     }
 }

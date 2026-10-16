@@ -4,6 +4,22 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #29 — Penjadwalan Tes: peserta selesai bisa dihapus (hasil hilang), calon peserta termasuk akun ditolak, jumlah_peserta melenceng, UI tidak konsisten
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `resources/views/admin/penjadwalan-tes/{index,detail}.blade.php` (tulis ulang), partial baru `_form.blade.php` (modal tambah/ubah + dialog konfirmasi), hapus `tambah.blade.php` & `edit.blade.php`, `app/Http/Controllers/Admin/PenjadwalanTesController.php`, `app/Http/Requests/{Simpan,Perbarui}SesiTesRequest.php`, `TambahPesertaSesiRequest.php`, test baru `tests/Feature/PenjadwalanTesHalamanTest.php` |
+| Masalah | (1) Tombol hapus peserta tersedia juga untuk peserta yang sudah Selesai; `peserta_sesi_tes` dihapus permanen, `log_aktivitas_tes` ikut terhapus (cascade), dan peserta hilang dari Hasil Tes. (2) Daftar calon peserta memuat semua karyawan/kandidat, termasuk 3 kandidat `ditolak`, 1 `menunggu_verifikasi`, 3 karyawan `nonaktif`. (3) `sesi_tes.jumlah_peserta` (dibaca Hasil Tes) dikelola dengan increment/decrement dan sudah melenceng: sesi 1 tercatat 8 padahal ada 10, sesi 2–4 juga selisih 2. (4) Ubah sesi boleh tanpa alat tes, padahal tambah mewajibkannya. (5) Tambah peserta menerima alat tes di luar sesi. (6) Filter tidak punya status "Belum Dimulai"; detail menampilkan `status` mentah, bukan `status_display` seperti index. (7) `tambah`/`edit` dua salinan form, hex & `style` inline, `confirm()` |
+| Akar | Hitungan peserta didenormalisasi tanpa sinkron ulang; aksi hapus peserta tidak membedakan status pengerjaan; kueri calon peserta hanya menyaring `tipe_akun` |
+| Fix | Hapus peserta ditolak (flash error) bila `status_pengerjaan` ≠ Belum Mengerjakan atau `waktu_mulai` terisi; di tabel tampil ikon gembok. Calon peserta hanya `status = aktif`. `jumlah_peserta` dihitung ulang dari data setiap tambah/keluarkan peserta. `alat_tes_ids` wajib saat ubah; tambah peserta menolak alat tes di luar sesi. Index: ringkasan 4 status (pintasan filter, kueri sama dengan `statusDisplay`), filter cari + status, kartu sesi (badge status, periode, departemen, kode alat, progres), dropdown Ubah/Hapus. Satu modal tambah/ubah (`_form`) dipakai index & detail; `/tambah` → `index?tambah=1`, `/{id}/edit` → `detail?ubah=1`; validasi gagal membuka ulang modal dengan isian lama. Detail: kepala + peringatan Draft, ringkasan peserta/progres, tabel peserta, panel tambah peserta Alpine (tab Karyawan/Kandidat dengan jumlah, cari nama/email, pilih semua yang tampil, pilihan di tab lain tetap terkirim, alat tes sesi tercentang default) |
+| Verifikasi | Ringkasan 3 aktif / 0 belum dimulai / 3 draft / 20 selesai = 26 sesi di DB; tiap filter status hanya memuat sesi dengan `status_display` itu (test). Sesi 1: 24 karyawan + 7 kandidat aktif sebagai calon, 2 baris peserta Selesai terkunci, memilih 7 kandidat lalu pindah ke tab Karyawan → 7 `user_ids[]` tetap terkirim. Modal ubah sesi 2 mengirim data identik DB → simpan, redirect ke detail dengan flash Berhasil. Tambah tanpa alat tes → modal terbuka lagi, nama/tanggal tetap, pesan "alat tes wajib diisi". 375px: 0 elemen melewati layar di index, detail 1/2/26 dan kedua modal (sebelumnya panel tambah peserta 413px karena nama alat panjang). Console error 0. `php artisan test` 36/36 |
+| Pelajaran | (a) `@js()` tidak dikompilasi di atribut komponen `x-ui.*` (keluar mentah, Alpine error "calon is not defined"); pakai `{{ Js::from() }}`. (b) Atribut Alpine tanpa nilai pada komponen (`@keydown.enter.prevent`) dirender Blade jadi `="@keydown.enter.prevent"` sehingga Alpine SyntaxError; beri `=""`. (c) `grid` tanpa `grid-cols-*` membuat kolom `auto` yang melebar ke konten terpanjang; `truncate` baru bekerja dengan `grid-cols-1`/`min-w-0`. (d) Kolom hitungan denormalisasi: hitung ulang dari sumber, jangan increment |
+| Log Keyword | penjadwalan tes, sesi tes, peserta, hapus peserta selesai, cascade log_aktivitas_tes, jumlah_peserta, calon peserta ditolak nonaktif, status_display, Belum Dimulai, @js atribut komponen, keydown.enter.prevent |
+| Deploy | `npm run build`, `php artisan view:clear` |
+
+---
+
 ### Fix #28 — Bank Soal: ubah soal IST selalu gagal tanpa pesan, form ganda, UI tidak konsisten
 
 | Field | Detail |

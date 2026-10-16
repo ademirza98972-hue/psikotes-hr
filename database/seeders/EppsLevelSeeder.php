@@ -26,12 +26,13 @@ class EppsLevelSeeder extends Seeder
             return;
         }
 
+        // Patokan EPPS.xls (kolom Kategori): persentil ≤3 SR, ≤16 R, ≤84 Sedang, ≤96 Tinggi, sisanya ST.
         $levels = [
-            ['label' => 'Sangat Rendah', 'skor_min' => 0,   'skor_max' => 10,  'urutan' => 1],
-            ['label' => 'Rendah',        'skor_min' => 11,  'skor_max' => 30,  'urutan' => 2],
-            ['label' => 'Sedang',        'skor_min' => 31,  'skor_max' => 70,  'urutan' => 3],
-            ['label' => 'Tinggi',        'skor_min' => 71,  'skor_max' => 90,  'urutan' => 4],
-            ['label' => 'Sangat Tinggi', 'skor_min' => 91,  'skor_max' => 100, 'urutan' => 5],
+            ['label' => 'Sangat Rendah', 'skor_min' => 0,  'skor_max' => 3,   'urutan' => 1],
+            ['label' => 'Rendah',        'skor_min' => 4,  'skor_max' => 16,  'urutan' => 2],
+            ['label' => 'Sedang',        'skor_min' => 17, 'skor_max' => 84,  'urutan' => 3],
+            ['label' => 'Tinggi',        'skor_min' => 85, 'skor_max' => 96,  'urutan' => 4],
+            ['label' => 'Sangat Tinggi', 'skor_min' => 97, 'skor_max' => 100, 'urutan' => 5],
         ];
 
         foreach ($dimensiList as $dimensi) {

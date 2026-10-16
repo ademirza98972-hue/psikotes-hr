@@ -214,6 +214,7 @@
         <form id="form-jawaban" action="{{ route('peserta.tes.jawab', $sesiId) }}" method="POST">
             @csrf
             <input type="hidden" name="timer_expired" id="timer-expired-flag" value="0">
+            <input type="hidden" name="soal_id" value="{{ $soal_data['id'] }}">
             <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
                 <div class="p-8">
                     {{-- Forced Choice Format --}}

@@ -740,6 +740,16 @@ class PengerjaanTesController extends Controller
         $soalId = $soal['id'];
         $tipeFormat = $soal['tipe_format'] ?? 'pilihan_ganda';
 
+        // Halaman yang dikirim harus = soal aktif di session. Bila tidak (klik ganda, tombol back,
+        // dua tab, kirim ulang), jangan simpan: dulu opsi soal lain ikut tersimpan ke soal ini.
+        $opsiDikirim = $request->input('opsi_id');
+        $tidakSinkron = ($request->filled('soal_id') && (int) $request->input('soal_id') !== (int) $soalId)
+            || ($opsiDikirim !== null && $opsiDikirim !== ''
+                && ! \App\Models\OpsiJawaban::whereKey((int) $opsiDikirim)->where('soal_id', $soalId)->exists());
+        if ($tidakSinkron) {
+            return redirect()->route('peserta.tes.kerjakan', $sesiId);
+        }
+
         Session::forget($this->sessionKey($sesiId, 'timer_per_soal_' . $soalId));
 
         $timerExpired = $request->boolean('timer_expired');
@@ -837,35 +847,7 @@ class PengerjaanTesController extends Controller
                 continue;
             }
 
-            $formatDasar = strtolower(str_replace(' ', '_', $soalDummy[$kodeAlat]['format_dasar'] ?? ''));
-            if ($formatDasar === 'forced_choice') {
-                $authUser = Auth::user();
-                $jenisKelamin = $authUser->dataKaryawan?->jenis_kelamin
-                    ?? $authUser->profilKandidat?->jenis_kelamin
-                    ?? null;
-                $kelompokSegmen = match ($jenisKelamin) {
-                    'L' => '3',
-                    'P' => '4',
-                    default => '3',
-                };
-            } elseif ($kodeAlat === 'IST') {
-                $user = Auth::user();
-                $tanggalLahir = $user->dataKaryawan?->tanggal_lahir
-                    ?? $user->profilKandidat?->tanggal_lahir;
-                $usia = $tanggalLahir
-                    ? (int) \Carbon\Carbon::parse($tanggalLahir)->diffInYears(now())
-                    : 25;
-                $kelompokSegmen = match(true) {
-                    $usia <= 25 => 'USIA_21_25',
-                    $usia <= 30 => 'USIA_26_30',
-                    $usia <= 35 => 'USIA_31_35',
-                    $usia <= 40 => 'USIA_36_40',
-                    $usia <= 45 => 'USIA_41_45',
-                    default     => 'USIA_51_60',
-                };
-            } else {
-                $kelompokSegmen = 'default';
-            }
+            $kelompokSegmen = $this->scoringService->kelompokSegmen(Auth::user(), \App\Models\AlatTes::findOrFail($alatTesId));
 
             $skorHasil[$kodeAlat] = $this->scoringService->dispatch(
                 $userId,
@@ -1089,31 +1071,7 @@ class PengerjaanTesController extends Controller
             );
         }
 
-        $stat = GridInputPeserta::where('user_id', $userId)
-            ->where('sesi_tes_id', $sesiId)
-            ->where('alat_tes_id', $alatTesId)
-            ->where('kolom_ke', $kolomKe)
-            ->selectRaw('
-                SUM(is_benar = 1) as jumlah_benar,
-                SUM(is_benar = 0 AND jawaban_peserta != 0 AND jawaban_peserta IS NOT NULL) as jumlah_salah,
-                SUM(jawaban_peserta IS NULL OR jawaban_peserta = 0) as jumlah_kelewat,
-                MIN(waktu_input) as waktu_min
-            ')->first();
-
-        HasilKolomGrid::updateOrCreate(
-            [
-                'user_id'     => $userId,
-                'sesi_tes_id' => $sesiId,
-                'alat_tes_id' => $alatTesId,
-                'kolom_ke'    => $kolomKe,
-            ],
-            [
-                'jumlah_benar'      => (int) ($stat->jumlah_benar ?? 0),
-                'jumlah_salah'      => (int) ($stat->jumlah_salah ?? 0),
-                'jumlah_kelewat'    => (int) ($stat->jumlah_kelewat ?? 0),
-                'waktu_pakai_detik' => (int) max(0, now()->diffInSeconds($stat->waktu_min ?? now())),
-            ]
-        );
+        $this->scoringService->rekapKolomGrid($userId, $sesiId, $alatTesId, $kolomKe);
 
         return redirect()->route('peserta.tes.kraepelin', $sesiId);
     }

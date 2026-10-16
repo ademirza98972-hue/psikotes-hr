@@ -4,6 +4,104 @@ Terbaru → terlama. Hanya tulis setelah terverifikasi.
 
 ---
 
+### Fix #22 — Laporan PAPI: grafik radar JavaScript tidak ikut PDF, tanpa kontrol kelengkapan, 3 salinan kode
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | partial baru `admin/hasil-tes/partials/papi.blade.php`, `app/helpers.php` (`faktor_papi()`), `app/Http/Controllers/Admin/HasilTesController.php` (hapus `buildPapScores` yang tak terpakai), view `admin/hasil-tes/{detail,print,pdf}` |
+| Masalah | Grafik radar PAPI memakai Chart.js (JavaScript) → tidak muncul di PDF dompdf; laporan tidak memeriksa kelengkapan jawaban sehingga sesi rusak (mis. 82/90, 18/90) tetap tampil seolah normal; data faktor (nama, kode DB, kelompok) disalin di 3 view (layar 163 baris, cetak 144, pdf 34 + array global) |
+| Akar | Tampilan dibuat per view tanpa komponen bersama; kontrol "Total Atas/Bawah harus 45" dari Papi Kostick.xls tidak diterapkan |
+| Fix | Partial bersama: (A) tabel 20 faktor per aspek (Arah Kerja … Ketaatan) dengan skor, batang 0–9, interpretasi kolom Analisis Excel; (B) roda profil SVG 20 jari-jari skala 0–9 (tampil di layar, cetak, dan dompdf); (C) kontrol total atas (G L I T V S R D C E) & bawah (N A P X B O Z K F W) masing-masing 45 dengan peringatan bila tidak lengkap. Satu sumber data faktor `faktor_papi()` |
+| Verifikasi | Sesi 4 user 10: 45/45 "Lengkap", Z=6 → "Mudah menyesuaikan diri", K=7 → "Agresi pribadi…" sesuai ambang Excel; skor faktor cocok dengan hitung ulang Python dari kunci Excel (Fix #17). 30 render (10 sesi × layar/cetak/pdf) tanpa error; teks PDF memuat tabel, label roda, dan "45 / 45". `php artisan test` 17/17 |
+| Pelajaran | Kontrol kelengkapan yang ada di patokan (total 210 EPPS, 45/45 PAPI) wajib ikut tampil di laporan agar data rusak tidak terbaca sebagai hasil sah |
+| Log Keyword | PAPI, roda profil, radar, Chart.js, dompdf, total atas bawah 45, faktor_papi, laporan |
+| Deploy | `php artisan view:clear` |
+
+**Revisi Fix #22 (2026-10-16, laporan user dari screenshot sesi 20 user 18):** roda profil terlihat seperti jarum tanpa struktur, dan faktor E = 10 (mustahil, maksimal 9; data rusak, lihat Fix #17) membuat batang keluar kolom dan titik menembus lingkaran. Roda dibuat ulang: 7 sektor aspek berwarna (isian tipis + pita tepi + nama aspek), cincin 1–9 (5 & 9 tegas), huruf faktor di tepi, nilai di setiap titik. Skor > 9 dibatasi di cincin terluar, ditandai merah, dan Kontrol Jawaban menyebut "Skor melebihi 9 pada faktor E = 10 — data jawaban tidak valid". Verifikasi: screenshot sesi 20/18 (data rusak) & 4/10 (45/45, layar + cetak); teks PDF memuat nama aspek dan pesan kontrol; 33 render tanpa error; test 17/17.
+
+---
+
+### Fix #21 — Laporan IST tanpa skor RW/SW & profil, subtes WU salah label "Kecerdasan Umum"
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | partial baru `admin/hasil-tes/partials/ist.blade.php`, `app/helpers.php` (`subtes_ist()`), `app/Http/Controllers/Admin/HasilTesController.php` (`kelompok_norma`, nama aspek ringkasan), view `admin/hasil-tes/{detail,print,pdf}` |
+| Masalah | Lampiran IST hanya centang SR/R/C/T/ST; RW/SW tersembunyi di bagian "Lihat skor detail" (layar) dan tidak ada di cetak/PDF; tidak ada profil subtes; norma usia yang dipakai tidak disebut. Label aspek buatan: WU (Würfelaufgaben = soal kubus/spasial) disebut "Kecerdasan Umum", FA disebut "Daya Kreativitas", ZR "Berpikir Praktis". Kesimpulan IST ganda dengan Ringkasan Evaluasi |
+| Akar | Psikogram IST meniru template perusahaan lama tanpa acuan nama subtes Amthauer; tiga view punya salinan blok IST sendiri (layar 156 baris, cetak 100, pdf 74) |
+| Fix | Partial bersama: (A) tabel 9 subtes — kode + nama Jerman/Indonesia, aspek yang diukur + kelompok (Verbal/Numerik/Figural/Ingatan), RW, SW, kategori (patokan IST_Norma_Usia.xls), baris Jumlah RW → IQ → klasifikasi; (B) profil SW SVG (pita Sedang 95–104, garis rata-rata 100, titik berwarna per kategori); (C) tabel klasifikasi IQ dengan baris peserta disorot. Norma usia (mis. "usia 21–25 tahun") diambil dari `ScoringEngineService::kelompokSegmen()` pada tanggal tes. Nama aspek ringkasan diselaraskan (WU = kemampuan ruang) |
+| Verifikasi | Sesi 1 user 7 (norma 21–25): SE RW3→SW76, WA 3→74, AN 3→83, GE 1→72, RA 11→105, ZR 13→108, FA 4→81, WU 5→86, ME 4→84, jumlah RW 47 → SW 82 → IQ 73 Borderline — semua cocok dengan tabel "USIA 21 - 25" & "Norma IQ" Sofware IST.xlsx. 27 render (9 sesi × layar/cetak/pdf) tanpa error, screenshot layar & cetak dicek, teks PDF memuat ketiga bagian. `php artisan test` 17/17 |
+| Pelajaran | Nama & arti subtes psikotes harus mengikuti manual alat tesnya; label "versi perusahaan" boleh ditambahkan, bukan menggantikan |
+| Log Keyword | IST, RW, SW, profil IST, taraf kecerdasan, klasifikasi IQ, WU kubus, norma usia, laporan |
+| Deploy | `php artisan view:clear` |
+
+---
+
+### Fix #20 — Laporan Kraepelin mentah ala Excel (7 desimal, tanpa interpretasi), grafik tidak ikut PDF, regresi beda dengan skor
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `app/Http/Controllers/Admin/HasilTesController.php` (`buildGridExtra`, ringkasan Kraepelin), partial baru `admin/hasil-tes/partials/kraepelin.blade.php`, view `admin/hasil-tes/{detail,print,pdf}` |
+| Masalah | Uji Kraepelin lengkap via browser (kandidat1, sesi 69, 50 kolom; kolom 1 dibiarkan habis waktu). Laporan menampilkan istilah Excel mentah ("speed factor", "ausdeur factor"), y(0) = 13.8987755, kategori tanpa penjelasan; grafik Chart.js (JavaScript) sehingga tidak muncul di PDF dompdf. `buildGridExtra` menghitung regresi hanya atas kolom tersimpan, berbeda dengan skor KETAHANAN (N = 50, kolom kosong = 0) bila ada kolom tak tersimpan |
+| Akar | View meniru lembar Excel apa adanya; tiga view punya blok Grid sendiri-sendiri (detail 149 baris, print 120, pdf 88) |
+| Fix | Partial bersama: (A) rekap skoring sesuai kotak SCORING lembar jawab (Mean/Panker, Range + kolom tertinggi/terendah, Av. Deviation/Janker, Sum of errors, Sum of skippeds, Tianker, Hanker = y(50) − y(0) + tren), angka 2 desimal format Indonesia; (B) grafik kerja SVG (titik per kolom + garis tren regresi) di `<img>` data-URI → tampil di layar, cetak, dan dompdf; (C) tabel interpretasi 4 faktor dengan teks per kategori. `buildGridExtra` memakai N = jumlah kolom soal & kolom kosong = 0 (sama dengan `scoreGrid`), tren menurun hanya bila selisih < 0 (Kraepelin.xls). Ringkasan: satuan jelas + peringatan jumlah kolom tanpa jawaban benar |
+| Verifikasi | Sesi 69: 50 kolom, 755 benar, 43 salah, 0 terlampaui; 69 input "0" (63 benar — dulu dihitung terlewat, lihat Fix #17). Hitung ulang Python dari y per kolom: Panker 15,1 · Janker 1,22 · Hanker 2,36 · Range 18 = sama persis dengan laporan. 27 render (9 sesi × detail/print/pdf) tanpa error; teks PDF memuat "Kolom ke-" (SVG ter-render dompdf). Screenshot layar & cetak dicek. `php artisan test` 17/17 |
+| Pelajaran | Grafik untuk dokumen cetak/PDF jangan bergantung JavaScript — SVG statis tampil sama di semua keluaran. Rumus tampilan harus memanggil definisi yang sama dengan rumus skor (N kolom) |
+| Log Keyword | Kraepelin, Panker, Janker, Hanker, Tianker, grafik kerja, SVG, dompdf, regresi, buildGridExtra, laporan |
+| Deploy | `php artisan view:clear` |
+
+---
+
+### Fix #19 — Laporan hasil tes berisi teks contoh & EPPS tanpa skor: format laporan standar
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `app/Http/Controllers/Admin/HasilTesController.php` (`susunRingkasan`, identitas), `app/Services/FormatHasilEppsService.php` (`NAMA_KEBUTUHAN`, `INTERPRETASI`), partial baru `admin/hasil-tes/partials/{epps,ringkasan}.blade.php`, view `admin/hasil-tes/{detail,print,pdf}` |
+| Masalah | Uji EPPS lengkap via browser (kandidat1, sesi 58): laporan menulis "Rekrutmen Staff Finance Batch 1", tanggal TTD "28 Juli 2026", dan **Ringkasan Evaluasi yang sama untuk semua peserta** ("taraf kecerdasan umum baik…") padahal peserta hanya tes EPPS. Posisi/Departemen selalu "—". Tabel EPPS hanya centang tanpa RS/persentil, nama kebutuhan asli tidak tampil, tanpa grafik profil. Seksi PSIKOGRAM kosong tetap tampil. Di halaman cetak, seksi EPPS **tidak pernah muncul** (`nama_alat_tes === 'EPPS'`, padahal namanya "EPPS (Edwards…)"). `catatan_hr` dicetak dengan `<br />` mentah |
+| Akar | View dibuat dari mockup dengan teks statis; tiga view (layar/cetak/pdf) menyalin array & markup sendiri-sendiri sehingga berbeda isi |
+| Fix | Identitas dari data (posisi & departemen dari profil, tujuan tes per jenis peserta, pemeriksa = admin login, tanggal cetak = hari ini). Ringkasan disusun dari skor tiap alat tes (EPPS: kebutuhan tinggi/rendah + konsistensi; IST: IQ, klasifikasi, aspek kuat/lemah; Kraepelin: 4 faktor; PAPI: 3 faktor tertinggi) + kontrol kelengkapan dari Excel (EPPS total 210, PAPI total 90). Partial EPPS dipakai 3 view: tabel No/Aspek (nama asli)/RS/Persentil/Kategori/Interpretasi, grafik profil persentil dengan pita Sedang 17–84, kotak validitas (konsistensi x/15 + kontrol 210). Partial ringkasan: ringkasan, kesimpulan dari Catatan HR, tanda tangan. PSIKOGRAM hanya tampil bila ada isinya |
+| Verifikasi | 18 render (6 peserta × detail/print/pdf) tanpa error. Sesi 58: "EPPS: kebutuhan menonjol pada Kreativitas… Konsistensi 7 dari 15 (Sangat Rendah)", tabel 15 baris, kontrol "210 dari 210". Sesi 10 user 31 (4 jawaban): "hanya 4 dari 210 soal terskor — hasil belum dapat ditafsirkan". Sesi 22 user 18 (data rusak Fix #17): "PAPI hanya 82 dari 90". Screenshot layar & cetak dicek; teks PDF dompdf memuat semua seksi. `php artisan test` 17/17 |
+| Pelajaran | Teks laporan psikologi tidak boleh statis — narasi yang sama untuk semua peserta menyesatkan. Satu komponen dipakai bersama oleh layar/cetak/pdf agar tidak berbeda |
+| Log Keyword | laporan hasil tes, ringkasan evaluasi, teks contoh, EPPS persentil, grafik profil, validitas, print EPPS tidak muncul, partial |
+| Deploy | `php artisan view:clear` |
+
+---
+
+### Fix #18 — Peserta bisa membuka Hasil Tes, Alat Tes, Bank Soal & Penjadwalan admin
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `routes/web.php`, `app/Http/Middleware/CekIzin.php`, `tests/Feature/SmokeHalamanTest.php` |
+| Masalah | Login sebagai kandidat (kandidat1@test.com) lalu buka `/admin/hasil-tes/1/7` → laporan hasil psikotes peserta lain tampil penuh. Sama untuk `/admin/alat-tes`, `/admin/bank-soal` (kunci jawaban!), `/admin/penjadwalan-tes`, `/admin/aktivitas` |
+| Akar | Grup rute tersebut hanya dibungkus `auth`, tanpa middleware `izin:` — padahal kode izin `hasil_tes.lihat` & `soal.lihat` sudah ada dan dipakai menu sidebar (menu tersembunyi, URL tetap terbuka) |
+| Fix | `izin:hasil_tes.lihat` di grup hasil-tes; `izin:soal.lihat,kategori_tes.kelola` di alat-tes/bank-soal/penjadwalan; `izin:dashboard.lihat` di aktivitas. `CekIzin` menerima beberapa izin (cukup salah satu, sama dengan aturan sidebar) |
+| Verifikasi | Browser: kandidat → `/admin/hasil-tes/1/7` & `/admin/penjadwalan-tes` = 403 "Anda tidak punya akses"; super admin tetap bisa buka hasil sesi 58. Test baru `test_peserta_ditolak_dari_semua_halaman_admin` (semua GET `admin/*` + 3 URL berparameter); `php artisan test` 17/17 |
+| Pelajaran | Menyembunyikan menu ≠ mengamankan halaman. Setiap grup rute admin wajib punya middleware izin; test smoke peserta-vs-admin menjaga ini |
+| Log Keyword | 403, izin, CekIzin, hasil_tes.lihat, soal.lihat, kandidat buka admin, akses tanpa izin |
+| Deploy | `php artisan route:clear` (bila route di-cache) |
+
+---
+
+### Fix #17 — Skoring tidak sesuai patokan "4 ALAT TES.zip": kunci EPPS buatan, IQ IST belum dikonversi, Kraepelin "0" = terlewat, jawaban tersimpan ke soal salah
+
+| Field | Detail |
+|---|---|
+| Tanggal | 2026-10-16 |
+| File | `app/Services/ScoringEngineService.php`, `app/Http/Controllers/PengerjaanTesController.php`, `app/helpers.php`, `routes/console.php` (cmd `psikotes:hitung-ulang`), `database/migrations/2026_10_16_000001_koreksi_skoring_sesuai_patokan.php`, seeder `EppsSoalSeeder`/`EppsSeeder`/`EppsNormaSeeder`/`EppsLevelSeeder`/`ISTSeeder`/`KraepelinLevelSeeder`, `data/norma_epps_full.csv`, view `admin/hasil-tes/{detail,print,pdf}`, `peserta/pengerjaan-soal`, hapus `EppsKonsistensiSoalSeeder` & `EppsSimulasiKonsistensiSeeder`, test `SkoringPatokanTest` |
+| Masalah | **EPPS**: 221/225 item dipetakan ke kebutuhan yang salah (soal 1 "menolong teman" dihitung *ach*); skor konsistensi tidak pernah dihitung; kategori 0-10/11-30/31-70/71-90/91-100; soal 7–12 punya 4 opsi (2 asli + "Pilihan A/B" tanpa bobot); kebutuhan skor 0 tidak tersimpan; nama int/suc salah (Introjection/Success). **IST**: dimensi IQ berisi SW total (mis. 132) bukan IQ (148); kunci 18/93/96 salah; 6 kunci GE menyimpang dari "Kunci Soal 4"; 3 sel norma salah ketik & WA usia 51–60 RW 19–20 kosong → SW 0; klasifikasi IQ & kategori subtes beda dari patokan. **Kraepelin**: jawaban "0" (4+6) dihitung terlewat & tidak dihitung salah; pita level kecepatan berlubang (8.5 → tanpa kategori); pembagi = jumlah kolom tersimpan, bukan 50. **PAPI**: interpretasi cetak memakai skala R/K/C/B/T & teks karangan; data radar di print tidak sesuai urutan label. **Simpan jawaban**: 90/90 jawaban PAPI user 18 sesi 21 (dan 11 lain) tersimpan dengan opsi milik soal lain |
+| Akar | Kunci EPPS di seeder dibuat mekanis (loop i×j), bukan dari EPPS.xls; `dispatch()` tidak memanggil `scoreConsistency`; seeder konsistensi lama menimpa soal 7–12; tahap "Norma IQ" (SW→IQ) di Sofware IST.xlsx tidak diimplementasikan; query `jawaban_peserta = 0` dianggap kosong; `jawab()` memakai soal dari `current_step` session tanpa memastikan opsi yang dikirim milik soal itu (klik ganda/back/2 tab menggeser langkah) |
+| Fix | Kunci EPPS = EPPS.xls (`EppsSoalSeeder::KUNCI`, 15 soal diagonal tak diskor, total 210) + 15 pasangan konsistensi (`duplikat_dari_soal_id`), con dihitung di `dispatch`; kategori persentil ≤3/≤16/≤84/≤96; typo het 544→54. IST: `normaTerdekat()` 2 tahap (JUMLAH per usia → "Norma IQ"), kunci 18=e, 93=24, 96=3 (diselesaikan dari isi soal), `ISTSeeder::KUNCI_GE` sesuai Kunci Soal 4 + variasi ejaan IST_Norma_Usia.xls, typo norma AN/GE diperbaiki, WA 51–60 RW19–20=135; helper `klasifikasi_iq()`/`kategori_subtes_ist()`. Kraepelin: rumus Kraepelin.xls (N=50, kolom kosong y=0), salah = `is_benar=0`, terlampaui = `MAX(baris)-COUNT`. PAPI: `interpretasi_papi()` dari kolom Analisis Papi Kostick.xls. `jawab()` menolak `soal_id`/opsi yang tidak sesuai soal aktif |
+| Verifikasi | Skrip Python menghitung ulang semua hasil langsung dari rumus/tabel Excel: EPPS 80/80, IST 30/30, Kraepelin 28/28 cocok; PAPI 167/200 (33 sisanya = 3 sesi user 18 yang jawabannya sudah rusak tersimpan, tidak bisa dipulihkan). Kunci di DB vs Excel: EPPS 0 selisih, PAPI 0 selisih. `psikotes:hitung-ulang`: 172 kolom Kraepelin direkap, 25 hasil dihitung ulang, 0 gagal; berubah EPPS 45/80, PAPI 45/270, KRP 21/28, IST 20/30. `php artisan test` 16/16. Halaman detail/print/pdf dirender tanpa error |
+| Pelajaran | Kunci & norma psikotes wajib diambil dari file patokan lalu dicek otomatis (tes `SkoringPatokanTest`), jangan digenerate. Bila sumber patokan saling beda, pilih yang terbukti benar dari isi soal. Server tidak boleh percaya halaman yang dikirim klien sinkron dengan session |
+| Log Keyword | EPPS kunci, konsistensi con, persentil, IST IQ, Norma IQ, SW, GE, Kraepelin Panker Janker Hanker Tianker, terlampaui, PAPI interpretasi, opsi soal lain, current_step, hitung-ulang |
+| Deploy | Backup DB → `php artisan migrate` → `php artisan psikotes:hitung-ulang` → `php artisan view:clear`. Backup lokal: `storage/app/backup_sebelum_koreksi_skoring_2026-10-16.sql` |
+
+---
+
 ### Fix #16 — Portal peserta: sidebar gelap beda sendiri & tidak responsif di HP
 
 | Field | Detail |

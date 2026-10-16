@@ -5,116 +5,144 @@ namespace Database\Seeders;
 use App\Models\AlatTes;
 use App\Models\BobotOpsiDimensi;
 use App\Models\DimensiAlatTes;
+use App\Models\JawabanPeserta;
 use App\Models\OpsiJawaban;
 use App\Models\Soal;
 use Illuminate\Database\Seeder;
 
+/**
+ * 225 soal EPPS + kunci skoring sesuai patokan "12. EPPS/EPPS.xls" (softwarepsikotes).
+ * Idempoten: aman dijalankan ulang, jawaban peserta tidak dihapus.
+ */
 class EppsSoalSeeder extends Seeder
 {
+    /**
+     * Kunci per nomor: [kebutuhan bila pilih A, kebutuhan bila pilih B].
+     * 15 soal diagonal matriks (1, 7, 13, 19, 25, 101, ..., 225) tidak diskor → [null, null],
+     * sehingga total skor 15 kebutuhan selalu 210.
+     */
+    public const KUNCI = [
+            1 => [null, null], 2 => ['def', 'ach'], 3 => ['ord', 'ach'], 4 => ['exh', 'ach'], 5 => ['aut', 'ach'],
+            6 => ['ach', 'def'], 7 => [null, null], 8 => ['ord', 'def'], 9 => ['exh', 'def'], 10 => ['aut', 'def'],
+            11 => ['ach', 'ord'], 12 => ['def', 'ord'], 13 => [null, null], 14 => ['exh', 'ord'], 15 => ['aut', 'ord'],
+            16 => ['ach', 'exh'], 17 => ['def', 'exh'], 18 => ['ord', 'exh'], 19 => [null, null], 20 => ['aut', 'exh'],
+            21 => ['ach', 'aut'], 22 => ['def', 'aut'], 23 => ['ord', 'aut'], 24 => ['exh', 'aut'], 25 => [null, null],
+            26 => ['ach', 'aff'], 27 => ['def', 'aff'], 28 => ['ord', 'aff'], 29 => ['exh', 'aff'], 30 => ['aut', 'aff'],
+            31 => ['ach', 'int'], 32 => ['def', 'int'], 33 => ['ord', 'int'], 34 => ['exh', 'int'], 35 => ['aut', 'int'],
+            36 => ['ach', 'suc'], 37 => ['def', 'suc'], 38 => ['ord', 'suc'], 39 => ['exh', 'suc'], 40 => ['aut', 'suc'],
+            41 => ['ach', 'dom'], 42 => ['def', 'dom'], 43 => ['ord', 'dom'], 44 => ['exh', 'dom'], 45 => ['aut', 'dom'],
+            46 => ['ach', 'aba'], 47 => ['def', 'aba'], 48 => ['ord', 'aba'], 49 => ['exh', 'aba'], 50 => ['aut', 'aba'],
+            51 => ['ach', 'nur'], 52 => ['def', 'nur'], 53 => ['ord', 'nur'], 54 => ['exh', 'nur'], 55 => ['aut', 'nur'],
+            56 => ['ach', 'chg'], 57 => ['def', 'chg'], 58 => ['ord', 'chg'], 59 => ['exh', 'chg'], 60 => ['aut', 'chg'],
+            61 => ['ach', 'end'], 62 => ['def', 'end'], 63 => ['ord', 'end'], 64 => ['exh', 'end'], 65 => ['aut', 'end'],
+            66 => ['ach', 'het'], 67 => ['def', 'het'], 68 => ['ord', 'het'], 69 => ['exh', 'het'], 70 => ['aut', 'het'],
+            71 => ['ach', 'agg'], 72 => ['def', 'agg'], 73 => ['ord', 'agg'], 74 => ['exh', 'agg'], 75 => ['aut', 'agg'],
+            76 => ['aff', 'ach'], 77 => ['int', 'ach'], 78 => ['suc', 'ach'], 79 => ['dom', 'ach'], 80 => ['aba', 'ach'],
+            81 => ['aff', 'def'], 82 => ['int', 'def'], 83 => ['suc', 'def'], 84 => ['dom', 'def'], 85 => ['aba', 'def'],
+            86 => ['aff', 'ord'], 87 => ['int', 'ord'], 88 => ['suc', 'ord'], 89 => ['dom', 'ord'], 90 => ['aba', 'ord'],
+            91 => ['aff', 'exh'], 92 => ['int', 'exh'], 93 => ['suc', 'exh'], 94 => ['dom', 'exh'], 95 => ['aba', 'exh'],
+            96 => ['aff', 'aut'], 97 => ['int', 'aut'], 98 => ['suc', 'aut'], 99 => ['dom', 'aut'], 100 => ['aba', 'aut'],
+            101 => [null, null], 102 => ['int', 'aff'], 103 => ['suc', 'aff'], 104 => ['dom', 'aff'], 105 => ['aba', 'aff'],
+            106 => ['aff', 'int'], 107 => [null, null], 108 => ['suc', 'int'], 109 => ['dom', 'int'], 110 => ['aba', 'int'],
+            111 => ['aff', 'suc'], 112 => ['int', 'suc'], 113 => [null, null], 114 => ['dom', 'suc'], 115 => ['aba', 'suc'],
+            116 => ['aff', 'dom'], 117 => ['int', 'dom'], 118 => ['suc', 'dom'], 119 => [null, null], 120 => ['aba', 'dom'],
+            121 => ['aff', 'aba'], 122 => ['int', 'aba'], 123 => ['suc', 'aba'], 124 => ['dom', 'aba'], 125 => [null, null],
+            126 => ['aff', 'nur'], 127 => ['int', 'nur'], 128 => ['suc', 'nur'], 129 => ['dom', 'nur'], 130 => ['aba', 'nur'],
+            131 => ['aff', 'chg'], 132 => ['int', 'chg'], 133 => ['suc', 'chg'], 134 => ['dom', 'chg'], 135 => ['aba', 'chg'],
+            136 => ['aff', 'end'], 137 => ['int', 'end'], 138 => ['suc', 'end'], 139 => ['dom', 'end'], 140 => ['aba', 'end'],
+            141 => ['aff', 'het'], 142 => ['int', 'het'], 143 => ['suc', 'het'], 144 => ['dom', 'het'], 145 => ['aba', 'het'],
+            146 => ['aff', 'agg'], 147 => ['int', 'agg'], 148 => ['suc', 'agg'], 149 => ['dom', 'agg'], 150 => ['aba', 'agg'],
+            151 => ['nur', 'ach'], 152 => ['chg', 'ach'], 153 => ['end', 'ach'], 154 => ['het', 'ach'], 155 => ['agg', 'ach'],
+            156 => ['nur', 'def'], 157 => ['chg', 'def'], 158 => ['end', 'def'], 159 => ['het', 'def'], 160 => ['agg', 'def'],
+            161 => ['nur', 'ord'], 162 => ['chg', 'ord'], 163 => ['end', 'ord'], 164 => ['het', 'ord'], 165 => ['agg', 'ord'],
+            166 => ['nur', 'exh'], 167 => ['chg', 'exh'], 168 => ['end', 'exh'], 169 => ['het', 'exh'], 170 => ['agg', 'exh'],
+            171 => ['nur', 'aut'], 172 => ['chg', 'aut'], 173 => ['end', 'aut'], 174 => ['het', 'aut'], 175 => ['agg', 'aut'],
+            176 => ['nur', 'aff'], 177 => ['chg', 'aff'], 178 => ['end', 'aff'], 179 => ['het', 'aff'], 180 => ['agg', 'aff'],
+            181 => ['nur', 'int'], 182 => ['chg', 'int'], 183 => ['end', 'int'], 184 => ['het', 'int'], 185 => ['agg', 'int'],
+            186 => ['nur', 'suc'], 187 => ['chg', 'suc'], 188 => ['end', 'suc'], 189 => ['het', 'suc'], 190 => ['agg', 'suc'],
+            191 => ['nur', 'dom'], 192 => ['chg', 'dom'], 193 => ['end', 'dom'], 194 => ['het', 'dom'], 195 => ['agg', 'dom'],
+            196 => ['nur', 'aba'], 197 => ['chg', 'aba'], 198 => ['end', 'aba'], 199 => ['het', 'aba'], 200 => ['agg', 'aba'],
+            201 => [null, null], 202 => ['chg', 'nur'], 203 => ['end', 'nur'], 204 => ['het', 'nur'], 205 => ['agg', 'nur'],
+            206 => ['nur', 'chg'], 207 => [null, null], 208 => ['end', 'chg'], 209 => ['het', 'chg'], 210 => ['agg', 'chg'],
+            211 => ['nur', 'end'], 212 => ['chg', 'end'], 213 => [null, null], 214 => ['het', 'end'], 215 => ['agg', 'end'],
+            216 => ['nur', 'het'], 217 => ['chg', 'het'], 218 => ['end', 'het'], 219 => [null, null], 220 => ['agg', 'het'],
+            221 => ['nur', 'agg'], 222 => ['chg', 'agg'], 223 => ['end', 'agg'], 224 => ['het', 'agg'], 225 => [null, null],
+    ];
+
+    /** Pasangan [soal asli, soal ulangan] untuk skor konsistensi (con), 15 pasang. */
+    public const PASANGAN_KONSISTENSI = [
+        [1, 151], [7, 157], [13, 163], [19, 169], [25, 175],
+        [26, 101], [32, 107], [38, 113], [44, 119], [50, 125],
+        [51, 201], [57, 207], [63, 213], [69, 219], [75, 225],
+    ];
+
     public function run(): void
     {
         $alatTes = AlatTes::where('kode', 'EPPS')->first();
         if (!$alatTes) {
-            $this->command->error('AlatTes EPPS tidak ditemukan.');
+            $this->command?->error('AlatTes EPPS tidak ditemukan.');
             return;
         }
 
-        // Muat semua dimensi
         $dimensiMap = DimensiAlatTes::where('alat_tes_id', $alatTes->id)
             ->pluck('id', 'kode_dimensi');
 
         $required = ['ach','def','ord','exh','aut','aff','int','suc','dom','aba','nur','chg','end','het','agg'];
         foreach ($required as $kode) {
             if (!isset($dimensiMap[$kode])) {
-                $this->command->error("Dimensi '{$kode}' tidak ditemukan.");
+                $this->command?->error("Dimensi '{$kode}' tidak ditemukan.");
                 return;
             }
         }
 
-        // Hapus soal lama beserta semua dependensinya
-        $soalLama = Soal::where('alat_tes_id', $alatTes->id)->get();
-        $soalIds = $soalLama->pluck('id');
-        $opsiIds = OpsiJawaban::whereIn('soal_id', $soalIds)->pluck('id');
-
-        // Hapus jawaban peserta yang mereferensi opsi lama
-        \App\Models\JawabanPeserta::whereIn('opsi_dipilih_id', $opsiIds)->delete();
-        \App\Models\JawabanPeserta::whereIn('soal_id', $soalIds)->delete();
-
-        // Hapus bobot, opsi, soal
-        BobotOpsiDimensi::whereIn('opsi_jawaban_id', $opsiIds)->delete();
-        OpsiJawaban::whereIn('soal_id', $soalIds)->delete();
-        Soal::whereIn('id', $soalIds)->delete();
-
-        // Kunci dimensi per soal (210 soal utama + 15 konsistensi)
-        $kunci = $this->getKunci();
-
-        // Teks soal
         $teks = $this->getTeks();
 
-        foreach ($kunci as $nomor => [$dimA, $dimB]) {
-            $teksA = $teks[$nomor][0] ?? "Pernyataan A nomor {$nomor}";
-            $teksB = $teks[$nomor][1] ?? "Pernyataan B nomor {$nomor}";
+        foreach (self::KUNCI as $nomor => $dimPerOpsi) {
+            $soal = Soal::updateOrCreate(
+                ['alat_tes_id' => $alatTes->id, 'nomor' => $nomor],
+                [
+                    'teks_soal'             => 'Pilih salah satu pernyataan yang paling menggambarkan diri Anda.',
+                    'tipe_format'           => 'forced_choice',
+                    'urutan'                => $nomor,
+                    'duplikat_dari_soal_id' => null,
+                ]
+            );
 
-            $soal = Soal::create([
-                'alat_tes_id' => $alatTes->id,
-                'nomor'       => $nomor,
-                'teks_soal'   => "Pilih salah satu pernyataan yang paling menggambarkan diri Anda.",
-                'tipe_format' => 'forced_choice',
-                'urutan'      => $nomor,
-            ]);
+            foreach ([1, 2] as $urutan) {
+                $opsi = OpsiJawaban::updateOrCreate(
+                    ['soal_id' => $soal->id, 'urutan' => $urutan],
+                    ['teks_opsi' => $teks[$nomor][$urutan - 1] ?? 'Pernyataan ' . ($urutan === 1 ? 'A' : 'B') . " nomor {$nomor}"]
+                );
 
-            // Opsi A
-            $opsiA = OpsiJawaban::create([
-                'soal_id'  => $soal->id,
-                'teks_opsi' => $teksA,
-                'urutan'   => 1,
-            ]);
-            BobotOpsiDimensi::create([
-                'opsi_jawaban_id' => $opsiA->id,
-                'dimensi_id'      => $dimensiMap[$dimA],
-                'bobot'           => 1,
-                'is_reverse'      => false,
-            ]);
+                BobotOpsiDimensi::where('opsi_jawaban_id', $opsi->id)->delete();
+                $dim = $dimPerOpsi[$urutan - 1];
+                if ($dim) {
+                    BobotOpsiDimensi::create([
+                        'opsi_jawaban_id' => $opsi->id,
+                        'dimensi_id'      => $dimensiMap[$dim],
+                        'bobot'           => 1,
+                        'is_reverse'      => false,
+                    ]);
+                }
 
-            // Opsi B
-            $opsiB = OpsiJawaban::create([
-                'soal_id'  => $soal->id,
-                'teks_opsi' => $teksB,
-                'urutan'   => 2,
-            ]);
-            BobotOpsiDimensi::create([
-                'opsi_jawaban_id' => $opsiB->id,
-                'dimensi_id'      => $dimensiMap[$dimB],
-                'bobot'           => 1,
-                'is_reverse'      => false,
-            ]);
-
-            if ($nomor % 25 === 0) {
-                $this->command->info("Soal {$nomor}/225 selesai...");
-            }
-        }
-
-        $this->command->info('EppsSoalSeeder selesai: 225 soal, 15 dimensi, distribusi seimbang 28x per dimensi.');
-    }
-
-    private function getKunci(): array
-    {
-        $dimensi = ['ach','def','ord','exh','aut','aff','int','suc','dom','aba','nur','chg','end','het','agg'];
-        $kunci = [];
-        $n = 1;
-        for ($i = 0; $i < 15; $i++) {
-            foreach ($dimensi as $j => $dim2) {
-                if ($dimensi[$i] !== $dim2) {
-                    $kunci[$n++] = [$dimensi[$i], $dim2];
+                // Bersihkan opsi ganda dengan urutan sama (sisa seeder konsistensi lama):
+                // pindahkan jawaban peserta ke opsi resmi, lalu hapus opsi gandanya.
+                $ganda = OpsiJawaban::where('soal_id', $soal->id)->where('urutan', $urutan)
+                    ->where('id', '!=', $opsi->id)->pluck('id');
+                if ($ganda->isNotEmpty()) {
+                    JawabanPeserta::whereIn('opsi_dipilih_id', $ganda)->update(['opsi_dipilih_id' => $opsi->id]);
+                    BobotOpsiDimensi::whereIn('opsi_jawaban_id', $ganda)->delete();
+                    OpsiJawaban::whereIn('id', $ganda)->delete();
                 }
             }
         }
-        // 15 soal konsistensi (211-225): duplikat soal 1-15
-        $konSources = [1,16,53,4,5,6,7,8,9,10,11,12,13,14,15];
-        foreach ($konSources as $idx => $src) {
-            $kunci[211 + $idx] = $kunci[$src];
+
+        $soalIdByNomor = Soal::where('alat_tes_id', $alatTes->id)->pluck('id', 'nomor');
+        foreach (self::PASANGAN_KONSISTENSI as [$asli, $ulangan]) {
+            Soal::where('id', $soalIdByNomor[$ulangan])->update(['duplikat_dari_soal_id' => $soalIdByNomor[$asli]]);
         }
-        return $kunci;
+
+        $this->command?->info('EppsSoalSeeder selesai: 225 soal, kunci sesuai EPPS.xls, 15 pasangan konsistensi.');
     }
 
     private function getTeks(): array

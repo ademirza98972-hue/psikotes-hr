@@ -13,6 +13,40 @@ use Illuminate\Support\Facades\DB;
 
 class ISTSeeder extends Seeder
 {
+    /** Kunci GE (soal 61–76): jawaban skor 2 dan skor 1, sisanya 0. Patokan: sheet "Kunci Soal 4" (Sofware IST.xlsx),
+     *  ditambah variasi ejaan dari IST_Norma_Usia.xls yang tidak bertentangan dengan Kunci Soal 4. */
+    public const KUNCI_GE = [
+        61 => ['2' => ['bunga', 'kembang', 'perdu'], '1' => ['tumbuh-tumbuhan', 'tumbuhan', 'tanaman', 'tangkai', 'harum']],
+        62 => ['2' => ['alat indera', 'indera', 'panca indera', 'alat indra', 'indra', 'panca indra'], '1' => ['organ', 'organ tubuh', 'alat tubuh', 'bagian tubuh']],
+        63 => ['2' => ['hablur', 'kristal', 'zat arang'], '1' => ['berkilauan', 'berkilau', 'mengkilat', 'bening']],
+        64 => ['2' => ['musim'], '1' => ['cuaca', 'air', 'basah', 'gejala alam']],
+        65 => ['2' => ['pembawa berita', 'alat perhubungan', 'alat komunikasi'], '1' => ['telekomunikasi', 'perhubungan', 'komunikasi', 'pos', 'p.t.t']],
+        66 => ['2' => ['alat optik', 'optik'], '1' => ['lensa']],
+        67 => ['2' => ['alat pencernaan'], '1' => ['jalan makanan', 'perut', 'isi perut', 'pencernaan', 'pencernaan makanan']],
+        68 => ['2' => ['jumlah', 'kuantitas', 'penyebut jumlah', 'penyertaan jumlah', 'pengertian jumlah'], '1' => ['mengukur', 'ukuran', 'ukur']],
+        69 => ['2' => ['bibit', 'bakal', 'embrio', 'alat pembiak', 'permulaan penghidupan', 'permulaan kehidupan'], '1' => ['sel', 'pembiakan', 'perkembangbiakan', 'berkembangbiak']],
+        70 => ['2' => ['simbol', 'lambang', 'tanda'], '1' => ['nama', 'pengenal', 'tanda pengenal']],
+        71 => ['2' => ['makhluk', 'makhluk hidup', 'organisme', 'organism'], '1' => ['tumbuh', 'biologi', 'ilmu hayat', 'ilmu hayati']],
+        72 => ['2' => ['wadah', 'tempat pengisi', 'tempat mengisi', 'tempat penyimpan', 'tempat penyimpanan'], '1' => ['alat', 'tempat sesuatu', 'tempat', 'benda']],
+        73 => ['2' => ['pengertian waktu', 'batas', 'batas waktu'], '1' => ['waktu', 'masa', 'saat', 'lamanya', 'lama']],
+        74 => ['2' => ['kata sifat', 'watak', 'sifat karakter', 'sifat-karakter', 'sifat watak', 'sifat-watak'], '1' => ['sifat']],
+        75 => ['2' => ['regulator harga', 'regulasi harga', 'pengertian ekonomi'], '1' => ['dagang', 'pembelian', 'penjualan', 'niaga', 'jual beli']],
+        76 => ['2' => ['pengertian ruang', 'penyebut ruang'], '1' => ['arah', 'tempat', 'ruang', 'letak', 'penunjuk tempat', 'penentuan daerah']],
+    ];
+
+    /** Tahap 2: sheet "Norma IQ" (Sofware IST.xlsx) — SW total → IQ, berlaku semua kelompok usia. */
+    public const NORMA_SW_KE_IQ = [
+        140 => 160, 139 => 158.5, 138 => 157, 137 => 155.5, 136 => 154, 135 => 152.5, 134 => 151, 133 => 149.5,
+        132 => 148, 131 => 146.5, 130 => 145, 129 => 143.5, 128 => 142, 127 => 140.5, 126 => 139, 125 => 137.5,
+        124 => 136, 123 => 134.5, 122 => 133, 121 => 131.5, 120 => 130, 119 => 128.5, 118 => 127, 117 => 125.5,
+        116 => 124, 115 => 122.5, 114 => 121, 113 => 119.5, 112 => 118, 111 => 116.5, 110 => 115, 109 => 113.5,
+        108 => 112, 107 => 110.5, 106 => 109, 105 => 107.5, 104 => 106, 103 => 104.5, 102 => 103, 101 => 101.5,
+        100 => 100, 99 => 98.5, 98 => 97, 97 => 95.5, 96 => 94, 95 => 92.5, 94 => 91, 93 => 89.5,
+        92 => 88, 91 => 86.5, 90 => 85, 89 => 83.5, 88 => 82, 87 => 80.5, 86 => 79, 85 => 77.5,
+        84 => 76, 83 => 74.5, 82 => 73, 81 => 71.5, 80 => 70, 79 => 68.5, 78 => 67, 77 => 65.5,
+        76 => 64, 75 => 62.5, 74 => 61, 73 => 59,
+    ];
+
     public function run(): void
     {
         // 1. ALAT TES
@@ -298,6 +332,8 @@ class ISTSeeder extends Seeder
             [2, 'USIA_41_45', 80],
             [1, 'USIA_41_45', 77],
             [0, 'USIA_41_45', 75],
+            [20, 'USIA_51_60', 135], // sel kosong di patokan → pakai nilai tertinggi (RW 18)
+            [19, 'USIA_51_60', 135],
             [18, 'USIA_51_60', 135],
             [17, 'USIA_51_60', 131],
             [16, 'USIA_51_60', 128],
@@ -337,7 +373,7 @@ class ISTSeeder extends Seeder
             [9, 'USIA_21_25', 98],
             [8, 'USIA_21_25', 96],
             [7, 'USIA_21_25', 93],
-            [6, 'USIA_21_25', 81],
+            [6, 'USIA_21_25', 91], // patokan tertulis 81 (salah ketik, tabel harus naik: RW5=88, RW7=93)
             [5, 'USIA_21_25', 88],
             [4, 'USIA_21_25', 86],
             [3, 'USIA_21_25', 83],
@@ -467,7 +503,7 @@ class ISTSeeder extends Seeder
             [11, 'USIA_21_25', 100],
             [10, 'USIA_21_25', 97],
             [9, 'USIA_21_25', 94],
-            [8, 'USIA_21_25', 82],
+            [8, 'USIA_21_25', 92], // patokan tertulis 82 (salah ketik: RW7=89, RW9=94)
             [7, 'USIA_21_25', 89],
             [6, 'USIA_21_25', 86],
             [5, 'USIA_21_25', 83],
@@ -563,7 +599,7 @@ class ISTSeeder extends Seeder
             [20, 'USIA_51_60', 133],
             [19, 'USIA_51_60', 130],
             [18, 'USIA_51_60', 127],
-            [17, 'USIA_51_60', 127],
+            [17, 'USIA_51_60', 124], // patokan tertulis 127 = RW18 (salah ketik: RW16=121, RW18=127)
             [16, 'USIA_51_60', 121],
             [15, 'USIA_51_60', 118],
             [14, 'USIA_51_60', 115],
@@ -1359,6 +1395,10 @@ class ISTSeeder extends Seeder
         foreach ($normaIQ as [$min, $max, $kel, $iq]) {
             NormaKonversi::create(['alat_tes_id' => $alatTes->id, 'dimensi_id' => $dimensiIds['IQ'], 'kelompok_segmen' => $kel, 'tahap' => 1, 'skor_mentah_min' => $min, 'skor_mentah_max' => $max, 'skor_hasil' => $iq]);
         }
+        // Tahap 2: sheet "Norma IQ" (Sofware IST.xlsx) — SW total (hasil tahap 1) → IQ, berlaku semua usia.
+        foreach (self::NORMA_SW_KE_IQ as $sw => $iq) {
+            NormaKonversi::create(['alat_tes_id' => $alatTes->id, 'dimensi_id' => $dimensiIds['IQ'], 'kelompok_segmen' => 'default', 'tahap' => 2, 'skor_mentah_min' => $sw, 'skor_mentah_max' => $sw, 'skor_hasil' => $iq]);
+        }
         $this->command->info('Norma selesai');
 
         // 4. SOAL - Hapus lama
@@ -1472,7 +1512,7 @@ class ISTSeeder extends Seeder
         OpsiJawaban::create(['soal_id' => $soal->id, 'teks_opsi' => 'jauh', 'urutan' => 3]);
         OpsiJawaban::create(['soal_id' => $soal->id, 'teks_opsi' => 'jarang', 'urutan' => 4]);
         OpsiJawaban::create(['soal_id' => $soal->id, 'teks_opsi' => 'pada dasarnya', 'urutan' => 5]);
-        $soal = Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 18, 'teks_soal' => 'Diantara kota-kota berikut ini, maka kota ..... letaknya paling selatan.', 'tipe_format' => 'pilihan_ganda', 'kunci_jawaban' => 'b', 'urutan' => 18]);
+        $soal = Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 18, 'teks_soal' => 'Diantara kota-kota berikut ini, maka kota ..... letaknya paling selatan.', 'tipe_format' => 'pilihan_ganda', 'kunci_jawaban' => 'e', 'urutan' => 18]);
         OpsiJawaban::create(['soal_id' => $soal->id, 'teks_opsi' => 'Jakarta', 'urutan' => 1]);
         OpsiJawaban::create(['soal_id' => $soal->id, 'teks_opsi' => 'Bandung', 'urutan' => 2]);
         OpsiJawaban::create(['soal_id' => $soal->id, 'teks_opsi' => 'Cirebon', 'urutan' => 3]);
@@ -1733,22 +1773,22 @@ class ISTSeeder extends Seeder
         OpsiJawaban::create(['soal_id' => $soal->id, 'teks_opsi' => 'korek api', 'urutan' => 4]);
         OpsiJawaban::create(['soal_id' => $soal->id, 'teks_opsi' => 'lautan api', 'urutan' => 5]);
         // GE
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 61, 'teks_soal' => 'mawar - melati', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["bunga", "kembang", "perdu"], "1": ["tumbuh-tumbuhan", "tangkai", "harum"]}', 'urutan' => 61]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 62, 'teks_soal' => 'mata - telinga', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["alat indera", "indera", "panca indera"], "1": ["organ", "alat tubuh"]}', 'urutan' => 62]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 63, 'teks_soal' => 'gula - intan', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["hablur", "kristal", "zat arang"], "1": ["berkilauan", "mengkilat", "bening"]}', 'urutan' => 63]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 64, 'teks_soal' => 'hujan - salju', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["musim"], "1": ["cuaca", "iklim"]}', 'urutan' => 64]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 65, 'teks_soal' => 'pengantar surat - telepon', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["pembawa berita", "alat perhubungan"], "1": ["telekomunikasi", "perhubungan", "komunikasi"]}', 'urutan' => 65]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 66, 'teks_soal' => 'kamera - kacamata', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["alat optik", "optik"], "1": ["lensa", "melihat", "alat melihat"]}', 'urutan' => 66]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 67, 'teks_soal' => 'lambung - usus', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["alat pencernaan"], "1": ["jalan makanan", "perut", "isi perut", "pencernaan makanan"]}', 'urutan' => 67]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 68, 'teks_soal' => 'banyak - sedikit', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["jumlah", "kuantitas", "penyebut jumlah", "penyertaan jumlah"], "1": ["mengukur", "ukuran"]}', 'urutan' => 68]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 69, 'teks_soal' => 'telur - benih', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["bibit", "bakal", "embrio", "alat pembiak", "permulaan penghidupan"], "1": ["sel", "pembiakan", "pertanian", "keturunan"]}', 'urutan' => 69]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 70, 'teks_soal' => 'bendera - lencana', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["simbol", "lambang", "tanda"], "1": ["nama", "tanda pengenal"]}', 'urutan' => 70]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 71, 'teks_soal' => 'rumput - gajah', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["makhluk", "organism", "makhluk hidup"], "1": ["tumbuh", "ilmu hayat", "biologi", "hayat"]}', 'urutan' => 71]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 72, 'teks_soal' => 'ember - kantong', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["wadah", "tempat pengisi", "tempat penyimpan"], "1": ["alat", "tempat sesuatu", "tempat", "benda"]}', 'urutan' => 72]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 73, 'teks_soal' => 'awal - akhir', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["pengertian waktu", "batas"], "1": ["waktu", "lamanya", "masa", "saat"]}', 'urutan' => 73]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 74, 'teks_soal' => 'kikir - boros', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["kata sifat", "watak", "sifat", "sifat karakter"], "1": ["sifat", "karakter"]}', 'urutan' => 74]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 75, 'teks_soal' => 'penawaran - permintaan', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["regulator harga", "pengertian ekonomi"], "1": ["dagang", "pembelian", "penjualan", "niaga", "jual beli"]}', 'urutan' => 75]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 76, 'teks_soal' => 'atas - bawah', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => '{"2": ["pengertian ruang", "penyebut ruang"], "1": ["arah", "tempat", "ruang", "letak", "penunjuk tempat", "tingkatan"]}', 'urutan' => 76]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 61, 'teks_soal' => 'mawar - melati', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[61]), 'urutan' => 61]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 62, 'teks_soal' => 'mata - telinga', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[62]), 'urutan' => 62]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 63, 'teks_soal' => 'gula - intan', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[63]), 'urutan' => 63]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 64, 'teks_soal' => 'hujan - salju', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[64]), 'urutan' => 64]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 65, 'teks_soal' => 'pengantar surat - telepon', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[65]), 'urutan' => 65]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 66, 'teks_soal' => 'kamera - kacamata', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[66]), 'urutan' => 66]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 67, 'teks_soal' => 'lambung - usus', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[67]), 'urutan' => 67]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 68, 'teks_soal' => 'banyak - sedikit', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[68]), 'urutan' => 68]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 69, 'teks_soal' => 'telur - benih', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[69]), 'urutan' => 69]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 70, 'teks_soal' => 'bendera - lencana', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[70]), 'urutan' => 70]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 71, 'teks_soal' => 'rumput - gajah', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[71]), 'urutan' => 71]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 72, 'teks_soal' => 'ember - kantong', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[72]), 'urutan' => 72]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 73, 'teks_soal' => 'awal - akhir', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[73]), 'urutan' => 73]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 74, 'teks_soal' => 'kikir - boros', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[74]), 'urutan' => 74]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 75, 'teks_soal' => 'penawaran - permintaan', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[75]), 'urutan' => 75]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 76, 'teks_soal' => 'atas - bawah', 'tipe_format' => 'isian_teks', 'kunci_jawaban' => json_encode(self::KUNCI_GE[76]), 'urutan' => 76]);
         // RA
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 77, 'teks_soal' => 'Jika seorang anak memiliki 50 rupiah dan memberikan 15 rupiah kepada orang lain, berapa rupiahkah yang masih tinggal padanya?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '35', 'urutan' => 77]);
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 78, 'teks_soal' => 'Berapa km-kah yang dapat ditempuh oleh kereta api dalam waktu 7 jam, jika kecepatannya 40 km/jam?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '280', 'urutan' => 78]);
@@ -1766,10 +1806,10 @@ class ISTSeeder extends Seeder
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 90, 'teks_soal' => 'Mesin A menenun 60 m kain, sedangkan mesin B menenun 40 m. Berapa meterkah yang ditenun mesin A, jika mesin B menenun 60 m?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '90', 'urutan' => 90]);
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 91, 'teks_soal' => 'Seseorang membelikan 1/10 dari uangnya untuk perangko dan 4 kali jumlah itu untuk alat tulis. Sisa uangnya masih Rp 60. Berapa rupiahkah uang semula?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '120', 'urutan' => 91]);
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 92, 'teks_soal' => 'Di dalam dua peti terdapat 43 piring. Di dalam peti yang satu terdapat 9 piring lebih banyak dari pada di dalam peti yang lain. Berapa buah piring terdapat di dalam peti yang lebih kecil?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '17', 'urutan' => 92]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 93, 'teks_soal' => 'Suatu lembaran kain yang panjangnya 60 cm harus dibagikan sehingga panjangnya satu bagian ialah 2/3 dari bagian yang lain. Berapa panjangnya bagian yang terpendek?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '36', 'urutan' => 93]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 93, 'teks_soal' => 'Suatu lembaran kain yang panjangnya 60 cm harus dibagikan sehingga panjangnya satu bagian ialah 2/3 dari bagian yang lain. Berapa panjangnya bagian yang terpendek?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '24', 'urutan' => 93]);
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 94, 'teks_soal' => 'Suatu perusahaan mengekspor 3/4 dari hasil produksinya dan menjual 4/5 dari sisa itu dalam negeri. Berapa persen hasil produksi yang masih tinggal?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '5', 'urutan' => 94]);
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 95, 'teks_soal' => 'Jika suatu botol berisi anggur hanya 7/8 bagian dan harganya ialah Rp 84, berapakah harga anggur itu jika botol itu hanya terisi 1/2 penuh?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '48', 'urutan' => 95]);
-        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 96, 'teks_soal' => 'Di dalam suatu keluarga setiap anak perempuan mempunyai jumlah saudara laki-laki yang sama dengan jumlah saudara perempuan dan setiap anak laki-laki mempunyai dua kali lebih banyak saudara perempuan dari pada saudara laki-laki. Berapa anak laki-lakikah yang terdapat di dalam keluarga tersebut?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '1', 'urutan' => 96]);
+        Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 96, 'teks_soal' => 'Di dalam suatu keluarga setiap anak perempuan mempunyai jumlah saudara laki-laki yang sama dengan jumlah saudara perempuan dan setiap anak laki-laki mempunyai dua kali lebih banyak saudara perempuan dari pada saudara laki-laki. Berapa anak laki-lakikah yang terdapat di dalam keluarga tersebut?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '3', 'urutan' => 96]);
         // ZR
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 97, 'teks_soal' => '6 9 12 15 18 21 24 ?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '27', 'urutan' => 97]);
         Soal::create(['alat_tes_id' => $alatTes->id, 'nomor' => 98, 'teks_soal' => '15 16 18 19 21 22 24 ?', 'tipe_format' => 'isian_angka', 'kunci_jawaban' => '25', 'urutan' => 98]);

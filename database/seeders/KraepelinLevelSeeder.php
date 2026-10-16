@@ -63,10 +63,11 @@ class KraepelinLevelSeeder extends Seeder
 
         // ── Panker (KECEPATAN): avg ≈ 13, range 0–26 ──────────────────────────
         $pankerLevels = [
-            ['label' => 'Rendah',         'skor_min' => 0,  'skor_max' => 8,  'urutan' => 1],
-            ['label' => 'Kurang',         'skor_min' => 9,  'skor_max' => 13, 'urutan' => 2],
-            ['label' => 'Cukup',          'skor_min' => 14, 'skor_max' => 18, 'urutan' => 3],
-            ['label' => 'Baik',           'skor_min' => 19, 'skor_max' => 23, 'urutan' => 4],
+            // Kecepatan berupa desimal 2 angka (mis. 13.5) → batas atas x.99 agar tidak ada celah.
+            ['label' => 'Rendah',         'skor_min' => 0,  'skor_max' => 8.99,  'urutan' => 1],
+            ['label' => 'Kurang',         'skor_min' => 9,  'skor_max' => 13.99, 'urutan' => 2],
+            ['label' => 'Cukup',          'skor_min' => 14, 'skor_max' => 18.99, 'urutan' => 3],
+            ['label' => 'Baik',           'skor_min' => 19, 'skor_max' => 23.99, 'urutan' => 4],
             ['label' => 'Baik Sekali',    'skor_min' => 24, 'skor_max' => 999,'urutan' => 5],
         ];
 
